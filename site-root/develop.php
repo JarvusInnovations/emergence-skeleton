@@ -1,0 +1,3 @@
+<?php
+
+WebdavRequestHandler::handleRequest();
