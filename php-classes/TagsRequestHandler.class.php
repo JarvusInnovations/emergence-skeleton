@@ -1,11 +1,8 @@
 <?php
 
-
-
- class TagsRequestHandler extends RecordsRequestHandler
+class TagsRequestHandler extends RecordsRequestHandler
 {
-
-	// RecordRequestHandler configuration
+    // RecordRequestHandler configuration
 	static public $recordClass = 'Tag';
 	static public $accountLevelBrowse = false;
 	static public $accountLevelAssign = 'User';
@@ -28,7 +25,7 @@
 	}
 	
 	
-	static public function handleBrowseRequest($conditions = array())
+	static public function handleBrowseRequest($options = array(), $conditions = array(), $responseID = NULL, $responseData = array())
 	{
 		$conditions = array();
 		
@@ -56,7 +53,7 @@
 	}
 
 	
-	static public function handleRecordRequest(Tag $Tag, $action = false)
+	static public function handleRecordRequest(ActiveRecord $Tag, $action = false)
 	{
 		switch($action ? $action : $action = static::shiftPath())
 		{
@@ -133,5 +130,4 @@
 			,'data' => $results
 		));
 	}
-
 }

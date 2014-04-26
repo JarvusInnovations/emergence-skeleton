@@ -1,13 +1,11 @@
 <?php
 
-
-
- class Validators
+class Validators
 {
-	
-	public static function is($string, $options = array())
-	{
-		$options = array_merge(array(
+    
+    public static function is($string, $options = array())
+    {
+    	$options = array_merge(array(
 			'value' => false
 		), $options);
 		
@@ -74,7 +72,7 @@
 	public static function datetime($datetime, $options = array())
 	{
 		return !empty($datetime)
-			&& preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s*T?[0-9]{2}:[0-9]{2}(:[0-9]{2})?$/', $datetime);
+			&& preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}(\s*T?[0-9]{2}:[0-9]{2}(:[0-9]{2})?)?$/', $datetime);
 	}
 
 	public static function date_dmy($date, $options = array())
@@ -489,7 +487,7 @@
 			'ancestor' => false
 		), $options);
 		
-		return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $string) && class_exists($string)
+		return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\\\\]*$/', $string) && class_exists($string)
 			&& (
 				empty($options['ancestor'])
 				|| ($string == $options['ancestor'])
@@ -508,10 +506,11 @@
 	public static function handle($string, $options = array())
 	{
 		$options = array_merge(array(
-			'pattern' => '/^[a-zA-Z0-9\-_:]+$/'
+			'pattern' => '/^[a-zA-Z0-9][a-zA-Z0-9\-_\.]*$/'
+            ,'allowNumeric' => false
 		), $options);
 		
-		return preg_match($options['pattern'], $string);		
+		return ($options['allowNumeric'] || !is_numeric($string)) && preg_match($options['pattern'], $string);		
 	}
 	
 	public static function FQDN($string, $options = array())

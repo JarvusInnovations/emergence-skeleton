@@ -1,10 +1,8 @@
 <?php
 
 
-
- class PasswordAuthenticator extends Authenticator
+class PasswordAuthenticator extends Authenticator
 {
-
 	// configurable settings
 	public static $requestContainer = '_LOGIN';
 	
@@ -23,7 +21,6 @@
 	 */
 	public function checkAuthentication()
 	{
-
 		if (isset($this->_authenticatedPerson))
 		{
 			return true;
@@ -54,11 +51,11 @@
 			if ($this->_authenticatedPerson)
 			{
 				// redirect if original request was GET
-				if($requestData['returnMethod'] == 'GET')
+				if($requestData['returnMethod'] != 'POST' && $_SERVER['REQUEST_METHOD'] != 'GET')
 				{
 					Site::redirect($_SERVER['REQUEST_URI']);
 				}
-			
+
 				return true;
 			}
 			else
@@ -159,16 +156,11 @@
 	 */
 	public function respondLoginPrompt($authException = false)
 	{
-		if (RequestHandler::peekPath() == 'json')
-		{
+		if(Site::$pathStack[0] == 'json') {
 			RequestHandler::$responseMode = 'json';
 		}
-		else
-		{
-			MICS::useHTTPS();
-		}
 		
-		header("HTTP/1.0 403 Forbidden");
+		header('HTTP/1.1 401 Unauthorized');
 		
 		$postVars = $_POST;
 		unset($postVars[static::$requestContainer]);
@@ -182,5 +174,4 @@
 		));
 	
 	}
-
 }

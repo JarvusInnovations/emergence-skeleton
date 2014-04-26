@@ -1,13 +1,9 @@
 <?php
 
-
-
- abstract class VersionedRecord extends ActiveRecord
+abstract class VersionedRecord extends ActiveRecord
 {
-
-
-	// configure ActiveRecord
-	static public $fields = array(
+    // configure ActiveRecord
+    static public $fields = array(
 		'RevisionID' => array(
 			'columnName' => 'RevisionID'
 			,'type' => 'integer'
@@ -49,10 +45,10 @@
 	
 	static protected function _initRelationship($relationship, $options)
 	{
-		if($options['type'] == 'history')
-		{
-			if(empty($options['class']))
+		if ($options['type'] == 'history') {
+			if (empty($options['class'])) {
 				$options['class'] = get_called_class();
+			}
 		}
 
 		return parent::_initRelationship($relationship, $options);
@@ -62,7 +58,7 @@
 	{
 		if(!isset($this->_relatedObjects[$relationship]))
 		{
-			$rel = static::$_classRelationships[get_called_class()][$relationship];
+			$rel = static::getStackedConfig('relationships', $relationship);
 
 			if($rel['type'] == 'history')
 			{
@@ -98,13 +94,13 @@
 	
 	static public function getRevisionRecords($options = array())
 	{
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'indexField' => false
 			,'conditions' => array()
 			,'order' => false
 			,'limit' => false
 			,'offset' => 0
-		));
+		), $options);
 				
 		$query = 'SELECT * FROM `%s` WHERE (%s)';
 		$params = array(
@@ -137,26 +133,26 @@
 	/*
 	 * Create new revisions on save
 	 */
-	public function save($deep = true, $createRevision = true)
+	public function save($deep = true)
 	{
 		$wasDirty = false;
 		
-		if($this->isDirty && $createRevision)
+		if($this->isDirty)
 		{
-			// update creation time / user
-			$this->Created = time();
-			$this->CreatorID = $_SESSION['User'] ? $_SESSION['User']->ID : null;
-			
 			$wasDirty = true;
 		}
 	
 		// save record as usual
 		$return = parent::save($deep);
 
-		if($wasDirty && $createRevision)
+		if($wasDirty)
 		{
 			// save a copy to history table
 			$recordValues = $this->_prepareRecordValues();
+			
+			$recordValues['Created'] = time();
+			$recordValues['CreatorID'] = !empty($_SESSION) && !empty($_SESSION['User']) ? $_SESSION['User']->ID : null;
+			
 			$set = static::_mapValuesToSet($recordValues);
 	
 			DB::nonQuery(
@@ -170,5 +166,14 @@
 		
 	}
 
+	public function getRootClass($boundingParentClass = __CLASS__)
+	{
+		return parent::getRootClass($boundingParentClass);
+	}
 
+	static public function getStaticRootClass($boundingParentClass = __CLASS__)
+	{
+		return parent::getStaticRootClass($boundingParentClass);
+	}
+	
 }

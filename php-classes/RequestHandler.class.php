@@ -1,15 +1,10 @@
 <?php
 
-
-
 abstract class RequestHandler
 {
-	// configurables
-	public static $responseMode = 'html';
-	
-	
-	// abstract methods
-	abstract public static function handleRequest();
+    // configurables
+    public static $responseMode = 'html';
+    
 	
 	// static properties
 	protected static $_path;
@@ -73,39 +68,30 @@ abstract class RequestHandler
 	
 	static public function respond($responseID, $responseData = array(), $responseMode = false)
 	{
-		header('X-Response-ID: '.$responseID);
+		if (!$responseMode) {
+			$responseMode = static::$responseMode;
+		}
+		
+		if ($responseMode != 'return') {
+			header('X-Response-ID: '.$responseID);
+		}
 	
-		switch($responseMode ? $responseMode : static::$responseMode)
+		switch($responseMode)
 		{
 			case 'json':
-				return JSON::translateAndRespond($responseData);
+				return static::respondJson($responseID, $responseData);
 				
 			case 'csv':
-			{
-				if(is_array($responseData['data']))
-				{
-					header('Content-Type: text/csv');
-					header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.csv"');
-					print(CSV::fromRecords($responseData['data']));
-				}
-				elseif($responseID == 'error')
-				{
-					print ($responseData['message']);
-				}
-				else
-				{
-					print 'Unable to render data to CSV: '.$responseID;
-				}
-				exit();
-			}
+                return static::respondCsv($responseID, $responseData);
+            
+            case 'pdf':
+                return static::respondPdf($responseID, $responseData);
+
+    		case 'xml':
+                return static::respondXml($responseID, $responseData);
 
 			case 'html':
-				$responseData['responseID'] = $responseID;
-				return TemplateResponse::respond($responseID, $responseData);
-
-			case 'xml':
-				header('Content-Type: text/xml');
-				return TemplateResponse::respond($responseID, $responseData);
+                return static::respondHtml($responseID, $responseData);
 				
 			case 'return':
 				return array(
@@ -114,10 +100,70 @@ abstract class RequestHandler
 				);
 
 			default:
-				die('Invalid response mode');
+				throw new Exception('Invalid response mode');
 		}
 	}
-	
+    
+    static public function respondJson($responseID, $responseData = array())
+    {
+        return JSON::translateAndRespond($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
+    }
+    
+    static public function respondCsv($responseID, $responseData = array())
+    {
+        if (!empty($_REQUEST['downloadToken'])) {
+            setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
+        }
+        
+		if (is_array($responseData['data'])) {
+			header('Content-Type: text/csv');
+			header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.csv"');
+			print(CSV::fromRecords($responseData['data']));
+		} elseif ($responseID == 'error') {
+			print($responseData['message']);
+		} else {
+			print 'Unable to render data to CSV: '.$responseID;
+		}
+		exit();
+    }
+    
+    static public function respondPdf($responseID, $responseData = array())
+    {
+        if (!empty($_REQUEST['downloadToken'])) {
+            setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
+        }
+        
+		$tmpPath = tempnam('/tmp', 'e_pdf_');
+
+		file_put_contents($tmpPath.'.html', Emergence\Dwoo\Engine::getSource("$responseID.pdf", $responseData));
+        
+        header('Content-Type: application/pdf');
+		header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
+        
+		exec("/usr/local/bin/wkhtmltopdf \"$tmpPath.html\" \"$tmpPath.pdf\"");
+        
+        if (!file_exists("$tmpPath.pdf")) {
+            header('HTTP/1.0 501 Not Implemented');
+            die('Unable to generate PDF, check that this system has wkhtmltopdf installed');
+        }
+        
+        readfile($tmpPath.'.pdf');
+        exit();
+    }
+    
+    static public function respondXml($responseID, $responseData = array())
+    {
+		header('Content-Type: text/xml');
+		return Emergence\Dwoo\Engine::respond($responseID, $responseData);
+    }
+    
+    static public function respondHtml($responseID, $responseData = array())
+    {
+		header('Content-Type: text/html; charset=utf-8');
+		$responseData['responseID'] = $responseID;
+		return Emergence\Dwoo\Engine::respond($responseID, $responseData);
+    }
+    
 	public static function throwUnauthorizedError($message = 'You do not have authorization to access this resource')
 	{
 		if(!$GLOBALS['Session']->Person)

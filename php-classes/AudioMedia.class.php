@@ -1,14 +1,12 @@
 <?php
 
-
-
- class AudioMedia extends Media
+class AudioMedia extends Media
 {
 
 	// configurables
 	public static $previewExtractCommand = 'ffmpeg -i %1$s -ss %3$u -t %4$u -f mp3 -y %2$s'; // 1=input file, 2=output file, 3=start time, 4=duration
 	public static $previewDuration = 30;
-	public static $iconPath = '/var/mics/code/Static/img/icons/filetypes/mp3.png';
+	public static $iconPath = '/site-root/img/icons/filetypes/mp3.png';
 	
 	
 	// magic methods
@@ -22,14 +20,10 @@
 	}
 	
 		
-	function __get($name)
+	function getValue($name)
 	{
 		switch($name)
 		{
-			case 'JsonTranslation':
-				return array_merge(parent::__get($name), array(
-				));
-			
 			case 'ThumbnailMIMEType':
 				return 'image/png';
 				
@@ -50,7 +44,7 @@
 				}
 				
 			default:
-				return parent::__get($name);
+				return parent::getValue($name);
 		}
 	}
 	
@@ -58,7 +52,8 @@
 	// public methods
 	static public function getBlankPath($contextClass)
 	{
-		return static::$iconPath;
+		$node = Site::resolvePath(static::$iconPath);
+		return $node ? $node->RealPath : null;
 	}
 	
 	public function getImage($sourceFile = null)

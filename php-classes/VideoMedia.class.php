@@ -1,8 +1,6 @@
 <?php
 
-
-
- class VideoMedia extends Media
+class VideoMedia extends Media
 {
 
 	// configurables
@@ -22,14 +20,10 @@
 	}
 	
 		
-	function __get($name)
+	function getValue($name)
 	{
 		switch($name)
 		{
-			case 'JsonTranslation':
-				return array_merge(parent::__get($name), array(
-				));
-			
 			case 'ThumbnailMIMEType':
 				return 'image/jpeg';
 				
@@ -44,7 +38,7 @@
 				}
 				
 			default:
-				return parent::__get($name);
+				return parent::getValue($name);
 		}
 	}
 	

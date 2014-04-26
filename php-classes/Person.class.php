@@ -1,12 +1,9 @@
 <?php
 
-
-
- class Person extends VersionedRecord
+class Person extends VersionedRecord
 {
-
-	// support subclassing
-	static public $rootClass = __CLASS__;
+    // support subclassing
+    static public $rootClass = __CLASS__;
 	static public $defaultClass = __CLASS__;
 	static public $subClasses = array(__CLASS__);
 
@@ -17,12 +14,18 @@
 	static public $tableName = 'people';
 	static public $singularNoun = 'person';
 	static public $pluralNoun = 'people';
+    static public $collectionRoute = '/people';
 	
 	static public $fields = array(
-		'ContextClass' => null
-		,'ContextID' => null
-		,'FirstName'
-		,'LastName'
+    	'FirstName' => array(
+			'includeInSummary' => true
+		)
+    	,'LastName' => array(
+			'includeInSummary' => true
+		)
+    	,'MiddleName' => array(
+    		'notnull' => false
+		)
 		,'Gender' => array(
 			'type' => 'enum'
 			,'values' => array('Male','Female')
@@ -31,16 +34,19 @@
 		,'BirthDate' => array(
 			'type' => 'date'
 			,'notnull' => false
+            ,'accountLevelEnumerate' => 'Staff'
 		)
 		,'Email' => array(
 			'notnull' => false
 			,'unique' => true
+            ,'accountLevelEnumerate' => 'User'
 		)
 		,'Phone' => array(
 			'type' => 'decimal'
 			,'length' => '10,0'
 			,'unsigned' => true
 			,'notnull' => false
+            ,'accountLevelEnumerate' => 'User'
 		)
 		,'Location' => array(
 			'notnull' => false
@@ -59,7 +65,7 @@
 	static public $relationships = array(
 		'GroupMemberships' => array(
 			'type' => 'one-many'
-			,'class' => 'GroupMembership'
+			,'class' => 'GroupMember'
 			,'indexField' => 'GroupID'
 			,'foreign' => 'PersonID'
 		)
@@ -68,6 +74,13 @@
 			,'class' => 'Note'
 			,'contextClass' => 'Person'
 			,'order' => array('ID' => 'DESC')
+		)
+		,'Groups' => array(
+			'type' => 'many-many'
+			,'class' => 'Group'
+			,'linkClass' => 'GroupMember'
+			,'linkLocal' => 'PersonID'
+			,'linkForeign' => 'GroupID'
 		)
 		,'PrimaryPhoto' => array(
 			'type' => 'one-one'
@@ -84,7 +97,59 @@
 			,'class' => 'Comment'
 			,'contextClass' => __CLASS__
 			,'order' => array('ID' => 'DESC')
-		)	
+		)
+	);
+    
+    static public $dynamicFields = array(
+        'PrimaryPhoto'
+        ,'Photos'
+        ,'groupIDs' => array(
+            'method' => 'getGroupIDs'
+        )
+    );
+	
+	static public $searchConditions = array(
+		'FirstName' => array(
+			'qualifiers' => array('any','name','fname','firstname','first')
+			,'points' => 2
+			,'sql' => 'FirstName LIKE "%%%s%%"'
+		)
+    	,'LastName' => array(
+			'qualifiers' => array('any','name','lname','lastname','last')
+			,'points' => 2
+			,'sql' => 'LastName LIKE "%%%s%%"'
+		)
+		,'Username' => array(
+			'qualifiers' => array('any','username','uname','user')
+			,'points' => 2
+			,'sql' => 'Username LIKE "%%%s%%"'
+		)
+        ,'Gender' => array(
+			'qualifiers' => array('gender','sex')
+			,'points' => 2
+			,'sql' => 'Gender LIKE "%s"'
+		)
+		,'Class' => array(
+			'qualifiers' => array('class')
+			,'points' => 2
+			,'sql' => 'Class LIKE "%%%s%%"'
+		)
+		,'AccountLevel' => array(
+			'qualifiers' => array('accountlevel')
+			,'points' => 2
+			,'sql' => 'AccountLevel LIKE "%%%s%%"'
+		)
+		,'Group' => array(
+			'qualifiers' => array('group')
+			,'points' => 1
+			,'join' => array(
+				'className' => 'GroupMember'
+				,'aliasName' => 'GroupMember'
+				,'localField' => 'ID'
+				,'foreignField' => 'PersonID'
+			)
+			,'callback' => 'getGroupConditions'
+		)
 	);
 
 	// Person
@@ -96,7 +161,7 @@
 	static public $requireAbout = false;
 	
 	
-	public function __get($name)
+	public function getValue($name)
 	{
 		switch($name)
 		{
@@ -147,15 +212,10 @@
 				return sprintf('"%s" <%s>', $this->FullName, $this->Email);
 			}
 			
-			default: return parent::__get($name);
+			default: return parent::getValue($name);
 		}
 	}
-	
-	
-	static public function getByHandle($handle)
-	{
-		return User::getByHandle($handle);
-	}
+
 	
 	static public function getByEmail($email)
 	{
@@ -196,10 +256,15 @@
 		);
 	}
 	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
+		
+		// strip any non-digit characters from phone before validation
+		if($this->Phone) {
+			$this->Phone = preg_replace('/\D/', '', $this->Phone);
+		}
 		
 		$this->_validator->validate(array(
 			'field' => 'Class'
@@ -212,14 +277,14 @@
 			'field' => 'FirstName'
 			,'minlength' => 2
 			,'required' => true
-			,'errorMessage' => 'First name is required'
+    		,'errorMessage' => 'First name is required'
 		));
 		
 		$this->_validator->validate(array(
 			'field' => 'LastName'
 			,'minlength' => 2
 			,'required' => true
-			,'errorMessage' => 'Last name is required'
+    		,'errorMessage' => 'Last name is required'
 		));
 
 		$this->_validator->validate(array(
@@ -262,6 +327,35 @@
 		// save results
 		return $this->finishValidation();
 	}
+    	
+	static public function getGroupConditions($handle, $matchedCondition)
+    {		
+		$group = Group::getByHandle($handle);
 
-
+		if(!$group)
+		{
+			return false;
+		}
+		
+		$containedGroups = DB::allRecords('SELECT ID FROM %s WHERE `Left` BETWEEN %u AND %u', array(
+			Group::$tableName
+			,$group->Left
+			,$group->Right		
+		));
+		
+		$containedGroups = array_map(function($group) {
+			return $group['ID'];
+		},$containedGroups);
+		
+		$condition = $matchedCondition['join']['aliasName'].'.GroupID'.' IN ('.implode(',',$containedGroups).')';
+		
+		return $condition;
+	}
+    
+    public function getGroupIDs()
+    {
+        return array_map(function($Group){
+    		return $Group->ID;
+		}, $this->Groups);
+    }
 }

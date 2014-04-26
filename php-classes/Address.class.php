@@ -1,8 +1,6 @@
 <?php
 
-
-
- class Address extends ActiveRecord
+class Address extends ActiveRecord
 {
 
 	static public $requirePhone = false;
@@ -103,10 +101,10 @@
 		return $Address ? $Address : static::create($data);
 	}
 	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'Name'

@@ -19,7 +19,7 @@
  */
 class Dwoo_Plugin_template extends Dwoo_Block_Plugin implements Dwoo_ICompilable_Block
 {
-	public function init($name, array $rest = array())
+    public function init($name, array $rest = array())
 	{
 	}
 
@@ -51,7 +51,7 @@ class Dwoo_Plugin_template extends Dwoo_Block_Plugin implements Dwoo_ICompilable
 
 	public static function postProcessing(Dwoo_Compiler $compiler, array $params, $prepend, $append, $content)
 	{
-		$paramstr = 'Dwoo $dwoo';
+		$paramstr = 'Dwoo_Core $dwoo';
 		$init = 'static $_callCnt = 0;'."\n".
 		'$dwoo->scope[\' '.$params['uuid'].'\'.$_callCnt] = array();'."\n".
 		'$_scope = $dwoo->setScope(array(\' '.$params['uuid'].'\'.($_callCnt++)));'."\n";
@@ -66,7 +66,7 @@ class Dwoo_Plugin_template extends Dwoo_Block_Plugin implements Dwoo_ICompilable
 		}
 		$init .= '/* -- template start output */';
 
-		$funcName = 'Dwoo_Plugin_'.$params['name'].'_'.$params['uuid'];
+		$funcName = 'Dwoo_Plugin_'.$params['name'];
 
 		$search = array(
 			'$this->charset',

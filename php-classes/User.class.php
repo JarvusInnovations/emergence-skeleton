@@ -4,7 +4,7 @@
 class User extends Person
 {
 
-	static public $defaultClass = __CLASS__;
+    static public $defaultClass = __CLASS__;
 	static public $subClasses = array(__CLASS__);
 	static public $singularNoun = 'user';
 	static public $pluralNoun = 'users';
@@ -18,6 +18,7 @@ class User extends Person
 			'type' => 'password'
 			,'length' => 40
 			,'hashFunction' => 'SHA1'
+			,'excludeFromData' => true
 		)
 		,'AccountLevel' => array(
 			'type' => 'enum'
@@ -70,19 +71,10 @@ class User extends Person
 	
 	}
 	
-	public function getData()
-	{
-		return array_merge(parent::getData(), array(
-			'Password' => null
-		));
-	}
-
-	
-	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'Username'
@@ -129,15 +121,20 @@ class User extends Person
 		return $this->finishValidation();
 	}
 	
-	public function save()
+	public function save($deep = true)
 	{
 		if(!$this->Username)
 		{
 			// auto generate username from first & last name
 		}
 		
-		return parent::save();
+		return parent::save($deep);
 	}
+    
+    public function getHandle()
+    {
+        return $this->Username;
+    }
 	
 	static public function getByHandle($handle)
 	{
@@ -186,9 +183,9 @@ class User extends Person
 	static public function getUniqueUsername($firstName, $lastName, $options = array())
 	{
 		// apply default options
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'format' => 'short' // full or short
-		));
+		), $options);
 		
 		// create username
 		switch($options['format'])

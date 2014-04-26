@@ -1,12 +1,15 @@
 <?php
 
-
 class TableManagerRequestHandler extends RequestHandler
 {
-
-
-	static public function handleRequest()
-	{
+    static public $classFilters = array(
+        '/^(Dwoo|Sabre|PHPUnit)[\\\\_]/',
+        '/^getID3/',
+        '/(Trait|Interface|Test)$/'
+    );
+    
+    static public function handleRequest()
+    {
 		$GLOBALS['Session']->requireAccountLevel('Developer');
 		
 		if(static::peekPath() == 'json')
@@ -28,14 +31,14 @@ class TableManagerRequestHandler extends RequestHandler
 				return static::handleSQLRequest();
 			}
 			
-			case 'metadata':
+			case 'ext-model':
 			{
-				return static::handleMetadataRequest();
+				return static::handleExtModelRequest();
 			}
 			
-			case 'column_model':
+			case 'ext-columns':
 			{
-				return static::handleColumnModelRequest();
+				return static::handleExtColumnsRequest();
 			}
 			
 			case 'index':
@@ -67,22 +70,29 @@ class TableManagerRequestHandler extends RequestHandler
 	{
 		// discover activerecord classes
 		$recordClasses = array();
-		
-		$localClasses = SiteCollection::getOrCreateCollection('php-classes');
-		$parentClasses = SiteCollection::getOrCreateCollection('php-classes', null, true);
-
-		foreach(array_merge($localClasses->getChildren(),$parentClasses->getChildren()) AS $classNode)
-		{
-			if($classNode->Type != 'application/php')
+      
+		foreach (Emergence_FS::findFiles('\.php$', true, 'php-classes') AS $classNode) {
+			if ($classNode->Type != 'application/php') {
 				continue;
-			
-			$className = preg_replace('/\.class\.php$/i', '', $classNode->Handle);
+			}
+            
+            $classPath = $classNode->getFullPath(null, false);
+            array_shift($classPath);
 
-			if(is_subclass_of($className, 'ActiveRecord') && !in_array($className, $recordClasses))
-			{
+			$className = preg_replace('/(\.class)?\.php$/i', '', join('\\', $classPath));
+            
+            foreach (static::$classFilters AS $pattern) {
+                if (preg_match($pattern, $className)) {
+                    continue 2;
+                }
+            }
+
+			if (is_subclass_of($className, 'ActiveRecord') && !in_array($className, $recordClasses)) {
 				$recordClasses[] = $className;
 			}
 		}
+        
+        natsort($recordClasses);
 
 		return static::respond('classes', array(
 			'classes' => $recordClasses
@@ -120,7 +130,7 @@ class TableManagerRequestHandler extends RequestHandler
 	}
 	
 	
-	static public function handleMetadataRequest()
+	static public function handleExtModelRequest()
 	{
 	
 		if(empty($_REQUEST['class']) || !is_subclass_of($_REQUEST['class'], 'ActiveRecord'))
@@ -128,13 +138,13 @@ class TableManagerRequestHandler extends RequestHandler
 			return static::throwInvalidRequestError();
 		}
 
-		return static::respond('metadata', array(
-			'data' => ExtJS::getRecordMetadata($_REQUEST['class'])
+		return static::respond('ext-model', array(
+			'data' => Sencha\CodeGenerator::getRecordModel($_REQUEST['class'])
 			,'class' => $_REQUEST['class']
 		));
 	}
 
-	static public function handleColumnModelRequest()
+	static public function handleExtColumnsRequest()
 	{
 	
 		if(empty($_REQUEST['class']) || !is_subclass_of($_REQUEST['class'], 'ActiveRecord'))
@@ -142,8 +152,8 @@ class TableManagerRequestHandler extends RequestHandler
 			return static::throwInvalidRequestError();
 		}
 
-		return static::respond('column_model', array(
-			'data' => ExtJS::getColumnModelConfig($_REQUEST['class'])
+		return static::respond('ext-columns', array(
+			'data' => Sencha\CodeGenerator::getRecordColumns($_REQUEST['class'])
 			,'class' => $_REQUEST['class']
 		));
 	}
@@ -162,6 +172,4 @@ class TableManagerRequestHandler extends RequestHandler
 			'message' => 'Renesting complete'
 		));
 	}
-
-
 }

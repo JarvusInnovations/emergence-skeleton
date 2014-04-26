@@ -1,10 +1,8 @@
 <?php
 
-
 class Format
 {
-
-	static public function emailLink($email, $subject=false)
+    static public function emailLink($email, $subject=false)
 	{
 		$mailto = 'mailto:'.$email;
 
@@ -56,7 +54,7 @@ class Format
 		return $string;
   	}
 
-	function fuzzyTime($timestamp) {
+	static function fuzzyTime($timestamp) {
         /*
 	  if ( !ctype_digit($time) && ( $time = strtotime( $time ) ) == false ) {
 	    return 'an unknown time';

@@ -3,7 +3,7 @@
 class TagItem extends ActiveRecord
 {
 
-	static public $tableName = 'tag_items';
+    static public $tableName = 'tag_items';
 	static public $rootClass = __CLASS__;
 	
 	static public $fields = array(
@@ -24,7 +24,10 @@ class TagItem extends ActiveRecord
 	);
 	
 	static public $relationships = array(
-		'Tag' => array(
+		'Context' => array(
+			'type' => 'context-parent'
+		)
+		,'Tag' => array(
 			'type' => 'one-one'
 			,'class' => 'Tag'
 		)
@@ -38,10 +41,10 @@ class TagItem extends ActiveRecord
 	);
 
 	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'TagID'
@@ -69,7 +72,7 @@ class TagItem extends ActiveRecord
 		return $this->_isValid;
 	}
 	
-	public function save()
+	public function save($deep = true)
 	{
 		global $Session;
 		
@@ -78,24 +81,19 @@ class TagItem extends ActiveRecord
 			$this->Creator = $Session->Person;
 		}
 		
-		return parent::save(true);
+		return parent::save($deep);
 	}
 	
 	public function destroy()
 	{
-		return static::delete($this->ContextClass,$this->ContextID,$this->TagID);
-	}
-	
-	static public function delete($ContextClass,$ContextID,$TagID)
-	{
 		DB::nonQuery('DELETE FROM `%s` WHERE `%s` = \'%s\' AND `%s` = %u AND `%s` = %u', array(
 			static::$tableName
 			,static::_cn('ContextClass')
-			,$ContextClass
+			,$this->ContextClass
 			,static::_cn('ContextID')
-			,$ContextID
+			,$this->ContextID
 			,static::_cn('TagID')
-			,$TagID
+			,$this->TagID
 		));
 		
 		return DB::affectedRows() > 0;
@@ -103,15 +101,16 @@ class TagItem extends ActiveRecord
 	
 	static public function getTagsSummary($options = array())
 	{
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'tagConditions' => array()
 			,'itemConditions' => array()
 			,'Class' => false
 			,'classConditions' => array()
 			,'overlayTag' => false
 			,'order' => 'itemsCount DESC'
+			,'excludeEmpty' => true
 			,'limit' => false
-		));
+		), $options);
 		
 		// initialize conditions
 		$options['tagConditions'] = Tag::mapConditions($options['tagConditions']);
@@ -166,7 +165,7 @@ class TagItem extends ActiveRecord
 			$itemsCountQuery .= sprintf(
 				' AND TagItem.`%s` = "%s" AND TagItem.`%s` IN (%s)'
 				,TagItem::getColumnName('ContextClass')
-				,$options['Class']::$rootClass
+				,$options['Class']::getStaticRootClass()
 				,TagItem::getColumnName('ContextID')
 				,DB::prepareQuery($classSubquery, $classParams)
 			);
@@ -180,6 +179,12 @@ class TagItem extends ActiveRecord
 			,Tag::$tableName
 			,count($options['tagConditions']) ? join(') AND (', $options['tagConditions']) : '1'
 		);
+		
+		// exclude empty
+		if($options['excludeEmpty'])
+		{
+			$tagSummaryQuery .= ' HAVING itemsCount > 0';
+		}
 
 		// add order options
 		if($options['order'])
@@ -192,17 +197,19 @@ class TagItem extends ActiveRecord
 		{
 			$tagSummaryQuery .= sprintf(' LIMIT %u,%u', $options['offset'], $options['limit']);
 		}
-		
-		// return indexed table or list
-		if($options['indexField'])
-		{
-			return DB::table(Tag::getColumnName($options['indexField']), $tagSummaryQuery, $tagSummaryParams);
-		}
-		else
-		{
-			return DB::allRecords($tagSummaryQuery, $tagSummaryParams);
+
+		try {
+			// return indexed table or list
+			if($options['indexField'])
+			{
+				return DB::table(Tag::getColumnName($options['indexField']), $tagSummaryQuery, $tagSummaryParams);
+			}
+			else
+			{
+				return DB::allRecords($tagSummaryQuery, $tagSummaryParams);
+			}
+		} catch(TableNotFoundException $e) {
+			return array();
 		}
 	}
-
-
 }

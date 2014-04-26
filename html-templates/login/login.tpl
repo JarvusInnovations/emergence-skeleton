@@ -8,7 +8,8 @@
 	{foreach item=value key=name from=$postVars}
 		{if is_array($value)}
 			{foreach item=subvalue key=subkey from=$value}
-			<input type="hidden" name="{$name|escape}[{$subkey|escape}]" value="{$subvalue|escape}">
+				<input type="hidden" name="{$name|escape}[{$subkey|escape}]" value="{$subvalue|escape}">
+			{/foreach}
 		{else}
 			<input type="hidden" name="{$name|escape}" value="{$value|escape}">
 		{/if}

@@ -46,7 +46,7 @@
 		// prepend record handler
 		array_unshift($path, $classPath);
 		
-		Site::redirect($path);
+		MICS::redirect($path);
 	}
 
 }

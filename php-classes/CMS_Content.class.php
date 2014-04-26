@@ -14,12 +14,24 @@ abstract class CMS_Content extends VersionedRecord
     static public $rootClass = __CLASS__;
     static public $defaultClass = __CLASS__;
     static public $subClasses = array('CMS_Page','CMS_BlogPost');
+    
+    static public $searchConditions = array(
+    	'Title' => array(
+    		'qualifiers' => array('any', 'title')
+    		,'points' => 2
+    		,'sql' => 'Title Like "%%%s%%"'
+    	)
+    	,'Handle' => array(
+    		'qualifiers' => array('any', 'handle')
+    		,'points' => 2
+    		,'sql' => 'Handle Like "%%%s%%"'
+    	)
+    );
 
     static public $fields = array(
-        //'ContextClass' => null // uncomment to enable
-        //,'ContextID' => null
-        
-        'Title'
+        'ContextClass'
+		,'ContextID' => 'uint'
+        ,'Title'
         ,'Handle' => array(
             'unique' => true
         )
@@ -36,11 +48,19 @@ abstract class CMS_Content extends VersionedRecord
             'type'  =>  'timestamp'
             ,'notnull' => false
         )
+        ,'Visibility' => array(
+        	'type' => 'enum'
+        	,'values' => array('Public','Private')
+        	,'default' => 'Public'
+        )
     );
     
     
     static public $relationships = array(
-		'GlobalHandle' => array(
+		'Context' => array(
+			'type' => 'context-parent'
+		)
+		,'GlobalHandle' => array(
 			'type' => 'handle'
 		)
 		,'Author' =>  array(
@@ -59,24 +79,27 @@ abstract class CMS_Content extends VersionedRecord
         	,'class' => 'Tag'
         	,'linkClass' => 'TagItem'
         	,'linkLocal' => 'ContextID'
-        	,'conditions' => array('Link.ContextClass = "CMS_BlogPost"')
+        	,'conditions' => array('Link.ContextClass = "CMS_Content"')
         )
-		,'Categories' => array(
-        	'type' => 'many-many'
-        	,'class' => 'Category'
-        	,'linkClass' => 'CategoryItem'
-        	,'linkLocal' => 'ContextID'
-        	,'conditions' => array('Link.ContextClass = "CMS_BlogPost"')
-        )
+		,'Comments' => array(
+			'type' => 'context-children'
+			,'class' => 'Comment'
+			,'order' => array('ID' => 'DESC')
+		)
     );
 
     
     static public function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'conditions' => array()
 			,'order' => array('Published' => 'DESC')
-		));
+		), $options);
+		
+		if(!$GLOBALS['Session']->Person)
+		{
+			$options['conditions']['Visibility'] = 'Public';
+		}
 		
 		$options['conditions']['Status'] = 'Published';
 		$options['conditions'][] = 'Published IS NULL OR Published <= CURRENT_TIMESTAMP';
@@ -89,9 +112,10 @@ abstract class CMS_Content extends VersionedRecord
    
     static public function getAllPublishedByAuthor(Person $Author, $options = array())
     {
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'order' => array('Published' => 'DESC')
-		));
+		), $options);
+		
 		
 		$conditions = array(
 			'AuthorID' => $Author->ID
@@ -141,10 +165,6 @@ abstract class CMS_Content extends VersionedRecord
     	{
     		$this->Published = time();
     	}
-    	
-        // if not handle specified create one
-		if(!$this->Handle)
-			$this->Handle = strtolower(static::getUniqueHandle($this->Title));
         
 		// implement handles
 		GlobalHandleBehavior::onSave($this, $this->Title);				
@@ -152,24 +172,12 @@ abstract class CMS_Content extends VersionedRecord
         // call parent
         parent::save($deep, $createRevision);
     }
-    
-    public function destroy() {
-    	
-    	// delete all TagItems
-    	DB::nonQuery("DELETE FROM `" . TagItem::$tableName . "` WHERE `ContextClass`='" . $this->Class . "' AND `ContextID`='" . $this->ID ."'");
-    	
-    	// delete all CategoryItems
-    	DB::nonQuery("DELETE FROM `" . CategoryItem::$tableName . "` WHERE `ContextClass`='" . $this->Class . "' AND `ContextID`='" . $this->ID ."'");
-    	
-    	return parent::destroy();
-    }
 
 	public function getData()
 	{
 		return array_merge(parent::getData(), array(
 			'items' => array_values(JSON::translateObjects($this->Items))
 			,'tags' => array_values(JSON::translateObjects($this->Tags))
-			,'categories' => array_values(JSON::translateObjects($this->Categories))
 			,'Author' => $this->Author ? $this->Author->getData() : null
 		));
 	

@@ -2,12 +2,10 @@
 
 class TemplatePreviewRequestHandler
 {
-
-	static public function handleRequest()
+	public static function handleRequest()
 	{
 		$GLOBALS['Session']->requireAccountLevel('Developer');
 
-		TemplateResponse::respond(implode('/',Site::$pathStack));
+		Emergence\Dwoo\Engine::respond(implode('/', Site::$pathStack));
 	}
-
 }

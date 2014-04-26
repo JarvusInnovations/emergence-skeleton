@@ -1,3 +1,3 @@
 <?php
 
-WebdavRequestHandler::handleRequest();
+Emergence\DAV\DevelopRequestHandler::handleRequest();

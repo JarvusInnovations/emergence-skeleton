@@ -1,8 +1,6 @@
 <?php
 
-
-
- class Session extends ActiveRecord
+class Session extends ActiveRecord
 {
 
 	// Session configurables
@@ -101,7 +99,7 @@
 	{
 
 		// check timestamp
-		if($Session->LastRequest < (time() - static::$timeout))
+		if(static::$timeout && $Session->LastRequest < (time() - static::$timeout))
 		{
 			$Session->terminate();
 			
@@ -130,7 +128,7 @@
 		));
 	}
 
-	public function save()
+	public function save($deep = true)
 	{
 		// set handle
 		if(!$this->Handle)
@@ -139,7 +137,7 @@
 		}
 
 		// call parent
-		parent::save();
+		parent::save($deep);
 		
 		// set cookie
 		setcookie(

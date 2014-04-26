@@ -28,9 +28,9 @@ class CMS_MediaContent extends CMS_ContentItem
 					.'</a>';
 
 			case 'VideoMedia':
-				return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link video-link">'
+				return '<div title="'.htmlspecialchars($Media->Caption).'" class="media-link video-link" id="player-'.$Media->ID.'" style="width:425px;height:300px;">'
 					.'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
-					.'</a>';
+					.'</div><script>flowplayer("player-'.$Media->ID.'", "/swf/flowplayer-3.2.15.swf",{playlist:["'.$Media->WebPath.'"]})</script>';
 
 			case 'PDFMedia':
 				return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link pdf-link">'

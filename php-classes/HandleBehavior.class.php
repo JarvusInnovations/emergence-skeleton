@@ -1,11 +1,7 @@
 <?php
 
-
-
- class HandleBehavior extends RecordBehavior
+class HandleBehavior extends RecordBehavior
 {
-
-
 	static public function onSave(ActiveRecord $Record, $handleInput = false)
 	{
 		// set handle
