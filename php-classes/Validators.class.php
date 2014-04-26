@@ -5,7 +5,7 @@ class Validators
     
     public static function is($string, $options = array())
     {
-    	$options = array_merge(array(
+        $options = array_merge(array(
 			'value' => false
 		), $options);
 		
@@ -506,7 +506,7 @@ class Validators
 	public static function handle($string, $options = array())
 	{
 		$options = array_merge(array(
-			'pattern' => '/^[a-zA-Z0-9][a-zA-Z0-9\-_\.]*$/'
+			'pattern' => '/^[\\pL][\\pL\d_:\-\.]*$/u'
             ,'allowNumeric' => false
 		), $options);
 		

@@ -21,7 +21,7 @@ class ActiveRecord
      */
     static public $pluralNoun = 'records';
     
-	/**
+    /**
 	 * String to identify this class with in administrative interfaces
 	 * @var string
 	 */
@@ -1272,41 +1272,6 @@ class ActiveRecord
 		}
 		
 		return $records;
-	}
-	
-	static public function getUniqueHandle($text, $options = array())
-	{
-		// apply default options
-		$options = array_merge(array(
-			'handleField' => 'Handle'
-			,'domainConstraints' => array()
-			,'alwaysSuffix' => false
-			,'format' => '%s-%u'
-		), $options);
-	
-		// strip bad characters
-		$handle = $strippedText = preg_replace(
-			 array('/\s+/', '/^[^a-zA-Z]+/', '/[-_]*[^a-zA-Z0-9_:\-\.]+[-_]*/', '/[-_]*:[-_]*/')
-			,array('_'    , ''             , '-'                          , '--')
-			,trim($text)
-		);
-		
-		$handle = strtolower(trim($handle, '-_'));
-		
-		$where = $options['domainConstraints'];
-		
-		$incarnation = 0;
-		do
-		{
-			// TODO: check for repeat posting here?
-			$incarnation++;
-			
-			if($options['alwaysSuffix'] || $incarnation > 1)
-				$handle = sprintf($options['format'], $strippedText, $incarnation);
-		}
-		while(static::getByWhere(array_merge($options['domainConstraints'],array($options['handleField']=>$handle))));
-		
-		return $handle;
 	}
 	
 	static public function getSqlSearchConditions($qualifier, $term)

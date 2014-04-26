@@ -194,10 +194,7 @@ class Tag extends ActiveRecord
 
     public function save($deep = true)
     {
-        // set handle
-        if (!$this->Handle) {
-            $this->Handle = strtolower(static::getUniqueHandle($this->Title));
-        }
+        HandleBehavior::onSave($this, strtolower($this->Title));
 
         return parent::save(true);
     }
