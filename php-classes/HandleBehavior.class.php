@@ -2,35 +2,98 @@
 
 class HandleBehavior extends RecordBehavior
 {
-	static public function onSave(ActiveRecord $Record, $handleInput = false)
-	{
-		// set handle
-		if(!$Record->Handle)
-		{
-			$Record->Handle = $Record::getUniqueHandle($handleInput ? $handleInput : $Record->Title);
-		}
-	}
+    public static $alwaysSuffix = false;
+    public static $format = '%s-%u';
+    public static $transliterate = true;
+    public static $emptyHandle = 'n-a';
 
-	static public function onValidate(ActiveRecord $Record, RecordValidator $validator)
-	{
-		$validator->validate(array(
-			'field' => 'Handle'
-			,'required' => false
-			,'validator' => 'handle'
-			,'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
-		));
-				
-		// check handle uniqueness
-		if($Record->isFieldDirty('Handle') && !$validator->hasErrors('Handle') && $Record->Handle)
-		{
-			$ExistingRecord = $Record::getByHandle($Record->Handle);
-			
-			if($ExistingRecord && ($ExistingRecord->ID != $Record->ID))
-			{
-				$validator->addError('Handle', 'Handle already registered');
-			}
-		}
-	}
-	
+    public static function onSave(ActiveRecord $Record, $handleInput = false)
+    {
+        // set handle
+        if (!$Record->Handle) {
+            $Record->Handle = static::getUniqueHandle($Record, $handleInput ? $handleInput : $Record->Title);
+        }
+    }
 
+    public static function onValidate(ActiveRecord $Record, RecordValidator $validator)
+    {
+        $validator->validate(array(
+            'field' => 'Handle'
+            ,'required' => false
+            ,'validator' => 'handle'
+            ,'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
+        ));
+
+        // check handle uniqueness
+        if ($Record->isFieldDirty('Handle') && !$validator->hasErrors('Handle') && $Record->Handle) {
+            $ExistingRecord = $Record::getByHandle($Record->Handle);
+
+            if ($ExistingRecord && ($ExistingRecord->ID != $Record->ID)) {
+                $validator->addError('Handle', 'Handle already registered');
+            }
+        }
+    }
+
+    public static function getUniqueHandle($class, $text, $options = array())
+    {
+        // apply default options
+        $options = array_merge(array(
+            'handleField' => 'Handle'
+            ,'domainConstraints' => array()
+            ,'alwaysSuffix' => static::$alwaysSuffix
+            ,'format' => static::$format
+            ,'transliterate' => static::$transliterate
+        ), $options);
+
+        // strip bad characters
+        $text = preg_replace(
+             array(
+                 '/\s+/'                                // 1- Find spaces
+                 ,'/^[^\\pL]+/u'                        // 2- Find anything not a letter at the beginning
+                 ,'/[-_]*[^\\pL\d_:\-\.]+[-_]*/u'       // 3- Find non-allowed charecters segment and any placeholders next to it
+                 ,'/[-_]*:[-_]*/')                      // 4- Find any : and any placeholders next to it
+            ,array(
+                '_'                                     // 1- Replace spaces with _
+                , ''                                    // 2- Erase anything not a letter at the beginning
+                ,'-'                                    // 3- Replace non-allowed characters with -
+                ,'--'                                   // 4- Replace any : with --
+            )
+            ,$text
+        );
+        
+        // transliterate
+        if ($options['transliterate']) {
+            $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+            // trim any non-word characters created during transliterate and any adjacent placeholders
+            $text = preg_replace('/[-_]*[^-\w]+[-_]*/u', '', $text);
+        }
+
+        // lowercase
+        $text = strtolower($text);
+
+        // clean up any placeholder characters from ends
+        $text = trim($text, '-_');
+
+        // use empty handle if nothing is left
+        if (!$text) {
+            $text = static::$emptyHandle;
+        }
+
+        // search for unique handle
+        $where = $options['domainConstraints'];
+        $incarnation = 0;
+        $handle = $text;
+        do {
+            $incarnation++;
+
+            if ($options['alwaysSuffix'] || $incarnation > 1) {
+                $handle = sprintf($options['format'], $text, $incarnation);
+            }
+            
+            $where[$options['handleField']] = $handle;
+        } while ($class::getByWhere($where));
+
+        return $handle;
+    }
 }

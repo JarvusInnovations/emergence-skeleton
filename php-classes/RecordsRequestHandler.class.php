@@ -6,7 +6,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $recordClass;
     static public $accountLevelRead = false;
     static public $accountLevelComment = 'User';
-	static public $accountLevelBrowse = 'Staff';
+    static public $accountLevelBrowse = 'Staff';
 	static public $accountLevelWrite = 'Staff';
 	static public $accountLevelAPI = false;
 	static public $browseOrder = false;
@@ -63,7 +63,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 			default:
 			{
-				if($Record = static::getRecordByHandle($action))
+				if($Record = static::getRecordByHandle(urldecode($action)))
 				{
 					if(!static::checkReadAccess($Record))
 					{
