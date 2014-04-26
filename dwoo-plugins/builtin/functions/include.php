@@ -22,7 +22,7 @@
  * @date       2009-07-18
  * @package    Dwoo
  */
-function Dwoo_Plugin_include(Dwoo $dwoo, $file, $cache_time = null, $cache_id = null, $compile_id = null, $data = '_root', $assign = null, array $rest = array())
+function Dwoo_Plugin_include(Dwoo_Core $dwoo, $file, $cache_time = null, $cache_id = null, $compile_id = null, $data = '_root', $assign = null, array $rest = array())
 {
 	if ($file === '') {
 		return;
@@ -62,11 +62,18 @@ function Dwoo_Plugin_include(Dwoo $dwoo, $file, $cache_time = null, $cache_id = 
 		$vars = $rest + $vars;
 	}
 
-	$out = $dwoo->get($include, $vars);
+	$clone = clone $dwoo;
+	$out = $clone->get($include, $vars);
 
 	if ($assign !== null) {
 		$dwoo->assignInScope($out, $assign);
-	} else {
+	}
+
+	foreach ($clone->getReturnValues() as $name => $value) {
+		$dwoo->assignInScope($value, $name);
+	}
+
+	if ($assign === null) {
 		return $out;
 	}
 }

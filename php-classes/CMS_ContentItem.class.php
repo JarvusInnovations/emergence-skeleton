@@ -16,10 +16,7 @@ abstract class CMS_ContentItem extends VersionedRecord
     static public $subClasses = array('CMS_TextContent','CMS_RichTextContent','CMS_MediaContent','CMS_AlbumContent');
 
     static public $fields = array(
-        'ContextClass' => null // uncomment to enable
-        ,'ContextID' => null
-        
-        ,'Title' => array(
+        'Title' => array(
             'notnull' => false
             ,'blankisnull' => true
         )
@@ -42,7 +39,7 @@ abstract class CMS_ContentItem extends VersionedRecord
         	,'unsigned' => true
         	,'notnull' => false
         )
-        ,'Data' => 'clob'
+        ,'Data' => 'serialized'
     );
     
     

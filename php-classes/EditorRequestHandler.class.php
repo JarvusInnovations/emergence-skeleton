@@ -1,4 +1,5 @@
 <?php
+
 class EditorRequestHandler extends RequestHandler {
     
     static public $activitySessionThreshold = 3600;
@@ -24,11 +25,12 @@ class EditorRequestHandler extends RequestHandler {
                 return static::searchRequest();
             case 'activity':
                 return static::handleActivityRequest();
-			case 'export':
+    		case 'export':
 				return static::handleExportRequest();
 			case 'import':
 				return static::handleImportRequest();
-
+			case 'timesheet':
+				return static::handleTimesheetRequest();
             default:
             {
                 return static::respond('editor');
@@ -38,20 +40,24 @@ class EditorRequestHandler extends RequestHandler {
     
     public static function handleExportRequest()
     {
-    		$tmp = EmergenceIO::export();
-    		header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . $_SERVER["SERVER_NAME"] . '-export.zip');
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Length: ' . filesize($tmp));
-			readfile($tmp);
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+	
+		$tmp = EmergenceIO::export();
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename=' . $_SERVER["SERVER_NAME"] . '-export.zip');
+		header('Content-Transfer-Encoding: binary');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+		header('Content-Length: ' . filesize($tmp));
+		readfile($tmp);
     }
     
     public static function handleImportRequest()
     {
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
 		if($_SERVER['REQUEST_METHOD'] == 'PUT') {
 			$put = fopen("php://input", "r"); // open input stream
 			
@@ -73,6 +79,8 @@ class EditorRequestHandler extends RequestHandler {
 
     public static function viewSourceRequest()
     {
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
         $file = SiteFile::getByID($_POST['ID']);
 
         if(!$file) {
@@ -86,58 +94,57 @@ class EditorRequestHandler extends RequestHandler {
     
 	public static function searchRequest()
     {
-        $files = DB::allRecords(
-            'SELECT MAX(`ID`) as `RID`'
-            .' FROM `_e_files`'
-            //.' WHERE `Handle` LIKE \'%%.php\''
-            .' GROUP BY  `Handle`,`CollectionID`'
-        );
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+        set_time_limit(180);
         
-        $clc = sprintf('grep -nI "%s"',$_REQUEST['q']);
-        
-        foreach($files as $file)
-        {
-            $clc .= ' ' . $file['RID'];
+        if (empty($_REQUEST['q'])) {
+            return static::throwInvalidRequestError('q required');
         }
+    	
+        $fileResults = DB::query('SELECT f.ID FROM (SELECT MAX(ID) AS ID FROM _e_files GROUP BY Handle, CollectionID) matches JOIN _e_files f USING(ID) WHERE f.Status = "Normal"');
         
-        //echo $clc . '<br>' . "\n";
+        // open grep process
+        $cmd = sprintf('xargs grep -nI "%s" ', addslashes($_REQUEST['q']));
+        $cwd = Site::$rootPath . '/data/';
+
+        $grepProc = proc_open($cmd, array(0 => array('pipe', 'r'), 1 => array('pipe', 'w')), $pipes, $cwd);
         
-        chdir(Site::$rootPath . '/data/');
+        // pipe file list into xargs
+        $filesCount = 0;
+        while ($file = $fileResults->fetch_assoc()) {
+            fwrite($pipes[0], $file['ID'].PHP_EOL);
+        }
+        fclose($pipes[0]);
         
-        $results = shell_exec($clc);
-        
-        $results = explode("\n",$results);
-        
+        // pipe results out
         $output = array();
         
-        foreach($results as $result)
-        {
-            $line = explode(':',$result,3);
-            
-            if(count($line) === 3)
-            {
+        while (!feof($pipes[1])) { 
+            $line = trim(stream_get_line($pipes[1], 1000000, PHP_EOL)); 
+            $line = explode(':', $line, 3);
+
+            if (count($line) === 3) {
                 $file = SiteFile::getByID($line[0]);
-                
-                if(is_object($file)) {
-                    $fdata = $file->getData();  
-                }
     
                 $output[] = array(
-                    'File'  =>  $fdata
+                    'File'  =>  $file ? $file->getData() : null
                     ,'line' =>  $line[1]
                     ,'result' => $line[2]
                 );
             }
         }
+        fclose($pipes[1]);
+        proc_close($grepProc);
         
-        header('Content-type: application/json');
-        echo json_encode(array(
+        JSON::respond(array(
         	'success'=> true
         	,'data'	=>	$output
         ));
     }
     
     public static function handleRevisionsRequest() {
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
         $node = SiteFile::getByID($_REQUEST['ID']);
         if(!$node)
         {
@@ -170,6 +177,8 @@ class EditorRequestHandler extends RequestHandler {
     }
     
     public static function handleCodeMapRequest($class=__CLASS__) {
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
         $Reflection = new ReflectionClass($class);
         
         $ReflectionMethods = $Reflection->getMethods();
@@ -202,6 +211,8 @@ class EditorRequestHandler extends RequestHandler {
     
     static public function handleActivityRequest()
     {
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
         if(static::peekPath() == 'all')
             static::$activityPageSize = false;
         
@@ -219,10 +230,11 @@ class EditorRequestHandler extends RequestHandler {
             
             list($authorID, $collectionID, $handle) = explode('/', $path, 3);
             $Collection = SiteCollection::getByID($collectionID);
+            $Author = Person::getByID($authorID);
             
             $activity[] = array(
                 'EventType' => 'save'
-                ,'Author' => Person::getByID($authorID)->getData()
+                ,'Author' => $Author ? $Author->getData() : null
                 ,'Collection' => $Collection->getData()
                 ,'Handle' => $handle
                 ,'CollectionPath' => $Collection->FullPath
@@ -268,7 +280,7 @@ class EditorRequestHandler extends RequestHandler {
                     // push new activity
                 	$activity[] = array(
     	                'EventType' => 'delete'
-    	                ,'Author' => $Author->getData()
+    	                ,'Author' => $Author ? $Author->getData() : null
                         ,'Timestamp' => $editRecord['Timestamp']
                         ,'files' => array(
                             array(
@@ -304,7 +316,8 @@ class EditorRequestHandler extends RequestHandler {
         
             
         // close any files still open
-        array_walk(array_keys($openFiles), $closeFile);
+        $openFileKeys = array_keys($openFiles);
+        array_walk($openFileKeys, $closeFile);
         
         // sort activity by last edit
         usort($activity, function($a, $b) {
@@ -314,6 +327,98 @@ class EditorRequestHandler extends RequestHandler {
         return static::respond('activity', array(
             'success' => true
             ,'data' => $activity
+        ));
+    }
+    
+    static public function handleTimesheetRequest()
+    {
+    	if(static::peekPath() == 'html') {
+    		static::$responseMode = 'html';
+    	}
+    	
+    	$GLOBALS['Session']->requireAccountLevel('Developer');
+    	
+    	$daysLimit = isset($_REQUEST['daysLimit']) ? $_REQUEST['daysLimit'] : 7;
+    	$gapLimit = isset($_REQUEST['gapLimit']) ? $_REQUEST['gapLimit'] : 1800;
+    	$minimumSessionDuration = isset($_REQUEST['minimumSessionDuration']) ? $_REQUEST['minimumSessionDuration'] : 120;
+    	$dayShift = isset($_REQUEST['dayShift']) ? $_REQUEST['dayShift'] : 18000; // 5 hours
+    	
+    	$workDays = array();
+    	
+        $editResults = DB::query(
+            'SELECT UNIX_TIMESTAMP(Timestamp) AS Timestamp, AuthorID'
+            .' FROM _e_files f'
+            .' WHERE f.AuthorID IS NOT NULL'
+            .' ORDER BY ID DESC'
+        );
+        
+        while($editRecord = $editResults->fetch_assoc()) {
+        	$day = date('Y-m-d', $editRecord['Timestamp'] - $dayShift);
+        	
+        	if(!array_key_exists($day, $workDays)) {
+        		if(count($workDays) == $daysLimit) {
+        			break;
+        		}
+        		
+        		$workDays[$day] = array();
+        	}
+        	
+        	if(!array_key_exists($editRecord['AuthorID'], $workDays[$day])) {
+        		$workDays[$day][$editRecord['AuthorID']] = array();
+        	}
+        	
+        	if(
+        		!count($workDays[$day][$editRecord['AuthorID']])
+        		|| ($workDays[$day][$editRecord['AuthorID']][0]['firstEdit'] - $gapLimit) > $editRecord['Timestamp']
+        	) {
+        		array_unshift($workDays[$day][$editRecord['AuthorID']], array(
+        			'firstEdit' => $editRecord['Timestamp']
+        			,'lastEdit' => $editRecord['Timestamp']
+        		));
+        	}
+        	else {
+        		$workDays[$day][$editRecord['AuthorID']][0]['firstEdit'] = $editRecord['Timestamp'];
+        	}
+        	
+        }
+        
+        // compile results
+        $results = array();
+        foreach($workDays AS $day => $authors) {
+#        	print("<h1>$day</h1>");
+			$dayResults = array(
+				'date'  => $day
+				,'authors' => array()
+			);
+        	
+        	foreach($authors AS $authorID => $sessions) {
+        		$authorResults = array(
+        			'Person' => Person::getByID($authorID)
+        			,'totalDuration' => 0
+        			,'sessions' => array()
+        		);
+#        		print("<h2>$Author->FullName</h2><pre>");
+        		
+        		foreach($sessions AS $authorSession) {
+        			$authorSession['duration'] = $authorSession['lastEdit'] - $authorSession['firstEdit'];
+        			$authorResults['sessions'][] = $authorSession;
+#        			printf("%s\t->\t%s\t:\t%s minutes\n", date('g:i:sa', $authorSession['firstEdit']), date('g:i:sa', $authorSession['lastEdit']), number_format($authorSession['duration']/60,1));
+        			$authorResults['totalDuration'] += max($authorSession['duration'], $minimumSessionDuration);
+        		}
+        		
+        		$dayResults['authors'][] = $authorResults;
+#        		print("</pre><p>".number_format($dayAuthor['duration'] / 60, 1)." minutes estimated total</p>");
+        	}
+        	
+        	$results[] = $dayResults;
+        }
+        
+        return static::respond('timesheet', array(
+        	'data' => $results
+	    	,'daysLimit' => $daysLimit
+	    	,'gapLimit' => $gapLimit
+	    	,'minimumSessionDuration' => $minimumSessionDuration
+	    	,'dayShift' => $dayShift
         ));
     }
 }

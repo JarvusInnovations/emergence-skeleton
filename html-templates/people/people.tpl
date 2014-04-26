@@ -16,7 +16,7 @@
 	
 	<ul>
 	{foreach item=Person from=$data}
-		<li><a href="/people/{$Person->ID}">{$Person->FullName|escape}</a></li>
+		<li>{personLink $Person}</li>
 	{foreachelse}
 		<li><em>No one's here yet =[</em></li>
 	{/foreach}

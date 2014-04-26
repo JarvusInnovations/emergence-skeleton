@@ -9,8 +9,8 @@
 {/block}
 
 {block "app-menu"}
-	<a href="/{Site::$requestPath[0]}" class="page open">Edit My Profile</a>
-	<a href="/{Site::$requestPath[0]}/view" class="page">View Profile</a>
+	<a href="/{MICS::getApp()}" class="page open">Edit My Profile</a>
+	<a href="/{MICS::getApp()}/view" class="page">View Profile</a>
 {/block}
 
 {block "content"}

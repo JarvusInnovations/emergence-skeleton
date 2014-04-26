@@ -17,9 +17,7 @@ abstract class Token extends ActiveRecord
 
 	
 	static public $fields = array(
-		'ContextClass' => null
-		,'ContextID' => null
-		,'Handle' => array(
+		'Handle' => array(
 			'type' => 'string'
 			,'unique' => true
 		)
@@ -72,7 +70,7 @@ abstract class Token extends ActiveRecord
 	
 	}
 
-	public function save()
+	public function save($deep = true)
 	{
 		// set handle
 		if(!$this->Handle)
@@ -86,7 +84,7 @@ abstract class Token extends ActiveRecord
 		}
 
 		// call parent
-		parent::save();
+		parent::save($deep);
 	}
 
 

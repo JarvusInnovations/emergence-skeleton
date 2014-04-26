@@ -1,70 +1,53 @@
-{$siteConfig = Site::$config}
-
 <!DOCTYPE html>
+{load_templates designs/site.subtemplates.tpl}
 <html class="no-js" lang="en">
 
 <head>
 	<meta charset="utf-8">
 	
 	{* now use {$dwoo.parent} on subpages to automatically fill in the site name *}
-	<title>{block "title"}{$siteConfig.label|default:$.server.HTTP_HOST}{/block}</title>
+	<title>{block "title"}{$.Site.title|escape}{/block}</title>
 	
 	{block "meta-info"}
-	{* most other old-school meta tags are now useless; "keywords" is ignored by Google, for example
-	 * but "description" is still good, and you can put other microdata-type tags in here if need be
-	*}
-	<meta name="description" content="">
+        {include includes/site.meta-info.tpl}
 	{/block}
 	
 	{block "meta-rendering"}
-	{* tell IE to always use the most modern available rendering engine (even if that means invoking Chrome Frame :) *}
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	{* viewport settings for mobile browsers (change these if default rendering/width is undesirable) *}
-	<meta name="viewport" content="width=1000">
+        {include includes/site.meta-rendering.tpl}
 	{/block}
 	
 	{block "favicons"}
-	{* in most cases, placing a favicon.ico & a high res apple-touch-icon.png into site-root will suffice
-	 * in which case you can delete these link tags
-	 * but you can uncomment and use them if you need more explicit URLs for some reason
-	<link rel="shortcut icon" href="/favicon.ico">
-	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/touch-icon-ipad.png" />
-	<link rel="apple-touch-icon" sizes="114x114" href="/touch-icon-iphone4.png" />
-	*}
+        {include includes/site.favicons.tpl}
 	{/block}
-	
+    
 	{block "css"}
-	{* increment the ?v= counter when you update the CSS, to ensure browsers will re-download *}
-	<link rel="stylesheet" href="/css/base.css">
-	<link rel="stylesheet" href="/css/site.css">
+        {include includes/site.css.tpl}
 	{/block}
 	
 	{block "css-ie"}
-	<!--[if IE 6]><link rel="stylesheet" href="/css/ie6.css?v=1"><![endif]-->
-	<!--[if IE 7]><link rel="stylesheet" href="/css/ie7.css?v=1"><![endif]-->
-	<!--[if IE 8]><link rel="stylesheet" href="/css/ie8.css?v=1"><![endif]-->
+		<!--[if IE 6]><link rel="stylesheet" href="/css/ie6.css"><![endif]-->
+		<!--[if IE 7]><link rel="stylesheet" href="/css/ie7.css"><![endif]-->
+		<!--[if IE 8]><link rel="stylesheet" href="/css/ie8.css"><![endif]-->
 	{/block}
-	
+    
 	{block "js-top"}
-	{* modernizr.com *}
-	<script src="/js/modernizr.js"></script>
+        {include includes/site.js-top.tpl}
 	{/block}
 </head>
 
 {* using the responseID as a class on the body can help with subpage-specific styles *}
-<body class="{$responseID|default:'template'}">
+<body class="{block 'body-class'}{str_replace('/', '_', $.responseId)}-tpl{/block}">
 	<div class="wrapper site">
 	<header class="site clearfix">
 	{block "header"}
 		{* the things in here should probably be set up as configurable subtemplates in some way (especially nav) *}
 		<h1 id="logo">
-			<a href="/"><img src="http://placehold.it/300x40" alt="{$siteConfig.label|default:$.server.HTTP_HOST}" width="300" height="40"></a>
+			<a href="/"><img src="http://placehold.it/300x40" alt="{Site::getConfig(label)|escape}" width="300" height="40"></a>
 		</h1>
 		
 		<section id="user-info">
 			{if $.User}
-				<a href="/profile" id="current-user">{$.User->FullName}</a> - <a href="/logout">Logout</a>
+				{avatar $.User size=10} <a href="/profile" id="current-user">{$.User->FullName}</a> - <a href="/logout">Logout</a>
 			{else}
 				<form id="minilogin" action="/login" method="post">
 					<fieldset>
@@ -103,27 +86,17 @@
 	{/block}
 	</footer>
 	</div> <!--!end .site.wrapper -->
-
-	{block "js-analytics"}
-	{* Optimized Analytics loader (uncomment and change UA-XXXXX-X to be your site's ID) goo.gl/PpmmQ
-	<script>
-		var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];(function(d,t){
-		var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-		g.async=1;g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)
-		}(document,'script'))
-	</script>
-	*}
-	{/block}
 	
 	{block "js-bottom"}
-	{* more info goo.gl/mZiyb *}
-	<!--[if lt IE 7 ]>
-	<script src="js/libs/dd_belatedpng.js"></script>
-	<script>DD_belatedPNG.fix('img, .png_bg');</script>
-	<![endif]-->
-	
-	<script src="/x/ext/ext.js"></script>
+        {include includes/site.js-bottom.tpl}
 	{/block}
+
+    {block "js-analytics"}
+        {include includes/site.analytics.tpl}
+    {/block}
+	
+	{* enables site developers to dump the internal session log here by setting ?log_report=1 on any page *}
+	{log_report}
 </body>
 
 </html>

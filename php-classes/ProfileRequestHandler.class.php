@@ -1,10 +1,11 @@
 <?php
 
-
 class ProfileRequestHandler extends RequestHandler
 {
-
 	static public $profileFields = array('Location','About','Phone','Email');
+	static public $onBeforeProfileValidated = false;
+	static public $onBeforeProfileSaved = false;
+	static public $onProfileSaved = false;
 
 	static public function handleRequest()
 	{
@@ -73,14 +74,26 @@ class ProfileRequestHandler extends RequestHandler
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
 			$profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
-		//Debug::dump($profileChanges, 'changes', true);
+
 			$User->setFields($profileChanges);
+			
+			if(static::$onBeforeProfileValidated){
+				call_user_func(static::$onBeforeProfileValidated, $User, $profileChanges, $_REQUEST);
+			}
 			
 			// validate
 			if($User->validate())
 			{
+				if(static::$onBeforeProfileSaved){
+					call_user_func(static::$onBeforeProfileSaved, $User, $profileChanges, $_REQUEST);
+				}
+
 				// save session
 				$User->save();
+				
+				if(static::$onProfileSaved){
+					call_user_func(static::$onProfileSaved, $User, $profileChanges, $_REQUEST);
+				}
 				
 				// fire created response
 				return static::respond('profileSaved', array(
@@ -205,7 +218,4 @@ class ProfileRequestHandler extends RequestHandler
 			'success' => true
 		));
 	}
-	
-	
-
 }

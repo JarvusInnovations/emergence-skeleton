@@ -1,11 +1,9 @@
 <?php
 
-
-
- class RecordValidator
+class RecordValidator
 {
 
-	// configurables
+    // configurables
 	public static $autoTrim = true;
 	
 	// protected properties
@@ -34,6 +32,11 @@
 
 
 	// public instance methods
+	public function resetErrors()
+	{
+		$this->_errors = array();
+	}
+	
 	public function getErrors($id = false)
 	{
 		if($id === false)
@@ -133,7 +136,7 @@
 			else
 			{
 				// default 'erroMessage' built from 'id'
-				$this->_errors[$options['id']] = Inflector::spacifyCaps($options['id']) . ' is ' . ($options['required'] && empty($value) ? 'missing' : 'invalid');
+				$this->_errors[$options['id']] = Inflector::spacifyCaps($options['id']) . ' is ' . ($options['required'] && empty($value) ? 'missing' : 'invalid') . '.';
 			}
 			return false;
 		}
@@ -170,10 +173,6 @@
 	// protected static methods
 	protected static function trimArray(&$array)
 	{
-	if(!is_array($array))
-	{
-	debug_print_backtrace();
-	}
 		foreach($array AS &$var)
 		{
 			if(is_string($var))
@@ -182,6 +181,4 @@
 				self::trimArray($var);
 		}
 	}
-
-
 }

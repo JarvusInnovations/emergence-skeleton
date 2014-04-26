@@ -62,10 +62,10 @@ class GlobalHandle extends ActiveRecord
 		), !$Context->isPhantom);
 	}
 	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'Type'

@@ -1,7 +1,6 @@
 {extends "designs/site.tpl"}
 
 {block "content"}
-
 	<form>
 		<table>
 			<tr>
@@ -15,10 +14,10 @@
 					</select>
 				</td>
 				<td valign="top" align="center" width="200">
-					<input type="submit" value="Generate CREATE TABLE SQL" onclick="this.form.action='/{Site::$requestPath[0]}/sql'">
-					<input type="submit" value="Generate ExtJS Metadata" onclick="this.form.action='/{Site::$requestPath[0]}/metadata'">
-					<input type="submit" value="Generate ExtJS Column Model" onclick="this.form.action='/{Site::$requestPath[0]}/column_model'">
-					<input type="submit" value="Repair nested-set" onclick="this.form.action='/{Site::$requestPath[0]}/renest'">
+					<input type="submit" value="Generate CREATE TABLE SQL" onclick="this.form.action='/{Site::getPath(0)}/sql'">
+					<input type="submit" value="Generate Ext Model" onclick="this.form.action='/{Site::getPath(0)}/ext-model'">
+					<input type="submit" value="Generate Ext Columns" onclick="this.form.action='/{Site::getPath(0)}/ext-columns'">
+					<input type="submit" value="Repair nested-set" onclick="this.form.action='/{Site::getPath(0)}/renest'">
 				</td>
 			</tr>
 		</table>

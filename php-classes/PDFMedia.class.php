@@ -1,12 +1,10 @@
 <?php
 
-
-
- class PDFMedia extends Media
+class PDFMedia extends Media
 {
 
 	// configurables
-	public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>&1'; // 1=pdf path, 2=page
+	public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>/dev/null'; // 1=pdf path, 2=page
 	public static $extractPageIndex = 0;
 	
 	
@@ -21,14 +19,10 @@
 	}
 	
 	
-	function __get($name)
+	function getValue($name)
 	{
 		switch($name)
 		{
-			case 'JsonTranslation':
-				return array_merge(parent::__get($name), array(
-				));
-			
 			case 'ThumbnailMIMEType':
 				return 'image/jpeg';
 				
@@ -43,7 +37,7 @@
 				}
 				
 			default:
-				return parent::__get($name);
+				return parent::getValue($name);
 		}
 	}
 	

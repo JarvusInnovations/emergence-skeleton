@@ -2,10 +2,10 @@
 
 abstract class RecordsRequestHandler extends RequestHandler
 {
-
-	// configurables
-	static public $recordClass;
-	static public $accountLevelRead = false;
+    // configurables
+    static public $recordClass;
+    static public $accountLevelRead = false;
+    static public $accountLevelComment = 'User';
 	static public $accountLevelBrowse = 'Staff';
 	static public $accountLevelWrite = 'Staff';
 	static public $accountLevelAPI = false;
@@ -23,10 +23,13 @@ abstract class RecordsRequestHandler extends RequestHandler
 		// save static class
 		static::$calledClass = get_called_class();
 	
-		// handle JSON requests
-		if(static::peekPath() == 'json')
+		switch(static::peekPath())
 		{
-			static::$responseMode = static::shiftPath();
+			case 'csv':
+			case 'json':
+            case 'pdf':
+				static::$responseMode = static::shiftPath();
+				break;
 		}
 		
 		return static::handleRecordsRequest();
@@ -87,17 +90,18 @@ abstract class RecordsRequestHandler extends RequestHandler
 			return null;
 	}
 	
-	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array())
+	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
 	{
+		$className = static::$recordClass;
 		$terms = preg_split('/\s+/', $query);
 		
-		$options = Site::prepareOptions($options, array(
+		$options = array_merge(array(
 			'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault
 			,'offset' => !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false
-			,'order' => array('searchScore DESC')
-		));
+		), $options);
 
-		$select = array('*');
+		$select = array($className.'.*');
+		$joins = array();
 		$having = array();
 		$matchers = array();
 
@@ -107,48 +111,88 @@ abstract class RecordsRequestHandler extends RequestHandler
 			$qualifier = 'any';
 			$split = explode(':', $term, 2);
 			
+			if(empty($term))
+			{
+				continue;
+			}
+			
 			if(count($split) == 2)
 			{
 				$qualifier = strtolower($split[0]);
 				$term = $split[1];
 			}
+            
+            if($qualifier == 'mode' && $term=='or')
+            {
+                $mode = 'OR';
+                continue;
+            }
 			
-			foreach(static::$searchConditions AS $k => $condition)
-			{
-				if(!in_array($qualifier, $condition['qualifiers']))
-					continue;
+			
+			$sqlSearchConditions = $className::getSqlSearchConditions($qualifier, $term);
 
-				$matchers[] = array(
-					'condition' => sprintf($condition['sql'], DB::escape($term))
-					,'points' => $condition['points']
-				);
-				
-				$n++;
-			}
-			
-			if($n == 0)
+			if(count($sqlSearchConditions['conditions']) == 0 && !$sqlSearchConditions['qualifierFound'])
 			{
-				throw new Exception('Unknown search qualifier: '.$qualifier);
+                return static::throwError('Unknown search qualifier: '.$qualifier);
+			}
+
+			$matchers = array_merge($matchers, $sqlSearchConditions['conditions']);
+			
+			if($sqlSearchConditions['joins'])
+			{
+				$joins = array_merge($joins, $sqlSearchConditions['joins']);
 			}
 		}
+        
+        if(empty($matchers))
+        {
+            return static::throwError('Query was empty');
+        }
 		
-		$select[] = join('+', array_map(function($c) {
-			return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
-		}, $matchers)) . ' AS searchScore';
-		
-		$having[] = 'searchScore > 1';
-	
-		$className = static::$recordClass;
+        if($mode == 'OR') // OR mode, object can match any term and results are sorted by score
+        {
+    		$select[] = join('+', array_map(function($c) {
+    			return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
+    		}, $matchers)) . ' AS searchScore';
+    		
+    		$having[] = 'searchScore > 1';
+            
+            if(empty($options['order']))
+            {
+                $options['order'] = array('searchScore DESC');
+            }
+        }
+        else // AND mode, all terms must match 
+        {
+            // group by qualifier
+            $qualifierConditions = array();
+            foreach($matchers AS $matcher)
+            {
+                $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
+                //$conditions[] = $matcher['condition'];
+            }
+            
+            // compile conditions
+            foreach($qualifierConditions AS $newConditions)
+            {
+                $conditions[] = '( (' . join(') OR (', $newConditions) . ') )';
+            }
+            
+            if(static::$browseOrder)
+                $options['order'] = $className::mapFieldOrder(static::$browseOrder);
+        }
 
 		return static::respond(
 			isset($responseID) ? $responseID : static::getTemplateName($className::$pluralNoun)
 			,array_merge($responseData, array(
 				'success' => true
 				,'data' => $className::getAllByQuery(
-					'SELECT %s FROM `%s` WHERE (%s) %s %s %s'
+					'SELECT %s FROM `%s` %s %s WHERE (%s) %s %s %s'
 					,array(
 						join(',',$select)
 						,$className::$tableName
+						,$className
+						,!empty($joins) ? implode(' ', $joins) : ''
 						,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
 						,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
 						,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
@@ -161,17 +205,20 @@ abstract class RecordsRequestHandler extends RequestHandler
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
+			,static::$responseMode
 		);
 	}
 
 
 	static public function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
 	{
+		$className = static::$recordClass;
+		
 		if(!static::checkBrowseAccess(func_get_args()))
 		{
 			return static::throwUnauthorizedError();
 		}
-			
+
 		if(static::$browseConditions)
 		{
 			if(!is_array(static::$browseConditions))
@@ -179,28 +226,82 @@ abstract class RecordsRequestHandler extends RequestHandler
 			$conditions = array_merge(static::$browseConditions, $conditions);
 		}
 		
-		$limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault;
-		$offset = !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false;
+		$limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault;
+		$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : false;
 		
-		$options = Site::prepareOptions($options, array(
+		if(!empty($_REQUEST['sort'])) {
+			$dir = (empty($_REQUEST['dir']) || $_REQUEST['dir'] == 'ASC') ? 'ASC' : 'DESC';
+			
+			if($className::sorterExists($_REQUEST['sort'])) {
+				$order = call_user_func($className::getSorter($_REQUEST['sort']), $dir, $_REQUEST['sort']);
+			}
+			elseif($className::fieldExists($_REQUEST['sort'])) {
+				$order = array(
+					$_REQUEST['sort'] => $dir
+				);
+			}
+			else {
+				return static::throwError('Invalid sort field');
+			}
+		}
+		else {
+			$order = static::$browseOrder;
+		}
+		
+		$options = array_merge(array(
 			'limit' =>  $limit
 			,'offset' => $offset
-			,'order' => static::$browseOrder
-		));
-
+			,'order' => $order
+		), $options);
+		
 		// handle query search
-		if(!empty($_REQUEST['q']) && static::$searchConditions)
+		if(!empty($_REQUEST['q']) && $className::$searchConditions)
 		{
 			return static::handleQueryRequest($_REQUEST['q'], $conditions, array('limit' => $limit, 'offset' => $offset), $responseID, $responseData);
 		}
 
-		$className = static::$recordClass;
 
+        // get results
+        $results = $className::getAllByWhere($conditions, $options);
+        
+        
+        // embed tables
+        if (!empty($_GET['relatedTable'])) {
+            $relatedTables = is_array($_GET['relatedTable']) ? $_GET['relatedTable'] : explode(',', $_GET['relatedTable']);
+            
+            $related = array();
+            foreach ($results AS $result) {
+                foreach ($relatedTables AS $relName) {
+                    if (!$result::relationshipExists($relName)) {
+                        continue;
+                    }
+                    
+                    $relConfig = $result::getStackedConfig('relationships', $relName);
+                    if (!$relConfig || $relConfig['type'] != 'one-one') {
+                        continue;
+                    }
+                    
+                    $relatedInstance = $result->$relName;
+                    if (!$relatedInstance) {
+                        continue;
+                    }
+                    
+                    if (empty($related[$relName]) || !in_array($relatedInstance, $related[$relName])) {
+                        $related[$relName][] = $relatedInstance;
+                    }
+                }
+            }
+            
+            $responseData['related'] = $related;
+        }
+        
+
+        // generate response
 		return static::respond(
 			isset($responseID) ? $responseID : static::getTemplateName($className::$pluralNoun)
 			,array_merge($responseData, array(
 				'success' => true
-				,'data' => $className::getAllByWhere($conditions, $options)
+				,'data' => $results
 				,'conditions' => $conditions
 			    ,'total' => DB::foundRows()
 			    ,'limit' => $options['limit']
@@ -224,6 +325,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 					'success' => true
 					,'data' => $Record
 				));
+			}
+			
+			case 'comment':
+			{
+				return static::handleCommentRequest($Record);
 			}
 			
 			case 'edit':
@@ -251,8 +357,8 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 
 	static public function handleMultiSaveRequest()
-	{		
-		if(static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], array('POST','PUT')))
+	{
+		if($_SERVER['CONTENT_TYPE'] == 'application/json')
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
@@ -271,7 +377,15 @@ abstract class RecordsRequestHandler extends RequestHandler
 			// get record
 			if(empty($datum['ID']))
 			{
-				$Record = new $className::$defaultClass();
+				$subClasses = $className::getStaticSubClasses();
+				
+				if (!empty($datum['Class']) && in_array($datum['Class'], $subClasses)) {
+					$defaultClass = $datum['Class'];
+				} else {
+					$defaultClass = $className::getStaticDefaultClass();
+				}
+				
+				$Record = new $defaultClass();
 				static::onRecordCreated($Record, $datum);
 			}
 			else
@@ -305,7 +419,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 				static::onBeforeRecordSaved($Record, $datum);
 
 				$Record->save();
-				$results[] = (!$Record::_fieldExists('Class') || get_class($Record) == $Record->Class) ? $Record : $Record->changeClass();
+				$results[] = (!$Record::fieldExists('Class') || get_class($Record) == $Record->Class) ? $Record : $Record->changeClass();
 				
 				// call template function
 				static::onRecordSaved($Record, $datum);
@@ -313,12 +427,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 			catch(RecordValidationException $e)
 			{
 				$failed[] = array(
-					'record' => $Record->data
-					,'validationErrors' => $Record->validationErrors
+					'record' => $Record->getData()
+					,'validationErrors' => $e->validationErrors
 				);
 			}
 		}
-		
 		
 		return static::respond(static::getTemplateName($className::$pluralNoun).'Saved', array(
 			'success' => count($results) || !count($failed)
@@ -403,11 +516,18 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		// save static class
 		static::$calledClass = get_called_class();
+		$className = static::$recordClass;
 
-		if(!$Record)
-		{
-			$className = static::$recordClass;
-			$Record = new $className::$defaultClass();
+		if (!$Record) {
+			$subClasses = $className::getStaticSubClasses();
+			
+			if (!empty($_REQUEST['Class']) && in_array($_REQUEST['Class'], $subClasses)) {
+				$defaultClass = $_REQUEST['Class'];
+			} else {
+				$defaultClass = $className::getStaticDefaultClass();
+			}
+			
+			$Record = new $defaultClass();
 		}
 		
 		// call template function
@@ -494,6 +614,30 @@ abstract class RecordsRequestHandler extends RequestHandler
 	}
 	
 
+	static public function handleCommentRequest(ActiveRecord $Record)
+	{
+		$className = static::$recordClass;
+
+		if(!static::checkCommentAccess($Record))
+		{
+			return static::throwUnauthorizedError();
+		}
+		
+		if($_SERVER['REQUEST_METHOD'] == 'POST')
+		{
+			$Comment = Comment::create(array(
+				'Context' => $Record
+				,'Author' => $GLOBALS['Session']->Person
+				,'Message' => $_REQUEST['Message']
+				,'Authored' => time()
+			), true);
+			
+			Site::redirect(array(Site::$requestPath[0], $Record->Handle), false, "comment-$Comment->ID");
+		}
+		else {
+			static::throwInvalidRequestError();
+		}
+	}
 
 	static protected function getTemplateName($noun)
 	{
@@ -557,27 +701,48 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		if(static::$accountLevelBrowse)
 		{
+			$GLOBALS['Session']->requireAuthentication();
 			return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelBrowse);
 		}
 		
 		return true;
 	}
 
-	static public function checkReadAccess(ActiveRecord $Record)
+	static public function checkReadAccess(ActiveRecord $Record, $suppressLogin=false)
 	{
 		if(static::$accountLevelRead)
 		{
+			if(!$suppressLogin)
+			{
+				$GLOBALS['Session']->requireAuthentication();
+			}
+			
 			return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelRead);
 		}
 		
 		return true;
 	}
 	
-	static public function checkWriteAccess(ActiveRecord $Record)
+	static public function checkWriteAccess(ActiveRecord $Record, $suppressLogin=false)
 	{
 		if(static::$accountLevelWrite)
 		{
+			if(!$suppressLogin)
+			{
+				$GLOBALS['Session']->requireAuthentication();
+			}
+			
 			return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelWrite);
+		}
+		
+		return true;
+	}
+	
+	static public function checkCommentAccess(ActiveRecord $Record)
+	{
+		if(static::$accountLevelComment)
+		{
+			return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelComment);
 		}
 		
 		return true;
@@ -587,6 +752,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		if(static::$accountLevelAPI)
 		{
+			$GLOBALS['Session']->requireAuthentication();
 			return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelAPI);
 		}
 		

@@ -33,7 +33,7 @@ class ErrorHandler extends RequestHandler
 				$report .= '<h2>Debug Log</h2><pre>'.print_r(DebugLog::getLog(), true).'</pre>';
 				
 
-				if(Debug::$DebugMode)
+				if(MICS::$DebugMode)
 				{
 					die($report);
 				}
@@ -56,27 +56,27 @@ class ErrorHandler extends RequestHandler
 	{
 		header('HTTP/1.0 500 Internal Server Error');
 		print('An internal system error occurred: '.$message);
-		exit();
+		MICS::terminate();
 	}
 	
 	public static function handleNotFound($properNoun = false, $commonNoun = 'page')
 	{
 		header('HTTP/1.0 404 Not Found');
 		printf('The %s you requested "%s" was not found.', $commonNoun, $properNoun);
-		exit();
+		MICS::terminate();
 	}
 	
 	public static function handleInvalidRequest()
 	{
 		header('HTTP/1.0 400 Bad Request');
 		print('Invalid request');
-		exit();
+		MICS::terminate();
 	}
 	
 	public static function handleInadaquateAccess($requiredAccountLevel)
 	{
 		printf('Sorry, you must have %s access to do that', $requiredAccountLevel);
-		exit();
+		MICS::terminate();
 	}
 	
 	public static function handleValidationError(RecordValidationException $e)

@@ -1,13 +1,15 @@
 <?php
 
-
 class Media extends ActiveRecord
 {
+    static public $singularNoun = 'media item';
+	static public $pluralNoun = 'media items';
 
 	// support subclassing
 	static public $rootClass = __CLASS__;
 	static public $defaultClass = __CLASS__;
 	static public $subClasses = array(__CLASS__);
+    static public $collectionRoute = '/media';
 
 	// get rid of these??
 	public static $Namespaces = array();
@@ -18,8 +20,7 @@ class Media extends ActiveRecord
 	
 	static public $fields = array(
 		'ContextClass' => array(
-			'type' => 'enum'
-			,'values' => array('Person')
+			'type' => 'string'
 			,'notnull' => false
 		)
 		,'ContextID' => array(
@@ -28,20 +29,27 @@ class Media extends ActiveRecord
 		)
 		,'MIMEType' => array(
 			'type' => 'enum'
-			,'values' => array('image/gif','image/jpeg','image/png','video/x-flv','application/pdf')
+			,'values' => array('image/gif','image/jpeg','image/png','video/x-flv','application/pdf', 'video/mp4')
 		)
 		,'Width' => array(
 			'type' => 'integer'
 			,'unsigned' => true
+        	,'notnull' => false
 		)
 		,'Height' => array(
 			'type' => 'integer'
 			,'unsigned' => true
+        	,'notnull' => false
 		)
 		,'Duration' => array(
 			'type' => 'float'
+    		,'unsigned' => true
+    		,'notnull' => false
 		)
-		,'Caption'
+		,'Caption' => array(
+            'type' => 'string'
+    		,'notnull' => false
+        )
 	);
 	
 	static public $relationships = array(
@@ -54,6 +62,29 @@ class Media extends ActiveRecord
 			'type' => 'context-parent'
 		)
 	);
+	
+	static public $searchConditions = array(
+		'Caption' => array(
+			'qualifiers' => array('any','caption')
+			,'points' => 2
+			,'sql' => 'Caption LIKE "%%%s%%"'
+		)
+		,'CaptionLike' => array(
+			'qualifiers' => array('caption-like')
+			,'points' => 2
+			,'sql' => 'Caption LIKE "%s"'
+		)
+		,'CaptionNot' => array(
+			'qualifiers' => array('caption-not')
+			,'points' => 2
+			,'sql' => 'Caption NOT LIKE "%%%s%%"'
+		)
+		,'CaptionNotLike' => array(
+			'qualifiers' => array('caption-not-like')
+			,'points' => 2
+			,'sql' => 'Caption NOT LIKE "%s"'
+		)
+	);
 
 	static public $webPathFormat = '/media/open/%u'; // 1=mediaID
 	static public $thumbnailRequestFormat = '/thumbnail/%1$u/%2$ux%3$u%4$s'; // 1=media_id 2=width 3=height 4=fill_color
@@ -64,6 +95,7 @@ class Media extends ActiveRecord
 	static public $newDirectoryPermissions = 0775;
 	static public $newFilePermissions = 0664;
 	static public $magicPath = null;//'/usr/share/misc/magic.mgc';
+    static public $useFaceDetection = true;
 	
 	static public $mimeHandlers = array();
 
@@ -86,7 +118,7 @@ class Media extends ActiveRecord
 
 
 	// magic methods
-	function __get($name)
+	function getValue($name)
 	{
 		switch($name)
 		{
@@ -141,7 +173,7 @@ class Media extends ActiveRecord
 					return false;
 				}
 
-				return Site::$rootPath.'/media/original/'.$this->Filename;
+				return Site::$rootPath.'/site-data/media/original/'.$this->Filename;
 				
 				
 			case 'BlankPath':
@@ -150,7 +182,7 @@ class Media extends ActiveRecord
 
 
 			default:
-				return parent::__get($name);
+				return parent::getValue($name);
 		}
 	}
 	
@@ -167,29 +199,15 @@ class Media extends ActiveRecord
 		);
 	}
 	
-	public function getThumbnailRequest($width, $height, $fillColor = null)
+	public function getThumbnailRequest($width, $height, $fillColor = null, $cropped = false)
 	{
 		return sprintf(
 			static::$thumbnailRequestFormat
 			, $this->ID
 			, $width
 			, $height
-			, ( isset($fillColor) ? 'x'.$fillColor : '' )
-		);
-	}
-	
-	public function getConstrainedSize($maxWidth, $maxHeight)
-	{
-		// calculate scale ratios
-		$widthRatio = ($this->Width > $maxWidth) ? ($maxWidth / $this->Width) : 1;
-		$heightRatio = ($this->Height > $maxHeight) ? ($maxHeight / $this->Height) : 1;
-		
-		$ratio = min($widthRatio, $heightRatio);
-
-		return array(
-			'width' => round($this->Width * $ratio)
-			, 'height' => round($this->Height * $ratio)
-		);
+			, ( is_string($fillColor) ? 'x'.$fillColor : '' )
+		) . ($cropped ? '/cropped' : '');
 	}
 	
 	public function getImage($sourceFile = null)
@@ -209,7 +227,7 @@ class Media extends ActiveRecord
 		return $fileImage;
 	}
 	
-	public function getThumbnail($maxWidth, $maxHeight, $fillColor = false)
+	public function getThumbnail($maxWidth, $maxHeight, $fillColor = false, $cropped = false)
 	{
 		// init thumbnail path
 		$thumbFormat = sprintf('%ux%u', $maxWidth, $maxHeight);
@@ -218,44 +236,23 @@ class Media extends ActiveRecord
 		{
 			$thumbFormat .= 'x'.strtoupper($fillColor);
 		}
+        
+        if ($cropped) {
+            $thumbFormat .= '.cropped';
+        }
 		
-		$thumbPath = Site::$rootPath.'/media/'.$thumbFormat.'/'.$this->Filename;
+		$thumbPath = Site::$rootPath.'/site-data/media/'.$thumbFormat.'/'.$this->Filename;
 				
 		// look for cached thumbnail
-		if (!file_exists($thumbPath))
-		{
-			
-			// create new thumbnail
-			$thumbnail = $this->createThumbnailImage($maxWidth, $maxHeight, $fillColor);
-			
-			//Debug::dump(imagesx($thumbnail),'thumb',true);
-			
-			// save thumbnail to cache
-			$thumbDir = dirname($thumbPath);
-			if (!is_dir($thumbDir))
-			{
+		if (!file_exists($thumbPath)) {
+            // ensure directory exists
+    		$thumbDir = dirname($thumbPath);
+			if (!is_dir($thumbDir)) {
 				mkdir($thumbDir, static::$newDirectoryPermissions, true);
 			}
-			
-			switch($this->ThumbnailMIMEType)
-			{
-				case 'image/gif':
-					imagegif($thumbnail, $thumbPath);
-					break;
-				
-				case 'image/jpeg':
-					imagejpeg($thumbnail, $thumbPath, static::$thumbnailJPEGCompression);
-					break;
-					
-				case 'image/png':
-					imagepng($thumbnail, $thumbPath, static::$thumbnailPNGCompression);
-					break;
-					
-				default:
-					throw new Exception('Unhandled thumbnail format');		
-			}
-			
-			chmod($thumbPath, static::$newFilePermissions);		
+            
+			// create new thumbnail
+			$this->createThumbnailImage($thumbPath, $maxWidth, $maxHeight, $fillColor, $cropped);
 		}
 		
 		
@@ -264,84 +261,122 @@ class Media extends ActiveRecord
 	}
 	
 	
-	public function createThumbnailImage($maxWidth, $maxHeight, $fillColor = false)
+	public function createThumbnailImage($thumbPath, $maxWidth, $maxHeight, $fillColor = false, $cropped = false)
 	{
-		$scale = $this->getConstrainedSize($maxWidth, $maxHeight);
+		$thumbWidth = $maxWidth;
+		$thumbHeight = $maxHeight;
+                
+        if ($cropped && extension_loaded('imagick')) {
+            if (static::$useFaceDetection && extension_loaded('facedetect')) {
+                $cropper = new CropFace($this->FilesystemPath);
+            } else {
+                $cropper = new stojg\crop\CropEntropy($this->FilesystemPath);
+            }
+            $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
+            $croppedImage->writeimage($thumbPath);
+        } else {
+        	$widthRatio = ($this->Width > $maxWidth) ? ($maxWidth / $this->Width) : 1;
+    		$heightRatio = ($this->Height > $maxHeight) ? ($maxHeight / $this->Height) : 1;
+                
+        	// crop width/height to scale size if fill disabled
+            if ($cropped) {
+            	$ratio = max($widthRatio, $heightRatio);
+            } else {
+            	$ratio = min($widthRatio, $heightRatio);
+            }
+            
+            $scaledWidth = round($this->Width * $ratio);
+            $scaledHeight = round($this->Height * $ratio);
+            
+    		if (!$fillColor && !$cropped) {
+            	$thumbWidth = $scaledWidth;
+    			$thumbHeight = $scaledHeight;
+    		}
+            
+    		// create images
+    		$srcImage = $this->getImage();
+    		$image = imagecreatetruecolor($thumbWidth, $thumbHeight);
+    		
+    		// paint fill color
+    		if ($fillColor) {
+    			// extract decimal values from hex triplet
+    			$fillColor = sscanf($fillColor, '%2x%2x%2x');
+    
+    			// convert to color index
+    			$fillColor = imagecolorallocate($image, $fillColor[0], $fillColor[1], $fillColor[2]);
+    			
+    			// fill background
+    			imagefill($image, 0, 0, $fillColor);
+    		} elseif( ($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png' )) {
+    			$trans_index = imagecolortransparent($srcImage);
+    			
+    			// check if there is a specific transparent color
+    			if ($trans_index >= 0) {
+    				$trans_color = imagecolorsforindex($srcImage, $trans_index);
+    				
+    				// allocate in thumbnail
+    				$trans_index = imagecolorallocate($image, $trans_color['red'], $trans_color['green'], $trans_color['blue']);
+    				
+    				// fill background
+    				imagefill($image, 0, 0, $trans_index);
+    				imagecolortransparent($image, $trans_index);
+    
+    			} elseif($this->MIMEType == 'image/png') {
+    				imagealphablending($image, false);
+    				$trans_color = imagecolorallocatealpha($image, 0, 0, 0, 127);
+    				imagefill($image, 0, 0, $trans_color);
+    				imagesavealpha($image, true);
+    			}
+    			
+    /*
+    			$trans_index = imagecolorallocate($image, 218, 0, 245);
+    			ImageColorTransparent($image, $background); // make the new temp image all transparent
+    			imagealphablending($image, false); // turn off the alpha blending to keep the alpha channel
+    */
+    		}
 
-		// crop width/height to scale size if fill disabled
-		if($fillColor)
-		{
-			$width = $maxWidth;
-			$height = $maxHeight;
-		}
-		else
-		{
-			$width = $scale['width'];
-			$height = $scale['height'];
-		}
-		
-		// create images
-		$srcImage = $this->getImage();
-		$image = imagecreatetruecolor($width, $height);
-		
-		// paint fill color
-		if ($fillColor)
-		{
-			// extract decimal values from hex triplet
-			$fillColor = sscanf($fillColor, '%2x%2x%2x');
-
-			// convert to color index
-			$fillColor = imagecolorallocate($image, $fillColor[0], $fillColor[1], $fillColor[2]);
-			
-			// fill background
-			imagefill($image, 0, 0, $fillColor);
-		}
-		elseif( ($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png' ))
-		{
-			$trans_index = imagecolortransparent($srcImage);
-			
-			// check if there is a specific transparent color
-			if($trans_index >= 0)
-			{
-				$trans_color = imagecolorsforindex($srcImage, $trans_index);
+        	// resize photo to thumbnail
+            if ($cropped) {
+                imagecopyresampled(
+        			  $image
+        			, $srcImage
+        			, ($thumbWidth - $scaledWidth) / 2, ($thumbHeight - $scaledHeight) / 2
+            		, 0, 0
+        			, $scaledWidth, $scaledHeight
+        			, $this->Width, $this->Height
+        		);
+            } else {
+        		imagecopyresampled(
+        			  $image
+        			, $srcImage
+        			, round( ($thumbWidth - $scaledWidth) / 2 ), round( ($thumbHeight - $scaledHeight) / 2 )
+        			, 0, 0
+        			, $scaledWidth, $scaledHeight
+        			, $this->Width, $this->Height
+        		);
+            }
+            
+    		// save thumbnail to disk
+			switch ($this->ThumbnailMIMEType) {
+				case 'image/gif':
+					imagegif($image, $thumbPath);
+					break;
 				
-				// allocate in thumbnail
-				$trans_index = imagecolorallocate($image, $trans_color['red'], $trans_color['green'], $trans_color['blue']);
-				
-				// fill background
-				imagefill($image, 0, 0, $trans_index);
-				imagecolortransparent($image, $trans_index);
-
+				case 'image/jpeg':
+					imagejpeg($image, $thumbPath, static::$thumbnailJPEGCompression);
+					break;
+					
+				case 'image/png':
+					imagepng($image, $thumbPath, static::$thumbnailPNGCompression);
+					break;
+					
+				default:
+					throw new Exception('Unhandled thumbnail format');		
 			}
-			elseif($this->MIMEType == 'image/png' )
-			{
-				imagealphablending($image, false);
-				$trans_color = imagecolorallocatealpha($image, 0, 0, 0, 127);
-				imagefill($image, 0, 0, $trans_color);
-				imagesavealpha($image, true);
-			}
-			
-/*
-			$trans_index = imagecolorallocate($image, 218, 0, 245);
-			ImageColorTransparent($image, $background); // make the new temp image all transparent
-			imagealphablending($image, false); // turn off the alpha blending to keep the alpha channel
-*/
-		}
-		
-		
-		//Debug::dump(imagesx($srcImage), 'srcImage');
-		
-		// resize photo to thumbnail
-		imagecopyresampled(
-			  $image
-			, $srcImage
-			, round( ($width - $scale['width']) / 2 ), round( ($height - $scale['height']) / 2 )
-			, 0, 0
-			, $scale['width'], $scale['height']
-			, $this->Width, $this->Height
-		);
-		
-		return $image;
+        }
+    		
+		chmod($thumbPath, static::$newFilePermissions);
+        return true;
 	}
 	
 	/*
@@ -383,22 +418,15 @@ class Media extends ActiveRecord
 		$Media->save();
 		
 		// move file
-		$success = rename($file, $Media->FilesystemPath);
-		if (!$success)
+		$targetDirectory = dirname($Media->FilesystemPath);
+		
+		if(!is_dir($targetDirectory))
 		{
-			$error = error_get_last();
-
-			// handle directory doesn't exist
-			if (substr($error['message'], -25) == "No such file or directory")
-			{
-				mkdir(dirname($Media->FilesystemPath), static::$newDirectoryPermissions, true);
-				
-				$success = @rename($file, $Media->FilesystemPath);
-			}
+			mkdir($targetDirectory, static::$newDirectoryPermissions, true);
 		}
 		
 		// set file permissions
-		if ($success)
+		if (rename($file, $Media->FilesystemPath))
 		{
 			chmod($Media->FilesystemPath, static::$newFilePermissions);
 			return $Media;
@@ -414,8 +442,6 @@ class Media extends ActiveRecord
 	
 	public function initializeFromAnalysis($mediaInfo)
 	{
-		global $Session;
-	
 		$this->MIMEType = $mediaInfo['mimeType'];
 		$this->Width = $mediaInfo['width'];
 		$this->Height = $mediaInfo['height'];
@@ -453,7 +479,7 @@ class Media extends ActiveRecord
 		// determine type
 		if(!isset(static::$mimeHandlers[$mediaInfo['mimeType']]))
 		{
-			//Debug::dump(static::$mimeHandlers, 'MIME Handlers');
+			//MICS::dump(static::$mimeHandlers, 'MIME Handlers');
 			throw new MediaTypeException('No class registered for mime type "' . $mediaInfo['mimeType'] . '"');
 		}
 		
@@ -467,7 +493,16 @@ class Media extends ActiveRecord
 	
 	static public function getBlankPath($contextClass)
 	{
-		return Site::$rootPath.'/media/original/'.sprintf(static::$defaultFilenameFormat, $contextClass);
+		$path = array('site-root','img',sprintf(static::$defaultFilenameFormat, $contextClass));
+		
+		if($node = Site::resolvePath($path))
+		{
+			return $node->RealPath;
+		}
+		else
+		{
+			throw new Exception('Could not load '.implode('/',$path));
+		}
 	}
 	
 	static public function getBlank($contextClass)
@@ -502,8 +537,5 @@ class Media extends ActiveRecord
 		return $blankMedia;
 		
 	}
-
-
-
 
 }

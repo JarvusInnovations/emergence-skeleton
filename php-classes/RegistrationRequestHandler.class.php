@@ -3,6 +3,7 @@
 class RegistrationRequestHandler extends RequestHandler
 {
 	// configurables
+	static public $enableRegistration = true;
 	static public $onRegisterComplete = false;
 	static public $welcomeFrom = false;
 	static public $welcomeSubject = false;
@@ -30,10 +31,6 @@ class RegistrationRequestHandler extends RequestHandler
 		if(static::peekPath() == 'json')
 		{
 			static::$responseMode = static::shiftPath();
-		}
-		else
-		{
-			MICS::useHTTPS();
 		}
 		
 		switch($action = static::shiftPath())
@@ -66,8 +63,13 @@ class RegistrationRequestHandler extends RequestHandler
 		{
 			return static::throwError('You are already logged into a user account; you do not need to register.');
 		}
-	
-		$User = new User::$defaultClass();
+		
+		if (!static::$enableRegistration) {
+			return static::throwError('Self-registration is not currently available');
+		}
+        
+        $className = User::getStaticDefaultClass();
+		$User = new $className();
 
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{

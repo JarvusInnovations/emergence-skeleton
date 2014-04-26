@@ -1,6 +1,5 @@
 <?php
 
-
 class PhotoMedia extends Media
 {
 
@@ -20,15 +19,10 @@ class PhotoMedia extends Media
 	}
 		
 	
-	function __get($name)
+	function getValue($name)
 	{
 		switch($name)
 		{
-			case 'JsonTranslation':
-				return array_merge(parent::__get($name), array(
-				));
-			
-				
 			case 'Extension':
 
 				switch($this->MIMEType)
@@ -47,7 +41,7 @@ class PhotoMedia extends Media
 				}	
 				
 			default:
-				return parent::__get($name);
+				return parent::getValue($name);
 		}
 	}
 	

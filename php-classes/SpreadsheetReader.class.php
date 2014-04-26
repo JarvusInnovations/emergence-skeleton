@@ -5,6 +5,7 @@ class SpreadsheetReader
 	protected $_options = array(
 		'parseHeader' => true
 		,'autoTrim' => true
+		,'packedColumn' => false // set to an integer index to pack extra columns into given column by comma
 	);
 	protected $_fh;
 	protected $_columnNames;
@@ -45,21 +46,33 @@ class SpreadsheetReader
 		if($this->_options['parseHeader'])
 		{
 			$this->_columnNames = $this->getNextRow();
+			
+			if (is_string($this->_options['packedColumn'])) {
+				$this->_options['packedColumn'] = array_search($this->_options['packedColumn'], $this->_columnNames);
+			}
 		}
 	}
 
 
 	public function getNextRow($assoc = true)
 	{
-		if(!$row = fgetcsv($this->_fh))
-		{
+		if (!$row = fgetcsv($this->_fh)) {
 			return false;
 		}
 		
-		if($this->_options['autoTrim'])
+		if ($this->_options['autoTrim']) {
 			$row = array_map('trim', $row);
-	
-		return $assoc&&isset($this->_columnNames) ? array_combine($this->_columnNames, $row) : $row;
+		}
+		
+		if ($assoc && isset($this->_columnNames)) {
+			if (is_int($this->_options['packedColumn']) && ($columnCount = count($this->_columnNames)) < ($rowCount = count($row))) {
+				$row[$this->_options['packedColumn']] .= ','.join(',', array_splice($row, $this->_options['packedColumn'] + 1, $rowCount - $columnCount));
+			}
+			
+			return array_combine($this->_columnNames, $row);
+		}
+		
+		return $row;
 	}
 	
 	

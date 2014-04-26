@@ -19,7 +19,7 @@ class CMS_Page extends CMS_Content
     
     static public function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
-		$options = Site::prepareOptions($options, array(
+		$options = MICS::prepareOptions($options, array(
 			'conditions' => array()
 		));
 		

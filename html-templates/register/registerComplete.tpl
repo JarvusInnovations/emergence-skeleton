@@ -9,7 +9,7 @@
 	<h1>{$.server.HTTP_HOST} account created</h1>
 	<hr class="clear" />
 	
-	<p>Your username is: <a href="/users/{$User->Username}">{$User->Username|escape}</a></p>
+	<p>Your username is: <a href="/people/{$User->Username}">{$User->Username|escape}</a></p>
 	
 	<p>
 		Things to do next&hellip;

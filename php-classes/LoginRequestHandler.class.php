@@ -1,8 +1,6 @@
 <?php
 
-
-
- class LoginRequestHandler extends RequestHandler
+class LoginRequestHandler extends RequestHandler
 {
 
 	static public $defaultRedirect = '/';
@@ -27,15 +25,16 @@
 		{
 			return static::handleLogoutRequest($returnURL);
 		}
-		
+
 		// force login
 		$GLOBALS['Session']->requireAuthentication();
 		
 		$returnURL = static::getReturnURL($returnURL);
 	
-		if(is_callable(static::$onLoginComplete))
+		if(is_callable(static::$onLoginComplete)) {
 			call_user_func(static::$onLoginComplete, $GLOBALS['Session'], $returnURL);
-			
+		}
+		
 		static::onLoginComplete($GLOBALS['Session'], $returnURL);
 	
 		// respond
@@ -56,9 +55,10 @@
 				
 		$returnURL = static::getReturnURL($returnURL);
 	
-		if(is_callable(static::$onLogoutComplete))
+		if(is_callable(static::$onLogoutComplete)) {
 			call_user_func(static::$onLogoutComplete, $GLOBALS['Session'], $returnURL);
-			
+		}
+		
 		static::onLogoutComplete($GLOBALS['Session'], $returnURL);
 
 		// send redirect header
@@ -82,7 +82,7 @@
 		elseif(!empty($_SERVER['HTTP_REFERER']) && !preg_match('|^https?://[^/]+/login|i', $_SERVER['HTTP_REFERER']))
 			return $_SERVER['HTTP_REFERER'];
 		else
-			return 'http://'.$_SERVER['HTTP_HOST'].static::$defaultRedirect;
+			return (empty($_SERVER['HTTPS']) ? 'http' : 'https').'://'.$_SERVER['HTTP_HOST'].static::$defaultRedirect;
 	}
 
 

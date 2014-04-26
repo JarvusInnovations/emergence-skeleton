@@ -1,18 +1,15 @@
 <?php
 
-
-
- class CommentsRequestHandler extends RecordsRequestHandler
+class CommentsRequestHandler extends RecordsRequestHandler
 {
-
-	// RecordsRequestHandler configuration
+    // RecordsRequestHandler configuration
 	static public $recordClass = 'Comment';
 	static public $accountLevelRead = false;
 	static public $accountLevelBrowse = false;
 	static public $accountLevelWrite = 'User';
 	static public $browseOrder = array('ID' => 'DESC');
-    
-    static public $sendEmailNotifications = false;
+	
+	static public $sendEmailNotifications = false;
 
 	static public function handleRequest()
 	{
@@ -60,7 +57,7 @@
 	
 	
 	
-	static public function handleBrowseRequest($options = array(), $conditions = array())
+	static public function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
 	{
 		// accept conditions to limit results
 		if(!empty($_REQUEST['q']))
@@ -92,15 +89,14 @@
 		
 		if(!empty($Context))
 		{
-			$Comment->ContextClass = $Context::$rootClass;
-			$Comment->ContextID = $Context->ID;
+			$Comment->Context = $Context;
 		}
 		
 		return static::handleEditRequest($Comment);
 	}
 
 
-	static public function handleCommentRequest(Comment $Comment)
+	static public function handleCommentRequest(ActiveRecord $Comment)
 	{
 		switch($action = static::shiftPath())
 		{
@@ -131,7 +127,7 @@
 	}
 	
 	
-	static public function handleEditRequest(Comment $Comment)
+	static public function handleEditRequest(ActiveRecord $Comment)
 	{
 		$GLOBALS['Session']->requireAuthentication();
 	
@@ -142,7 +138,11 @@
 	
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			$Comment->setFields($_REQUEST);
+			$Comment->Message = $_REQUEST['Message'];
+			if(!empty($_REQUEST['ReplyToID']) && is_numeric($_REQUEST['ReplyToID']))
+			{
+				$Comment->ReplyToID = $_REQUEST['ReplyToID'];
+			}
 			
 			// validate
 			if($Comment->validate())
@@ -166,7 +166,7 @@
 		));
 	}
 
-	static public function handleDeleteRequest(Comment $Comment)
+	static public function handleDeleteRequest(ActiveRecord $Comment)
 	{
 		$GLOBALS['Session']->requireAuthentication();
 	
@@ -193,26 +193,24 @@
 	}
 	
 	
-	static public function respond($responseID, $data = array())
+	static public function respond($responseID, $responseData = array(), $responseMode = false)
 	{
 		if(static::$responseMode == 'rss')
 		{
 			static::$responseMode = 'xml';
-			return parent::respond('rss', $data);
+			return parent::respond('rss', $responseData);
 		}
 		else
 		{
-			return parent::respond($responseID, $data);
+			return parent::respond($responseID, $responseData);
 		}
 	}
 
-    static protected function onRecordCreated(ActiveRecord $Record)
-    {
-        if(static::$sendEmailNotifications)
-        {
-            $Comment->emailNotifications();
-        }
-    }
-
-
+	static protected function onRecordCreated(ActiveRecord $Record, $requestData)
+	{
+		if(static::$sendEmailNotifications)
+		{
+			$Comment->emailNotifications();
+		}
+	}
 }

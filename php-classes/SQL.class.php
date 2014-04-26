@@ -2,11 +2,10 @@
 
 class SQL
 {
-
-	static public function getCreateTable($recordClass, $historyVariant = false)
-	{
-		$queryFields = array();
-		$indexes = $historyVariant ? array() : $recordClass::$indexes;
+    static public function getCreateTable($recordClass, $historyVariant = false)
+    {
+        $queryFields = array();
+    	$indexes = $historyVariant ? array() : $recordClass::aggregateStackedConfig('indexes');
 		$fulltextColumns = array();
 		
 		// history table revisionID field
@@ -17,23 +16,22 @@ class SQL
 		}
 		
 		// compile fields
-		$rootClass = !empty($recordClass::$rootClass) ? $recordClass::$rootClass : $recordClass;
-		foreach($recordClass::getClassFields() AS $fieldId => $field)
+		$rootClass = $recordClass::getStaticRootClass();
+		foreach($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field)
 		{
-			//Debug::dump($field, "Field: $field[columnName]");
 			if($field['columnName'] == 'RevisionID')
 			{
 				continue;
 			}
 			
 			// force notnull=false on non-rootclass fields
-			if($rootClass && !$rootClass::_fieldExists($fieldId))
+			if($rootClass && !$rootClass::fieldExists($fieldId))
 			{
 				$field['notnull'] = false;
 			}
 			
 			// auto-prepend class type
-			if($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && empty($rootClass::$subClasses))
+			if($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses()))
 			{
 				array_unshift($field['values'], $rootClass);
 			}
@@ -61,7 +59,7 @@ class SQL
 			}				
 			$queryFields[] = $fieldDef;
 			
-			if($field['primary'])
+			if(!empty($field['primary']))
 			{
 				if($historyVariant)
 					$queryFields[] = 'KEY `'.$field['columnName'].'` (`'.$field['columnName'].'`)';
@@ -69,24 +67,24 @@ class SQL
 					$queryFields[] = 'PRIMARY KEY (`'.$field['columnName'].'`)';
 			}
 			
-			if($field['unique'] && !$historyVariant)
+			if(!empty($field['unique']) && !$historyVariant)
 			{
 				$queryFields[] = 'UNIQUE KEY `'.$field['columnName'].'` (`'.$field['columnName'].'`)';
 			}
 			
-			if($field['index'] && !$historyVariant)
+			if(!empty($field['index']) && !$historyVariant)
 			{
 				$queryFields[] = 'KEY `'.$field['columnName'].'` (`'.$field['columnName'].'`)';
 			}
 			
-			if($field['fulltext'] && !$historyVariant)
+			if(!empty($field['fulltext']) && !$historyVariant)
 			{
 				$fulltextColumns[] = $field['columnName'];
 			}
 		}
 		
 		// context index
-		if(!$historyVariant && $recordClass::_fieldExists('ContextClass') && $recordClass::_fieldExists('ContextID'))
+		if(!$historyVariant && $recordClass::fieldExists('ContextClass') && $recordClass::fieldExists('ContextID'))
 		{
 			$queryFields[] = 'KEY `CONTEXT` (`'.$recordClass::getColumnName('ContextClass').'`,`'.$recordClass::getColumnName('ContextID').'`)';
 		}
@@ -134,10 +132,7 @@ class SQL
 		
 
 		$createSQL = sprintf(
-			"--\n-- %s for class %s\n--\n"
-			."CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=%s;"
-			, $historyVariant ? 'History table' : 'Table'
-			, $recordClass
+			"CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=%s;"
 			, $historyVariant ? $recordClass::$historyTable : $recordClass::$tableName
 			, join("\n\t,", $queryFields)
 			, DB::$charset
@@ -159,46 +154,51 @@ class SQL
 			case 'boolean':
 				return 'boolean';
 			case 'tinyint':
-				return 'tinyint' . ($field['unsigned'] ? ' unsigned' : '') . ($field['zerofill'] ? ' zerofill' : '');
+			case 'smallint':
+			case 'mediumint':
+			case 'bigint':
+				return $field['type'] . ($field['unsigned'] ? ' unsigned' : '') . ($field['zerofill'] ? ' zerofill' : '');
 			case 'uint':
 				$field['unsigned'] = true;
 			case 'int':
 			case 'integer':
-				return 'int' . ($field['unsigned'] ? ' unsigned' : '') . ($field['zerofill'] ? ' zerofill' : '');;
+				return 'int' . ($field['unsigned'] ? ' unsigned' : '') . (!empty($field['zerofill']) ? ' zerofill' : '');
 			case 'decimal':
-				return sprintf('decimal(%s)', $field['length']) . ($field['unsigned'] ? ' unsigned' : '') . ($field['zerofill'] ? ' zerofill' : '');;
+				return sprintf('decimal(%s)', $field['length']) . (!empty($field['unsigned']) ? ' unsigned' : '') . (!empty($field['zerofill']) ? ' zerofill' : '');;
 			case 'float':
 				return 'float';
 			case 'double':
 				return 'double';
 				
 			case 'password':
-			case 'string':
+    		case 'string':
+    		case 'varchar':
 			case 'list':
-				return $field['length'] ? sprintf('char(%u)', $field['length']) : 'varchar(255)';
+				return sprintf(!$field['length'] || $field['type'] == 'varchar' ? 'varchar(%u)' : 'char(%u)', $field['length'] ? $field['length'] : 255);
 			case 'clob':
 			case 'serialized':
+			case 'json':
 				return 'text';
 			case 'blob':
 				return 'blob';
 				
 			case 'timestamp':
 				return 'timestamp';
+			case 'time':
+				return 'time';
 			case 'date':
 				return 'date';
 			case 'year':
 				return 'year';
 				
 			case 'enum':
-				return sprintf('enum("%s")', join('","', $field['values']));
+				return sprintf('enum("%s")', join('","', array_map(array('DB', 'escape'), $field['values'])));
 				
 			case 'set':
-				return sprintf('set("%s")', join('","', $field['values']));
+				return sprintf('set("%s")', join('","', array_map(array('DB', 'escape'), $field['values'])));
 				
 			default:
 				die("getSQLType: unhandled type $field[type]");
 		}
 	}
-
-
 }

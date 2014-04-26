@@ -1,10 +1,7 @@
 <?php
 
-
-
- class Comment extends VersionedRecord
+class Comment extends VersionedRecord
 {
-
 	static public $anonymousClass = 'AnonymousComment';
 
 	// VersionedRecord configuration
@@ -20,16 +17,9 @@
 	static public $singularNoun = 'comment';
 	static public $pluralNoun = 'comments';
 	
-	// configurable
-	static public $siteName = 'MICS powered site';
-	static public $siteAddress = '';
-    
-	
 	static public $fields = array(
-		'ContextClass' => array(
-			'type' => 'enum'
-			,'values' => array('Discussion')
-		)
+		'ContextClass'
+		,'ContextID' => 'uint'
 		,'Handle' => array(
 			'unique' => true	
 		)
@@ -41,15 +31,26 @@
 			'type' => 'integer'
 			,'unsigned' => true
 		)
+		,'ReplyToID' => array(
+			'type' => 'integer'
+			,'unsigned' => true
+		)
 	);
 	
 	static public $relationships = array(
-		'Author' => array(
+		'Context' => array(
+			'type' => 'context-parent'
+		)
+		,'Author' => array(
 			'type' => 'one-one'
 			,'class' => 'User'
 		)
 		,'GlobalHandle' => array(
 			'type' => 'handle'
+		)
+		,'ReplyTo' => array(
+			'type' => 'one-one'
+			,'class' => 'Comment'
 		)
 	);
 	
@@ -87,9 +88,9 @@
 					. $dateCreated . "<strong> " . $this->Author->FirstName . "</strong>: \"" . $this->Message . "\"" . "<br/>" 
                     . "<p>You may reply to this comment by replying to this email.</p><br/>";
 
-			$subject = Comment::$siteName . ' - ' . $this->Author->FullName . " commented on your status update" ;
+			$subject = Site::$title . ' - ' . $this->Author->FullName . " commented on your status update" ;
 			
-			Email::send($Context->Author->Email, $subject, $body, Comment::$siteName . ".com <hello@" . Comment::$siteAddress . '>', $header);
+			Email::send($Context->Author->Email, $subject, $body, Site::$title . ".com <hello@" . Comment::$siteAddress . '>', $header);
 		}
 		
 		
@@ -120,7 +121,7 @@
 		{
 			$possessive = $Context->Author->FullNamePossessive;
 		}
-		$subject = Comment::$siteName . ' - ' . $this->Author->FullName . " also commented on " . $possessive . ' status update'; 
+		$subject = Site::$title . ' - ' . $this->Author->FullName . " also commented on " . $possessive . ' status update'; 
 		$body = $this->Author->FullName . " also commented on " . $possessive . ' status update:'
 				. "<br/><p>\"" . $Context->Message . "\"</p><br/>"
 				. "<br/>" . $dateCreated . " " . $this->Author->FirstName . ":" . " \"" . $this->Message . "\"" ;
@@ -140,38 +141,30 @@
 						$header .= "\r\n";
 				}
 			}
-			Email::send($to[0], $subject, $body, Comment::$siteName . " <hello@" . Comment::$siteAddress . '>', $header);
+			Email::send($to[0], $subject, $body, Site::$title . " <hello@" . Comment::$siteAddress . '>', $header);
 		}
 	}
 	
-	public function getData()
-	{	
-		if($this->Author->PrimaryPhoto)
+	public function getData($deep = true)
+	{
+		$data = parent::getData();
+		
+		$data['realTime'] = date('c', $this->Created);
+		$data['fuzzyTime'] = Format::fuzzyTime($this->Created);					
+		$data['Author'] = $this->Author ? $this->Author->getData() : null;
+		
+		if($deep)
 		{
-			$thumbnail = array('thumbnail' => $this->Author->PrimaryPhoto->getThumbnailRequest(48,48));
-			
+			$data['ReplyTo'] = $this->ReplyTo ? $this->ReplyTo->getData(false) : null;
 		}
-		$data = array(
-			'realTime' => date('c', $this->Created)
-			,'fuzzyTime' => Format::fuzzyTime($this->Created)
-			,'authorFullName' => $this->Author->FullName
-			,'authorFullNamePossesive' => $this->Author->FullNamePossesive
-			,'authorUsername' => $this->Author->Username
-			,'primaryPhoto' => $this->Author->PrimaryPhotoID
-		);
 		
-		if($thumbnail)
-			$data = array_merge($data, $thumbnail);
-			
-		return array_merge(parent::getData(), $data);		
-		
-		
+		return $data;
 	}
 
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'Message'
@@ -223,5 +216,4 @@
 		
 		parent::save();
 	}
-
 }
