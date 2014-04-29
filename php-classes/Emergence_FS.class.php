@@ -6,7 +6,7 @@ class Emergence_FS
     {
         // split path into array
         if (is_string($path)) {
-        	$path = Site::splitPath($path);
+            $path = Site::splitPath($path);
 		}
 
 		// get tree map from parent
@@ -36,6 +36,8 @@ class Emergence_FS
 		if(is_string($path)) {
 			$path = Site::splitPath($path);
 		}
+
+        DB::nonQuery('LOCK TABLES `%s` READ', SiteCollection::$tableName);
 		
 		if($path) {
             $collections = static::getCollectionLayers($path, $localOnly);
@@ -47,13 +49,23 @@ class Emergence_FS
 			// calculate position conditions
 			$positionConditions = array();
 			if($collections['local']) {
-				$positionConditions[] = sprintf('PosLeft BETWEEN %u AND %u', $collections['local']->PosLeft, $collections['local']->PosRight);
+                $positions = DB::oneRecord('SELECT PosLeft, PosRight FROM `%s` WHERE ID = %u', array(
+                    SiteCollection::$tableName
+                    ,$collections['local']->ID
+                ));
+
+				$positionConditions[] = sprintf('PosLeft BETWEEN %u AND %u', $positions['PosLeft'], $positions['PosRight']);
 			}
 			
 			if($collections['remote']) {
-				$positionConditions[] = sprintf('PosLeft BETWEEN %u AND %u', $collections['remote']->PosLeft, $collections['remote']->PosRight);
+                $positions = DB::oneRecord('SELECT PosLeft, PosRight FROM `%s` WHERE ID = %u', array(
+                    SiteCollection::$tableName
+                    ,$collections['remote']->ID
+                ));
+
+    			$positionConditions[] = sprintf('PosLeft BETWEEN %u AND %u', $positions['PosLeft'], $positions['PosRight']);
 			}
-			
+
 			// append to tree conditions
 			$conditions[] = join(') OR (', $positionConditions);
 		}
@@ -63,7 +75,7 @@ class Emergence_FS
 		    $conditions[] = 'Status = "Normal"';
         }
 		
-		return DB::table(
+		$tree = DB::table(
 			'ID'
 			,'SELECT ID, Site, Handle, ParentID, Status FROM `%s` WHERE (%s) ORDER BY Site = "Remote", PosLeft'
 			,array(
@@ -71,6 +83,10 @@ class Emergence_FS
 				,join(') AND (', $conditions)
 			)
 		);
+
+        DB::nonQuery('UNLOCK TABLES');
+
+        return $tree;
 	}
 	
 	static public function getTreeFiles($path = null, $localOnly = false, $conditions = array()) {
@@ -186,7 +202,7 @@ class Emergence_FS
 		}
 		
 		$tree = static::getTree($sourcePath, $options['localOnly'], $options['transferDelete']);
-		
+
 		// build relative paths and create directories
 		foreach ($tree AS &$node) {
 			
@@ -549,11 +565,18 @@ class Emergence_FS
             }
         }
 
+        DB::nonQuery('LOCK TABLES '.SiteFile::$tableName.' f1 READ, '.SiteFile::$tableName.' f2 READ, '.SiteCollection::$tableName.' collections READ');
+
 		$collectionsQuery = sprintf('SELECT collections.ID FROM `%s` collections WHERE Status != "Deleted"', SiteCollection::$tableName);
 
 		if (count($collections)) {
 			$collectionsQuery .= sprintf(' AND ((%s))', implode(') OR (', array_map(function($collection) {
-                 return sprintf('PosLeft BETWEEN %u AND %u', $collection->PosLeft, $collection->PosRight);
+                $positions = DB::oneRecord('SELECT PosLeft, PosRight FROM `%s` collections WHERE ID = %u', array(
+                    SiteCollection::$tableName
+                    ,$collection->ID
+                ));
+                
+                return sprintf('PosLeft BETWEEN %u AND %u', $positions['PosLeft'], $positions['PosRight']);
 			}, $collections)));
 		}
 
@@ -566,6 +589,8 @@ class Emergence_FS
 				,DB::escape($filename)
 			)
 		);
+
+        DB::nonQuery('UNLOCK TABLES');
 
 		$results = array();
 		while ($record = $fileResults->fetch_assoc()) {
