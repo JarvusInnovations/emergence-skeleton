@@ -24,9 +24,7 @@ Emergence_FS::cacheTree($sassPath);
 $exportResult = Emergence_FS::exportTree($sassPath, $sassTmpPath);
 Benchmark::mark("exported $sassPath to $sassTmpPath: ".http_build_query($exportResult));
 
-if (!empty($_REQUEST['pullImages'])) {
-    Emergence_FS::cacheTree($imgPath);
-}
+Emergence_FS::cacheTree($imgPath);
 $exportResult = Emergence_FS::exportTree($imgPath, $imgTmpPath);
 Benchmark::mark("exported $imgPath to $imgTmpPath: ".http_build_query($exportResult));
 
@@ -38,24 +36,24 @@ Benchmark::mark("exported $fontsPath to $fontsTmpPath: ".http_build_query($expor
 chdir($sassTmpPath);
 Benchmark::mark("chdir to: $sassTmpPath");
 
-$cmd = '/usr/local/bin/compass compile';
+$cmd = 'compass compile 2>&1';
 Benchmark::mark("running CMD: $cmd");
 
-passthru("$cmd 2>&1", $cmdStatus);
+passthru($cmd, $cmdStatus);
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import build
 if($cmdStatus == 0)
 {
     Benchmark::mark("importing $cssTmpPath");
-	
-	$importResults = Emergence_FS::importTree($cssTmpPath, "site-root/css", array('transferDelete' => false));
-	Benchmark::mark("imported files: ".http_build_query($importResults));
+
+    $importResults = Emergence_FS::importTree($cssTmpPath, "site-root/css", array('transferDelete' => false));
+    Benchmark::mark("imported files: ".http_build_query($importResults));
 }
 
 // clean up
 if(empty($_GET['leaveWorkspace']))
 {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }
