@@ -5,8 +5,6 @@
 
 {block "content"}
 	{$Person = $data}
-
-	{if MICS::isReferred()}<a href="{$.server.HTTP_REFERER}" onclick="history.go(-1);return false;">&laquo; Back</a>{/if}
 	
 	<div id="photos">
 		{if $Person->PrimaryPhoto}
