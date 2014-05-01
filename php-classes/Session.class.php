@@ -131,9 +131,8 @@ class Session extends ActiveRecord
 	public function save($deep = true)
 	{
 		// set handle
-		if(!$this->Handle)
-		{
-			$this->Handle = static::generateUniqueHandle();
+		if (!$this->Handle) {
+			$this->Handle = HandleBehavior::generateRandomHandle($this);
 		}
 
 		// call parent
@@ -157,20 +156,4 @@ class Session extends ActiveRecord
 		
 		$this->destroy();
 	}
-
-
-
-	public static function generateUniqueHandle()
-	{
-		do
-		{
-			$handle = md5(mt_rand(0, mt_getrandmax()));
-		}
-		while( static::getByHandle($handle) );
-		
-		return $handle;
-	}
-	
-	
-
 }

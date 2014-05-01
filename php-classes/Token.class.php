@@ -73,9 +73,8 @@ abstract class Token extends ActiveRecord
 	public function save($deep = true)
 	{
 		// set handle
-		if(!$this->Handle)
-		{
-			$this->Handle = static::generateUniqueHandle();
+		if (!$this->Handle) {
+    		$this->Handle = HandleBehavior::generateRandomHandle($this);
 		}
 
 		if(!$this->Expires)
@@ -85,18 +84,6 @@ abstract class Token extends ActiveRecord
 
 		// call parent
 		parent::save($deep);
-	}
-
-
-	public static function generateUniqueHandle()
-	{
-		do
-		{
-			$handle = md5(mt_rand(0, mt_getrandmax()));
-		}
-		while( static::getByHandle($handle) );
-		
-		return $handle;
 	}
 
 

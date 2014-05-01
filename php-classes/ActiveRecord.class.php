@@ -1342,23 +1342,7 @@ class ActiveRecord
 		
 		return $sqlSearchConditions;
 	}
-	
-	public static function generateRandomHandle($length = 32, $options = array())
-	{
-		// apply default options
-		$options = array_merge(array(
-			'handleField' => 'Handle'
-		), $options);
-	
-		do
-		{
-			$handle = substr(md5(mt_rand(0, mt_getrandmax())), 0, $length);
-		}
-		while( static::getByField($options['handleField'], $handle) );
-		
-		return $handle;
-	}
-	
+
 	// protected methods
 	
 

@@ -46,13 +46,10 @@ class GlobalHandle extends ActiveRecord
 	
 	static public function createAlias(ActiveRecord $Context, $handle = false)
 	{
-		if($handle)
-		{
-			$handle = static::getUniqueHandle($handle);
-		}
-		else
-		{
-			$handle = static::generateRandomHandle(4);
+		if ($handle) {
+			$handle = HandleBehavior::getUniqueHandle(__CLASS__, $handle);
+		} else {
+			$handle = HandleBehavior::generateRandomHandle(__CLASS__, 4);
 		}
 	
 		return static::create(array(
@@ -105,9 +102,8 @@ class GlobalHandle extends ActiveRecord
 	public function save($deep = true)
 	{
 		// set handle
-		if(!$this->Handle)
-		{
-			$this->Handle = static::generateRandomHandle(4);
+		if (!$this->Handle) {
+			$this->Handle = HandleBehavior::generateRandomHandle($this, 4);
 		}
 		
 		// update PK
@@ -119,7 +115,4 @@ class GlobalHandle extends ActiveRecord
 		// call parent
 		parent::save($deep);
 	}
-
-
-
 }
