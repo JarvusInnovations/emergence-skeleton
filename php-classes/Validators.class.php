@@ -6,7 +6,7 @@ class Validators
     public static function is($string, $options = array())
     {
         $options = array_merge(array(
-			'value' => false
+    		'value' => false
 		), $options);
 		
 		if($options['value'])
@@ -386,13 +386,18 @@ class Validators
 
 	public static function set($value, $options = array())
 	{
-		if(is_string($value))
-			$value = explode(',', $value);;
+		if (is_string($value)) {
+			$value = explode(',', $value);
+		}
 
 		$options = array_merge(array(
 			'choices' => array()
 			,'minCount' => 0
 		), $options);
+
+		if (!$value) {
+			return $options['minCount'] == 0;
+		}
 		
 		return !count(array_diff($value, $options['choices'])) && (count($value) >= $options['minCount']);
 	}
