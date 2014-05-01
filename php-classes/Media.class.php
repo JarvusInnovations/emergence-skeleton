@@ -3,7 +3,7 @@
 class Media extends ActiveRecord
 {
     static public $singularNoun = 'media item';
-	static public $pluralNoun = 'media items';
+    static public $pluralNoun = 'media items';
 
 	// support subclassing
 	static public $rootClass = __CLASS__;
@@ -394,6 +394,19 @@ class Media extends ActiveRecord
 	// static methods
 	static public function createFromUpload($uploadedFile, $fieldValues = array())
 	{
+        // handle recieving a field array from $_FILES
+        if (is_array($uploadedFile)) {
+            if (isset($uploadedFile['error']) && $uploadedFile['error'] != ERR_UPLOAD_OK) {
+                return null;
+            }
+
+            if (!empty($uploadedFile['name']) && empty($fieldValues['Caption'])) {
+                $fieldValues['Caption'] = preg_replace('/\.[^.]+$/', '', $uploadedFile['name']);
+            }
+
+            $uploadedFile = $uploadedFile['tmp_name'];
+        }
+        
 		// sanity check
 		if(!is_uploaded_file($uploadedFile))
 		{
