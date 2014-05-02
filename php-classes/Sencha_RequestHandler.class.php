@@ -5,7 +5,7 @@ class Sencha_RequestHandler extends RequestHandler
     static public $externalRoot = '/app';
 
     static public $validModes = array(
-    	'development'
+        'development'
 		,'develop' => 'development'
 		,'testing'
 		,'production'
@@ -39,6 +39,11 @@ class Sencha_RequestHandler extends RequestHandler
 		// check if appName is 'packages'
 		if($appName == 'packages') {
 			return static::handlePackagesRequest();
+		}
+    	
+		// check if appName is 'x'
+		if($appName == 'x') {
+			return static::handleLibraryRequest();
 		}
 		
 		// get app
@@ -127,6 +132,19 @@ class Sencha_RequestHandler extends RequestHandler
 		}
 		else {
 			return static::throwNotFoundError('Packages asset not found');
+		}
+	}
+    
+    static public function handleLibraryRequest()
+	{
+		$filePath = static::getPath();
+		array_unshift($filePath, 'ext-library');
+		
+		if($fileNode = Site::resolvePath($filePath)) {
+			$fileNode->outputAsResponse();
+		}
+		else {
+			return static::throwNotFoundError('Library asset not found');
 		}
 	}
 	
