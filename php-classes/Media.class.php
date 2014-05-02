@@ -492,7 +492,6 @@ class Media extends ActiveRecord
 		// determine type
 		if(!isset(static::$mimeHandlers[$mediaInfo['mimeType']]))
 		{
-			//MICS::dump(static::$mimeHandlers, 'MIME Handlers');
 			throw new MediaTypeException('No class registered for mime type "' . $mediaInfo['mimeType'] . '"');
 		}
 		

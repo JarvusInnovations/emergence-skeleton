@@ -1,7 +1,5 @@
 <?php
 
-
-
 class ErrorHandler extends RequestHandler
 {
 	static public $reportEmail = 'chris@devnuts.com';
@@ -56,27 +54,27 @@ class ErrorHandler extends RequestHandler
 	{
 		header('HTTP/1.0 500 Internal Server Error');
 		print('An internal system error occurred: '.$message);
-		MICS::terminate();
+		Site::finishRequest();
 	}
 	
 	public static function handleNotFound($properNoun = false, $commonNoun = 'page')
 	{
 		header('HTTP/1.0 404 Not Found');
 		printf('The %s you requested "%s" was not found.', $commonNoun, $properNoun);
-		MICS::terminate();
+    	Site::finishRequest();
 	}
 	
 	public static function handleInvalidRequest()
 	{
 		header('HTTP/1.0 400 Bad Request');
 		print('Invalid request');
-		MICS::terminate();
+    	Site::finishRequest();
 	}
 	
 	public static function handleInadaquateAccess($requiredAccountLevel)
 	{
 		printf('Sorry, you must have %s access to do that', $requiredAccountLevel);
-		MICS::terminate();
+    	Site::finishRequest();
 	}
 	
 	public static function handleValidationError(RecordValidationException $e)
