@@ -4,8 +4,9 @@ abstract class RequestHandler
 {
     // configurables
     public static $responseMode = 'html';
+    public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
     
-	
+    
 	// static properties
 	protected static $_path;
 	protected static $_parameters;
@@ -69,9 +70,15 @@ abstract class RequestHandler
 	static public function respond($responseID, $responseData = array(), $responseMode = false)
 	{
 		if (!$responseMode) {
-			$responseMode = static::$responseMode;
+            if (!empty($_GET['format']) && in_array($_GET['format'], static::$userResponseModes)) {
+                $responseMode = $_GET['format'];
+            } elseif (!empty($_SERVER['HTTP_ACCEPT']) && array_key_exists($_SERVER['HTTP_ACCEPT'], static::$userResponseModes)) {
+                $responseMode = static::$userResponseModes[$_SERVER['HTTP_ACCEPT']];
+            } else {
+			    $responseMode = static::$responseMode;
+            }
 		}
-		
+
 		if ($responseMode != 'return') {
 			header('X-Response-ID: '.$responseID);
 		}

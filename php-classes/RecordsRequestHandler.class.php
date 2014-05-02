@@ -7,7 +7,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelRead = false;
     static public $accountLevelComment = 'User';
     static public $accountLevelBrowse = 'Staff';
-	static public $accountLevelWrite = 'Staff';
+    static public $accountLevelWrite = 'Staff';
 	static public $accountLevelAPI = false;
 	static public $browseOrder = false;
 	static public $browseConditions = false;
@@ -17,6 +17,10 @@ abstract class RecordsRequestHandler extends RequestHandler
 	
 	static public $calledClass = __CLASS__;
 	static public $responseMode = 'html';
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+        ,'text/csv' => 'csv'
+    );
 	
 	static public function handleRequest()
 	{
@@ -205,7 +209,6 @@ abstract class RecordsRequestHandler extends RequestHandler
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
-			,static::$responseMode
 		);
 	}
 
@@ -643,27 +646,33 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		return preg_replace_callback('/\s+([a-zA-Z])/', function($matches) { return strtoupper($matches[1]); }, $noun);
 	}
-	
-	
-	static public function respond($responseID, $responseData = array(), $responseMode = false)
-	{
-		// default to static property
-		if(!$responseMode)
-		{
-			$responseMode = static::$responseMode;
+    
+	static public function respondJson($responseID, $responseData = array())
+    {
+		if (!static::checkAPIAccess($responseID, $responseData, 'json')) {
+			return static::throwAPIUnauthorizedError();
 		}
-		
-		// check access for API response modes
-		if($responseMode != 'html' && $responseMode != 'return')
-		{
-			if(!static::checkAPIAccess($responseID, $responseData, $responseMode))
-			{
-				return static::throwAPIUnauthorizedError();
-			}
+
+        return parent::respondJson($responseID, $responseData);
+    }
+    
+    static public function respondCsv($responseID, $responseData = array())
+    {
+		if (!static::checkAPIAccess($responseID, $responseData, 'csv')) {
+			return static::throwAPIUnauthorizedError();
 		}
-	
-		return parent::respond($responseID, $responseData, $responseMode);
-	}
+
+        return parent::respondCsv($responseID, $responseData);
+    }
+    
+    static public function respondXml($responseID, $responseData = array())
+    {
+		if (!static::checkAPIAccess($responseID, $responseData, 'xml')) {
+			return static::throwAPIUnauthorizedError();
+		}
+
+        return parent::respondXml($responseID, $responseData);
+    }
 	
 	static protected function applyRecordDelta(ActiveRecord $Record, $data)
 	{

@@ -22,7 +22,7 @@ class ActiveRecord
     static public $pluralNoun = 'records';
     
     /**
-	 * String to identify this class with in administrative interfaces
+     * String to identify this class with in administrative interfaces
 	 * @var string
 	 */
 	static public $classTitle = 'Untitled Class';
@@ -505,14 +505,19 @@ class ActiveRecord
 		{
 			$this->_validator->resetErrors();
 		}
-        
+
         // iterate through validators config
-        foreach (static::getStackedConfig('validators') AS $validator => $options) {
-            if (isset($options['validator']) && is_callable($options['validator'])) {
-                call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
-            } else {
-                $this->_validator->validate($options);
+        $validators = static::getStackedConfig('validators');
+        if (count(static::getStackedConfig('validators'))) {
+            foreach (static::getStackedConfig('validators') AS $validator => $options) {
+                if (isset($options['validator']) && is_callable($options['validator'])) {
+                    call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
+                } else {
+                    $this->_validator->validate($options);
+                }
             }
+
+            $this->finishValidation();
         }
 
 		// validate related objects
@@ -532,7 +537,11 @@ class ActiveRecord
 					{
 						$this->_relatedObjects[$relationship]->validate();
 						$this->_isValid = $this->_isValid && $this->_relatedObjects[$relationship]->isValid;
-						$this->_validationErrors[$relationship] = $this->_relatedObjects[$relationship]->validationErrors;
+						$validationErrors = $this->_relatedObjects[$relationship]->validationErrors;
+
+						if (count($validationErrors)) {
+							$this->_validationErrors[$relationship] = $validationErrors;
+						}
 					}
 				}
 				elseif($options['type'] == 'one-many')
@@ -543,8 +552,12 @@ class ActiveRecord
 						{
 							$object->validate();
 							$this->_isValid = $this->_isValid && $object->isValid;
-							$this->_validationErrors[$relationship][$i] = $object->validationErrors;
-						}					
+							$validationErrors = $object->validationErrors;
+
+							if (count($validationErrors)) {
+								$this->_validationErrors[$relationship][$i] = $validationErrors;
+							}
+						}
 					}
 				}
 				/*elseif($options['type'] == 'contextual')
@@ -1329,23 +1342,7 @@ class ActiveRecord
 		
 		return $sqlSearchConditions;
 	}
-	
-	public static function generateRandomHandle($length = 32, $options = array())
-	{
-		// apply default options
-		$options = array_merge(array(
-			'handleField' => 'Handle'
-		), $options);
-	
-		do
-		{
-			$handle = substr(md5(mt_rand(0, mt_getrandmax())), 0, $length);
-		}
-		while( static::getByField($options['handleField'], $handle) );
-		
-		return $handle;
-	}
-	
+
 	// protected methods
 	
 

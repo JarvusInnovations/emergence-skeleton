@@ -3,7 +3,7 @@
 class Sencha
 {
     static public $frameworks = array(
-		'ext' => array(
+    	'ext' => array(
 			'defaultVersion' => '4.2.2.1144'
 			,'mappedVersions' => array(
 				'4.2.1' => '4.2.1.883'
@@ -110,6 +110,25 @@ class Sencha
 		$assetPath = Sencha_RequestHandler::$externalRoot . '/' . $framework . '-' . $version . '/' . implode('/', $filePath);
         
         array_unshift($filePath, 'sencha-workspace', "$framework-$version");
+        $Asset = Site::resolvePath($filePath);
+		
+		if($Asset) {
+			return $assetPath . '?_sha1=' . $Asset->SHA1;
+		}
+		else {
+			return $assetPath;
+		}
+    }
+    
+    static public function getVersionedLibraryPath($filePath)
+    {
+        if (is_string($filePath)) {
+			$filePath = Site::splitPath($filePath);
+		}
+        
+		$assetPath = Sencha_RequestHandler::$externalRoot . '/x/' . implode('/', $filePath);
+        
+        array_unshift($filePath, 'ext-library');
         $Asset = Site::resolvePath($filePath);
 		
 		if($Asset) {
