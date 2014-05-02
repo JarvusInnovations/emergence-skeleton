@@ -30,8 +30,7 @@ class ErrorHandler extends RequestHandler
 				$report .= ErrorHandler::formatBacktrace(debug_backtrace());
 				$report .= '<h2>Debug Log</h2><pre>'.print_r(DebugLog::getLog(), true).'</pre>';
 				
-
-				if(MICS::$DebugMode)
+				if(Site::$debug)
 				{
 					die($report);
 				}
