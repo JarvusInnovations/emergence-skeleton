@@ -11,16 +11,14 @@
             <title>{if $title}{$title}{else}{$appName}-{$mode}{/if}</title>
         {/block}
 
-        {*block base}
-            {if $mode == 'production' || $mode == 'testing'}
-                <base href="/app/{$App->getName()}/build/{$mode}/">
-            {else}
-                <base href="/app/{$App->getName()}/">
-            {/if}
-        {/block*}
-
         {block js-data}
-            <script type="text/javascript">window.SiteUser = {$.User->getData()|json_encode};</script>
+            <script type="text/javascript">
+                var SiteEnvironment = SiteEnvironment || { };
+                SiteEnvironment.user = {$.User->getData()|json_encode};
+                SiteEnvironment.appName = {$App->getName()|json_encode};
+                SiteEnvironment.appMode = {$mode|json_encode};
+                SiteEnvironment.appBaseUrl = '/app/{$App->getName()}/{tif $mode == production || $mode == testing ? "build/{$mode}/"}';
+            </script>
         {/block}
 
         {block js-app}
