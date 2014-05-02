@@ -24,7 +24,7 @@ class ActiveRecord
     /**
      * String to identify this class with in administrative interfaces
      * @var string
-	 */
+     */
 	static public $classTitle = 'Untitled Class';
     
 	/**
@@ -1744,11 +1744,6 @@ class ActiveRecord
 			// apply type-dependent transformations
 			switch($fieldOptions['type'])
 			{
-				case 'password':
-				{
-					return $value;
-				}
-				
 				case 'timestamp':
 				{
 					if(!isset($this->_convertedValues[$field]))

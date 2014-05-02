@@ -1,9 +1,7 @@
 <?php
 
-
 class User extends Person
 {
-
     static public $defaultClass = __CLASS__;
 	static public $subClasses = array(__CLASS__);
 	static public $singularNoun = 'user';
@@ -142,24 +140,33 @@ class User extends Person
 	}
 	
 	// enable login by email
-	static public function getByLogin($username, $password)
-	{
-		return static::getByWhere(array(
-			sprintf('"%s" IN (`%s`, `%s`)', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
-			,'Password' => call_user_func(static::$passwordHasher, $password)
-		));
-	}
-	
+    public static function getByLogin($username, $password)
+    {
+        $User = static::getByUsername($username);
+
+        if ($User && is_a($User, __CLASS__) && $User->verifyPassword($password)) {
+            return $User;
+        } else {
+            return null;
+        }
+    }
+
 	static public function getByUsername($username)
 	{
 		return static::getByWhere(array(
 			sprintf('"%s" IN (`%s`, `%s`)', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
 		));
 	}
-	public function matchPassword($password)
-	{
-		return call_user_func(static::$passwordHasher, $password) == $this->Password;
-	}
+
+    public function verifyPassword($password)
+    {
+    	return call_user_func(static::$passwordHasher, $password) == $this->Password;
+    }
+
+    public function setClearPassword($password)
+    {
+        $this->Password = call_user_func(static::$passwordHasher, $password);
+    }
 
 	public function hasAccountLevel($accountLevel)
 	{

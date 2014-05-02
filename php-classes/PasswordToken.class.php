@@ -2,11 +2,9 @@
 
 class PasswordToken extends Token
 {
-
-	static public $emailTemplate = 'register/passwordToken.email';
+    static public $emailTemplate = 'register/passwordToken.email';
 	static public $formTemplate = 'register/passwordForm';
 	static public $emailSubject = 'The password recovery link you requested';
-
 
 	public function handleRequest($data)
 	{
@@ -21,7 +19,7 @@ class PasswordToken extends Token
 			throw new Exception('Enter your new password twice for confirmation');
 		}
 
-		$this->Creator->Password = call_user_func(User::$passwordHasher, $data['Password']);
+		$this->Creator->setClearPassword($data['Password']);
 		$this->Creator->save();
 		
 		// set used
@@ -30,5 +28,4 @@ class PasswordToken extends Token
 	
 		return RequestHandler::respond('register/passwordRecovered');
 	}
-
 }
