@@ -2,8 +2,8 @@
 
 class CSV
 {
-    static public function fromRecords($records, $include = 'all')
-	{
+    static public function fromRecords($records, $include = '*')
+    {
 		if (!is_array($records)) {
 			throw new Exception('fromRecords expects an array');
 		} elseif (empty($records)) {
