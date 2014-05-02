@@ -23,7 +23,7 @@ class ActiveRecord
     
     /**
      * String to identify this class with in administrative interfaces
-	 * @var string
+     * @var string
 	 */
 	static public $classTitle = 'Untitled Class';
     
@@ -169,7 +169,7 @@ class ActiveRecord
         }
 	}
 	
-	function __construct($record = array(), $isDirty = false, $isPhantom = null)
+	public function __construct($record = array(), $isDirty = false, $isPhantom = null)
 	{
 		$this->_record = static::_convertRecord($record);
 		$this->_isPhantom = isset($isPhantom) ? $isPhantom : empty($record);
@@ -188,6 +188,17 @@ class ActiveRecord
 		}
 		
 	}
+
+    public function __toString()
+    {
+        if ($this->isPhantom) {
+            return $this->Class . ' [phantom]';
+        } elseif ($url = $this->getURL()) {
+            return $url;
+        } else {
+            return $this->Class . ' #' . $this->ID;
+        }
+    }
     
     static protected function _initStackedConfig($propertyName)
     {
