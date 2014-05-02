@@ -25,26 +25,27 @@
 
         {block js-app}
             {if $mode == 'development' || !$App->getAsset($jsBuildPath)}
-                {capture assign=frameworkPath}sdk/ext{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-dev'}.js{/capture}
-                <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
-
-                {sencha_preloader}
-
-                {if !$suppressBootstrap}
-                    <script type="text/javascript" src="{$App->getVersionedPath('bootstrap.js')}"></script>
-                {/if}
-
-                <script type="text/javascript">
-                    Ext.Loader.setConfig({
-                        enabled: true
-                        ,paths: {
-                            'Ext': '/app/{$App->getName()}/sdk/src'
-                            ,'Ext.ux': '/app/{$App->getName()}/sdk/examples/ux'
-                            ,'Emergence': '/app/{$App->getName()}/x/Emergence'
-                            ,'Jarvus': '/app/{$App->getName()}/x/Jarvus'
-                        }
-                    });
-                </script>
+                {block js-app-devenv}
+                    {capture assign=frameworkPath}sdk/ext{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-dev'}.js{/capture}
+                    <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
+    
+                    {sencha_preloader}
+    
+                    {if !$suppressBootstrap}
+                        <script type="text/javascript" src="{$App->getVersionedPath('bootstrap.js')}"></script>
+                    {/if}
+    
+                    <script type="text/javascript">
+                        Ext.Loader.setConfig({
+                            enabled: true
+                            ,paths: {
+                                'Ext': '/app/{$App->getName()}/sdk/src'
+                                ,'Emergence': '/app/{$App->getName()}/x/Emergence'
+                                ,'Jarvus': '/app/{$App->getName()}/x/Jarvus'
+                            }
+                        });
+                    </script>
+                {/block}
 
                 <script type="text/javascript" src="{tif $App->getAsset('app.js') ? $App->getVersionedPath('app.js') : $App->getVersionedPath('app/app.js')}"></script>
             {else}
