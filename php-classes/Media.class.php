@@ -5,7 +5,7 @@ class Media extends ActiveRecord
     static public $singularNoun = 'media item';
     static public $pluralNoun = 'media items';
 
-	// support subclassing
+    // support subclassing
 	static public $rootClass = __CLASS__;
 	static public $defaultClass = __CLASS__;
 	static public $subClasses = array(__CLASS__);
@@ -311,7 +311,7 @@ class Media extends ActiveRecord
     			$trans_index = imagecolortransparent($srcImage);
     			
     			// check if there is a specific transparent color
-    			if ($trans_index >= 0) {
+    			if ($trans_index >= 0 && $trans_index < imagecolorstotal($srcImage)) {
     				$trans_color = imagecolorsforindex($srcImage, $trans_index);
     				
     				// allocate in thumbnail
@@ -406,7 +406,7 @@ class Media extends ActiveRecord
 
             $uploadedFile = $uploadedFile['tmp_name'];
         }
-        
+
 		// sanity check
 		if(!is_uploaded_file($uploadedFile))
 		{
