@@ -17,7 +17,7 @@
                 SiteEnvironment.user = {$.User->getData()|json_encode};
                 SiteEnvironment.appName = {$App->getName()|json_encode};
                 SiteEnvironment.appMode = {$mode|json_encode};
-                SiteEnvironment.appBaseUrl = '/app/{$App->getName()}/{tif $mode == production || $mode == testing ? "build/{$mode}/"}';
+                SiteEnvironment.appBaseUrl = '/app/{$App->getName()}/{tif $mode == production || $mode == testing ? "build/$mode/"}';
             </script>
         {/block}
 
