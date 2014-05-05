@@ -1,13 +1,13 @@
 <?php
 
-function Dwoo_Plugin_format_timerange(Dwoo_Core $dwoo, $from, $to, $seperator = '&ndash;', $shortMonth = false, $html = false, $forceYear = false, $ordinalSuffix = true)
+function Dwoo_Plugin_format_timerange(Dwoo_Core $dwoo, $from, $to, $seperator = '&ndash;', $shortMonth = false, $html = false, $forceYear = false, $ordinalSuffix = true, $includeTooltips = true)
 {
     $fromTime = is_numeric($from) ? $from : strtotime($from);
     $toTime = is_numeric($to) ? $to : strtotime($to);
     
     $from = getdate(min($fromTime, $toTime));
     $to = getdate(max($fromTime, $toTime));
-	
+    
 	$from['m'] = $from['hours']<=12?'am':'pm';
 	$to['m'] = $to['hours']<=12?'am':'pm';
 
@@ -41,10 +41,9 @@ function Dwoo_Plugin_format_timerange(Dwoo_Core $dwoo, $from, $to, $seperator = 
 	}
     
     if ($html) {
-        $fromString = sprintf('<time datetime="%s" title="%s" class="dtstart">%s</time>', date(DATE_W3C, $from[0]), date('l jS \of F Y h:i:s A', $from[0]), $fromString);
-        $toString = sprintf('<time datetime="%s" title="%s" class="dtend">%s</time>', date(DATE_W3C, $to[0]), date('l jS \of F Y h:i:s A', $to[0]), $toString);
+        $fromString = sprintf('<time datetime="%s" title="%s" class="dtstart">%s</time>', date(DATE_W3C, $from[0]), $includeTooltips ? date('l jS \of F Y h:i:s A', $from[0]) : '', $fromString);
+        $toString = sprintf('<time datetime="%s" title="%s" class="dtend">%s</time>', date(DATE_W3C, $to[0]), $includeTooltips ? date('l jS \of F Y h:i:s A', $to[0]) : '', $toString);
     }
 
     return $fromString . $seperator . $toString;
 }
-
