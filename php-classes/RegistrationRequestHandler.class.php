@@ -77,9 +77,12 @@ class RegistrationRequestHandler extends RequestHandler
 
 			// save person fields
 			$User->setFields(array_merge($requestFields, array(
-				'Password' => !empty($_REQUEST['Password']) ? call_user_func(User::$passwordHasher, $_REQUEST['Password']) : ''
-				,'AccountLevel' => User::$fields['AccountLevel']['default']
+				'AccountLevel' => User::$fields['AccountLevel']['default']
 			), $overrideFields));
+            
+            if (!empty($_REQUEST['Password'])) {
+                $User->setClearPassword($_REQUEST['Password']);
+            }
 			
 			// additional checks
 			$additionalErrors = array();

@@ -2,7 +2,7 @@
 
 class ProfileRequestHandler extends RequestHandler
 {
-	static public $profileFields = array('Location','About','Phone','Email');
+    static public $profileFields = array('Location','About','Phone','Email');
 	static public $onBeforeProfileValidated = false;
 	static public $onBeforeProfileSaved = false;
 	static public $onProfileSaved = false;
@@ -198,7 +198,7 @@ class ProfileRequestHandler extends RequestHandler
 		{
 			return static::throwError('Enter your current password for verification');
 		}
-		elseif(call_user_func(User::$passwordHasher, $_REQUEST['OldPassword']) != $GLOBALS['Session']->Person->getPasswordHash())
+		elseif(!$GLOBALS['Session']->Person->verifyPassword($_REQUEST['OldPassword']))
 		{
 			return static::throwError('You did not enter your current password correctly');
 		}
@@ -211,7 +211,7 @@ class ProfileRequestHandler extends RequestHandler
 			return static::throwError('The passwords you supplied did not match');
 		}
 	
-		$GLOBALS['Session']->Person->Password = call_user_func(User::$passwordHasher, $_REQUEST['Password']);
+		$GLOBALS['Session']->Person->setClearPassword($_REQUEST['Password']);
 		$GLOBALS['Session']->Person->save();
 	
 		return static::respond('passwordChanged', array(

@@ -7,7 +7,7 @@
 {if $.get.jsdebug || !Site::resolvePath('site-root/js/pages/common.js')}
     <script src="{Sencha::getVersionedFrameworkPath('ext', 'ext-all-dev.js')}"></script>
 {else}
-    <script src="{Site::getVersionedRootUrl('js/pages/common.js')}"></script>
+    <script src="{versioned_url('/js/pages/common.js')}"></script>
 {/if}
 
 <script>
