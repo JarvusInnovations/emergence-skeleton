@@ -66,14 +66,16 @@ class SiteFileTest extends \PHPUnit_Framework_TestCase
         $dirname2 = 'testdir-'.mt_rand(100000, 999999);
         $filename = 'testfile-'.mt_rand(100000, 999999);
         $newPath = "$dirname1/$dirname2/$filename";
+        $now = time();
 
         $fileData = $this->parentRootNode->createFile($newPath, "line 1\nline 2\n");
         $this->assertInternalType('array', $fileData);
         $this->assertEquals($filename, $fileData['Handle'], 'created node handle matches');
         $this->assertEquals('Normal', $fileData['Status'], 'created node status is Normal');
-        $this->assertEquals(14, $fileData['Size'], 'create node size is 14');
-        $this->assertEquals('text/plain', $fileData['Type'], 'create node type is text/plain');
-        $this->assertEquals('5e841ee02c64eb30f882676939a7b6bccc06c326', $fileData['SHA1'], 'create node SHA1 is 5e841ee02c64eb30f882676939a7b6bccc06c326');
+        $this->assertEquals(14, $fileData['Size'], 'created node size is 14');
+        $this->assertEquals('text/plain', $fileData['Type'], 'created node type is text/plain');
+        $this->assertEquals('5e841ee02c64eb30f882676939a7b6bccc06c326', $fileData['SHA1'], 'created node SHA1 is 5e841ee02c64eb30f882676939a7b6bccc06c326');
+        $this->assertEquals($now, $fileData['Timestamp'], 'created node timestamp is correct');
         
         $retrievedNode = $this->parentRootNode->resolvePath($newPath);
         $this->assertInstanceOf('SiteFile', $retrievedNode, 'resolved node is SiteFile');
