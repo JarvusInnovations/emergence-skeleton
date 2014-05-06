@@ -7,7 +7,7 @@ class Emergence_FS
         // split path into array
         if (is_string($path)) {
             $path = Site::splitPath($path);
-		}
+    	}
 
 		// get tree map from parent
 		$remoteTree = Emergence::resolveCollectionFromParent($path);
@@ -32,12 +32,13 @@ class Emergence_FS
 	
 	static public function getTree($path = null, $localOnly = false, $includeDeleted = false, $conditions = array())
 	{
+		$tableLocked = false;
+
 		// split path into array
 		if(is_string($path)) {
 			$path = Site::splitPath($path);
 		}
 
-        DB::nonQuery('LOCK TABLES `%s` READ', SiteCollection::$tableName);
 		
 		if($path) {
             $collections = static::getCollectionLayers($path, $localOnly);
@@ -45,7 +46,10 @@ class Emergence_FS
 			if(!$collections['local'] && !$collections['remote']) {
 				return array();
 			}
-	
+
+			DB::nonQuery('LOCK TABLES `%s` READ', SiteCollection::$tableName);
+			$tableLocked = true;
+
 			// calculate position conditions
 			$positionConditions = array();
 			if($collections['local']) {
@@ -84,7 +88,9 @@ class Emergence_FS
 			)
 		);
 
-        DB::nonQuery('UNLOCK TABLES');
+        if ($tableLocked) {
+            DB::nonQuery('UNLOCK TABLES');
+        }
 
         return $tree;
 	}
