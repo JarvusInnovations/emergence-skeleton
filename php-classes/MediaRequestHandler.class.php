@@ -489,35 +489,39 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 		
 		// load media
-		if ($mediaID)
-		{
-			if(!$Media = Media::getByID($mediaID))
-			{
-				static::throwNotFoundError('Media not found');
-			}
-		}
-		elseif ($contextClass && $contextID)
-		{
-			if(!$Media = Media::getByContext($contextClass, $contextID))
-			{
-				$Media = Media::getBlank($contextClass);
-			}
-		}
-		elseif ($contextClass)
-		{
-			if(!$Media = Media::getBlank($contextClass))
-			{
-				static::throwNotFoundError('Media not found');
-			}
-		}
-		else
-		{
-			static::throwError('Invalid request');
-		}
+        try {
+    		if ($mediaID)
+    		{
+    			if(!$Media = Media::getByID($mediaID))
+    			{
+    				return static::throwNotFoundError('Media not found');
+    			}
+    		}
+    		elseif ($contextClass && $contextID)
+    		{
+    			if(!$Media = Media::getByContext($contextClass, $contextID))
+    			{
+    				$Media = Media::getBlank($contextClass);
+    			}
+    		}
+    		elseif ($contextClass)
+    		{
+    			if(!$Media = Media::getBlank($contextClass))
+    			{
+    				return static::throwNotFoundError('Media not found');
+    			}
+    		}
+    		else
+    		{
+    			return static::throwError('Invalid request');
+    		}
 		
 
-		// get thumbnail
-		$thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
+    		// get thumbnail
+    		$thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
+        } catch (Exception $e) {
+    		return static::throwServerError('Thumbnail unavailable');
+        }
 
 
 		// dump it out
