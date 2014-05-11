@@ -13,9 +13,7 @@ class User extends Person
 			'unique' => true
 		)
 		,'Password' => array(
-			'type' => 'password'
-			,'length' => 40
-			,'hashFunction' => 'SHA1'
+			'type' => 'string'
 			,'excludeFromData' => true
 		)
 		,'AccountLevel' => array(
@@ -30,7 +28,7 @@ class User extends Person
 
 	// User
 	static public $minPasswordLength = 5;
-	static public $passwordHasher = 'SHA1';
+    static public $passwordHasher = 'SHA1';
 	
 	
 	static function __classLoaded()
@@ -81,15 +79,14 @@ class User extends Person
 			,'maxlength' => 30
 			,'errorMessage' => 'Username must be at least 2 characters'
 		));
-		
-		
+
 		$this->_validator->validate(array(
 			'field' => 'Username'
 			,'required' => true
 			,'validator' => 'handle'
 			,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores'
 		));
-		
+
 		// check handle uniqueness
 		if($this->isDirty && !$this->_validator->hasErrors('Username') && $this->Username)
 		{
@@ -99,15 +96,8 @@ class User extends Person
 			{
 				$this->_validator->addError('Username', 'Username already registered');
 			}
-		}
-
-		$this->_validator->validate(array(
-			'field' => 'Password'
-			,'required' => true
-			,'errorMessage' => 'Password required'
-		));
-				
-				
+		}	
+		
 		$this->_validator->validate(array(
 			'field' => 'AccountLevel'
 			,'validator' => 'selection'
@@ -123,7 +113,7 @@ class User extends Person
 	{
 		if(!$this->Username)
 		{
-			// auto generate username from first & last name
+			$this->Username = static::getUniqueUsername($this->FirstName, $this->LastName);
 		}
 		
 		return parent::save($deep);
@@ -153,14 +143,18 @@ class User extends Person
 
 	static public function getByUsername($username)
 	{
-		return static::getByWhere(array(
-			sprintf('"%s" IN (`%s`, `%s`)', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
-		));
+        if (static::fieldExists('Email')) {
+    		return static::getByWhere(array(
+    			sprintf('"%s" IN (`%s`, `%s`)', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
+    		));
+        } else {
+            return static::getByField('Username', $username);
+        }
 	}
 
     public function verifyPassword($password)
     {
-    	return call_user_func(static::$passwordHasher, $password) == $this->Password;
+    	return $this->Password && call_user_func(static::$passwordHasher, $password) == $this->Password;
     }
 
     public function setClearPassword($password)
