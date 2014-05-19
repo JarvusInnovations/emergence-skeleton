@@ -206,6 +206,14 @@ Ext.define('EmergenceEditor.view.editor.ACE', {
 			
 			case 'text/css':
 				return 'css';
+            
+            case 'text/x-scss':
+                return 'scss';
+            
+            case 'text/x-dwoo':
+            case 'text/x-smarty':
+            case 'text/x-html-template':
+                return 'html';
 				
 			default:
 				return false;

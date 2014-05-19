@@ -31,7 +31,7 @@
 		{if $Person->About}
 			<h2>About Me</h2>
 			<section class="about">
-				{$Person->About|micstext}
+				{$Person->About|escape|markdown}
 			</section>
 		{/if}
 		

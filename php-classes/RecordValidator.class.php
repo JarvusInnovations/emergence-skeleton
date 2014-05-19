@@ -135,7 +135,7 @@ class RecordValidator
 			}
 			else
 			{
-				// default 'erroMessage' built from 'id'
+				// default 'errorMessage' built from 'id'
 				$this->_errors[$options['id']] = Inflector::spacifyCaps($options['id']) . ' is ' . ($options['required'] && empty($value) ? 'missing' : 'invalid') . '.';
 			}
 			return false;

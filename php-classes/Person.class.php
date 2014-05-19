@@ -247,7 +247,7 @@ class Person extends VersionedRecord
 		
 		if(count($parts) != 2)
 		{
-			throw new Exception('Full name must contain a first and last name separated by a space');
+			throw new Exception('Full name must contain a first and last name separated by a space.');
 		}
 		
 		return array(
@@ -277,14 +277,14 @@ class Person extends VersionedRecord
 			'field' => 'FirstName'
 			,'minlength' => 2
 			,'required' => true
-    		,'errorMessage' => 'First name is required'
+    		,'errorMessage' => 'First name is required.'
 		));
 		
 		$this->_validator->validate(array(
 			'field' => 'LastName'
 			,'minlength' => 2
 			,'required' => true
-    		,'errorMessage' => 'Last name is required'
+    		,'errorMessage' => 'Last name is required.'
 		));
 
 		$this->_validator->validate(array(
@@ -300,7 +300,7 @@ class Person extends VersionedRecord
 			
 			if($ExistingUser && ($ExistingUser->ID != $this->ID))
 			{
-				$this->_validator->addError('Email', 'Email already registered to another account');
+				$this->_validator->addError('Email', 'Email already registered to another account.');
 			}
 		}
 

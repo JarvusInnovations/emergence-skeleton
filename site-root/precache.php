@@ -19,5 +19,5 @@ $trees = array(
 );
 
 foreach ($trees AS $tree) {
-    MICS::dump(Emergence_FS::cacheTree($tree), "Caching tree: $tree");
+    Debug::dumpVar(Emergence_FS::cacheTree($tree), false, "Cached tree: $tree");
 }

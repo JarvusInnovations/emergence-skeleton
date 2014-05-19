@@ -61,11 +61,11 @@ class RegistrationRequestHandler extends RequestHandler
 	{
 		if($_SESSION['User'])
 		{
-			return static::throwError('You are already logged into a user account; you do not need to register.');
+			return static::throwError('You are already logged in. Please log out if you need to register a new account.');
 		}
 		
 		if (!static::$enableRegistration) {
-			return static::throwError('Self-registration is not currently available');
+			return static::throwError('Sorry, self-registration is not currently available. Please contact an administrator.');
 		}
         
         $className = User::getStaticDefaultClass();
@@ -88,11 +88,11 @@ class RegistrationRequestHandler extends RequestHandler
 			$additionalErrors = array();
 			if(empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < User::$minPasswordLength))
 			{
-				$additionalErrors['Password'] = 'Password must be at least '.User::$minPasswordLength.' characters';
+				$additionalErrors['Password'] = 'Password must be at least '.User::$minPasswordLength.' characters long.';
 			}
 			elseif(empty($_REQUEST['PasswordConfirm']) || ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm']))
 			{
-				$additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation';
+				$additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
 			}
 
 			// validate
@@ -151,15 +151,15 @@ class RegistrationRequestHandler extends RequestHandler
 		
 			if(empty($_REQUEST['username']))
 			{
-				$error = 'Provide either your username or email';
+				$error = 'Please provide either your username or email address to reset your password.';
 			}
 			elseif(!($User = $userClass::getByUsername($_REQUEST['username'])) && !($User = $userClass::getByEmail($_REQUEST['username'])))
 			{
-				$error = 'No account was found';
+				$error = 'No account is currently registered for that username or email address.';
 			}
 			elseif(!$User->Email)
 			{
-				$error = 'No email address on file';
+				$error = 'Unforunately, there is no email address on file for this account. Please contact an administrator.';
 			}
 			else
 			{

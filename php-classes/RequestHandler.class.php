@@ -196,9 +196,17 @@ abstract class RequestHandler
 		}
 	}
 
-	public static function throwNotFoundError($message = 'Page not found')
+    public static function throwNotFoundError($message = 'Page not found')
 	{
 		header('HTTP/1.0 404 Not Found');
+		$args = func_get_args();
+		$args[0] = $message;
+		return call_user_func_array(array(get_called_class(), 'throwError'), $args);
+	}
+
+    public static function throwServerError($message = 'An unknown problem has prevented the server from completing your request')
+	{
+		header('HTTP/1.0 500 Internal Server Error');
 		$args = func_get_args();
 		$args[0] = $message;
 		return call_user_func_array(array(get_called_class(), 'throwError'), $args);

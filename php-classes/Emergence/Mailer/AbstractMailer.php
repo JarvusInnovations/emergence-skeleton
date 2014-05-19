@@ -18,8 +18,8 @@ abstract class AbstractMailer implements IMailer
 	
 	static public function renderTemplate($template, $data = array())
 	{
-		$body = trim(\TemplateResponse::getSource($template.'.email', $data));
-		$templateVars = \TemplateResponse::getInstance()->scope;
+		$body = trim(\Emergence\Dwoo\Engine::getSource($template.'.email', $data));
+		$templateVars = \Emergence\Dwoo\Engine::getInstance()->scope;
 		
 		return array(
 			'from' => $templateVars['from'] ? $templateVars['from'] : false
