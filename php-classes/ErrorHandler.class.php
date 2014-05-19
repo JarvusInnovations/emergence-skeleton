@@ -2,8 +2,6 @@
 
 class ErrorHandler extends RequestHandler
 {
-	static public $reportEmail = 'chris@devnuts.com';
-
 	// error codes
 	const ERROR_DB	= 1;
 
@@ -36,7 +34,7 @@ class ErrorHandler extends RequestHandler
 				}
 				else
 				{
-					Email::send(static::$reportEmail, 'Unhandeld '.get_class($e).' on '.$_SERVER['HTTP_HOST'], $report);
+					Email::send(Site::$webmasterEmail, 'Unhandeld '.get_class($e).' on '.$_SERVER['HTTP_HOST'], $report);
 					ErrorHandler::handleFailure('There was a problem... our technical staff has been notified. Please retry later.');
 				}
 
