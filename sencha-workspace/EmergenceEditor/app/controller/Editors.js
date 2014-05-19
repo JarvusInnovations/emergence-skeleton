@@ -14,10 +14,11 @@ Ext.define('EmergenceEditor.controller.Editors', {
 		,'/jslib/ace/mode-php.js'
 		,'/jslib/ace/mode-css.js'
 		,'/jslib/ace/mode-json.js'
-    	,'/jslib/ace/themes/coda-emergence.js'
-    	//,'/jslib/ace/themes/tomorrow-night.js'
+        ,'/jslib/ace/mode-scss.js'
+        //,'/jslib/ace/mode-smarty.js'
+        ,'/jslib/ace/theme-specials_board.js'
 	]
-	,aceTheme: "ace/theme/coda-emergence"
+	,aceTheme: 'ace/theme/specials_board'
 	
 	,init: function() {
 		var me = this
