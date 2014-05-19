@@ -2,11 +2,9 @@
 
 abstract class Token extends ActiveRecord
 {
-
 	static public $expirationHours = 48;
-	static public $emailTemplate = 'token.email';
+	static public $emailTemplate = 'token';
 	static public $emailSubject = 'The link you requested';
-	static public $emailFrom;
 
 	static public $tableName = 'tokens';
 
@@ -89,11 +87,8 @@ abstract class Token extends ActiveRecord
 
 	public function sendEmail($email)
 	{
-		$body = TemplateResponse::getSource(static::$emailTemplate, array(
-			'Token' => $this
+		return Emergence\Mailer\Mailer::sendFromTemplate($email, static::$emailTemplate, array(
+    		'Token' => $this
 		));
-										
-		return Email::send($email, static::$emailSubject, $body, static::$emailFrom);
 	}
-
 }
