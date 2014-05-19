@@ -14,7 +14,3 @@ if (!$frameworkVersion = $_GET['version']) {
 
 $cachedFiles = Emergence_FS::cacheTree("sencha-workspace/$framework-$frameworkVersion");
 Benchmark::mark("precached $cachedFiles files in sencha-workspace/$framework-$frameworkVersion");
-
-// precache workspace config
-$cachedFiles = Emergence_FS::cacheTree('sencha-workspace/.sencha');
-Benchmark::mark("precached sencha-workspace/.sencha");
