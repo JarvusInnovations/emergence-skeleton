@@ -6,7 +6,7 @@ class Validators
     public static function is($string, $options = array())
     {
         $options = array_merge(array(
-    		'value' => false
+        	'value' => false
 		), $options);
 		
 		if($options['value'])
@@ -300,7 +300,7 @@ class Validators
 		), $options);
 
 		if($options['country'] == 'US')
-			return !empty($postal) && preg_match('/^[0-9]{5}(-[0-9]{4})?$/', $postal);
+			return !empty($postal) && preg_match('/^[0-9]{5}([^a-zA-Z0-9]*[0-9]{4})?$/', $postal);
 		elseif($options['country'] == 'CA')
 			return !empty($postal) && preg_match('/^[a-zA-Z][0-9][a-zA-Z][[:space:]]?[0-9][a-zA-Z][0-9]$/', $postal);
 		elseif(in_array($options['country'], array('AD','AR', 'BM', 'BN', 'JM', 'MT', 'MD', 'NL', 'GB', 'VE')))
@@ -325,6 +325,7 @@ class Validators
 	{
 		$options = array_merge(array(
 			'country' => 'US'
+			,'fakeDetector' => false
 		), $options);
 
 
@@ -352,7 +353,7 @@ class Validators
 				return
 				(
 					(strlen($phone) == 10)
-					&& (substr($phone, 3, 3) != '555')
+					&& (!$options['fakeDetector'] || substr($phone, 3, 3) != '555')
 				);
 			}
 		
