@@ -77,14 +77,14 @@ class User extends Person
 			,'required' => true
 			,'minlength' => 2
 			,'maxlength' => 30
-			,'errorMessage' => 'Username must be at least 2 characters'
+			,'errorMessage' => 'Username must be at least two characters long.'
 		));
 
 		$this->_validator->validate(array(
 			'field' => 'Username'
 			,'required' => true
 			,'validator' => 'handle'
-			,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores'
+			,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores.'
 		));
 
 		// check handle uniqueness
@@ -94,7 +94,7 @@ class User extends Person
 			
 			if($ExistingUser && ($ExistingUser->ID != $this->ID))
 			{
-				$this->_validator->addError('Username', 'Username already registered');
+				$this->_validator->addError('Username', 'Username already registered.');
 			}
 		}	
 		
@@ -198,7 +198,7 @@ class User extends Person
 				$username = $firstName.'_'.$lastName;
 				break;
 			default:
-				throw new Exception ('Unknown username format');
+				throw new Exception ('Unknown username format.');
 		}
 
 		// strip bad characters
