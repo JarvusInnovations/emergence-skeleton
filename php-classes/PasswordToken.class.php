@@ -2,9 +2,8 @@
 
 class PasswordToken extends Token
 {
-    static public $emailTemplate = 'register/passwordToken.email';
+    static public $emailTemplate = 'register/passwordToken';
 	static public $formTemplate = 'register/passwordForm';
-	static public $emailSubject = 'The password recovery link you requested';
 
 	public function handleRequest($data)
 	{
