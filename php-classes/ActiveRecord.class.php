@@ -25,7 +25,7 @@ class ActiveRecord
      * String to identify this class with in administrative interfaces
      * @var string
      */
-	static public $classTitle = 'Untitled Class';
+    static public $classTitle = 'Untitled Class';
     
 	/**
 	 * URL that can be prefixed to this record's identifier by $this->getURL
@@ -2425,15 +2425,15 @@ class ActiveRecord
 			{
 				$fieldOptions = static::getFieldOptions($field);
 			
-				if($condition === null || ($condition == '' && $fieldOptions['blankisnull']))
-				{
+				if ($condition === null || ($condition == '' && $fieldOptions['blankisnull'])) {
 					$condition = sprintf('`%s` IS NULL', static::_cn($field));
-				}
-				else if(is_array($condition)) {
-					$condition = sprintf('`%s` %s "%s"', static::_cn($field), $condition['operator'],DB::escape($condition['value']));
-				}
-				else
-				{
+				} elseif (is_array($condition)) {
+					if (is_array($condition['values'])) {
+						$condition = sprintf('`%s` %s ("%s")' ,static::_cn($field), ($condition['operator'] ? $condition['operator'] : 'IN'), implode('", "', DB::escape($condition['values'])));
+					} else {
+						$condition = sprintf('`%s` %s "%s"', static::_cn($field), $condition['operator'], DB::escape($condition['value']));
+					}
+				} else {
 					$condition = sprintf('`%s` = "%s"', static::_cn($field), DB::escape($condition));
 				}
 			}
