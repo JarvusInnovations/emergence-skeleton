@@ -25,7 +25,7 @@ class EditorRequestHandler extends RequestHandler {
                 return static::searchRequest();
             case 'activity':
                 return static::handleActivityRequest();
-    		case 'export':
+        	case 'export':
 				return static::handleExportRequest();
 			case 'import':
 				return static::handleImportRequest();
@@ -104,7 +104,7 @@ class EditorRequestHandler extends RequestHandler {
         $fileResults = DB::query('SELECT f.ID FROM (SELECT MAX(ID) AS ID FROM _e_files GROUP BY Handle, CollectionID) matches JOIN _e_files f USING(ID) WHERE f.Status = "Normal"');
         
         // open grep process
-        $cmd = sprintf('xargs grep -nI "%s" ', addslashes($_REQUEST['q']));
+        $cmd = sprintf('xargs grep -nIP "%s" ', addslashes($_REQUEST['q']));
         $cwd = Site::$rootPath . '/data/';
 
         $grepProc = proc_open($cmd, array(0 => array('pipe', 'r'), 1 => array('pipe', 'w')), $pipes, $cwd);
@@ -125,11 +125,15 @@ class EditorRequestHandler extends RequestHandler {
 
             if (count($line) === 3) {
                 $file = SiteFile::getByID($line[0]);
+                if (strlen($line[2]) > 255) {
+                    $result = preg_match("/$_REQUEST[q]/", $line[2], $matches, PREG_OFFSET_CAPTURE);
+                    $line[2] = substr(substr($line[2], max(0, $matches[0][1]-50)), 0, 255);
+                }
     
                 $output[] = array(
                     'File'  =>  $file ? $file->getData() : null
                     ,'line' =>  $line[1]
-                    ,'result' => $line[2]
+                    ,'result' => trim($line[2])
                 );
             }
         }
