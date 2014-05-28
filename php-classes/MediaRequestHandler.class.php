@@ -4,7 +4,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 {
     // RecordRequestHandler configuration
     static public $recordClass = 'Media';
-	static public $browseLimit = 100;
+    static public $browseLimit = 100;
 	static public $browseOrder = array('ID' => 'DESC');
 
 	// configurables
@@ -183,7 +183,11 @@ class MediaRequestHandler extends RecordsRequestHandler
 			}
 					
 			// create media
-			$Media = Media::createFromUpload($_FILES[$options['fieldName']]['tmp_name'], $options);
+            try {
+			    $Media = Media::createFromUpload($_FILES[$options['fieldName']]['tmp_name'], $options);
+            } catch (MediaTypeException $e) {
+                return static::throwInvalidRequestError('The file you uploaded is not of a supported media format');
+            }
 			
 		} elseif($_SERVER['REQUEST_METHOD'] == 'PUT') {
 			$put = fopen("php://input", "r"); // open input stream
@@ -201,7 +205,11 @@ class MediaRequestHandler extends RecordsRequestHandler
 			fclose($put);
 			
 			// create media
-			$Media = Media::createFromFile($tmp, $options);
+            try {
+    		    $Media = Media::createFromFile($tmp, $options);
+            } catch (MediaTypeException $e) {
+                return static::throwInvalidRequestError('The file you uploaded is not of a supported media format');
+            }
 		} else {
 			return static::respond('upload');
 		}

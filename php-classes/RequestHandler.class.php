@@ -7,7 +7,7 @@ abstract class RequestHandler
     public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
     
     
-	// static properties
+    // static properties
 	protected static $_path;
 	protected static $_parameters;
 	protected static $_options = array();
@@ -214,6 +214,7 @@ abstract class RequestHandler
 	
 	public static function throwValidationError(RecordValidationException $e, $message = 'There were errors validating your submission')
 	{
+        header('HTTP/1.0 400 Bad Request');
 		return static::respond('validationError', array(
 			'success' => false
 			,'message' => $message
@@ -225,6 +226,7 @@ abstract class RequestHandler
 	
 	public static function throwInvalidRequestError($message = 'You did not supply the needed parameters correctly')
 	{
+    	header('HTTP/1.0 400 Bad Request');
 		return static::throwError($message);
 	}
 
