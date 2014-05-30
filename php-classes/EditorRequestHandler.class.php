@@ -25,7 +25,7 @@ class EditorRequestHandler extends RequestHandler {
                 return static::searchRequest();
             case 'activity':
                 return static::handleActivityRequest();
-        	case 'export':
+            case 'export':
 				return static::handleExportRequest();
 			case 'import':
 				return static::handleImportRequest();
@@ -120,7 +120,8 @@ class EditorRequestHandler extends RequestHandler {
         $output = array();
         
         while (!feof($pipes[1])) { 
-            $line = trim(stream_get_line($pipes[1], 1000000, PHP_EOL)); 
+            $line = trim($origLine =stream_get_line($pipes[1], 100000000, PHP_EOL));
+#            print "$origLine<hr>";
             $line = explode(':', $line, 3);
 
             if (count($line) === 3) {
@@ -128,6 +129,9 @@ class EditorRequestHandler extends RequestHandler {
                 if (strlen($line[2]) > 255) {
                     $result = preg_match("/$_REQUEST[q]/", $line[2], $matches, PREG_OFFSET_CAPTURE);
                     $line[2] = substr(substr($line[2], max(0, $matches[0][1]-50)), 0, 255);
+                }
+                if (!$file) {
+                    Debug::dumpVar($line, true, 'no file');
                 }
     
                 $output[] = array(

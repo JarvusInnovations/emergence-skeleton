@@ -1,6 +1,6 @@
 /*jslint browser: true, undef: true, white: false, laxbreak: true *//*global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.controller.Viewport', {
-	extend: 'Ext.app.Controller'
+    extend: 'Ext.app.Controller'
 	,requires: ['Ext.util.History']
 	
 	,refs: [{
@@ -186,19 +186,13 @@ Ext.define('EmergenceEditor.controller.Viewport', {
 				,searchQuery: query
 				,title: 'Search Results for ' + query
 				,closable: true
-		});
-		
-		var dv = tab.down('dataview');
-		
-		dv.bindStore(Ext.create('EmergenceEditor.store.SiteSearch'));
-		
+		    })
+            ,store = tab.getStore();
+
 		// load search results
-		dv.getStore().load({
-			params: {
-				q: query
-			}
-		});
-		
+		store.getProxy().extraParams.q = query;
+        store.load();
+
 		// set search tab to activetab
 		this.getTabPanel().setActiveTab(tab); 
 	}
