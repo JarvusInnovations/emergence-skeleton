@@ -216,7 +216,11 @@ class Person extends VersionedRecord
 		}
 	}
 
-	
+    public function getTitle()
+    {
+        return $this->FullName;
+    }
+
 	static public function getByEmail($email)
 	{
 		return static::getByField('Email', $email);
