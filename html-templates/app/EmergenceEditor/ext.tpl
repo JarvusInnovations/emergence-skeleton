@@ -1,10 +1,21 @@
 {extends app/ext.tpl}
 
+{* Legacy loader for 4.1.x *}
 {block js-app-devenv}
-    {$suppressBootstrap = true}
-    {$dwoo.parent}
+    {capture assign=frameworkPath}sdk/ext{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-dev'}.js{/capture}
+    <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
+
+    {sencha_preloader}
 
     <script type="text/javascript">
-        Ext.Loader.setPath('Ext.ux', '/app/{$App->getName()}/sdk/examples/ux');
+        Ext.Loader.setConfig({
+            enabled: true
+            ,paths: {
+                'Ext': '/app/{$App->getName()}/sdk/src'
+                ,'Ext.ux': '/app/{$App->getName()}/sdk/examples/ux'
+                ,'Emergence': '/app/{$App->getName()}/x/Emergence'
+                ,'Jarvus': '/app/{$App->getName()}/x/Jarvus'
+            }
+        });
     </script>
 {/block}

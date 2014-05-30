@@ -7,7 +7,7 @@ class Emergence_FS
         // split path into array
         if (is_string($path)) {
             $path = Site::splitPath($path);
-    	}
+        }
 
 		// get tree map from parent
 		$remoteTree = Emergence::resolveCollectionFromParent($path);
@@ -253,7 +253,7 @@ class Emergence_FS
 			while ($fileRow = $fileResult->fetch_assoc()) {
 				$dst = $tree[$fileRow['CollectionID']]['_path'].'/'.$fileRow['Handle'];
 				
-				if ($fileRow['Status'] == 'Normal' && ($tree[$fileRow['CollectionID']]['Site'] == 'Local' || !in_array($dst, $filesWritten))) {
+				if ($fileRow['Status'] == 'Normal' && $tree[$fileRow['CollectionID']]['Status'] != 'Deleted' && ($tree[$fileRow['CollectionID']]['Site'] == 'Local' || !in_array($dst, $filesWritten))) {
 					copy(Site::$rootPath . '/' . SiteFile::$dataPath . '/' . $fileRow['ID'], $dst);
 					touch($dst, strtotime($fileRow['Timestamp']));
 					$filesWritten[] = $dst;

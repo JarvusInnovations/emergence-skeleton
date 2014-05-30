@@ -366,6 +366,11 @@ class ActiveRecord
 	
 	
 	// public methods
+    public function getTitle()
+    {
+        return static::fieldExists('Title') ? $this->Title : "$this->Class #$this->ID";
+    }
+
     public function getHandle()
     {
         return static::fieldExists('Handle') ? $this->Handle : $this->ID;
