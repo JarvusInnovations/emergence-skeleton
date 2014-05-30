@@ -169,14 +169,14 @@ class Comment extends VersionedRecord
 		$this->_validator->validate(array(
 			'field' => 'Message'
 			,'validator' => 'string_multiline'
-			,'errorMessage' => 'You must provide a message'
+			,'errorMessage' => 'You must provide a message.'
 		));
 		
 		$this->_validator->validate(array(
 			'field' => 'Handle'
 			,'required' => false
 			,'validator' => 'handle'
-			,'errorMessage' => 'URL handle can only contain letters, numbers, hyphens, and underscores'
+			,'errorMessage' => 'URL handle can only contain letters, numbers, hyphens, and underscores.'
 		));
 		
 		// check handle uniqueness
