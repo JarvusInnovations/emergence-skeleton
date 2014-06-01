@@ -973,14 +973,14 @@ class ActiveRecord
 		return static::instantiateRecord($record);
 	}
 		
-	static public function getByField($field, $value, $cacheIndex = false)
+	static public function getByField($field, $value)
 	{
-		$record = static::getRecordByField($field, $value, $cacheIndex);
+		$record = static::getRecordByField($field, $value);
 		
 		return static::instantiateRecord($record);
 	}
 	
-	static public function getRecordByField($field, $value, $cacheIndex = false)
+	static public function getRecordByField($field, $value)
 	{
 		$query = 'SELECT * FROM `%s` WHERE `%s` = "%s" LIMIT 1';
 		$params = array(
