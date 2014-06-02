@@ -54,11 +54,6 @@ class Comment extends VersionedRecord
 		)
 	);
 	
-	static public function getByHandle($handle)
-	{
-		return static::getByField('Handle', $handle, true);
-	}
-	
 	public function getValue($name)
 	{
 		switch($name)

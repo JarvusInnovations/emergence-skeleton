@@ -38,11 +38,6 @@ class GlobalHandle extends ActiveRecord
 			'type' => 'context-parent'
 		)
 	);
-			
-	static public function getByHandle($handle)
-	{
-		return static::getByField('Handle', $handle, true);
-	}
 	
 	static public function createAlias(ActiveRecord $Context, $handle = false)
 	{

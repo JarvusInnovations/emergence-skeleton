@@ -115,11 +115,6 @@ class Session extends ActiveRecord
 		}
 	}
 	
-	static public function getByHandle($handle)
-	{
-		return static::getByField('Handle', $handle, true);
-	}
-	
 	public function getData()
 	{
 		// embed related object(s)

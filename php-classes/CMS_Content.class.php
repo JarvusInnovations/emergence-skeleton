@@ -128,11 +128,6 @@ abstract class CMS_Content extends VersionedRecord
     
 	    return static::getAllByWhere($conditions, $options);
     }
-   
-    static public function getByHandle($handle)
-    {
-        return static::getByField('Handle', $handle, true);
-    }
     
     public function validate()
     {
