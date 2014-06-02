@@ -70,11 +70,6 @@ class Group extends ActiveRecord
         )
     );
     
-    static public function getByHandle($handle)
-    {
-        return is_numeric($handle) ? static::getByID($handle) : static::getByField('Handle', $handle);
-    }
-    
     public function validate($deep = true)
     {
         // call parent

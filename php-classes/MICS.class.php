@@ -66,4 +66,9 @@ class MICS
     {
         Site::redirect($path, $get, $hash);
     }
+    
+    public static function getQueryString()
+    {
+        return $_SERVER['QUERY_STRING'];
+    }
 }
