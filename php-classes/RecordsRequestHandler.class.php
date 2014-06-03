@@ -8,7 +8,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelComment = 'User';
     static public $accountLevelBrowse = 'Staff';
     static public $accountLevelWrite = 'Staff';
-	static public $accountLevelAPI = false;
+    static public $accountLevelAPI = false;
 	static public $browseOrder = false;
 	static public $browseConditions = false;
 	static public $browseLimitDefault = false;
@@ -97,6 +97,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
 	{
 		$className = static::$recordClass;
+		$tableAlias = str_replace('\\', '_', $className);
 		$terms = preg_split('/\s+/', $query);
 		
 		$options = array_merge(array(
@@ -104,7 +105,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			,'offset' => !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false
 		), $options);
 
-		$select = array($className.'.*');
+		$select = array($tableAlias.'.*');
 		$joins = array();
 		$having = array();
 		$matchers = array();
@@ -195,7 +196,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 					,array(
 						join(',',$select)
 						,$className::$tableName
-						,$className
+						,$tableAlias
 						,!empty($joins) ? implode(' ', $joins) : ''
 						,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
 						,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
@@ -773,6 +774,4 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		return static::throwNotFoundError($message);
 	}
-	
-
 }
