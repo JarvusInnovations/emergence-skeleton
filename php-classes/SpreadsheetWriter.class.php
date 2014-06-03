@@ -12,8 +12,7 @@ class SpreadsheetWriter
     protected $_fh;
     protected $_headersWritten = false;
 
-
-    static public function createFromFile($filename)
+    public static function createFromFile($filename)
     {
         // get MIME type
         switch ($mimeType = File::getMIMEType($filename)) {
@@ -46,12 +45,12 @@ class SpreadsheetWriter
     public function writeHeaders()
     {
         header('Content-Type: text/csv');
-        
+
         $contentDisposition = 'attachment';
         if ($this->_options['filename']) {
             $contentDisposition .= '; filename="'.str_replace('"', '', $this->_options['filename']).'.csv"';
         }
-        
+
         header('Content-Disposition: '.$contentDisposition);
 
         return $this->_headersWritten = true;
@@ -59,7 +58,7 @@ class SpreadsheetWriter
 
     public function writeRow($data)
     {
-        if (!$this->_headersWritten) {
+        if (!$this->_headersWritten && !$this->_options['fileHandle']) {
             $this->writeHeaders();
 
             if ($this->_options['autoHeader']) {
