@@ -2,11 +2,10 @@
 
 class Validators
 {
-    
     public static function is($string, $options = array())
     {
         $options = array_merge(array(
-        	'value' => false
+            'value' => false
 		), $options);
 		
 		if($options['value'])
@@ -63,10 +62,16 @@ class Validators
 			&& preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/', $email);
 	}
 	
-	public static function URL($url)
+	public static function URL($url, $options = array())
 	{
-		return !empty($url)
-			&& preg_match('|^https?://([a-zA-Z0-9-.]+\.)+[a-zA-Z]{2,}|', $url);
+    	$options = array_merge(array(
+			'schemes' => array('http', 'https')
+		), $options);
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+		return $scheme
+			&& (empty($options['schemes']) || in_array(strtolower($scheme), $options['schemes']));
 	}
 	
 	public static function datetime($datetime, $options = array())
@@ -570,5 +575,4 @@ class Validators
 		
 		return true;
 	}
-
 }
