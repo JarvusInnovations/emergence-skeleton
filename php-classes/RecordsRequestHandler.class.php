@@ -9,7 +9,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelBrowse = 'Staff';
     static public $accountLevelWrite = 'Staff';
     static public $accountLevelAPI = false;
-	static public $browseOrder = false;
+    static public $browseOrder = false;
 	static public $browseConditions = false;
 	static public $browseLimitDefault = false;
 	static public $editableFields = false;
@@ -97,7 +97,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
 	{
 		$className = static::$recordClass;
-		$tableAlias = str_replace('\\', '_', $className);
+		$tableAlias = $className::getTableAlias();
 		$terms = preg_split('/\s+/', $query);
 		
 		$options = array_merge(array(
