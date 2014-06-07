@@ -27,7 +27,7 @@ class ActiveRecord
      */
     static public $classTitle = 'Untitled Class';
     
-	/**
+    /**
 	 * URL that can be prefixed to this record's identifier by $this->getURL
      * to generate a domain-relative address to this record
 	 * @var string
@@ -1120,7 +1120,7 @@ class ActiveRecord
 				{
 					case 'one-one':
 					{
-						$join .= sprintf(' JOIN `%1$s` AS `%2$s` ON(`%2$s`.`%3$s` = `%4$s`)', $rel['class']::$tableName, $rel['class']::getStaticRootClass(), $rel['foreign'], $rel['local']);
+						$join .= sprintf(' JOIN `%1$s` AS `%2$s` ON(`%2$s`.`%3$s` = `%4$s`)', $rel['class']::$tableName, $rel['class']::getTableAlias(), $rel['foreign'], $rel['local']);
 						break;
 					}
 					default:
@@ -1170,7 +1170,7 @@ class ActiveRecord
 		$params = array(
 			$options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
 			, static::$tableName
-			, static::getStaticRootClass()
+			, static::getTableAlias()
 			, $join
 			, $conditions ? join(') AND (', $conditions) : '1'
 		);
@@ -2578,4 +2578,9 @@ class ActiveRecord
 
 		Cache::store($cacheMapKey, $cacheMap);
 	}
+
+    static public function getTableAlias()
+    {
+        return str_replace('\\', '_', static::getStaticRootClass());
+    }
 }
