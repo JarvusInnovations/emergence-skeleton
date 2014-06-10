@@ -153,6 +153,7 @@ class ActiveRecord
 	 */
 	static function __classLoaded()
 	{
+        // TODO: apply these field changes to the cached stacked field config, as writing to static::$fields can be unpredictable
         if (static::$trackModified) {
             if (empty(static::$fields['Modified'])) {
                 static::$fields['Modified'] = array(
