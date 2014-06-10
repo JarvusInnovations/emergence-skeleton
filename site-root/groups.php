@@ -1,3 +1,3 @@
 <?php
 
-GroupsRequestHandler::handleRequest();
+Emergence\People\Groups\GroupsRequestHandler::handleRequest();

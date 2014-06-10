@@ -161,7 +161,7 @@ class Group extends ActiveRecord
     public function getPopulation()
     {
         try {
-            return DB::oneValue(
+            return (integer)DB::oneValue(
                 'SELECT COUNT(*) FROM (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u) `Group` JOIN `%s` GroupMember ON GroupID = `Group`.ID'
                 ,array(
                     static::$tableName

@@ -17,13 +17,11 @@ Ext.define('Jarvus.ext.proxy.API', {
 
         // ensure apiWrapper is required and converted to instance before request is built
         if (typeof apiWrapper == 'string') {
-            Ext.require(apiWrapper, function() {
-                me.apiWrapper = Ext.ClassManager.get(apiWrapper);
-                doApiRequest.apply(me, requestArguments);
-            });
-        } else {
-            doApiRequest.apply(me, requestArguments);
+            Ext.syncRequire(apiWrapper);
+            me.apiWrapper = Ext.ClassManager.get(apiWrapper);
         }
+
+        return doApiRequest.apply(me, requestArguments);
     },
     
     doApiRequest: function(operation, callback, scope) {
@@ -34,14 +32,17 @@ Ext.define('Jarvus.ext.proxy.API', {
         if (operation.allowWrite()) {
             request = writer.write(request);
         }
-        
-        me.getAPIWrapper().request(Ext.apply(request, {
+
+        // track last request for Jarvus.ext.override.proxy.Abort since we replace doRequest
+        me.lastAjaxRequest = me.getAPIWrapper().request(Ext.apply(request, {
             autoDecode: false,
             disableCaching: false,
             success: function(response) {
                 me.processResponse(true, operation, request, response, callback, scope);
             }
         }));
+
+        return request;
     },
 
     getAPIWrapper: function() {
