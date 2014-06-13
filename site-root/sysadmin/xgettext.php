@@ -39,7 +39,7 @@ foreach ($strings AS $string => $files) {
 rewind($pot);
 
 header('Content-Type: text/plain');
-header('Content-Disposition: attachment; filename="'.Site::getConfig('primary_hostname').'.pot"');
+header('Content-Disposition: attachment; filename="'.Site::getConfig('handle').'.pot"');
 fpassthru($pot);
 
 
