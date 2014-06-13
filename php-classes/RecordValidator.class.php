@@ -4,7 +4,7 @@ class RecordValidator
 {
 
     // configurables
-	public static $autoTrim = true;
+    public static $autoTrim = true;
 	
 	// protected properties
 	protected $_record;
@@ -131,12 +131,12 @@ class RecordValidator
 		{
 			if(!empty($options['errorMessage']))
 			{
-				$this->_errors[$options['id']] = $options['errorMessage'];
+				$this->_errors[$options['id']] = gettext($options['errorMessage']);
 			}
 			else
 			{
 				// default 'errorMessage' built from 'id'
-				$this->_errors[$options['id']] = Inflector::spacifyCaps($options['id']) . ' is ' . ($options['required'] && empty($value) ? 'missing' : 'invalid') . '.';
+    			$this->_errors[$options['id']] = sprintf($options['required'] && empty($value) ? _('%s is missing.') :  _('%s is invalid.'), Inflector::spacifyCaps($options['id']));
 			}
 			return false;
 		}
