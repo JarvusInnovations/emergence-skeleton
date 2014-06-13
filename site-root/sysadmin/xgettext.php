@@ -3,7 +3,7 @@
 $GLOBALS['Session']->requireAccountLevel('Developer');
 
 // patterns for matching translatable strings
-$patternTemplate = '/\{(_|gettext)\s*\(?\s*("?)(.*?)\2\s*\)?\}/';
+$patternTemplate = '/\{(_|gettext)\s*\(?\s*("|\')(.*?)\2\s*\)?(|.*?)\}/';
 $patternPHP = '/(_|gettext)\s*\(\s*(\'|")(.*?)\2\s*\)/';
 $patternPHPValidators = '/(\'|")errorMessage\1\s*=>\s*(\'|")(.*?)\2/';
 
