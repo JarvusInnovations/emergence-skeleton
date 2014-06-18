@@ -3,7 +3,8 @@
 $GLOBALS['Session']->requireAccountLevel('Developer');
 
 // patterns for matching translatable strings
-$patternTemplate = '/\{(_|gettext)\s*\(?\s*("?)(.*?)\2\s*\)?\}/';
+$patternTemplate = '/(_|gettext)\(\s*(\'|")(.*?)\2\s*\)/';
+$patternTemplateShort = '/\{(_|gettext)\s+("|\'|)(\S*?)\2\s*\}/';
 $patternPHP = '/(_|gettext)\s*\(\s*(\'|")(.*?)\2\s*\)/';
 $patternPHPValidators = '/(\'|")errorMessage\1\s*=>\s*(\'|")(.*?)\2/';
 
@@ -18,6 +19,7 @@ $files = Emergence_FS::getTreeFiles('html-templates', false, array('Type' => 'te
 foreach ($files AS $path => $fileData) {
     $node = SiteFile::getByID($fileData['ID']);
     _extractStrings($patternTemplate, $node->RealPath, $path, $strings);
+    _extractStrings($patternTemplateShort, $node->RealPath, $path, $strings);
 }
 
 // extract strings from PHP files
@@ -37,7 +39,7 @@ foreach ($strings AS $string => $files) {
 rewind($pot);
 
 header('Content-Type: text/plain');
-header('Content-Disposition: attachment; filename="'.Site::getConfig('primary_hostname').'.pot"');
+header('Content-Disposition: attachment; filename="'.Site::getConfig('handle').'.pot"');
 fpassthru($pot);
 
 
