@@ -15,8 +15,12 @@ Ext.define('Jarvus.ext.patch.grid.ResetTipAttributes', {
         return me.callParent(arguments);
     }
 }, function() {
+    //<debug>
+
     // 5.0.0.736 needs this and .970 doesn't, but neither reports itself as anything but "5"
     if (!Ext.getVersion().match('4.2.2.1144') && !Ext.getVersion().match('5')) {
         console.warn('This patch has not been tested with this version of ExtJS');
     }
+
+    //</debug>
 });
