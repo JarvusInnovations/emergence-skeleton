@@ -80,7 +80,7 @@ class Locale
         $node = Site::resolvePath("locales/$locale/site.po");
 
         if (!$node) {
-            throw new \Exception('Unable to load locale, site.po not found');
+            return false;
         }
 
         // write .po file to disk and compile to .mo if current version unknown or doesn't match
