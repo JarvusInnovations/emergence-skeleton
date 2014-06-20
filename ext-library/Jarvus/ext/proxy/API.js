@@ -2,6 +2,9 @@
 Ext.define('Jarvus.ext.proxy.API', {
     extend: 'Ext.data.proxy.Ajax',
     alias: 'proxy.api',
+    requires: [
+        'Jarvus.util.API'
+    ],
     
     /**
      * @cfg The API wrapper singleton that will process requests
