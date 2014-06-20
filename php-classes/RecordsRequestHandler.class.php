@@ -10,7 +10,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelWrite = 'Staff';
     static public $accountLevelAPI = false;
     static public $browseOrder = false;
-	static public $browseConditions = false;
+    static public $browseConditions = false;
 	static public $browseLimitDefault = false;
 	static public $editableFields = false;
 	static public $searchConditions = false;
@@ -447,8 +447,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	
 	static public function handleMultiDestroyRequest()
 	{
-		
-		if(static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], array('POST','PUT','DELETE')))
+		if($_SERVER['CONTENT_TYPE'] == 'application/json')
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
