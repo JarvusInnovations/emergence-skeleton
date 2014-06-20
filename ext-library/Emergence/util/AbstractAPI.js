@@ -26,6 +26,16 @@ Ext.define('Emergence.util.AbstractAPI', {
             'login'
         );
     },
+    
+    buildHeaders: function(headers) {
+        headers = headers || {};
+
+        if (!('Accept' in headers)) {
+            headers.Accept = 'application/json';
+        }
+
+        return headers;
+    },
 
     /**
      * Attempt to load session data
@@ -39,7 +49,7 @@ Ext.define('Emergence.util.AbstractAPI', {
         var me = this;
 
         me.request({
-            url: '/login/json',
+            url: '/login',
             method: 'GET',
             success: function(response) {
                 if(response.data && response.data.success) {
@@ -69,7 +79,7 @@ Ext.define('Emergence.util.AbstractAPI', {
         var me = this;
 
         me.request({
-            url: '/login/json',
+            url: '/login',
             params: {
                 '_LOGIN[username]': username,
                 '_LOGIN[password]': password,
@@ -97,7 +107,7 @@ Ext.define('Emergence.util.AbstractAPI', {
      */
     logout: function(callback, scope) {
         this.request({
-            url: '/login/json/logout',
+            url: '/login/logout',
             success: function(response) {
                 Ext.callback(callback, scope, [true, response]);
             },
