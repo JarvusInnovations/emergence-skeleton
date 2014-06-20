@@ -24,8 +24,16 @@ class Locale
 
         // prefer user-selected locale
         if (
-            !empty($_REQUEST['locale']) &&
-            ($requestedLocale = static::normalizeLocaleName($_REQUEST['locale'])) &&
+            (
+                (
+                    !empty($_GET['locale']) &&
+                    ($requestedLocale = static::normalizeLocaleName($_GET['locale']))
+                ) ||
+                (
+                    !empty($_COOKIE['locale']) &&
+                    ($requestedLocale = static::normalizeLocaleName($_COOKIE['locale']))
+                )
+            ) &&
             in_array($requestedLocale, $availableLocales)
         ) {
             return $requestedLocale;

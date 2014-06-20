@@ -4,7 +4,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 
 // patterns for matching translatable strings
 $patternTemplate = '/(_|gettext)\(\s*(\'|")(.*?)\2\s*\)/';
-$patternTemplateShort = '/\{(_|gettext)\s+("|\'|)(\S*?)\2\s*\}/';
+$patternTemplateShort = '/\{(_|gettext)\s+("|\'|)(.*?)\2\s*\}/';
 $patternPHP = '/(_|gettext)\s*\(\s*(\'|")(.*?)\2\s*\)/';
 $patternPHPValidators = '/(\'|")errorMessage\1\s*=>\s*(\'|")(.*?)\2/';
 
@@ -46,7 +46,7 @@ fpassthru($pot);
 // utility methods
 function _extractStrings($pattern, $fileRealPath, $fileVirtualPath, &$strings) {
     $lines = file($fileRealPath);
-    
+
     foreach (preg_grep($pattern, $lines) AS $lineNo => $line) {
         preg_match_all($pattern, $line, $matches);
 
