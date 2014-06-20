@@ -2,6 +2,9 @@
 Ext.define('Emergence.ext.proxy.Records', {
     extend: 'Jarvus.ext.proxy.API',
     alias: 'proxy.records',
+    requires: [
+        'Emergence.util.API'
+    ],
 
     apiWrapper: 'Emergence.util.API',
 
@@ -53,7 +56,7 @@ Ext.define('Emergence.ext.proxy.Records', {
 
     buildUrl: function(request) {
         var me = this,
-            baseUrl = me.getUrl(request) + '/json';
+            baseUrl = me.getUrl(request) ;
 
         switch(request.action) {
             case 'read':

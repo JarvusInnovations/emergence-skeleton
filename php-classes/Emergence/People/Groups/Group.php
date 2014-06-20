@@ -5,7 +5,8 @@ namespace Emergence\People\Groups;
 use DB;
 use ActiveRecord;
 use HandleBehavior, NestingBehavior;
-use Person, PeopleRequestHandler;
+use Emergence\People\Person;
+use PeopleRequestHandler;
 use DuplicateKeyException;
 
 class Group extends ActiveRecord
@@ -133,7 +134,7 @@ class Group extends ActiveRecord
         return Person::getAllByQuery(
             'SELECT Person.*'
             .' FROM `%s` GroupMember'
-            .' JOIN `%s` Person ON(Person.ID = GroupMember.PersonID)'
+            .' JOIN `%s` Person ON (Person.ID = GroupMember.PersonID)'
             .' WHERE GroupMember.GroupID IN (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u)'
             .' ORDER BY '.join(',', $order)
             ,array(
@@ -149,7 +150,7 @@ class Group extends ActiveRecord
     public function getFullPath()
     {
         return DB::oneValue(
-            'SELECT GROUP_CONCAT(Name SEPARATOR    "/") FROM `%s` WHERE `Left`<=%u AND `Right`>=%u ORDER BY `Left`'
+            'SELECT GROUP_CONCAT(Name SEPARATOR "/") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
             ,array(
                 static::$tableName
                 ,$this->Left
