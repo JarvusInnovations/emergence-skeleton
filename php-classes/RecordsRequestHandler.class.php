@@ -11,8 +11,8 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelAPI = false;
     static public $browseOrder = false;
     static public $browseConditions = false;
-	static public $browseLimitDefault = false;
-	static public $editableFields = false;
+    static public $browseLimitDefault = false;
+    static public $editableFields = false;
 	static public $searchConditions = false;
 	
 	static public $calledClass = __CLASS__;
@@ -619,26 +619,22 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 	static public function handleCommentRequest(ActiveRecord $Record)
 	{
-		$className = static::$recordClass;
-
-		if(!static::checkCommentAccess($Record))
-		{
+		if (!static::checkCommentAccess($Record)) {
 			return static::throwUnauthorizedError();
 		}
-		
-		if($_SERVER['REQUEST_METHOD'] == 'POST')
-		{
-			$Comment = Comment::create(array(
+
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$Comment = Emergence\Comments\Comment::create(array(
 				'Context' => $Record
-				,'Author' => $GLOBALS['Session']->Person
-				,'Message' => $_REQUEST['Message']
-				,'Authored' => time()
+				,'Message' => $_POST['Message']
 			), true);
-			
-			Site::redirect(array(Site::$requestPath[0], $Record->Handle), false, "comment-$Comment->ID");
-		}
-		else {
-			static::throwInvalidRequestError();
+
+            return static::respond('commentSaved', array(
+                'success' => true
+                ,'data' => $Comment
+            ));
+		} else {
+			return static::throwInvalidRequestError();
 		}
 	}
 
