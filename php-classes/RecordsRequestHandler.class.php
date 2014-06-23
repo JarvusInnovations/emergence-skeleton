@@ -12,7 +12,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $browseOrder = false;
     static public $browseConditions = false;
     static public $browseLimitDefault = false;
-	static public $editableFields = false;
+    static public $editableFields = false;
 	static public $searchConditions = false;
 	
 	static public $calledClass = __CLASS__;
@@ -192,7 +192,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			,array_merge($responseData, array(
 				'success' => true
 				,'data' => $className::getAllByQuery(
-					'SELECT %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+					'SELECT SQL_CALC_FOUND_ROWS %s FROM `%s` %s %s WHERE (%s) %s %s %s'
 					,array(
 						join(',',$select)
 						,$className::$tableName
