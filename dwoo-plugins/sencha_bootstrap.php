@@ -35,61 +35,40 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     $frameworkVersion = Sencha::normalizeFrameworkVersion($framework, $frameworkVersion);
     $frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
 
+    // initialize output state
+    $manifest = array(
+        'Ext' => "/app/$framework-$frameworkVersion/src"
+    );
+    $autoLoadPaths = array();
+
     // add paths for packages
     foreach (array_unique($packages) AS $packageName) {
         $packagePath = "sencha-workspace/packages/$packageName";
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
 
-    // build list of all selected collections, resolving CMD variables and children
-    $srcCollections = array();
+    // build list of all source trees, resolving CMD variables and children
+    $sources = array();
     foreach ($classPaths AS $classPath) {
         if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-            $classPath = 'ext-library/' . substr($classPath, 19);
-        } elseif(strpos($classPath, '${app.dir}/') === 0) {
+            $classPath = substr($classPath, 19);
+            $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
+
+            $classPath = 'ext-library/' . $classPath;
+        } elseif (strpos($classPath, 'ext-library/') === 0) {
+            $classPath = substr($classPath, 12);
+            $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
+
+            $classPath = 'ext-library/' . $classPath;
+        } elseif (strpos($classPath, '${app.dir}/') === 0) {
             $classPath = $appPath . substr($classPath, 10);
-        } elseif(strpos($classPath, '${ext.dir}/') === 0) {
+        } elseif (strpos($classPath, '${ext.dir}/') === 0) {
             $classPath = $frameworkPath . substr($classPath, 10);
-        } elseif(strpos($classPath, '${touch.dir}/') === 0) {
+        } elseif (strpos($classPath, '${touch.dir}/') === 0) {
             $classPath = $frameworkPath . substr($classPath, 12);
         }
 
-        try {
-            $tree = Emergence_FS::getTree($classPath);
-            $srcCollections = array_merge($srcCollections, array_keys($tree));
-        } catch (Exception $e) {
-            continue;
-        }
-    }
-
-    // get files
-    if (count($srcCollections)) {
-        $sources = DB::allRecords(
-            'SELECT'
-                .' f2.SHA1'
-                .',CONCAT('
-                    .'('
-                        .'SELECT GROUP_CONCAT(parent.Handle ORDER BY parent.PosLeft SEPARATOR "/")'
-                        .' FROM `%2$s` AS node, `%2$s` AS parent'
-                        .' WHERE node.PosLeft BETWEEN parent.PosLeft AND parent.PosRight AND node.ID = f2.CollectionID'
-                    .')'
-                    .',"/"'
-                    .',f2.Handle'
-                .') AS Path'
-                .' FROM ('
-                    .' SELECT MAX(f1.ID) AS ID'
-                    .' FROM `%1$s` f1'
-                    .' WHERE CollectionID IN (%3$s)'
-                    .' GROUP BY f1.CollectionID, f1.Handle'
-                .') AS lastestFiles'
-                .' LEFT JOIN `%1$s` f2 USING (ID)'
-                .' WHERE f2.Status = "Normal" AND f2.Type = "application/javascript"'
-            ,array(
-                SiteFile::$tableName
-                ,SiteCollection::$tableName
-                ,join(',', $srcCollections)
-            )
-        );
+        $sources = array_merge($sources, Emergence_FS::getTreeFiles($classPath, false, array('Type' => 'application/javascript')));
     }
 
     // skip patching loader if manifest will be empty
@@ -98,31 +77,25 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     }
 
     // process all source files and build manifest and list of classes to automatically load
-    $manifest = array(
-        'Ext' => "/app/$framework-$frameworkVersion/src"
-    );
-    $autoLoadPaths = array();
-
-    foreach ($sources AS &$source) {
-        $path = $source['Path'];
+    foreach ($sources AS $path => &$source) {
         $autoLoad = false;
 
         // rewrite path to canonican external URL
         if ($appPath && strpos($path, "$appPath/") === 0) {
-            $path = '/app/'.substr($path, 17);
+            $webPath = '/app/'.substr($path, 17);
         } elseif (strpos($path, 'ext-library/') === 0) {
-            $path = '/app/x'.substr($path, 11);
+            $webPath = '/app/x'.substr($path, 11);
         } elseif (strpos($path, 'sencha-workspace/packages/') === 0) {
-            $path = '/app/'.substr($path, 17);
+            $webPath = '/app/'.substr($path, 17);
 
             // package overrides should automatically be loaded
             if (substr($path, strpos($path, '/', 26), 11) == '/overrides/') {
                 $autoLoad = true;
             }
         } elseif (strpos($path, 'sencha-workspace/pages/') === 0) {
-            $path = '/app/'.substr($source['Path'], 17);
+            $webPath = '/app/'.substr($path, 17);
         } elseif (strpos($path, $frameworkPath) === 0) {
-            $path = '/app/'.substr($source['Path'], 17);
+            $webPath = '/app/'.substr($path, 17);
         } else {
             // this class was not in a recognized externally loadable collection
             continue;
@@ -132,7 +105,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $sourceCacheKey = "sencha-class-name/$source[SHA1]";
 
         if (!$source['Class'] = Cache::fetch($sourceCacheKey)) {
-            $sourceNode = Site::resolvePath($source['Path']);
+            $sourceNode = Site::resolvePath($path);
             $sourceReadHandle = $sourceNode->get();
 
             while (($line = fgets($sourceReadHandle, 4096)) !== false) {
@@ -154,14 +127,14 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         }
 
         // apply fingerprint signature to path
-        $path = "$path?_sha1=$source[SHA1]";
+        $webPath = "$webPath?_sha1=$source[SHA1]";
 
         // map class name to path
-        $manifest[$source['Class']] = $path;
+        $manifest[$source['Class']] = $webPath;
 
         // add path to autoLoad list
         if ($autoLoad) {
-            $autoLoadPaths[] = $path;
+            $autoLoadPaths[] = $webPath;
         }
     }
 
