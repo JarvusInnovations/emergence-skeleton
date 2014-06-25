@@ -60,19 +60,21 @@ class Sencha_App
 
         // merge properties from app.json
         $appCfg = $this->getAppCfg();
-        
-        $copyProperties = function($source, &$destination, $prefix) use(&$copyProperties) {
-            foreach ($source AS $key => $value) {
-                if (is_array($value)) {
-                    $copyProperties($value, $destination, "$prefix.$key");
-                } else {
-                    $destination["$prefix.$key"] = $value;
+
+        if (!empty($appCfg) && is_array($appCfg)) {
+            $copyProperties = function($source, &$destination, $prefix) use(&$copyProperties) {
+                foreach ($source AS $key => $value) {
+                    if (is_array($value)) {
+                        $copyProperties($value, $destination, "$prefix.$key");
+                    } else {
+                        $destination["$prefix.$key"] = $value;
+                    }
                 }
-            }
-        };
-        
-        $copyProperties($appCfg, $this->_buildCfg, 'app');
-        
+            };
+            
+            $copyProperties($appCfg, $this->_buildCfg, 'app');
+        }
+
 		// store in cache
 #		Cache::store($cacheKey, $this->_buildCfg);
 		
