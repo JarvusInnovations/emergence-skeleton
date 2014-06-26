@@ -9,6 +9,7 @@ use Emergence_FS;
 class Locale
 {
     public static $default = 'en_US.utf8';
+    protected static $_requestedLocale;
 
     /**
      * Gets locale that should be used for the current request, based on
@@ -20,6 +21,10 @@ class Locale
      */
     public static function getRequestedLocale()
     {
+        if (static::$_requestedLocale) {
+            return static::$_requestedLocale;
+        }
+        
         $availableLocales = static::getAvailableLocales();
 
         // prefer user-selected locale
@@ -36,7 +41,7 @@ class Locale
             ) &&
             in_array($requestedLocale, $availableLocales)
         ) {
-            return $requestedLocale;
+            return static::$_requestedLocale = $requestedLocale;
         }
 
         // find matching locale from Accept-Language header
@@ -45,11 +50,11 @@ class Locale
             $requestedLanguage = static::normalizeLocaleName($requestedLanguage);
 
             if (in_array($requestedLanguage, $availableLocales)) {
-                return $requestedLanguage;
+                return static::$_requestedLocale = $requestedLanguage;
             }
         }
 
-        return static::$default;
+        return static::$_requestedLocale = static::$default;
     }
 
     public static function normalizeLocaleName($locale)
@@ -71,6 +76,7 @@ class Locale
         // get available languages for this site
         if (!$availableLocales = Cache::fetch('locales')) {
             $availableLocales = array_keys(Emergence_FS::getAggregateChildren('locales'));
+            sort($availableLocales);
             Cache::store('locales', $availableLocales, 300);
         }
 
