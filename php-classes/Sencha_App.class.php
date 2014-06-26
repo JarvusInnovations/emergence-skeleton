@@ -4,7 +4,7 @@ class Sencha_App
 {
     protected $_name;
     protected $_buildCfg;
-	
+    
 	function __construct($name)
 	{
 		$this->_name = $name;
@@ -37,8 +37,7 @@ class Sencha_App
 	
 	public function getBuildCfg($key = null)
 	{
-		if($this->_buildCfg)
-		{
+		if ($this->_buildCfg) {
 			return $key ? $this->_buildCfg[$key] : $this->_buildCfg;
 		}
 		
@@ -53,13 +52,29 @@ class Sencha_App
 		// get from filesystem
 		$configPath = array('sencha-workspace', $this->_name, '.sencha', 'app', 'sencha.cfg');
 		
-		if(!$configNode = Site::resolvePath($configPath, true, false))
-		{
+		if (!$configNode = Site::resolvePath($configPath, true, false)) {
 			throw new Exception('Could not find .sencha/app/sencha.cfg for '.$this->_name);
 		}
 	
 		$this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
-		
+
+        // merge properties from app.json
+        $appCfg = $this->getAppCfg();
+
+        if (!empty($appCfg) && is_array($appCfg)) {
+            $copyProperties = function($source, &$destination, $prefix) use(&$copyProperties) {
+                foreach ($source AS $key => $value) {
+                    if (is_array($value)) {
+                        $copyProperties($value, $destination, "$prefix.$key");
+                    } else {
+                        $destination["$prefix.$key"] = $value;
+                    }
+                }
+            };
+            
+            $copyProperties($appCfg, $this->_buildCfg, 'app');
+        }
+
 		// store in cache
 #		Cache::store($cacheKey, $this->_buildCfg);
 		
@@ -68,16 +83,14 @@ class Sencha_App
 	
 	public function getAppCfg($key = null)
 	{
-		if($this->_appCfg)
-		{
+		if ($this->_appCfg) {
 			return $key ? $this->_appCfg[$key] : $this->_appCfg;
 		}
 		
 		// get from filesystem
 		$configPath = array('sencha-workspace', $this->_name, 'app.json');
 		
-		if(!$configNode = Site::resolvePath($configPath, true, false))
-		{
+		if (!$configNode = Site::resolvePath($configPath, true, false)) {
 			return null;
 		}
 		
