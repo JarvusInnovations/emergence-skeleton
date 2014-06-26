@@ -2,9 +2,10 @@
 
 class RegistrationRequestHandler extends RequestHandler
 {
-	// configurables
+    // configurables
 	static public $enableRegistration = true;
 	static public $onRegisterComplete = false;
+    static public $applyRegistrationData;
 	static public $welcomeFrom = false;
 	static public $welcomeSubject = false;
 	static public $welcomeTemplate = 'registerComplete.email';
@@ -94,6 +95,11 @@ class RegistrationRequestHandler extends RequestHandler
 			{
 				$additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
 			}
+            
+            // configurable hook
+            if (is_callable(static::$applyRegistrationData)) {
+                call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
+            }
 
 			// validate
 			if($User->validate() && empty($additionalErrors))
