@@ -75,6 +75,7 @@ class Locale
     {
         // get available languages for this site
         if (!$availableLocales = Cache::fetch('locales')) {
+            Emergence_FS::cacheTree('locales');
             $availableLocales = array_keys(Emergence_FS::getAggregateChildren('locales'));
             sort($availableLocales);
             Cache::store('locales', $availableLocales, 300);
