@@ -4,7 +4,6 @@ abstract class Token extends ActiveRecord
 {
 	static public $expirationHours = 48;
 	static public $emailTemplate = 'token';
-	static public $emailSubject = 'The link you requested';
 
 	static public $tableName = 'tokens';
 

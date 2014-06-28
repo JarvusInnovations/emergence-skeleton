@@ -1,13 +1,8 @@
 <?php
 
-
-
- class ContactRequestHandler extends RequestHandler
+class ContactRequestHandler extends RequestHandler
 {
-
 	static public $emailTo;
-	static public $emailSubject = 'Contact form submission';
-	static public $emailFrom = false;
 	static public $validators = array();
 	static public $formatters = array();
 	static public $excludeFields = array('path');
@@ -68,51 +63,19 @@
 				$Submission->save();
 				
 				// generate email report
-				if(!empty(static::$emailTo))
-				{
-					$subject = static::$emailSubject;
-					if(!empty($_REQUEST['Subject']))
-					{
-						$subject .= ': '.$_REQUEST['Subject'];
+				if (!empty(static::$emailTo)) {
+    				$headers = array();
+					if (!empty($_REQUEST['Email']) && Validators::email($_REQUEST['Email'])) {
+						$headers['Reply-To'] = $_REQUEST['Email'];
 					}
-					
-					$html = TemplateResponse::getSource('staffNotice.email', array(
-						'Submission' => $Submission
+
+        			Emergence\Mailer\Mailer::sendFromTemplate(static::$emailTo, 'staffNotice', array(
+    					'Submission' => $Submission
 						,'formatters' => static::$formatters
-					));
-					
-				/*
-					$html = '<table border="0">';
-					foreach($_REQUEST AS $field=>$value)
-					{
-						if(in_array($field, static::$excludeFields))
-						{
-							continue;
-						}
-						
-						if(is_array($value))
-						{
-							$value = implode(', ', $value);
-						}
-						
-						$html .= sprintf(
-							'<tr><th scope="row" valign="top" align="right">%s</th><td>%s</td></tr>'
-							, htmlspecialchars($field)
-							, nl2br(htmlspecialchars($value))
-						);
-					}
-					$html .= '</table>';
-					*/
-					
-					// set optional headers
-					$headers = '';
-					if(!empty($_REQUEST['Email']) && Validators::email($_REQUEST['Email']))
-					{
-						$headers .= "Reply-To: $_REQUEST[Email]" . PHP_EOL;
-					}
-					
-					// send email
-					Email::send(static::$emailTo, $subject, $html, static::$emailFrom, $headers);
+                        ,'subject' => $_REQUEST['Subject']
+    				), array(
+                        'Headers' => $headers
+                    ));
 				}
 				
 				// respond success
@@ -122,12 +85,10 @@
 				));
 			}
 		}	
-	
-	
+
 		return static::respond('contact', array(
 			'validationErrors' => isset($Validator) ? $Validator->getErrors() : array()
 			,'subform' => $subform
 		));
 	}
-
 }

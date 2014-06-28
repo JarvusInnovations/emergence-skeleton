@@ -50,7 +50,7 @@ class Logger extends \Psr\Log\AbstractLogger
         }
 
         if (in_array($level, static::$logLevelsEmail)) {
-            \Email::send(
+            \Emergence\Mailer\Mailer::send(
                 \Site::$webmasterEmail
                 ,"$level logged on $_SERVER[HTTP_HOST]"
                 ,'<dl>'

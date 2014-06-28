@@ -60,7 +60,7 @@ class PasswordAuthenticator extends Authenticator
 			}
 			else
 			{
-				$this->respondLoginPrompt(new PasswordAuthenticationFailedException('The username or password you entered was incorrect. You can try again, <a href="/register">create a new account</a>, or <a href="/register/recover">reset your password</a>.'));
+				$this->respondLoginPrompt(new PasswordAuthenticationFailedException(_('The username or password you entered was incorrect.')));
 				return false;
 			}
 		}
