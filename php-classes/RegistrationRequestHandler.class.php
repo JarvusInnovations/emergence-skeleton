@@ -3,12 +3,9 @@
 class RegistrationRequestHandler extends RequestHandler
 {
     // configurables
-	static public $enableRegistration = true;
+    static public $enableRegistration = true;
 	static public $onRegisterComplete = false;
-    static public $applyRegistrationData;
-	static public $welcomeFrom = false;
-	static public $welcomeSubject = false;
-	static public $welcomeTemplate = 'registerComplete.email';
+	static public $applyRegistrationData;
 	static public $registrationFields = array(
 		'FirstName'
 		,'LastName'
@@ -95,11 +92,11 @@ class RegistrationRequestHandler extends RequestHandler
 			{
 				$additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
 			}
-            
-            // configurable hook
-            if (is_callable(static::$applyRegistrationData)) {
-                call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
-            }
+
+			// configurable hook
+			if (is_callable(static::$applyRegistrationData)) {
+				call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
+			}
 
 			// validate
 			if($User->validate() && empty($additionalErrors))
@@ -111,17 +108,16 @@ class RegistrationRequestHandler extends RequestHandler
 				$GLOBALS['Session'] = $GLOBALS['Session']->changeClass('UserSession', array(
 					'PersonID' => $User->ID
 				));
-				
+
 				// send welcome email
-				$welcomeSubject = static::$welcomeSubject ? static::$welcomeSubject : 'Welcome to '.$_SERVER['HTTP_HOST'];				
-				$welcomeBody = TemplateResponse::getSource(static::$welcomeTemplate, array(
+				Emergence\Mailer\Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', array(
 					'User' => $User
 				));
-										
-				Email::send($User->EmailRecipient, $welcomeSubject, $welcomeBody, static::$welcomeFrom);
-				if(static::$onRegisterComplete){
-					call_user_func(static::$onRegisterComplete,$User,$_REQUEST);
+
+				if (is_callable(static::$onRegisterComplete)) {
+					call_user_func(static::$onRegisterComplete, $User, $_REQUEST);
 				}
+
 				return static::respond('registerComplete', array(
 					'success' => true
 					,'data' => $User
@@ -175,14 +171,14 @@ class RegistrationRequestHandler extends RequestHandler
 				
 				$Token->sendEmail($User->Email);
 				
-				TemplateResponse::respond('recoverPasswordComplete');
+				return static::respond('recoverPasswordComplete', array(
+					'success' => true
+				));
 			}
 		}
-	
-	
-		TemplateResponse::respond('recoverPassword', array(
+
+		return static::respond('recoverPassword', array(
 			'error' => isset($error) ? $error : false
 		));
 	}
-
 }
