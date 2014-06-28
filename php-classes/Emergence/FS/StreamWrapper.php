@@ -1,6 +1,6 @@
 <?php
 
-namespace Emergence;
+namespace Emergence\FS;
 
 use Site;
 
