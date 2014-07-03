@@ -66,7 +66,7 @@ class HandleBehavior extends RecordBehavior
             $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
 
             // trim any non-word characters created during transliterate and any adjacent placeholders
-            $text = preg_replace('/[-_]*[^-\w]+[-_]*/u', '', $text);
+            $text = preg_replace('/[-_]*[^-\w\.]+[-_]*/u', '', $text);
         }
 
         // lowercase
@@ -97,7 +97,7 @@ class HandleBehavior extends RecordBehavior
         return $handle;
     }
 
-	public static function generateRandomHandle($class, $length = 32, $options = array())
+    public static function generateRandomHandle($class, $length = 32, $options = array())
 	{
 		// apply default options
 		$options = array_merge(array(

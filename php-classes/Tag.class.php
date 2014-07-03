@@ -194,7 +194,7 @@ class Tag extends ActiveRecord
 
     public function save($deep = true)
     {
-        HandleBehavior::onSave($this, strtolower($this->Title));
+        HandleBehavior::onSave($this, $this->Title);
 
         return parent::save(true);
     }
