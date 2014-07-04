@@ -13,7 +13,9 @@ class Sencha_RequestHandler extends RequestHandler
 	static public $defaultMode = 'testing';
 	
 	static public $restrictedModes = array(
-		'development'
+		'development',
+        'testing',
+        'production'
 	);
 	
 	static public $restrictedAccountLevel = 'Staff';
