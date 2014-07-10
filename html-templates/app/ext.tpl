@@ -24,7 +24,21 @@
         {block js-app}
             {if $mode == 'development' || !$App->getAsset($jsBuildPath)}
                 {block js-app-devenv}
-                    {capture assign=frameworkPath}sdk/ext{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-dev'}.js{/capture}
+                    {$frameworkBuild = 'ext'}
+
+                    {if $.get.frameworkBuild != core}
+                        {$frameworkBuild .= '-all'}
+                    {/if}
+
+                    {if $mode == 'development' && $.get.frameworkBuild != allmin}
+                        {$frameworkBuild .= tif($App->getAsset("sdk/$frameworkBuild-dev.js") ? '-dev' : '-debug')}
+                    {/if}
+
+                    {$frameworkPath = cat('sdk/build/' $frameworkBuild '.js')}
+                    {if !$App->getAsset($frameworkPath)}
+                        {$frameworkPath = cat('sdk/' $frameworkBuild '.js')}
+                    {/if}
+
                     <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
 
                     {sencha_bootstrap}
