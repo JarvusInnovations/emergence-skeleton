@@ -2,13 +2,14 @@
 
 class Benchmark
 {
-	static public $livePrint = false;
+    static public $livePrint = false;
 	static public $startMark = null;
 	static public $lastMark = null;
 	static public $marks = array();
 	
 	static public function startLive()
 	{
+        header('X-Accel-Buffering: no');
 		header('Content-Type: text/plain');
 		ob_end_flush();
 		
