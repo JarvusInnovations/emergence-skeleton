@@ -2,14 +2,20 @@
 
 class Emergence_FS
 {
-    static public function cacheTree($path)
+    static public function cacheTree($path, $force = false)
     {
         // split path into array
         if (is_string($path)) {
             $path = Site::splitPath($path);
         }
+        
+        // check if this tree has already been cached
+        $cacheKey = 'cacheTree:' . implode('/', $path);
+        if (!$force && Cache::fetch($cacheKey)) {
+            return 0;
+        }
 
-		// get tree map from parent
+    	// get tree map from parent
 		$remoteTree = Emergence::resolveCollectionFromParent($path);
 
 		if (!$remoteTree) {
@@ -26,7 +32,9 @@ class Emergence_FS
 				$filesResolved++;
 			}
 		}
-		
+
+        Cache::store($cacheKey, true);
+
 		return $filesResolved;
 	}
 	

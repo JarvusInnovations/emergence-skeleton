@@ -7,24 +7,27 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $App = $dwoo->data['App'];
     }
 
+    // resolve nested dependencies for manually supplied packages
+    if (!empty($packages)) {
+        $packages = Sencha::crawlRequiredPackages($packages);
+    }
+
     // if app provided, load classpaths and packages
     if ($App) {
         $framework = $App->getFramework();
         $frameworkVersion = $App->getFrameworkVersion();
         $appPath = 'sencha-workspace/'.$App->getName();
 
-        // include classpath files
-        $classPaths = array_merge($classPaths, explode(',', $App->getBuildCfg('app.classpath')));
-
-        // merge app's required packages into packages list
-        if (is_array($appPackages = $App->getAppCfg('requires'))) {
-            $packages = array_merge($packages, $appPackages);
-        }
+        // recursively merge app's required packages and their required packages into packages list
+        $packages = array_merge($packages, $App->getRequiredPackages());
 
         // add theme to packages list
         if ($themeName = $App->getBuildCfg('app.theme')) {
             $packages[] = $themeName;
         }
+
+        // include classpath files
+        $classPaths = array_merge($classPaths, explode(',', $App->getBuildCfg('app.classpath')), Sencha::aggregateClassPathsForPackages($packages));
     }
 
     // apply default framework version and normalize
@@ -49,7 +52,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
 
     // build list of all source trees, resolving CMD variables and children
     $sources = array();
-    foreach ($classPaths AS $classPath) {
+    foreach (array_unique($classPaths) AS $classPath) {
         if (strpos($classPath, '${workspace.dir}/x/') === 0) {
             $classPath = substr($classPath, 19);
             $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
@@ -67,6 +70,8 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         } elseif (strpos($classPath, '${touch.dir}/') === 0) {
             $classPath = $frameworkPath . substr($classPath, 12);
         }
+        
+        Emergence_FS::cacheTree($classPath);
 
         $sources = array_merge($sources, Emergence_FS::getTreeFiles($classPath, false, array('Type' => 'application/javascript')));
     }

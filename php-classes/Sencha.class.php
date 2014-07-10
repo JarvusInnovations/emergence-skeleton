@@ -3,8 +3,8 @@
 class Sencha
 {
     static public $frameworks = array(
-    	'ext' => array(
-			'defaultVersion' => '4.2.2.1144'
+        'ext' => array(
+    		'defaultVersion' => '4.2.2.1144'
 			,'mappedVersions' => array(
 				'4.2.1' => '4.2.1.883'
 				,'4.2.2' => '4.2.2.1144'
@@ -140,5 +140,50 @@ class Sencha
 		else {
 			return $assetPath;
 		}
+    }
+
+    public static function crawlRequiredPackages($packages)
+    {
+        if (!is_array($packages)) {
+            return array();
+        }
+
+        foreach ($packages AS $package) {
+            $packageConfigNode = Site::resolvePath(array('sencha-workspace', 'packages', $package, 'package.json'));
+            if (!$packageConfigNode) {
+                continue;
+            }
+            
+            $packageConfig = json_decode(file_get_contents($packageConfigNode->RealPath), true);
+            
+            if (is_array($packageConfig) && !empty($packageConfig['requires'])) {
+                $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['requires']));
+            }
+        }
+
+        return $packages;
+    }
+
+    public static function aggregateClassPathsForPackages($packages, $skipPackageRelative = true)
+    {
+        if (!is_array($packages)) {
+            return array();
+        }
+
+        $classPaths = array();
+
+        foreach ($packages AS $packageName) {
+            $packageBuildConfigNode = Site::resolvePath("sencha-workspace/packages/$packageName/.sencha/package/sencha.cfg");
+            if ($packageBuildConfigNode) {
+                $packageBuildConfig = Sencha::loadProperties($packageBuildConfigNode->RealPath);
+                foreach (explode(',', $packageBuildConfig['package.classpath']) AS $classPath) {
+                    if(!$skipPackageRelative || strpos($classPath, '${package.dir}') !== 0) {
+                        $classPaths[] = $classPath;
+                    }
+                }
+            }
+        }
+
+        return array_unique($classPaths);
     }
 }

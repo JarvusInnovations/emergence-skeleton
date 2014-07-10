@@ -9,7 +9,7 @@ $defaultExclude = array(
 );
 
 if(empty($_GET['dumpWorkspace'])) {
-	Benchmark::startLive();
+    Benchmark::startLive();
 }
 
 // get app name
@@ -43,6 +43,9 @@ if (!$cmdVersion) {
 	die("Unable to determine CMD version, if this is an old application you need to manually set app.cmd.version in .sencha/app/sencha.cfg");
 }
 
+// get app-level classpath
+$classPaths = explode(',', $App->getBuildCfg('app.classpath')); // TODO: load workspace classpaths as well
+
 // set paths
 $workspacePath = 'sencha-workspace';
 $workspaceConfigPath = "$workspacePath/.sencha";
@@ -70,7 +73,7 @@ $exportResult = Emergence_FS::exportTree($workspaceConfigPath, $workspaceConfigT
 Benchmark::mark("exported $workspaceConfigPath to $workspaceConfigTmpPath: ".http_build_query($exportResult));
 
 // ... packages
-if (!($requiredPackages = $App->getAppCfg('requires')) || !is_array($requiredPackages)) {
+if (!($requiredPackages = $App->getRequiredPackages()) || !is_array($requiredPackages)) {
     $requiredPackages = array();
 }
 
@@ -78,11 +81,21 @@ if (($themeName = $App->getBuildCfg('app.theme')) && !in_array($themeName, $requ
     $requiredPackages[] = $themeName;
 }
 
+Benchmark::mark("aggregating classpaths from packages");
+$classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($requiredPackages));
+
 foreach ($requiredPackages AS $packageName) {
     $cachedFiles = Emergence_FS::cacheTree("$packagesPath/$packageName");
     Benchmark::mark("precached $cachedFiles files in $packagesPath/$packageName");
     $exportResult = Emergence_FS::exportTree("$packagesPath/$packageName", "$packagesTmpPath/$packageName");
     Benchmark::mark("exported $packagesPath to $packagesTmpPath/$packageName: ".http_build_query($exportResult));
+
+    // append package-level classpaths
+    $packageBuildConfigPath = "$packagesTmpPath/$packageName/.sencha/package/sencha.cfg";
+    if (file_exists($packageBuildConfigPath)) {
+        $packageBuildConfig = Sencha::loadProperties($packageBuildConfigPath);
+        $classPaths = array_merge($classPaths, explode(',', $packageBuildConfig['package.classpath']));
+    }
 }
 
 // ... framework
@@ -99,17 +112,15 @@ Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportRes
 
 
 // write any libraries from classpath
-$classPaths = explode(',', $App->getBuildCfg('app.classpath'));
-
-foreach($classPaths AS $classPath) {
-	if(strpos($classPath, '${workspace.dir}/x/') === 0) {
+foreach (array_unique($classPaths) AS $classPath) {
+	if (strpos($classPath, '${workspace.dir}/x/') === 0) {
 		$extensionPath = substr($classPath, 19);
 		$classPathSource = "ext-library/$extensionPath";
 		$classPathDest = "$tmpPath/x/$extensionPath";
 		Benchmark::mark("importing classPathSource: $classPathSource"); 
 		
-#		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
-#		Benchmark::mark("precached $cachedFiles files in $classPathSource");
+		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
+		Benchmark::mark("precached $cachedFiles files in $classPathSource");
 		
         $sourceNode = Site::resolvePath($classPathSource);
         
@@ -134,6 +145,7 @@ if(!empty($_GET['archive'])) {
 		Benchmark::mark("failed to export $archivePath, continueing");
 	}
 }
+
 
 // change into app's directory
 chdir($appTmpPath);
