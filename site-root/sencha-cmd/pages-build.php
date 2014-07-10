@@ -11,8 +11,9 @@ if(empty($_GET['dumpWorkspace'])) {
 $buildConfig = Sencha::loadProperties(Site::resolvePath('sencha-workspace/pages/.sencha/workspace/sencha.cfg')->RealPath);
 $framework = $buildConfig['pages.framework'];
 $frameworkVersion = Sencha::normalizeFrameworkVersion($framework, $buildConfig['pages.framework.version']);
+$cmdVersion = $buildConfig['workspace.cmd.version'];
 
-if(!framework) {
+if(!$framework) {
     die("app.framework not found in sencha.cfg");
 }
 
@@ -26,6 +27,11 @@ $frameworkTmpPath = "$tmpPath/$framework";
 $buildTmpPath = "$tmpPath/build";
 
 Benchmark::mark("created tmp: $tmpPath");
+
+
+// change into tmpPath
+chdir($tmpPath);
+Benchmark::mark("chdir to: $tmpPath");
 
 
 // precache and write pages
@@ -43,67 +49,86 @@ if (!empty($_REQUEST['pullFramework'])) {
 $exportResult = Emergence_FS::exportTree($frameworkPath, $frameworkTmpPath);
 Benchmark::mark("exported $frameworkPath to $frameworkTmpPath: ".http_build_query($exportResult));
 
-
-// write any libraries from classpath
-if (!empty($buildConfig['pages.classpath'])) {
-    $classPaths = explode(',', $buildConfig['pages.classpath']);
-    
-	foreach($classPaths AS $classPath) {
-		if(strpos($classPath, 'x/') === 0) {
-        	$extensionPath = substr($classPath, 2);
-    		$classPathSource = "ext-library/$extensionPath";
-    		$classPathDest = "$tmpPath/x/$extensionPath";
-    		Benchmark::mark("importing classPathSource: $classPathSource");
-        	
-    #		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
-    #		Benchmark::mark("precached $cachedFiles files in $classPathSource");
-    		
-            $sourceNode = Site::resolvePath($classPathSource);
-            
-            if (is_a($sourceNode, SiteFile)) {
-                mkdir(dirname($classPathDest), 0777, true);
-                copy($sourceNode->RealPath, $classPathDest);
-        		Benchmark::mark("copied file $classPathSource to $classPathDest");
-            } else {
-            	$exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-        		Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
-            }
-		}
-	}
-}
-
-
-// change into tmpPath
-chdir($tmpPath);
-Benchmark::mark("chdir to: $tmpPath");
-
-
-// build command
+// build command and scan for dependencies and pages
+$packages = array();
 $pageNames = array();
 $pageLoadCommands = array();
 $pageBuildCommands = array();
+$classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildConfig['workspace.classpath']) : array();
 
 foreach (glob('./src/page/*.js') AS $page) {
-	$pageNames[] = $pageName = basename($page, '.js');
+    $pageNames[] = $pageName = basename($page, '.js');
     
-	$pageLoadCommands[] = "union -r -c Site.page.$pageName and save $pageName";
+    $pageLoadCommands[] = "union -r -c Site.page.$pageName and save $pageName";
 	
 	if ($page != 'common.html') {
 		$pageBuildCommands[] = "restore $pageName and exclude --set common and concat --yui $buildTmpPath/$pageName.js";
+	}
+    
+    // detect required packages
+    if (preg_match_all('|//\s*@require-package\s*(\S+)|i', file_get_contents($page), $matches)) {
+        $packages = array_merge($packages, $matches[1]);
+    }
+}
+
+
+// analyze packages, export, and add to classPath
+$packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
+foreach($packages AS $package) {
+	$packageSource = "sencha-workspace/packages/$package/src";
+	$packageDest = "$tmpPath/packages/$package/src";
+	Benchmark::mark("importing package: $package from $packageSource");
+	
+	$cachedFiles = Emergence_FS::cacheTree($packageSource);
+	Benchmark::mark("precached $cachedFiles files in $packageSource");
+    
+	$exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+	Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+
+    $classPaths[] = "packages/$package/src";
+}
+
+// write any libraries from classpath
+Benchmark::mark("crawling packages for classpaths");
+$classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
+
+Benchmark::mark("processing all classpaths");
+foreach($classPaths AS &$classPath) {
+    if(strpos($classPath, '${workspace.dir}/x/') === 0) {
+    	$extensionPath = substr($classPath, 19);
+		$classPathSource = "ext-library/$extensionPath";
+		$classPath = "$tmpPath/x/$extensionPath";
+		Benchmark::mark("importing classPathSource: $classPathSource");
+    	
+        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
+        Benchmark::mark("precached $cachedFiles files in $classPathSource");
+		
+        $sourceNode = Site::resolvePath($classPathSource);
+        
+        if (is_a($sourceNode, SiteFile)) {
+            mkdir(dirname($classPath), 0777, true);
+            copy($sourceNode->RealPath, $classPath);
+    		Benchmark::mark("copied file $classPathSource to $classPath");
+        } else {
+        	$exportResult = Emergence_FS::exportTree($classPathSource, $classPath);
+    		Benchmark::mark("exported $classPathSource to $classPath: ".http_build_query($exportResult));
+        }
 	}
 }
 
 
 // prepare cmd
+$classPaths[] = 'src';
 $cmd = Sencha::buildCmd(
-	null
+	$cmdVersion
     ,"-sdk $frameworkTmpPath"
 	,'compile'
-    ," -classpath=./src,./x"
+    ," -classpath=".implode(',', array_unique($classPaths))
     ,'union -r -c Site.Common and save common'
 	,'and ' . join(' and ', $pageLoadCommands)
     ,count($pageNames) > 1 ? 'and intersect --min-match 2 --sets '.join(',', $pageNames) : ''
 	,'and include --set common'
+    ,'and exclude -namespace Site.page'
 	,'and save common'
 	,"and concat --yui $buildTmpPath/common.js"
 	,count($pageBuildCommands) ? 'and ' . join(' and ', $pageBuildCommands) : ''
