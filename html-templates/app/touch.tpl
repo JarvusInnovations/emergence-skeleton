@@ -88,19 +88,12 @@
     {/block}
 
     {block js-app}
-            {if $mode != 'production'}
+        {if $mode != 'production'}
             {if $mode == 'development' || !$App->getAsset('build/production/app.js')}
                 {capture assign=frameworkPath}sdk/sencha-touch{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-debug'}.js{/capture}
                 <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
-                <script type="text/javascript">
-                    Ext.Loader.setPath({
-                        'Ext': '/app/{$App->getName()}/sdk/src'
-                        ,'Emergence': '/app/{$App->getName()}/x/Emergence'
-                        ,'Jarvus': '/app/{$App->getName()}/x/Jarvus'
-                    });
-                </script>
 
-                {sencha_preloader}
+                {sencha_bootstrap}
 
                 {$scriptRoot = ''}
             {else}
