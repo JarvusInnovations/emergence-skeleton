@@ -156,7 +156,7 @@ class Media extends ActiveRecord
                 return $this->MIMEType;
 
             case 'Extension':
-                throw new Exception('Unable to find extension for mime-type: ' . $this->MIMEType);
+                throw new MediaTypeException('Unable to find extension for mime-type: ' . $this->MIMEType);
 
             case 'WebPath':
 
@@ -442,39 +442,43 @@ class Media extends ActiveRecord
 
     public static function createFromFile($file, $fieldValues = array())
     {
-        // analyze file
-        $mediaInfo = static::analyzeFile($file);
-
-        // create media object
-        $Media = $mediaInfo['className']::create($fieldValues);
-
-        // init media
-        $Media->initializeFromAnalysis($mediaInfo);
-
-        // save media
-        $Media->save();
-
-        // move file
-        $targetDirectory = dirname($Media->FilesystemPath);
-
-        if(!is_dir($targetDirectory))
-        {
-            mkdir($targetDirectory, static::$newDirectoryPermissions, true);
+        try {
+            // analyze file
+            $mediaInfo = static::analyzeFile($file);
+    
+            // create media object
+            $Media = $mediaInfo['className']::create($fieldValues);
+    
+            // init media
+            $Media->initializeFromAnalysis($mediaInfo);
+    
+            // save media
+            $Media->save();
+    
+            // move file
+            $targetDirectory = dirname($Media->FilesystemPath);
+    
+            if(!is_dir($targetDirectory))
+            {
+                mkdir($targetDirectory, static::$newDirectoryPermissions, true);
+            }
+    
+            // set file permissions
+            if (rename($file, $Media->FilesystemPath))
+            {
+                chmod($Media->FilesystemPath, static::$newFilePermissions);
+                return $Media;
+            }
+        } catch (Exception $e) {
+            // fall through to cleanup below
         }
 
-        // set file permissions
-        if (rename($file, $Media->FilesystemPath))
-        {
-            chmod($Media->FilesystemPath, static::$newFilePermissions);
-            return $Media;
-        }
-        else
-        {
-            // remove photo record
+        // remove photo record
+        if ($Media) {
             $Media->destroy();
-
-            throw new Exception('Media import failed');
         }
+
+        return null;
     }
 
     public function initializeFromAnalysis($mediaInfo)
