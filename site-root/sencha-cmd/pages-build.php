@@ -42,10 +42,9 @@ Benchmark::mark("exported $pagesPath to $tmpPath: ".http_build_query($exportResu
 
 
 // ... framework
-if (!empty($_REQUEST['pullFramework'])) {
-    $cachedFiles = Emergence_FS::cacheTree($frameworkPath);
-    Benchmark::mark("precached $cachedFiles files in $frameworkPath");
-}
+$cachedFiles = Emergence_FS::cacheTree($frameworkPath);
+Benchmark::mark("precached $cachedFiles files in $frameworkPath");
+
 $exportResult = Emergence_FS::exportTree($frameworkPath, $frameworkTmpPath);
 Benchmark::mark("exported $frameworkPath to $frameworkTmpPath: ".http_build_query($exportResult));
 
@@ -60,7 +59,7 @@ foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
     
     $pageLoadCommands[] = "union -r -c Site.page.$pageName and save $pageName";
-	
+    
 	if ($page != 'common.html') {
 		$pageBuildCommands[] = "restore $pageName and exclude --set common and concat --yui $buildTmpPath/$pageName.js";
 	}
