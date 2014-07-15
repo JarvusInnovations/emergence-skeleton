@@ -5,7 +5,7 @@ class MediaRequestHandler extends RecordsRequestHandler
     // RecordRequestHandler configuration
     static public $recordClass = 'Media';
     static public $browseLimit = 100;
-	static public $browseOrder = array('ID' => 'DESC');
+    static public $browseOrder = array('ID' => 'DESC');
 
 	// configurables
 	public static $defaultPage = 'browse';
@@ -337,7 +337,9 @@ class MediaRequestHandler extends RecordsRequestHandler
 		if(empty($filename))
 		{
 			$filename = $Media->Caption ? $Media->Caption : sprintf('%s_%u', $Media->ContextClass, $Media->ContextID);
-			
+		}
+        
+        if (strpos($filename, '.') === false) {
 			// add extension
 			$filename .= '.'.$Media->Extension;
 		}
