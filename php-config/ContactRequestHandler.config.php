@@ -21,7 +21,7 @@ ContactRequestHandler::$validators[] = array(
 ContactRequestHandler::$validators[] = array(
 	'field' => 'Phone'
 	,'validator' => 'phone'
-    ,'required' => true
+    ,'required' => false
 );
 
 
