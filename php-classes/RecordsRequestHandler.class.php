@@ -375,11 +375,12 @@ abstract class RecordsRequestHandler extends RequestHandler
 		$className = static::$recordClass;
 		$results = array();
 		$failed = array();
+        $message = null;
 
 		foreach($_REQUEST['data'] AS $datum)
 		{
 			// get record
-			if(empty($datum['ID']))
+			if(empty($datum['ID']) || !is_numeric($datum['ID']) || $datum['ID'] <= 0)
 			{
 				$subClasses = $className::getStaticSubClasses();
 				
@@ -434,6 +435,10 @@ abstract class RecordsRequestHandler extends RequestHandler
 					'record' => $Record->getData()
 					,'validationErrors' => $e->validationErrors
 				);
+                
+                if (!$message) {
+                    $message = reset($e->validationErrors); // store the first validation error in message
+                }
 			}
 		}
 		
@@ -441,6 +446,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			'success' => count($results) || !count($failed)
 			,'data' => $results
 			,'failed' => $failed
+            ,'message' => $message
 		));
 	}
 	
