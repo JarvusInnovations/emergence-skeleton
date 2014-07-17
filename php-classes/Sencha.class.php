@@ -21,7 +21,7 @@ class Sencha
 		)
 	);
 	
-	static public $defaultCmdVersion = '4.0.4.84';
+	static public $defaultCmdVersion = '5.0.0.160';
 	
 	static public $cmdPath = '/usr/local/bin/Sencha/Cmd';
 	static public $binPaths = array('/bin','/usr/bin','/usr/local/bin');
