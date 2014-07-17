@@ -4,7 +4,8 @@ Ext.define('Site.page.ContentEditor', {
     singleton: true,
     requires: [
         'Site.Common',
-        'Emergence.cms.view.DualView'
+        'Emergence.cms.view.DualView',
+        'Ext.QuickTips'
     ],
 
     constructor: function() {

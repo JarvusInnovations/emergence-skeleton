@@ -1,6 +1,7 @@
 {extends "designs/site.tpl"}
 
 {block "content"}
+    {load_templates "subtemplates/comments.tpl"}
     {$Comment = $data}
     
     <header class="page-header">
