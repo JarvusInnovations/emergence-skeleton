@@ -2,7 +2,8 @@
 Ext.define('Emergence.cms.model.Content', {
     extend: 'Ext.data.Model',
     requires:[
-        'Emergence.ext.proxy.Records'
+        'Emergence.ext.proxy.Records',
+        'Ext.data.identifier.Negative'
     ],
 
     statics: {
@@ -13,6 +14,7 @@ Ext.define('Emergence.cms.model.Content', {
         }
     },
 
+    identifier: 'negative',
     idProperty: 'ID',
     fields: [
         {name: 'ID', type: 'int'},
