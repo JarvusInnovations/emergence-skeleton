@@ -47,7 +47,7 @@
                     </div>
                 {/if}
                 {if $showCommentsSummary}
-                    <a href="{$Post->toURL()}#comments">
+                    <a href="{$Post->getUrl()}#comments">
                         {if $Post->Comments}
                             {count($Post->Comments)} Comment{tif count($Post->Comments) != 1 ? s}
                         {else}
