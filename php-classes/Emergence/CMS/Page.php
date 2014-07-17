@@ -16,7 +16,7 @@ class Page extends AbstractContent
             ,'values' => array('OneColumn')
             ,'default' => 'OneColumn'
         )
-        ,'LayoutConfig'  => 'serialized'
+        ,'LayoutConfig'  => 'json'
     );
 
 
