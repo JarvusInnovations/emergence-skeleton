@@ -47,7 +47,6 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     // add paths for packages
     foreach (array_unique($packages) AS $packageName) {
         $packagePath = "sencha-workspace/packages/$packageName";
-        Emergence_FS::cacheTree($packagePath);
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
 
@@ -59,13 +58,11 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
 
             $classPath = 'ext-library/' . $classPath;
-            Emergence_FS::cacheTree($classPath);
         } elseif (strpos($classPath, 'ext-library/') === 0) {
             $classPath = substr($classPath, 12);
             $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
 
             $classPath = 'ext-library/' . $classPath;
-            Emergence_FS::cacheTree($classPath);
         } elseif (strpos($classPath, '${app.dir}/') === 0) {
             $classPath = $appPath . substr($classPath, 10);
         } elseif (strpos($classPath, '${ext.dir}/') === 0) {
@@ -74,6 +71,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $classPath = $frameworkPath . substr($classPath, 12);
         }
 
+        Emergence_FS::cacheTree($classPath);
         $sources = array_merge($sources, Emergence_FS::getTreeFiles($classPath, false, array('Type' => 'application/javascript')));
     }
 
