@@ -60,10 +60,10 @@ class MigrationsRequestHandler extends \RequestHandler
 
         // sort migrations by sequence
         uasort($migrations, function($a, $b) {
-            if ($a['Sequence'] == $b['Sequence']) {
+            if ($a['sequence'] == $b['sequence']) {
                 return 0;
             }
-            return ($a['Sequence'] < $b['Sequence']) ? -1 : 1;
+            return ($a['sequence'] < $b['sequence']) ? -1 : 1;
         });
 
         return static::respond('migrations', array(
