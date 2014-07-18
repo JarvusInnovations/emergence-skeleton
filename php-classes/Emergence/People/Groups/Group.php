@@ -8,6 +8,7 @@ use HandleBehavior, NestingBehavior;
 use Emergence\People\Person;
 use PeopleRequestHandler;
 use DuplicateKeyException;
+use TableNotFoundException;
 
 class Group extends ActiveRecord
 {
@@ -196,14 +197,18 @@ class Group extends ActiveRecord
         }
 
         // delete tags
-        DB::query(
-            'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)'
-            ,array(
-                GroupMember::$tableName
-                ,$Person->ID
-                ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
-            )
-        );
+        try {
+            DB::query(
+                'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)'
+                ,array(
+                    GroupMember::$tableName
+                    ,$Person->ID
+                    ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
+                )
+            );
+        } catch (TableNotFoundException $e) {
+            // no groups need to be deleted
+        }
 
         return $assignedGroups;
     }
