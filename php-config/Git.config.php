@@ -13,6 +13,7 @@ Git::$repositories['Emergence-Skeleton'] = array(
         ,'php-classes'
         ,'php-config'
         ,'phpunit-tests'
+        ,'php-migrations'
         ,'site-root'
         ,'sencha-workspace'
 	)
