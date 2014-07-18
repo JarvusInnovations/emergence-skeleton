@@ -20,6 +20,7 @@ Ext.define('Emergence.ext.proxy.Records', {
     limitParam: 'limit',
     sortParam: 'sort',
     simpleSortMode: true,
+    groupParam: false,
     reader: {
         type: 'json',
         root: 'data',
