@@ -14,8 +14,7 @@ class Tag extends ActiveRecord
     static public $collectionRoute = '/tags';
 
     public static $fields = array(
-        'Class' => null
-        ,'Title'
+        'Title'
         ,'Handle' => array(
             'unique' => true
         )
