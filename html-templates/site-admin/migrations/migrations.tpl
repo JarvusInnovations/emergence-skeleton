@@ -3,7 +3,7 @@
 {block title}Migrations &mdash; {$dwoo.parent}{/block}
 
 {block content}
-    <table>
+    <table class="row-stripes row-highlight">
         <tr>
             <th scope="col">Migration</th>
             <th scope="col">Status</th>
