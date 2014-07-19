@@ -8,7 +8,7 @@ class Media extends ActiveRecord
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = array(__CLASS__, 'PhotoMedia', 'AudioMedia', 'VideoMedia', 'PDFMedia');
     public static $collectionRoute = '/media';
 
     // get rid of these??
