@@ -11,8 +11,8 @@
 
                 {if Emergence\CMS\BlogRequestHandler::checkWriteAccess($Post)}
                 <div class="header-buttons">
-                    <a href="/blog/{$Post->Handle}/edit" class="button small">Edit</a>&nbsp;
-                    <a href="/blog/{$Post->Handle}/delete"
+                    <a href="{$Post->getURL()}/edit" class="button small">Edit</a>&nbsp;
+                    <a href="{$Post->getURL()}/delete"
                        class="button destructive confirm small"
                        data-confirm-yes="Delete Post"
                        data-confirm-no="Don&rsquo;t Delete"
