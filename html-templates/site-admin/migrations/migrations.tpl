@@ -26,4 +26,9 @@
             </tr>
         {/foreach}
     </table>
+
+    <form method="GET">
+        <input type="hidden" name="refresh" value="1">
+        <input type="submit" value="Refresh Inherited Migrations">
+    </form>
 {/block}

@@ -40,7 +40,7 @@ class MigrationsRequestHandler extends \RequestHandler
             $migrationRecords = array();
         }
 
-        Emergence_FS::cacheTree('php-migrations');
+        Emergence_FS::cacheTree('php-migrations', !empty($_GET['refresh']));
         $migrations = array();
 
         // append sequence to each node
@@ -139,13 +139,6 @@ class MigrationsRequestHandler extends \RequestHandler
         ));
     }
 
-    protected static function getMigrationsBySequence()
-    {
-
-        return $migrations;
-    }
-
-
     protected static function createMigrationsTable()
     {
         DB::nonQuery(
@@ -157,5 +150,42 @@ class MigrationsRequestHandler extends \RequestHandler
                 . ',PRIMARY KEY (`Key`)'
             .')'
         );
+    }
+
+
+    // conveniance methods for use within migrations
+    protected static function resetMigrationStatus($migrationKey)
+    {
+        DB::nonQuery('DELETE FROM `_e_migrations` WHERE `Key` = "%s"', $migrationKey);
+    }
+
+    protected static function tableExists($tableName)
+    {
+        return (boolean)DB::oneRecord('SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s"', DB::escape($tableName));
+    }
+
+    protected static function columnExists($tableName, $columnName)
+    {
+        return (boolean)DB::oneRecord('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+    }
+
+    protected static function getColumn($tableName, $columnName)
+    {
+        return DB::oneRecord('SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+    }
+
+    protected static function getColumnType($tableName, $columnName)
+    {
+        return DB::oneValue('SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+    }
+    
+    protected static function getColumnKey($tableName, $columnName)
+    {
+        return DB::oneValue('SELECT COLUMN_KEY FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+    }
+    
+    protected static function getColumnIsNullable($tableName, $columnName)
+    {
+        return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
     }
 }
