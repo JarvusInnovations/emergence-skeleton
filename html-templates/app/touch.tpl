@@ -8,7 +8,7 @@
 
     {block base}
         {if $mode == 'production' || $mode == 'testing'}
-            <base href="/app/{$App->getName()}/build/{$mode}/">
+            <base href="/app/{$App->getName()}/build/production/">
         {else}
             <base href="/app/{$App->getName()}/">
         {/if}
@@ -101,7 +101,7 @@
             {/if}
 
             {foreach item=script from=$App->getAppCfg('js')}
-                {if !$script['x-bootstrap']}
+                {if !$script['x-bootstrap'] && !$script.remote}
                     <script type="text/javascript" src="{$App->getVersionedPath(cat($scriptRoot, $script.path))}"></script>
                 {/if}
             {/foreach}
