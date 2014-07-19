@@ -3,7 +3,7 @@
 {block title}Migrations &mdash; {$dwoo.parent}{/block}
 
 {block content}
-    <table>
+    <table class="row-stripes row-highlight">
         <tr>
             <th scope="col">Migration</th>
             <th scope="col">Status</th>
@@ -26,4 +26,9 @@
             </tr>
         {/foreach}
     </table>
+
+    <form method="GET">
+        <input type="hidden" name="refresh" value="1">
+        <input type="submit" value="Refresh Inherited Migrations">
+    </form>
 {/block}

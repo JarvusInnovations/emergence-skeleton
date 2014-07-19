@@ -12,14 +12,17 @@ class Sencha_RequestHandler extends RequestHandler
 	);
 	static public $defaultMode = 'testing';
 	
-	static public $restrictedModes = array(
-		'development',
-        'testing',
-        'production'
+	static public $defaultAccountLevels = array(
+		'development' => 'Developer'
+        ,'testing' => false
+        ,'production' => false
+        ,'docs' => 'Developer'
 	);
-	
-	static public $restrictedAccountLevel = 'Staff';
-	static public $restrictedDefaultMode = 'development';
+    
+    static public $appAccountLevels = array(
+        'EmergenceEditor' => 'Developer'
+        ,'EmergencePullTool' => 'Developer'
+    );
 	
 	static public function handleRequest()
 	{
@@ -79,12 +82,7 @@ class Sencha_RequestHandler extends RequestHandler
 		}
 		elseif(!$nextPath) {
 			$path = array_filter(Site::$requestPath);
-			if($GLOBALS['Session']->hasAccountLevel(static::$restrictedAccountLevel)) {
-				$path[] = static::$restrictedDefaultMode;
-			}
-			else {
-				$path[] = static::$defaultMode;
-			}
+			$path[] = static::$defaultMode;
 			$path[] = '';
 			Site::redirect($path);
 		}
@@ -152,9 +150,7 @@ class Sencha_RequestHandler extends RequestHandler
 	
 	static public function handleAppRequest(Sencha_App $App, $mode)
 	{
-		if(static::$restrictedModes && in_array($mode, static::$restrictedModes)) {
-			$GLOBALS['Session']->requireAccountLevel(static::$restrictedAccountLevel);
-		}
+        static::_requireAppAccountLevel($App->getName(), $mode);
 		
 		$nextPath = static::peekPath();
 		
@@ -183,7 +179,7 @@ class Sencha_RequestHandler extends RequestHandler
 	
 	static public function handleDocsRequest(Sencha_App $App)
 	{
-		$GLOBALS['Session']->requireAccountLevel(static::$restrictedAccountLevel);
+        static::_requireAppAccountLevel($App->getName(), 'docs');
 		
 		static::_forceTrailingSlash();
 
@@ -282,6 +278,38 @@ class Sencha_RequestHandler extends RequestHandler
 			Site::redirect(Site::$requestPath);
 		}
 	}
+    
+    static protected function _getRequiredAccountLevel($appName, $mode)
+    {
+        $requiredAccountLevel = 'default';
+
+        // check for app-specific config
+        if (array_key_exists($appName, static::$appAccountLevels)) {
+            if (is_string(static::$appAccountLevels[$appName])) {
+                return static::$appAccountLevels[$appName];
+            } elseif (array_key_exists($mode, static::$appAccountLevels[$appName])) {
+                return static::$appAccountLevels[$appName][$mode];
+            }
+        }
+
+        // check for default matching mode
+        if (is_string(static::$defaultAccountLevels)) {
+            return static::$defaultAccountLevels;
+        } elseif (array_key_exists($mode, static::$defaultAccountLevels)) {
+            return static::$defaultAccountLevels[$mode];
+        }
+
+        return 'Developer';
+    }
+
+    static protected function _requireAppAccountLevel($appName, $mode)
+    {
+        $requiredAccountLevel = static::_getRequiredAccountLevel($appName, $mode);
+
+    	if($requiredAccountLevel) {
+			$GLOBALS['Session']->requireAccountLevel($requiredAccountLevel);
+		}
+    }
 	
 	// override default implementation to print naked error without HTML template
 	static public function throwError($message)

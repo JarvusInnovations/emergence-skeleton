@@ -5,19 +5,29 @@
 {block content}
 
     {$Page = $data}
-
-    <header class="page-header">
-        <h2 class="header-title">
-            <a href="/pages/{$Page->Handle}">{$Page->Title}</a>
-        </h2>
-        {if Emergence\CMS\PagesRequestHandler::checkWriteAccess($Page, true)}
-            <div class="header-buttons">
-                <a href="/pages/{$Page->Handle}/edit" class="button primary">Edit</a>
-            </div>
-        {/if}
-    </header>
-
-    <section class="post-body">
-        {$Page->renderBody()}
-    </section>
+    <article class="cms-page reading-width">
+        <header class="page-header">
+            <h2 class="header-title">
+                <a href="{$Page->getURL()}">{$Page->Title}</a>
+            </h2>
+            {if Emergence\CMS\PagesRequestHandler::checkWriteAccess($Page, true)}
+                <div class="header-buttons">
+                    <a href="{$Page->getURL()}/edit" class="button small">Edit</a>&nbsp;
+                    <a href="{$Page->getURL()}/delete"
+                       class="button destructive confirm small"
+                       data-confirm-yes="Delete Page"
+                       data-confirm-no="Don&rsquo;t Delete"
+                       data-confirm-title="Deleting Post"
+                       data-confirm-body="Are you sure you want to delete the page &ldquo;{$Page->Title|escape}?&rdquo;"
+                       data-confirm-destructive="true"
+                       data-confirm-success-target=".cms-page"
+                       data-confirm-success-message="Page deleted">Delete</a>
+                </div>
+            {/if}
+        </header>
+    
+        <section class="page-body">
+            {$Page->renderBody()}
+        </section>
+    </article>
 {/block}

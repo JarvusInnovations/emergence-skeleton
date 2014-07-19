@@ -8,7 +8,7 @@ class Media extends ActiveRecord
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = array(__CLASS__, 'PhotoMedia', 'AudioMedia', 'VideoMedia', 'PDFMedia');
     public static $collectionRoute = '/media';
 
     // get rid of these??
@@ -225,6 +225,7 @@ class Media extends ActiveRecord
         switch($this->MIMEType)
         {
             case 'application/psd':
+            case 'image/tiff':
 
                 //Converts PSD to PNG temporarily on the real file system.
                 $tempFile = tempnam('/tmp', 'media_convert');
@@ -470,6 +471,13 @@ class Media extends ActiveRecord
                 return $Media;
             }
         } catch (Exception $e) {
+            \Emergence\Logger::general_warning('Caught exception while processing media upload, aborting upload and returning null', array(
+                'exceptionClass' => get_class($e)
+                ,'exceptionMessage' => $e->getMessage()
+                ,'exceptionCode' => $e->getCode()
+                ,'recordData' => $Media->getData()
+                ,'mediaInfo' => $mediaInfo
+            ));
             // fall through to cleanup below
         }
 
