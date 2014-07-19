@@ -4,7 +4,7 @@ class PhotoMedia extends Media
 {
 
     // configurables
-	public static $jpegCompression = 90;
+    public static $jpegCompression = 90;
 
 	// magic methods
 	static public function __classLoaded()
@@ -14,7 +14,8 @@ class PhotoMedia extends Media
 		Media::$mimeHandlers['image/gif'] = $className;
 		Media::$mimeHandlers['image/jpeg'] = $className;
 		Media::$mimeHandlers['image/png'] = $className;
-		Media::$mimeHandlers['application/psd'] = $className;
+        Media::$mimeHandlers['image/tiff'] = $className;
+    	Media::$mimeHandlers['application/psd'] = $className;
 
 		parent::__classLoaded();
 	}
@@ -25,18 +26,24 @@ class PhotoMedia extends Media
 		switch($name)
 		{
 			case 'ThumbnailMIMEType':
-				if ($this->MIMEType == 'application/psd') {
-					return 'image/png';
-				} else {
-					return $this->MIMEType;
-				}
+                switch ($this->MIMEType) {
+                    case 'application/psd':
+                        return 'image/png';
+        			case 'image/tiff':
+                        return 'image/jpeg';
+                    default:
+                        return $this->MIMEType;
+                }
 
 			case 'Extension':
 
 				switch($this->MIMEType)
 				{
-					case 'application/psd':
+    				case 'application/psd':
 						return 'psd';
+
+    				case 'image/tiff':
+						return 'tif';
 
 					case 'image/gif':
 						return 'gif';

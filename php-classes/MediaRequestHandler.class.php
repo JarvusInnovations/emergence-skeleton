@@ -7,7 +7,7 @@ class MediaRequestHandler extends RecordsRequestHandler
     static public $browseLimit = 100;
     static public $browseOrder = array('ID' => 'DESC');
 
-	// configurables
+    // configurables
 	public static $defaultPage = 'browse';
 	public static $defaultThumbnailWidth = 100;
 	public static $defaultThumbnailHeight = 100;
@@ -530,6 +530,18 @@ class MediaRequestHandler extends RecordsRequestHandler
     		// get thumbnail
     		$thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
         } catch (Exception $e) {
+            \Emergence\Logger::general_warning('Caught exception while creating thumbnail for media, returning server error', array(
+                'exceptionClass' => get_class($e)
+                ,'exceptionMessage' => $e->getMessage()
+                ,'exceptionCode' => $e->getCode()
+                ,'recordData' => $Media->getData()
+                ,'thumbFormat' => array(
+                    'maxWidth' => $maxWidth
+                    ,'maxHeight' => $maxHeight
+                    ,'fillColor' => $fillColor
+                    ,'cropped' => $cropped
+                )
+            ));
     		return static::throwServerError('Thumbnail unavailable');
         }
 
