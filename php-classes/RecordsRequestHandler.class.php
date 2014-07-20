@@ -13,7 +13,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $browseConditions = false;
     static public $browseLimitDefault = false;
     static public $editableFields = false;
-	static public $searchConditions = false;
+    static public $searchConditions = false;
 	
 	static public $calledClass = __CLASS__;
 	static public $responseMode = 'html';
@@ -267,8 +267,9 @@ abstract class RecordsRequestHandler extends RequestHandler
 
         // get results
         $results = $className::getAllByWhere($conditions, $options);
-        
-        
+        $resultsTotal = DB::foundRows();
+
+
         // embed tables
         if (!empty($_GET['relatedTable'])) {
             $relatedTables = is_array($_GET['relatedTable']) ? $_GET['relatedTable'] : explode(',', $_GET['relatedTable']);
@@ -307,7 +308,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 				'success' => true
 				,'data' => $results
 				,'conditions' => $conditions
-			    ,'total' => DB::foundRows()
+			    ,'total' => $resultsTotal
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
