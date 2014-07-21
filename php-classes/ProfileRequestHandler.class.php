@@ -2,220 +2,182 @@
 
 class ProfileRequestHandler extends RequestHandler
 {
-    static public $profileFields = array('Location','About','Phone','Email');
-	static public $onBeforeProfileValidated = false;
-	static public $onBeforeProfileSaved = false;
-	static public $onProfileSaved = false;
+    public static $profileFields = array('Location','About','Phone','Email');
 
-	static public function handleRequest()
-	{
-		// handle JSON requests
-		if(static::peekPath() == 'json')
-		{
-			static::$responseMode = static::shiftPath();
-		}
-		
-		// route request
-		switch($action = strtolower(static::shiftPath()))
-		{
-			case 'uploadphoto':
-			{
-				return static::handlePhotoUploadRequest();
-			}
-		
-			case 'primaryphoto':
-			{
-				return static::handlePhotoPrimaryRequest();
-			}
-		
-			case 'deletephoto':
-			{
-				return static::handlePhotoDeleteRequest();
-			}
-		
-			case 'password':
-			{
-				return static::handlePasswordRequest();
-			}
-			
-			case 'view':
-			{
-				return static::handleViewRequest();
-			}
-		
-			case '':
-			case false:
-			{
-				return static::handleEditRequest();
-			}
-			
-			default:
-			{
-				return static::throwNotFoundError();
-			}
-		
-		}
-		
-	}
-	
-	static public function handleViewRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
+    public static $onBeforeProfileValidated = false;
+    public static $onBeforeProfileSaved = false;
+    public static $onProfileSaved = false;
 
-		return Router::redirectViewRecord($GLOBALS['Session']->Person);
-	}
-	
-	static public function handleEditRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
-	
-		$User = $GLOBALS['Session']->Person;
-	
-		if($_SERVER['REQUEST_METHOD'] == 'POST')
-		{
-			$profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+    );
 
-			$User->setFields($profileChanges);
-			
-			if(static::$onBeforeProfileValidated){
-				call_user_func(static::$onBeforeProfileValidated, $User, $profileChanges, $_REQUEST);
-			}
-			
-			// validate
-			if($User->validate())
-			{
-				if(static::$onBeforeProfileSaved){
-					call_user_func(static::$onBeforeProfileSaved, $User, $profileChanges, $_REQUEST);
-				}
+    public static function handleRequest()
+    {
+        // route request
+        switch ($action = strtolower(static::shiftPath())) {
+            case 'uploadphoto':
+                return static::handlePhotoUploadRequest();
+            case 'primaryphoto':
+                return static::handlePhotoPrimaryRequest();
+            case 'deletephoto':
+                return static::handlePhotoDeleteRequest();
+            case 'password':
+                return static::handlePasswordRequest();
+            case 'view':
+                return static::handleViewRequest();
+            case '':
+            case false:
+                return static::handleEditRequest();
+            default:
+                return static::throwNotFoundError();
+        }
+    }
 
-				// save session
-				$User->save();
-				
-				if(static::$onProfileSaved){
-					call_user_func(static::$onProfileSaved, $User, $profileChanges, $_REQUEST);
-				}
-				
-				// fire created response
-				return static::respond('profileSaved', array(
-					'success' => true
-					,'data' => $User
-				));
-			}
-			
-			// fall through back to form if validation failed
-		}
-	
-		return static::respond('profileEdit', array(
-		));	
-	}
-	
-	
-	static public function handlePhotoUploadRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
+    public static function handleViewRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
 
-		// process photo upload with MediaRequestHandler
-		MediaRequestHandler::$responseMode = 'return';
-		$uploadResponse = MediaRequestHandler::handleUploadRequest(array(
-			'fieldName' => 'photoFile'
-			,'ContextClass' => 'Person'
-			,'ContextID' => $_SESSION['User']->ID
-			,'Caption' => $_SESSION['User']->FullName
-		));
-		
-		// set primary if none set
-		if(!$GLOBALS['Session']->Person->PrimaryPhoto)
-		{
-			$GLOBALS['Session']->Person->PrimaryPhotoID = $uploadResponse['data']['data']->ID;
-			$GLOBALS['Session']->Person->save();
-		}
+        return Site::redirect($GLOBALS['Session']->Person->getURL());
+    }
 
-		return static::respond('profilePhotoUploaded', $uploadResponse['data']);
-	}
-	
-	static public function handlePhotoPrimaryRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
+    public static function handleEditRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
+        $User = $GLOBALS['Session']->Person;
 
-		if(empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID']))
-		{
-			return static::throwInvalidRequestError();
-		}
-		
-		if(!$Media = Media::getByID($_REQUEST['MediaID']))
-		{
-			return static::throwNotFoundError();
-		}
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
 
-		if($Media->ContextClass != 'Person' || $Media->ContextID != $GLOBALS['Session']->Person->ID)
-		{
-			return static::throwUnauthorizedError();
-		}
+            $User->setFields($profileChanges);
 
-		$GLOBALS['Session']->Person->PrimaryPhotoID = $Media->ID;
-		$GLOBALS['Session']->Person->save();
-		
-		return static::respond('profilePhotoPrimaried', array(
-			'success' => true
-			,'data' => $Media
-		));
-	}
+            if (static::$onBeforeProfileValidated) {
+                call_user_func(static::$onBeforeProfileValidated, $User, $profileChanges, $_REQUEST);
+            }
 
+            // validate
+            if ($User->validate()) {
+                if (static::$onBeforeProfileSaved) {
+                    call_user_func(static::$onBeforeProfileSaved, $User, $profileChanges, $_REQUEST);
+                }
 
-	static public function handlePhotoDeleteRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
+                // save session
+                $User->save();
 
-		if(empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID']))
-		{
-			return static::throwInvalidRequestError();
-		}
-		
-		if(!$Media = Media::getByID($_REQUEST['MediaID']))
-		{
-			return static::throwNotFoundError();
-		}
+                if (static::$onProfileSaved) {
+                    call_user_func(static::$onProfileSaved, $User, $profileChanges, $_REQUEST);
+                }
 
-		if($Media->ContextClass != 'Person' || $Media->ContextID != $GLOBALS['Session']->Person->ID)
-		{
-			return static::throwUnauthorizedError();
-		}
+                // fire created response
+                return static::respond('profileSaved', array(
+                    'success' => true
+                    ,'data' => $User
+                ));
+            }
 
-		$Media->destroy();
-		
-		return static::respond('profilePhotoDeleted', array(
-			'success' => true
-			,'data' => $Media
-		));
-	}
-	
-	
-	static public function handlePasswordRequest()
-	{
-		$GLOBALS['Session']->requireAuthentication();
-		
-		if(empty($_REQUEST['OldPassword']))
-		{
-			return static::throwError('Enter your current password for verification');
-		}
-		elseif(!$GLOBALS['Session']->Person->verifyPassword($_REQUEST['OldPassword']))
-		{
-			return static::throwError('You did not enter your current password correctly');
-		}
-		elseif(empty($_REQUEST['Password']) || empty($_REQUEST['PasswordConfirm']))
-		{
-			return static::throwError('Enter your new password twice to change it');
-		}
-		elseif($_REQUEST['Password'] != $_REQUEST['PasswordConfirm'])
-		{
-			return static::throwError('The passwords you supplied did not match');
-		}
-	
-		$GLOBALS['Session']->Person->setClearPassword($_REQUEST['Password']);
-		$GLOBALS['Session']->Person->save();
-	
-		return static::respond('passwordChanged', array(
-			'success' => true
-		));
-	}
+            // fall through back to form if validation failed
+        }
+
+        return static::respond('profileEdit', array(
+            'data' => $User
+        ));
+    }
+
+    public static function handlePhotoUploadRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
+        $User = $GLOBALS['Session']->Person;
+
+        // process photo upload with MediaRequestHandler
+        $Photo = \Media::createFromUpload($_FILES['photoFile'], array(
+            'ContextClass' => $User->getRootClass()
+            ,'ContextID' => $User->ID
+            ,'Caption' => $User->FullName
+        ));
+
+        // set primary if none set
+        if (!$User->PrimaryPhoto) {
+            $User->PrimaryPhoto = $Photo;
+            $User->save();
+        }
+
+        return static::respond('profilePhotoUploaded', array(
+            'success' => true
+            ,'data' => $Photo
+        ));
+    }
+
+    public static function handlePhotoPrimaryRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
+        $User = $GLOBALS['Session']->Person;
+
+        if (empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID'])) {
+            return static::throwInvalidRequestError();
+        }
+
+        if (!$Media = Media::getByID($_REQUEST['MediaID'])) {
+            return static::throwNotFoundError();
+        }
+
+        if ($Media->ContextClass != $User->getRootClass() || $Media->ContextID != $User->ID) {
+            return static::throwUnauthorizedError();
+        }
+
+        $User->PrimaryPhoto = $Media;
+        $User->save();
+
+        return static::respond('profilePhotoPrimaried', array(
+            'success' => true
+            ,'data' => $Media
+        ));
+    }
+
+    public static function handlePhotoDeleteRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
+        $User = $GLOBALS['Session']->Person;
+
+        if (empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID'])) {
+            return static::throwInvalidRequestError();
+        }
+
+        if (!$Media = Media::getByID($_REQUEST['MediaID'])) {
+            return static::throwNotFoundError();
+        }
+
+        if ($Media->ContextClass != $User->getRootClass() || $Media->ContextID != $User->ID) {
+            return static::throwUnauthorizedError();
+        }
+
+        $Media->destroy();
+
+        return static::respond('profilePhotoDeleted', array(
+            'success' => true
+            ,'data' => $Media
+        ));
+    }
+
+    public static function handlePasswordRequest()
+    {
+        $GLOBALS['Session']->requireAuthentication();
+        $User = $GLOBALS['Session']->Person;
+
+        if (empty($_REQUEST['OldPassword'])) {
+            return static::throwError('Enter your current password for verification');
+        } elseif (!$User->verifyPassword($_REQUEST['OldPassword'])) {
+            return static::throwError('You did not enter your current password correctly');
+        } elseif (empty($_REQUEST['Password']) || empty($_REQUEST['PasswordConfirm'])) {
+            return static::throwError('Enter your new password twice to change it');
+        } elseif ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm']) {
+            return static::throwError('The passwords you supplied did not match');
+        }
+
+        $User->setClearPassword($_REQUEST['Password']);
+        $User->save();
+
+        return static::respond('passwordChanged', array(
+            'success' => true
+        ));
+    }
 }

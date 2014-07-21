@@ -1,6 +1,12 @@
 /*jslint browser: true, undef: true*//*global Ext*/
 
 /**
+ * @event
+ * Fires after successful login
+ * @param {Object} sessionData
+ */
+
+/**
  * @abstract
  * An abstract class for singletons that facilitates communication with backend services on a local or remote emergence server
  */
@@ -11,22 +17,6 @@ Ext.define('Emergence.util.AbstractAPI', {
         sessionData: null
     },
 
-    //@private
-    constructor: function(config) {
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.addEvents(
-            /**
-             * @event
-             * Fires after successful login
-             * @param {Object} sessionData
-             */
-            'login'
-        );
-    },
-    
     buildHeaders: function(headers) {
         headers = headers || {};
 

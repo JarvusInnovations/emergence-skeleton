@@ -5,7 +5,6 @@ class HandleBehavior extends RecordBehavior
     public static $alwaysSuffix = false;
     public static $format = '%s-%u';
     public static $transliterate = true;
-    public static $emptyHandle = 'n-a';
 
     public static function onSave(ActiveRecord $Record, $handleInput = false)
     {
@@ -75,9 +74,9 @@ class HandleBehavior extends RecordBehavior
         // clean up any placeholder characters from ends
         $text = trim($text, '-_');
 
-        // use empty handle if nothing is left
+        // restart with singular noun if nothing is left
         if (!$text) {
-            $text = static::$emptyHandle;
+            return static::getUniqueHandle($class, $class::$singularNoun, $options);
         }
 
         // search for unique handle
@@ -98,7 +97,7 @@ class HandleBehavior extends RecordBehavior
     }
 
     public static function generateRandomHandle($class, $length = 32, $options = array())
-	{
+    {
 		// apply default options
 		$options = array_merge(array(
 			'handleField' => 'Handle'

@@ -13,8 +13,8 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $browseConditions = false;
     static public $browseLimitDefault = false;
     static public $editableFields = false;
-	static public $searchConditions = false;
-	
+    static public $searchConditions = false;
+    
 	static public $calledClass = __CLASS__;
 	static public $responseMode = 'html';
     public static $userResponseModes = array(
@@ -88,10 +88,13 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		$className = static::$recordClass;
 		
-		if(method_exists($className, 'getByHandle'))
+        if (ctype_digit($handle) || is_int($handle)) {
+            return $className::getByID($handle);
+        } elseif (method_exists($className, 'getByHandle')) {
 			return $className::getByHandle($handle);
-		else
+		} else {
 			return null;
+		}
 	}
 	
 	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
@@ -267,8 +270,9 @@ abstract class RecordsRequestHandler extends RequestHandler
 
         // get results
         $results = $className::getAllByWhere($conditions, $options);
-        
-        
+        $resultsTotal = DB::foundRows();
+
+
         // embed tables
         if (!empty($_GET['relatedTable'])) {
             $relatedTables = is_array($_GET['relatedTable']) ? $_GET['relatedTable'] : explode(',', $_GET['relatedTable']);
@@ -307,7 +311,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 				'success' => true
 				,'data' => $results
 				,'conditions' => $conditions
-			    ,'total' => DB::foundRows()
+			    ,'total' => $resultsTotal
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
