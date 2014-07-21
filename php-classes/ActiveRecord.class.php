@@ -30,7 +30,7 @@ class ActiveRecord
     /**
      * URL that can be prefixed to this record's identifier by $this->getURL
      * to generate a domain-relative address to this record
-	 * @var string
+     * @var string
 	 */
     static public $collectionRoute;
 	
@@ -1938,7 +1938,7 @@ class ActiveRecord
 				if (!$fieldOptions['notnull'] && ($value === '' || $value === null)) {
 					$this->_convertedValues[$field] = $value = NULL;
 				} else {
-                    $value = round($value);
+                    $value = (integer)$value;
                     $this->_convertedValues[$field] = $value;
 					$value = (string)$value;
 				}
