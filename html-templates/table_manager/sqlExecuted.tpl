@@ -3,9 +3,9 @@
 {block "content"}
 
 	{if $success}
-		<p class="status">Query executed successfully</p>
+		<p class="notify success">Query executed successfully.</p>
 	{else}
-		<p class="status invalid">Query failed. MySQL said: {$error|escape}</p>
+		<p class="notify error">Query failed. MySQL said: {$error|escape}</p>
 	{/if}
 	
 	{$dwoo.parent}
