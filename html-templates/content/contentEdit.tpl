@@ -28,6 +28,5 @@
 {/block}
 
 {block content}
-    <!-- TODO: move inline width to site's stylesheet -->
     <div id='contentEditorCt'>Loading content editor&hellip;</div>
 {/block}
