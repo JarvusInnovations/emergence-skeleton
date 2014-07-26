@@ -54,7 +54,7 @@
                             Be the first to comment.
                         {/if}
                     </a>
-                {/if}                
+                {/if}
             </footer>
         {/if}
 

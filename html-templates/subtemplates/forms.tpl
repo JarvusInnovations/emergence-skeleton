@@ -15,7 +15,7 @@
         {if $label}<span class="field-label">{$label}</span>{/if}
 
         {$html}
-        
+
         {if $error}<p class="error-text">{$error}</p>{/if}
         {if $hint}<p class="hint">{$hint}</p>{/if}
     </label>
@@ -32,7 +32,7 @@
             {$attribs}
             value="{refill field=$name default=$default}">
     {/capture}
-    
+
     {labeledField html=$html type=$type label=$label error=$error hint=$hint required=$required class=$fieldClass}
 {/template}
 
@@ -49,7 +49,7 @@
     {if $unsetValue !== null}
         <input type="hidden" name="{$name|escape}" value="{$unsetValue|escape}">
     {/if}
-    
+
     {labeledField html=$html type=checkbox label=$label error=$error hint=$hint required=$required}
 {/template}
 
@@ -63,7 +63,7 @@
             {$attribs}
         >{refill field=$name default=$default}</textarea>
     {/capture}
-    
+
     {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required}
 {/template}
 
