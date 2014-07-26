@@ -13,11 +13,13 @@ Ext.define('Emergence.cms.view.Toolbar', {
 //         'ExtUx.DateTimeField'
     ],
 
+    padding: '8 0 8 8',
+    
     items:[
         {
             xtype: 'button',
             text: 'Save',
-    
+            glyph: 0xf0ee+'@FontAwesome', // fa-cloud-upload
             action: 'save'
         },
 //        '-',
@@ -29,6 +31,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
 //            href: '#',
 //            disabled: true
 //        },
+        '-',
         '->',
         {
             reference: 'statusBtn',
@@ -44,7 +47,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
                         group: 'status',
                         text: 'Draft',
                         value: 'Draft',
-                        glyph: '68',
+                        glyph: 0xf044+'@FontAwesome', // fa-pencil-square-o
                         tooltip: 'This content is not complete and will only be accessible to the author via the "my drafts" page'
                     },
                     {
@@ -52,7 +55,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
                         group: 'status',
                         text: 'Published',
                         value: 'Published',
-                        glyph: '80',
+                        glyph: 0xf046+'@FontAwesome', // fa-check-square-o
                         tooltip: 'Anyone online can find or view this content'
         
                     }
@@ -73,7 +76,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
                         group: 'visibility',
                         text: 'Login required',
                         value: 'Private',
-                        glyph: '76',
+                        glyph: 0xf0c0+'@FontAwesome', // fa-group
                         tooltip: 'Only users logged into the site can find or view this content'
                     },
                     {
@@ -81,17 +84,21 @@ Ext.define('Emergence.cms.view.Toolbar', {
                         group: 'visibility',
                         text: 'Public',
                         value: 'Public',
-                        glyph: '80',
+                        glyph: 0xf0ac+'@FontAwesome', // fa-globe
                         tooltip: 'Anyone online can find or view this content'
                     }
                 ]
             }
         },
         {
+            // flex: 1,
+            // minWidth: 200,
+            // maxWidth: 250,
             reference: 'publishedTimeBtn',
     
             xtype: 'button',
-            text: 'Set publication time',
+            text: 'Publication time',
+            glyph: 0xf017+'@FontAwesome', // fa-clock-o
             menu: {
                 plain: true,
                 width: 200,

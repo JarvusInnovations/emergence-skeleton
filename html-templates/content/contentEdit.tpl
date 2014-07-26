@@ -1,6 +1,7 @@
 {extends designs/site.tpl}
 
 {block "css"}
+    {cssmin fonts/font-awesome.css}
     <link rel="stylesheet" type="text/css" href="{Sencha_App::getByName('ContentEditor')->getVersionedPath('build/production/resources/ContentEditor-all.css')}" />
 
     {$dwoo.parent}
