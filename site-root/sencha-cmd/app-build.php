@@ -88,7 +88,7 @@ foreach ($requiredPackages AS $packageName) {
     $cachedFiles = Emergence_FS::cacheTree("$packagesPath/$packageName");
     Benchmark::mark("precached $cachedFiles files in $packagesPath/$packageName");
     $exportResult = Emergence_FS::exportTree("$packagesPath/$packageName", "$packagesTmpPath/$packageName");
-    Benchmark::mark("exported $packagesPath to $packagesTmpPath/$packageName: ".http_build_query($exportResult));
+    Benchmark::mark("exported $packagesPath/$packageName to $packagesTmpPath/$packageName: ".http_build_query($exportResult));
 
     // append package-level classpaths
     $packageBuildConfigPath = "$packagesTmpPath/$packageName/.sencha/package/sencha.cfg";

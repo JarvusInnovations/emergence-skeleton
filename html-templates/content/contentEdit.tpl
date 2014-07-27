@@ -1,6 +1,7 @@
 {extends designs/site.tpl}
 
 {block "css"}
+    {cssmin fonts/font-awesome.css}
     <link rel="stylesheet" type="text/css" href="{Sencha_App::getByName('ContentEditor')->getVersionedPath('build/production/resources/ContentEditor-all.css')}" />
 
     {$dwoo.parent}
@@ -28,6 +29,5 @@
 {/block}
 
 {block content}
-    <!-- TODO: move inline width to site's stylesheet -->
     <div id='contentEditorCt'>Loading content editor&hellip;</div>
 {/block}

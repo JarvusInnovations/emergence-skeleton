@@ -23,8 +23,8 @@ Ext.define('Emergence.cms.view.Preview', {
         'itemsCt'
     ],
     renderTpl: [
-        '<article class="blog-post reading-width">',
-            '<header class="section-header">',
+        '<article class="reading-width">',
+            '<header class="article-header">',
                 '<h2 class="header-title">',
                     '<a id="{id}-titleLink" data-ref="titleLink" href="#"></a>',
                 '</h2>',

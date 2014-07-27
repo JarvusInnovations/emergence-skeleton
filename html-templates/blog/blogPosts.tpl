@@ -11,11 +11,13 @@
         </div>            
     </header>
     
+    <section class="page-section article-collection">
     {foreach item=BlogPost from=$data}
         {blogPost $BlogPost headingLevel=h3}
     {foreachelse}
-        <p>Stay tuned for the first post</p>
+        <p class="empty-text">Stay tuned for the first post&hellip;</p>
     {/foreach}
+    </section>
 
     {if $total > $limit}
     <footer class="page-footer">

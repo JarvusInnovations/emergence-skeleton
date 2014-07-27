@@ -9,6 +9,7 @@
     "format": "1",
     "local": true,
     "requires": [
-        "emergence-apikit"
+        "emergence-apikit",
+        "jarvus-ext-glyphs"
     ]
 }

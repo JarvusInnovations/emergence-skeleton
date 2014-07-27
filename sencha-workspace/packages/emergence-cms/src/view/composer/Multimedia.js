@@ -11,7 +11,8 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
         contentItemClass: 'Emergence\\CMS\\Item\\Media',
         buttonCfg: {
             text: 'Multimedia',
-            iconCls: 'icon-content-multimedia',
+            glyph: 0xf0c6+'@FontAwesome', // fa-paperclip
+            cls: 'icon-w-22',
             tooltip: 'Add an audio, video, or photo file from your computer.'
         }
     },

@@ -8,7 +8,7 @@ if (!static::tableExists('group_members')) {
     return static::STATUS_SKIPPED;
 }
 
-if (static::getColumnType('group_members', 'Role') != $newGroupRollType) {
+if (static::getColumnType('group_members', 'Role') == $newGroupRollType) {
     printf("Skipping migration because `Role` column already has correct type\n");
     return static::STATUS_SKIPPED;
 }

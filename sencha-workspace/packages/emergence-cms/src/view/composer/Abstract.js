@@ -15,6 +15,7 @@ Ext.define('Emergence.cms.view.composer.Abstract', {
     },
 
     collapsible: false,
+    frame: false,
 
     getContentItemId: function() {
         var me = this,

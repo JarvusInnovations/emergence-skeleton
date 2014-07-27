@@ -40,12 +40,17 @@ Ext.define('Emergence.cms.view.Editor', {
     columnWidths: [1],
     maxColumns: 1,
     cls: ['emergence-content-editor'],
-    border: false,
+    bodyStyle: {
+        borderWidth: '1px 0',
+        padding: 0
+    },
 
     dockedItems: [{
         dock: 'top',
 
         xtype: 'toolbar',
+        border: false,
+        padding: '8 0 4 8',
         items: [
 //            'Title:',
             {
@@ -62,9 +67,13 @@ Ext.define('Emergence.cms.view.Editor', {
         dock: 'top',
         
         xtype: 'toolbar',
+        border: false,
+        padding: '4 0 0 8',
         items: [
-            'Tags:',
             {
+                xtype: 'tbtext',
+                text: '<i class="fa fa-lg fa-tags"></i> Tags'
+            },{
                 reference: 'tagsField',
                 flex: 1,
     
@@ -101,6 +110,7 @@ Ext.define('Emergence.cms.view.Editor', {
         dock: 'top',
 
         xtype: 'emergence-cms-toolbar',
+        border: false,
         layout: {
             overflowHandler: 'menu'
         }
@@ -108,9 +118,12 @@ Ext.define('Emergence.cms.view.Editor', {
         reference: 'inserterCt',
 
         xtype: 'buttongroup',
+        border: 1,
+        cls: 'segmented-btn-group',
         dock: 'bottom',
         title: 'Add a content block:',
         minHeight: 100,
+        bodyPadding: 0,
         defaults: {
             scale: 'large',
             iconAlign: 'top',

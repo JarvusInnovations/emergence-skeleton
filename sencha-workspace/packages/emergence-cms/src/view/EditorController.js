@@ -128,7 +128,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             text = 'Publish on save';
         } else {
             date = this.getView().getSelectedDateTime();
-            text = (date > new Date() ? 'Publish ' : 'Published ') + Ext.Date.format(date, 'n/j/Y g:i a');
+            text = /* (date > new Date() ? 'Publish ' : 'Published ') + */ Ext.Date.format(date, 'n/j/Y g:i a');
         }
 
         publishedTimeBtn.setText(text);

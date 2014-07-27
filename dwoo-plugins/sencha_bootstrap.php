@@ -39,10 +39,13 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     $frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
 
     // initialize output state
-    $manifest = array(
-        'Ext' => "/app/$framework-$frameworkVersion/src"
-    );
+    $manifest = array();
     $autoLoadPaths = array();
+
+    // set framework path if patching loader
+    if ($patchLoader) {
+        $manifest['Ext'] = "/app/$framework-$frameworkVersion/src";
+    }
 
     // add paths for packages
     foreach (array_unique($packages) AS $packageName) {
@@ -145,15 +148,13 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     // output loader patch and manifest
     return
         '<script type="text/javascript">(function(){'
-        
+            .'var origLoadScript = Ext.Loader.loadScript'
+                .',origLoadScriptFile = Ext.Loader.loadScriptFile'
+                .',dcParam = Ext.Loader.getConfig("disableCachingParam")'
+                .',now = Ext.Date.now();'
             .(
                 $patchLoader ?
-                    'var origLoadScript = Ext.Loader.loadScript'
-                        .',origLoadScriptFile = Ext.Loader.loadScriptFile'
-                        .',dcParam = Ext.Loader.getConfig("disableCachingParam")'
-                        .',now = Ext.Date.now();'
-        
-                    .'function _versionScriptUrl(url) {'
+                    'function _versionScriptUrl(url) {'
                         .'if (url[0] != "/") {'
                             .'url = window.location.pathname + url;'
                             .'while (url.match(/\/\.\.\//)) url = url.replace(/\/[^\/]+\/\.\./g, "");'

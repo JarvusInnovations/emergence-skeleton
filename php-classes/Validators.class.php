@@ -41,7 +41,7 @@ class Validators
 
 	public static function full_name($string)
 	{
-		return !empty($string) && ctype_print($string) && preg_match('/[a-zA-Z][a-zA-Z\']+\s+([a-zA-Z][a-zA-Z\'.]*\s+)*[a-zA-Z][a-zA-Z\']+/', $string);
+    	return !empty($string) && preg_match('/^[\\pL][\\pL\'\\-]+\s+([\\pL][\\pL\'.\\-]*\s+)*[\\pL][\\pL\'\\-]+$/u', $string);
 	}
 
 	public static function number($number, $options = array())

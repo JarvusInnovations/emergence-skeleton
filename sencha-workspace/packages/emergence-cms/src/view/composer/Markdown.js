@@ -10,8 +10,9 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
         contentItemClass: 'Emergence\\CMS\\Item\\Markdown',
         buttonCfg: {
             text: 'Markdown Text',
-            iconCls: 'icon-content-markdown',
-            tooltip: 'A block of text formatted with Markdown.'
+            glyph: 0xf0f6+'@FontAwesome', // fa-file-text-o
+            cls: 'icon-w-20',
+            tooltip: 'A block of text formatted with Markdown'
         }
     },
 
@@ -19,6 +20,8 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
     height: 200,
     tools: [{
         type: 'help',
+        glyph: true,
+        cls: 'icon-w-20',
         tooltip: 'Markdown formatting guide',
         callback: function() {
             window.open('https://help.github.com/articles/markdown-basics', '_blank');

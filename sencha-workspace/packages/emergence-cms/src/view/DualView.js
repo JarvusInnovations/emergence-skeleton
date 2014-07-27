@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.DualView', {
     extend: 'Ext.Container',
     xtype: 'emergence-cms-dualview',
+    cls: 'emergence-cms-dualview',
     requires: [
         'Emergence.cms.view.DualViewController',
         'Emergence.cms.view.Editor',
@@ -13,11 +14,13 @@ Ext.define('Emergence.cms.view.DualView', {
     layout: 'hbox',
     items: [{
         reference: 'preview',
+        cls: 'emergence-cms-preview',
         flex: 1,
 
         xtype: 'emergence-cms-preview'
     },{
         reference: 'editor',
+        cls: 'emergence-cms-editor',
         flex: 1,
 
         xtype: 'emergence-cms-editor'

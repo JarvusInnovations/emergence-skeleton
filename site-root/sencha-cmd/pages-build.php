@@ -23,8 +23,6 @@ $frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
 
 // get temporary directory and set paths
 $tmpPath = Emergence_FS::getTmpDir();
-$frameworkTmpPath = "$tmpPath/$framework";
-$buildTmpPath = "$tmpPath/build";
 
 Benchmark::mark("created tmp: $tmpPath");
 
@@ -37,16 +35,16 @@ Benchmark::mark("chdir to: $tmpPath");
 // precache and write pages
 $cachedFiles = Emergence_FS::cacheTree($pagesPath);
 Benchmark::mark("precached $cachedFiles files in $pagesPath");
-$exportResult = Emergence_FS::exportTree($pagesPath, $tmpPath);
-Benchmark::mark("exported $pagesPath to $tmpPath: ".http_build_query($exportResult));
+$exportResult = Emergence_FS::exportTree($pagesPath, '.');
+Benchmark::mark("exported $pagesPath to .: ".http_build_query($exportResult));
 
 
 // ... framework
 $cachedFiles = Emergence_FS::cacheTree($frameworkPath);
 Benchmark::mark("precached $cachedFiles files in $frameworkPath");
 
-$exportResult = Emergence_FS::exportTree($frameworkPath, $frameworkTmpPath);
-Benchmark::mark("exported $frameworkPath to $frameworkTmpPath: ".http_build_query($exportResult));
+$exportResult = Emergence_FS::exportTree($frameworkPath, $framework);
+Benchmark::mark("exported $frameworkPath to ./$framework: ".http_build_query($exportResult));
 
 // build command and scan for dependencies and pages
 $packages = array();
@@ -57,13 +55,10 @@ $classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildC
 
 foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
-    
-    $pageLoadCommands[] = "union -r -c Site.page.$pageName and save $pageName";
-    
-	if ($page != 'common.html') {
-		$pageBuildCommands[] = "restore $pageName and exclude --set common and concat --yui $buildTmpPath/$pageName.js";
-	}
-    
+
+    $pageLoadCommands[] = "union -recursive -class Site.page.$pageName and save $pageName";
+    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
+
     // detect required packages
     if (preg_match_all('|//\s*@require-package\s*(\S+)|i', file_get_contents($page), $matches)) {
         $packages = array_merge($packages, $matches[1]);
@@ -74,18 +69,19 @@ foreach (glob('./src/page/*.js') AS $page) {
 // analyze packages, export, and add to classPath
 $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
 foreach($packages AS $package) {
-	$packageSource = "sencha-workspace/packages/$package/src";
-	$packageDest = "$tmpPath/packages/$package/src";
-	Benchmark::mark("importing package: $package from $packageSource");
-	
-	$cachedFiles = Emergence_FS::cacheTree($packageSource);
-	Benchmark::mark("precached $cachedFiles files in $packageSource");
-    
-	$exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-	Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+    $packageSource = "sencha-workspace/packages/$package/src";
+    $packageDest = "./packages/$package/src";
+    Benchmark::mark("importing package: $package from $packageSource");
 
-    $classPaths[] = "packages/$package/src";
+    $cachedFiles = Emergence_FS::cacheTree($packageSource);
+    Benchmark::mark("precached $cachedFiles files in $packageSource");
+
+    $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+    Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+
+    $classPaths[] = "./packages/$package/src";
 }
+
 
 // write any libraries from classpath
 Benchmark::mark("crawling packages for classpaths");
@@ -94,93 +90,111 @@ $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($p
 Benchmark::mark("processing all classpaths");
 foreach($classPaths AS &$classPath) {
     if(strpos($classPath, '${workspace.dir}/x/') === 0) {
-    	$extensionPath = substr($classPath, 19);
-		$classPathSource = "ext-library/$extensionPath";
-		$classPath = "$tmpPath/x/$extensionPath";
-		Benchmark::mark("importing classPathSource: $classPathSource");
-    	
+        $extensionPath = substr($classPath, 19);
+        $classPathSource = "ext-library/$extensionPath";
+        $classPath = "./x/$extensionPath";
+        Benchmark::mark("importing classPathSource: $classPathSource");
+
         $cachedFiles = Emergence_FS::cacheTree($classPathSource);
         Benchmark::mark("precached $cachedFiles files in $classPathSource");
-		
+
         $sourceNode = Site::resolvePath($classPathSource);
-        
+
         if (is_a($sourceNode, SiteFile)) {
             mkdir(dirname($classPath), 0777, true);
             copy($sourceNode->RealPath, $classPath);
-    		Benchmark::mark("copied file $classPathSource to $classPath");
+            Benchmark::mark("copied file $classPathSource to $classPath");
         } else {
-        	$exportResult = Emergence_FS::exportTree($classPathSource, $classPath);
-    		Benchmark::mark("exported $classPathSource to $classPath: ".http_build_query($exportResult));
+            $exportResult = Emergence_FS::exportTree($classPathSource, $classPath);
+            Benchmark::mark("exported $classPathSource to $classPath: ".http_build_query($exportResult));
         }
-	}
+    }
 }
 
 
 // prepare cmd
 $classPaths[] = 'src';
 $cmd = Sencha::buildCmd(
-	$cmdVersion
-    ,"-sdk $frameworkTmpPath"
-	,'compile'
-    ," -classpath=".implode(',', array_unique($classPaths))
-    ,'union -r -c Site.Common and save common'
-	,'and ' . join(' and ', $pageLoadCommands)
-    ,count($pageNames) > 1 ? 'and intersect --min-match 2 --sets '.join(',', $pageNames) : ''
-	,'and include --set common'
-    ,'and exclude -namespace Site.page'
-	,'and save common'
-	,"and concat --yui $buildTmpPath/common.js"
-	,count($pageBuildCommands) ? 'and ' . join(' and ', $pageBuildCommands) : ''
+    $cmdVersion
+    ,"-sdk ./$framework"
+    ,'compile'
+        ,"-classpath=".implode(',', array_unique($classPaths))
+
+        // start with Site.Common and all its dependencies, store in set common
+        ,'union -recursive -class Site.Common'
+        ,'and save common'
+
+        // if there's at least one page...
+        ,count($pageLoadCommands)
+            ?
+                // create a set for each Site.page.* class and its dependencies
+                'and ' . join(' and ', $pageLoadCommands)
+
+                // switch back to the common set
+                .' and restore common'
+            : ''
+
+        // if there is more than one page being built for, add any dependencies that two or more share to the common set
+        ,count($pageNames) > 1
+            ?
+                'and intersect -min=2 -set ' . join(',', $pageNames)
+                .' and exclude -namespace Site.page'
+            : ''
+
+        // output the common set to common.js
+        ,"and concat -yui ./build/common.js"
+
+        // if there's at least one page...
+        ,count($pageBuildCommands)
+            ? 'and ' . join(' and ', $pageBuildCommands)
+            : ''
 );
 Benchmark::mark("running CMD: $cmd");
 
 // optionally dump workspace and exit
 if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
-	header('Content-Type: application/x-bzip-compressed-tar');
-	header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
-	chdir($tmpPath);
-	passthru("tar -cjf - ./");
-	exec("rm -R $tmpPath");
-	exit();
+    header('Content-Type: application/x-bzip-compressed-tar');
+    header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
+    passthru("tar -cjf - ./");
+    exec("rm -R $tmpPath");
+    exit();
 }
 
 // execute CMD
 //  - optionally dump workspace and exit
 if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
-	exec($cmd);
-	
-	header('Content-Type: application/x-bzip-compressed-tar');
-	header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
-	chdir($tmpPath);
-	passthru("tar -cjf - ./");
-	exec("rm -R $tmpPath");
-	exit();
+    exec($cmd);
+
+    header('Content-Type: application/x-bzip-compressed-tar');
+    header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
+    passthru("tar -cjf - ./");
+    exec("rm -R $tmpPath");
+    exit();
 }
 else {
-	passthru("$cmd 2>&1", $cmdStatus);
+    passthru("$cmd 2>&1", $cmdStatus);
 }
 
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import build
-if($cmdStatus == 0) {	
-	$buildTmpPath = "$tmpPath/build";
-	Benchmark::mark("importing $buildTmpPath");
-	
-	$importResults = Emergence_FS::importTree($buildTmpPath, 'site-root/js/pages');
-	Benchmark::mark("imported files: ".http_build_query($importResults));
-	
-	if(!empty($_GET['archive'])) {
-		Benchmark::mark("importing $archiveTmpPath to $archivePath");
-		
-		$importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
-		Benchmark::mark("imported files: ".http_build_query($importResults));
-	}
+if($cmdStatus == 0) {
+    Benchmark::mark("importing ./build");
+
+    $importResults = Emergence_FS::importTree('build', 'site-root/js/pages');
+    Benchmark::mark("imported files: ".http_build_query($importResults));
+
+    if(!empty($_GET['archive'])) {
+        Benchmark::mark("importing $archiveTmpPath to $archivePath");
+
+        $importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
+        Benchmark::mark("imported files: ".http_build_query($importResults));
+    }
 }
 
 
 // clean up
 if(empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

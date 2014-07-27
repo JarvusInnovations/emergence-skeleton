@@ -4,7 +4,7 @@
 {template blogPost Post showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true headingLevel=h2}
     <article class="blog-post reading-width">
         {if $showHeader}
-            <header class="section-header">
+            <header class="article-header">
                 <{$headingLevel} class="header-title">
                     <a href="{$Post->getURL()}">{$Post->Title|escape}</a>
                 </{$headingLevel}>
@@ -54,7 +54,7 @@
                             Be the first to comment.
                         {/if}
                     </a>
-                {/if}                
+                {/if}
             </footer>
         {/if}
 

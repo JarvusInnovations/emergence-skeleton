@@ -10,7 +10,8 @@ Ext.define('Emergence.cms.view.composer.Embed', {
         contentItemClass: 'Emergence\\CMS\\Item\\Embed',
         buttonCfg: {
             text: 'Embed Code',
-            iconCls: 'icon-content-embed',
+            glyph: 0xf121+'@FontAwesome', // fa-code
+            cls: 'icon-w-30',
             tooltip: 'Add a section containing an HTML embed code (from YouTube, etc).'
         }
     },
