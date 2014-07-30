@@ -19,7 +19,6 @@ Ext.define('Emergence.util.AbstractAPI', {
      */
 
     buildHeaders: function(headers) {
-        headers = headers || {};
 
         if (!('Accept' in headers)) {
             headers.Accept = 'application/json';
