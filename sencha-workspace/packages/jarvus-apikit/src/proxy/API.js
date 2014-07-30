@@ -8,33 +8,31 @@ Ext.define('Jarvus.ext.proxy.API', {
 
     config: {
         /**
-         * @cfg The API wrapper singleton that will process requests
+         * @cfg The {Ext.data.Connection} instance that will process requests
          * @required
          */
-        apiWrapper: 'Jarvus.util.API'
+        connection: 'Jarvus.util.API'
+    },
+    
+    applyConnection: function(connection) {
+        if (typeof connection == 'string') {
+            Ext.syncRequire(connection);
+            connection = Ext.ClassManager.get(connection);
+        }
+        
+        return connection;
     },
 
     sendRequest: function(request) {
-        var me = this,
-            apiWrapper = me.apiWrapper;
+        var me = this;     
 
-        // ensure apiWrapper is required and converted to instance before request is built
-        if (typeof apiWrapper == 'string') {
-            Ext.syncRequire(apiWrapper);
-            apiWrapper = me.apiWrapper = Ext.ClassManager.get(apiWrapper);
-        }
-
-        request.setRawRequest(apiWrapper.request(Ext.apply(request.getCurrentConfig(), {
+        request.setRawRequest(me.getConnection().request(Ext.applyIf({
             autoDecode: false,
             disableCaching: false
-        })));
+        }, request.getCurrentConfig())));
 
         me.lastRequest = request;
 
         return request;
-    },
-
-    getAPIWrapper: function() {
-        return this.apiWrapper;
     }
 });
