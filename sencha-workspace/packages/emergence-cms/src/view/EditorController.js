@@ -1,9 +1,10 @@
-/*jslint browser: true, undef: true *//*global Ext,Emergence*/
+/*jslint browser: true, undef: true *//*global Ext*/
 Ext.define('Emergence.cms.view.EditorController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.emergence-cms-editor',
     requires: [
-        'Ext.MessageBox'
+        'Ext.MessageBox',
+        'Emergence.cms.view.composer.Unknown'
     ],
 
     control: {
@@ -31,25 +32,25 @@ Ext.define('Emergence.cms.view.EditorController', {
     // lifecycle overrides
     init: function() {
         var me = this,
+            editorView = me.getView(),
             inserterCt = me.lookupReference('inserterCt'),
-            contentRecord = me.getView().getContentRecord(),
+            contentRecord = editorView.getContentRecord(),
             composers = me.composers = [],
-            composerClasses = Ext.ClassManager.getNamesByExpression('emergence-cms-composer.*'),
-            composersLength = composerClasses.length, composerIndex = 0, composer;
+            composerClasses = editorView.getComposers() || Ext.ClassManager.getNamesByExpression('emergence-cms-composer.*'),
+            composersLength = composerClasses.length, composerIndex = 0, composer, buttonCfg;
 
         // scan for composers and create buttons
         for (; composerIndex < composersLength; composerIndex++) {
             composer = Ext.ClassManager.get(composerClasses[composerIndex]);
+            buttonCfg = composer.buttonCfg;
+
             composers.push(composer);
 
-            inserterCt.add(Ext.applyIf({
-                composer: composer
-            }, composer.buttonCfg));
-        }
-
-        // load content
-        if (contentRecord && contentRecord.isModel) {
-            me.syncFromRecord();
+            if (buttonCfg) {
+                inserterCt.add(Ext.applyIf({
+                    composer: composer
+                }, composer.buttonCfg));
+            }
         }
     },
 
@@ -68,7 +69,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             editorView = me.getView(),
             contentRecord = editorView.getContentRecord(),
             wasPhantom = contentRecord.phantom;
-        
+
         editorView.setLoading('Saving&hellip;');
         me.syncToRecord();
 
@@ -92,7 +93,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             }
         });
     },
-    
+
     onEnumMenuCheckChange: function(menuItem, checked) {
         if (!checked) {
             return;
@@ -103,16 +104,16 @@ Ext.define('Emergence.cms.view.EditorController', {
         parentButton.setText(menuItem.text);
         parentButton.setGlyph(menuItem.glyph);
     },
-    
+
     onPublishImmediatelyCheckChange: function(menuItem, checked) {
         var publishedTimeBtn = this.lookupReference('publishedTimeBtn');
 
         publishedTimeBtn.down('datefield').setDisabled(checked);
         publishedTimeBtn.down('timefield').setDisabled(checked);
-        
+
         this.syncPublishedTimeBtnText();
     },
-    
+
     onPublishTimeFieldChange: function() {
         this.syncPublishedTimeBtnText();
     },
@@ -123,7 +124,7 @@ Ext.define('Emergence.cms.view.EditorController', {
         var publishedTimeBtn = this.lookupReference('publishedTimeBtn'),
             immediateChecked = publishedTimeBtn.down('menucheckitem').checked,
             date, text;
-        
+
         if (immediateChecked) {
             text = 'Publish on save';
         } else {
@@ -165,14 +166,6 @@ Ext.define('Emergence.cms.view.EditorController', {
                     tagsField.setValue(tagsData);
                 }, me, { single: true });
             }
-
-            // update open button
-//            if (isPhantom) {
-//                openBtn.disable();
-//            } else {
-//                openBtn.setHref(contentRecord.toUrl());
-//                openBtn.enable();
-//            }
 
             // sync status/visibility fields
             me.lookupReference('statusBtn').down('[value="'+contentRecord.get('Status')+'"]').setChecked(true);

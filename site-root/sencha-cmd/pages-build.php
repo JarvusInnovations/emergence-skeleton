@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * This command builds optimized javascript bundles for the frontend of a website using Sencha CMD
+ *
+ * sencha-workspace/pages/src/Common.js is examined first, in and all its dependencies are output to site-root/js/pages/common.js
+ * sencha-workspace/pages/src/page.*.js is examined next, and for each one the page class and all its dependencies are output to site-root/js/pages/*.js
+ *
+ * All classes included in common.js are excluded from each page's build, and if 2 or more pages are being built all classes shared by two or more of them
+ * are also included in common.js and excluded from the page-specific builds.
+ *
+ * Page class files may indicate package dependencies with header comments in the following format:
+ * ```
+ * // @require-package my-package-name
+ * ````
+ * 
+ * TODO:
+ * - For packages required by pages, all files within all packages' overrides folder should be automatically included in that page's build
+ *
+ */
+
 $GLOBALS['Session']->requireAccountLevel('Developer');
 set_time_limit(0);
 
@@ -68,18 +87,20 @@ foreach (glob('./src/page/*.js') AS $page) {
 
 // analyze packages, export, and add to classPath
 $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
-foreach($packages AS $package) {
-    $packageSource = "sencha-workspace/packages/$package/src";
-    $packageDest = "./packages/$package/src";
-    Benchmark::mark("importing package: $package from $packageSource");
-
-    $cachedFiles = Emergence_FS::cacheTree($packageSource);
-    Benchmark::mark("precached $cachedFiles files in $packageSource");
-
-    $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-    Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-
-    $classPaths[] = "./packages/$package/src";
+foreach ($packages AS $package) {
+    foreach (array('src', 'overrides') AS $subPath) { 
+        $packageSource = "sencha-workspace/packages/$package/$subPath";
+        $packageDest = "./packages/$package/$subPath";
+        Benchmark::mark("importing package: $package from $packageSource");
+    
+        $cachedFiles = Emergence_FS::cacheTree($packageSource);
+        Benchmark::mark("precached $cachedFiles files in $packageSource");
+    
+        $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+        Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+    
+        $classPaths[] = "./packages/$package/$subPath";
+    }
 }
 
 

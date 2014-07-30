@@ -7,7 +7,7 @@ Ext.define('Emergence.ext.proxy.Records', {
     ],
 
     config: {
-        apiWrapper: 'Emergence.util.API',
+        connection: 'Emergence.util.API',
         include: null,
         relatedTable: null,
         summary: false

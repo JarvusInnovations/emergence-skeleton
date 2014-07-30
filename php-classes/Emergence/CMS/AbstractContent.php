@@ -162,7 +162,7 @@ abstract class AbstractContent extends \VersionedRecord
         return $this->finishValidation();
     }
 
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
         // set author
         if (!$this->AuthorID) {
@@ -178,7 +178,7 @@ abstract class AbstractContent extends \VersionedRecord
         HandleBehavior::onSave($this);
 
         // call parent
-        parent::save($deep, $createRevision);
+        parent::save($deep);
     }
 
     public function renderBody()

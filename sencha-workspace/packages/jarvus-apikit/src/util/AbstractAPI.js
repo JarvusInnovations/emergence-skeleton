@@ -5,14 +5,23 @@
  * An abstract class for singletons that facilitates communication with backend services
  */
 Ext.define('Jarvus.util.AbstractAPI', {
-    extend: 'Ext.util.Observable',
-    requires: [
-        'Ext.Ajax'
-    ],
+    extend: 'Ext.data.Connection',
 
     config: {
+        /**
+         * @cfg {String/null}
+         * A hostname to prefix URLs with, or null to leave paths domain-relative
+         */
         hostname: null,
-        useSSL: false
+        
+        /**
+         * @cfg {Boolean}
+         * True to use HTTPS when prefixing hostname. Only used if {@link #cfg-hostname} is set
+         */
+        useSSL: false,
+
+        // @inheritdoc
+        withCredentials: true
     },
 
     //@private
@@ -22,66 +31,26 @@ Ext.define('Jarvus.util.AbstractAPI', {
     },
 
     //@private
-    buildParams: function(params) {
-        return params || null;
-    },
-
-    //@private
     buildHeaders: function(headers) {
         return headers;
     },
 
+    //@private
+    buildParams: function(params) {
+        return params || null;
+    },
+
     /**
-     * This is the core function of this class which allows to consume API data ,by building
-     * an HTTP request using all the params specified in the configuration and the one passed
-     * to the function. When tha request is completed ,will be called the provided **success**
-     * function if everything went fine including all the retrived data,
-     * otherwise will be called the **exception** one.
-     * @param {Object} options Unless otherwise noted ,options may include the following:
-     * <ul>
-     *
-     * <li><b>url</b> : String
-     * <div class="sub-desc">
-     * The portion of the API url that will be append to the class baseUrl provided.
-     * </div></li>
-     *
-     * <li><b>method</b> : String
-     * <div class="sub-desc">
-     * The HTTP method required to consume the requested API.
-     * </div></li>
-     *
-     * <li><b>params</b> : Object
-     * <div class="sub-desc">
-     * The Object which includes all the params that need to be sended
-     * over the HTTP in order to properly consume the requested API.
-     * </div></li>
-     *
-     * <li><b>success</b> : Function
-     * <div class="sub-desc">
-     * The callback function to call if the API call succeed.
-     * </div></li>
-     *
-     * <li><b>exception</b> : Function
-     * <div class="sub-desc">
-     * The callback function to call if the API call fails.
-     * </div></li>
-     *
-     * <li><b>scope</b> : Object
-     * <div class="sub-desc">
-     * The callback functions scope object.
-     * </div></li>
-     *
-     * </ul>
+     * Override {@link Ext.data.Connection#method-request} to implement auto-decoding and retry handler
+     * @inheritdoc
      */
     request: function(options) {
         var me = this;
 
-        return Ext.Ajax.request(Ext.applyIf({
-            url: me.buildUrl(options.url),
-            withCredentials: true,
-            params: me.buildParams(options.params),
-            headers: me.buildHeaders(options.headers),
-            timeout: options.timeout || 30000,
+        return this.callParent([Ext.applyIf({
+            url: options.url ? me.buildUrl(options.url) : null,
+            headers: me.buildHeaders(options.headers || {}),
+            params: me.buildParams(options.params || {}),
             success: function(response) {
 
                 if (options.autoDecode !== false && response.getResponseHeader('Content-Type') == 'application/json') {
@@ -94,8 +63,13 @@ Ext.define('Jarvus.util.AbstractAPI', {
             },
             failure: function(response) {
 
-                if (options.autoDecode !== false && response.getResponseHeader('Content-Type') == 'application/json') {
+                if (options.autoDecode !== false && response.status > 0 && response.getResponseHeader('Content-Type') == 'application/json') {
                     response.data = Ext.decode(response.responseText, true);
+                }
+                
+                if (response.aborted) {
+                    Ext.callback(options.abort, options.scope, [response]);
+                    return;
                 }
 
                 if (options.exception) {
@@ -110,6 +84,6 @@ Ext.define('Jarvus.util.AbstractAPI', {
 
             },
             scope: options.scope
-        }, options));
+        }, options)]);
     }
 });

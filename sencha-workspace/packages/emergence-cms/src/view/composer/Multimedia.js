@@ -1,11 +1,16 @@
-/*jslint browser: true, undef: true *//*global Ext,SWFUpload*/
+/*jslint browser: true, undef: true *//*global Ext,Emergence*/
 Ext.define('Emergence.cms.view.composer.Multimedia', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.multimedia',
     requires: [
-        'Ext.ProgressBar'
-//        'ExtUx.SWFUpload'
+        'Jarvus.ext.uploadbox.UploadBox',
+        'Emergence.cms.model.Media',
+        'Ext.MessageBox'
     ],
+    
+    config: {
+        media: null
+    },
 
     inheritableStatics: {
         contentItemClass: 'Emergence\\CMS\\Item\\Media',
@@ -16,126 +21,115 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
             tooltip: 'Add an audio, video, or photo file from your computer.'
         }
     },
+    
+    previewTpl: [
+        '<tpl for="Data">',
+            '<a class="media-link" title="{Caption:htmlEncode}" href="/media/{MediaID}/open" target="_blank">',
+                '<figure>',
+                    '<img src="/thumbnail/{MediaID}/1000x1000" alt="{Caption:htmlEncode}">',
+                    '<tpl if="caption"><figcaption>{Caption:htmlEncode}</figcaption></tpl>',
+                '</figure>',
+            '</a>',
+        '</tpl>'
+    ],
 
     title: 'Multimedia',
-    height: 200,
     layout: {
         type: 'vbox',
         align: 'stretch'
     },
-    targetUrl: '/media/json/upload',
-    fieldName: 'Media',
-    buttonText: '<span class="btnText">Browse…</span>',
-    fileTypes: '*.jpg; *.jpeg; *.png; *.gif; *.mp3; *.flv, *.mp4, *.pdf; *.JPG; *.JPEG; *.PNG; *.GIF; *.MP3; *.FLV; *.MP4; *.PDF',
-    fileTypesDescription: 'Multimedia Files',
-    fileSizeLimit: '300 MB',
-    buttonWidth: 158,
+    items: [{
+        xtype: 'jarvus-uploadbox',
+        connection: 'Emergence.util.API'
+    },{
+        xtype: 'textfield',
+        emptyText: 'Optional caption'
+    }],
 
+
+    // template method overrides
     initComponent: function() {
         var me = this,
-            contentArea;
-
-        me.contentItem = me.contentItem ? me.contentItem : {Data:{}};
-
-        me.items = me.getItems();
+            contentItem = me.getContentItem(),
+            mediaData = contentItem && contentItem.Media,
+            captionField, uploadBox;
 
         me.callParent(arguments);
-        contentArea = me.down('#mediaView');
-        contentArea.on('render', 'onContentAreaRendered', me);
-    },
+        
+        me.captionField = captionField = me.down('textfield');
+        me.uploadBox = uploadBox = me.down('jarvus-uploadbox');
 
-    getItems: function() {
-        var me = this,
-            progressBar = Ext.create('Ext.ProgressBar', {
-                text: 'Preparing Flash Uploader&hellip;',
-                height: 30,
-                flex: 1
-            });
-//            uploader = Ext.create('ExtUx.SWFUpload', {
-//                progressBar: progressBar,
-//                swfUploadCfg: {
-//                    autoStart: true,
-//                    debugMode: false,
-//                    targetUrl: me.targetUrl,
-//                    fieldName: me.fieldName,
-//                    file_size_limit: me.fileSizeLimit,
-//                    file_types: me.fileTypes,
-//                    file_types_description: me.fileTypesDescription,
-//                    button_text: me.buttonText,
-//    //              button_height: this.buttonHeight,
-//                    button_action: SWFUpload.BUTTON_ACTION.SELECT_FILE
-//                },
-//                listeners: {
-//                    scope: me,
-//                    uploadResponse: me.onUploadResponse,
-//                    uploadError: me.onUploadError
-//                }
-//            });
-
-        return [{
-            xtype: 'component',
-            itemId: 'mediaView',
-            flex: 1,
-            renderTpl: '<center><img style="padding: 20px" src="'+Ext.BLANK_IMAGE_URL+'" class="content-image" height=150 width=150 /></center>',
-            renderSelectors: {contentImage: '.content-image'}
-        },{
-            xtype: 'toolbar',
-            docked: 'bottom',
-            height: 30,
-            layout: {
-                type: 'hbox',
-                align: 'stretch'
-            },
-            items: [{ xtype: 'button', text: 'Browse...' }, progressBar]
-        }];
-    },
-
-    getItemData: function(){
-        var me = this,
-            mediaID = false;
-
-        if (me.contentItem && me.contentItem.Data && me.contentItem.Data.MediaID) {
-            mediaID = me.contentItem.Data.MediaID;
+        if (mediaData) {
+            me.setMedia(Emergence.cms.model.Media.create(mediaData));
         }
+
+        captionField.on('change', 'firePreviewChange', me, { buffer: 50 });
+        uploadBox.on('fileselect', 'onFileSelect', me);
+    },
+
+    getPreviewHtml: function(callback) {
+        callback(this.getTpl('previewTpl').apply(this.getItemData()));
+    },
+
+    getItemData: function() {
+        var me = this,
+            media = me.getMedia();
 
         return Ext.applyIf({
-            Class: 'Emergence\\CMS\\Item\\Media',
-            Data: {
-                MediaID: mediaID
+            Data: media ? {
+                MediaID: media.get('ID'),
+                Caption: me.captionField.getValue()
+            } : null
+        }, me.callParent());
+    },
+
+
+    // config handlers
+    updateMedia: function(media) {
+        this.uploadBox.setImageUrl('/thumbnail/'+media.get('ID')+'/1000x1000');
+        this.captionField.setValue(media.get('Caption'));
+    },
+
+
+    // event handlers
+    onFileSelect: function(uploadBox, file) {
+        var me = this,
+            captionField = me.captionField,
+            supportedTypes = window.SiteEnvironment && window.SiteEnvironment.mediaSupportedTypes;
+        
+        // check MIME type against supported types list if available
+        if (supportedTypes && !Ext.Array.contains(supportedTypes, file.type)) {
+            Ext.Msg.show({
+                title: 'File not supported',
+                message: 'This type of file is not currently supported, please try another file or reach out to your technical support contact if you think this is in error.',
+                buttons: Ext.Msg.OK,
+                icon: Ext.Msg.ERROR
+            });
+
+            return;
+        }
+        
+        // disable caption editing during upload because server will return a suggestion
+        captionField.disable();
+        
+        // upload to server
+        uploadBox.upload(file, {
+            url: '/media',
+            fileParam: 'mediaFile',
+            success: function(response) {
+                if (response.data.success) {
+                    var media = Emergence.cms.model.Media.create(response.data.data);
+
+                    me.setMedia(media);
+
+                    captionField.setValue(media.get('Caption'));
+                    captionField.enable();
+                    
+                    me.firePreviewChange();
+                } else {
+                    Ext.Msg.alert('Failed to upload media', response.data.message || 'The file you uploaded could not be processed, please try a different file. Details have been logged for the system administrator.');
+                }
             }
-        }, this.callParent());
-    },
-
-    onUploadResponse: function(file, responseText, receivedResponse) { //file upload response
-        var me = this,
-            r = Ext.decode(responseText);
-
-        if (r.success) {
-            var mediaData = r.data,
-                mediaView = me.down('#mediaView');
-
-            me.contentItem.Data.MediaID = mediaData.ID;
-            mediaView.contentImage.dom.src = '/thumbnail/'+mediaData.ID+'/150x150';
-            mediaView.show();
-        } else {
-            Ext.Msg.alert('Upload failed', r.message ? r.message : 'Your upload failed, please try again later or contact support');
-        }
-
-        me.uploading = false;
-    },
-    
-    onUploadError: function(file, errorCode, errorMessage) {
-        Ext.Msg.alert('Upload failed', 'Your upload failed, please try again later or contact support');
-        return false;
-    },
-
-    onContentAreaRendered: function() {
-        var me = this,
-            mediaView = me.down('#mediaView');
-
-
-        if (me.contentItem && me.contentItem.Data && me.contentItem.Data.MediaID) {
-            mediaView.contentImage.dom.src = '/thumbnail/' + me.contentItem.Data.MediaID;
-        }
+        });
     }
 });

@@ -615,4 +615,8 @@ class Media extends ActiveRecord
 
     }
 
+    public static function getSupportedTypes()
+    {
+        return array_unique(array_merge(array_keys(static::$mimeHandlers), array_keys(static::$mimeRewrites)));
+    }
 }

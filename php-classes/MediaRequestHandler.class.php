@@ -63,7 +63,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 			{
 				$mediaID = static::shiftPath();
 				
-				return static::handleOpenRequest($mediaID);
+				return static::handleMediaRequest($mediaID);
 			}
 			
 			case 'download':
@@ -107,17 +107,18 @@ class MediaRequestHandler extends RecordsRequestHandler
 			case '':
 			case 'browse':
 			{
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    return static::handleUploadRequest();
+                }
+
 				return static::handleBrowseRequest();
 			}
 
 			default:
 			{
-				if(is_numeric($action))
-				{
-					return static::handleOpenRequest($action);
-				}
-				else
-				{
+                if (ctype_digit($action)) {
+					return static::handleMediaRequest($action);
+				} else {
 					return parent::handleRecordsRequest($action);
 				}
 			}
@@ -136,7 +137,6 @@ class MediaRequestHandler extends RecordsRequestHandler
 		}
 		
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
-		
 			// init options
 			$options = array_merge(array(
 				'fieldName' => static::$uploadFileFieldName
@@ -238,51 +238,51 @@ class MediaRequestHandler extends RecordsRequestHandler
 		}
 
 		return static::respond('uploadComplete', array(
-			'success' => true
+			'success' => (boolean)$Media
 			,'data' => $Media
 			,'TagID' => isset($Tag) ? $Tag->ID : null
 		));
 	}
 	
 	
-	public static function handleOpenRequest($media_id)
+	public static function handleMediaRequest($mediaID)
 	{
-		if(empty($media_id) || !is_numeric($media_id))
-		{
+		if (empty($mediaID) || !is_numeric($mediaID)) {
 			static::throwError('Missing or invalid media_id');
 		}
 		
 		// get media
-		try
-		{
-			$Media = Media::getById($media_id);
-		}
-		catch(UserUnauthorizedException $e)
-		{
+		try {
+			$Media = Media::getById($mediaID);
+		} catch (UserUnauthorizedException $e) {
 			return static::throwUnauthorizedError('You are not authorized to download this media');
 		}
 		
-		
-		if(!$Media)
-		{
+		if (!$Media) {
 			static::throwNotFoundError('Media ID #%u was not found', $media_id);
 		}
 		
-		if(static::$responseMode == 'json')
-		{
+		if (static::$responseMode == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
 			JSON::translateAndRespond(array(
 				'success' => true
 				,'data' => $Media
 			));
-		}
-		else
-		{
-			$expires = 60*60*24*365;
-			header('Cache-Control: public, max-age='.$expires);
-			header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
-			header('Pragma: public');
+		} else {
+            // send caching headers
+            $expires = 60*60*24*365;
+    		header("Cache-Control: public, max-age=$expires");
+    		header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
+    		header('Pragma: public');
+            
+            // thumbnails are immutable for a given URL, so no need to actually check anything if the browser wants to revalidate its cache
+            if(!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+                header('HTTP/1.0 304 Not Modified');
+                exit();
+            }
+
 			header('Content-Type: ' . $Media->MIMEType);
 			header('Content-Length: ' . filesize($Media->FilesystemPath));
+            header('ETag: media-' . $Media->ID);
 			
 			readfile($Media->FilesystemPath);
 			Site::finishRequest();
@@ -547,7 +547,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 
 
 		// dump it out
-        header("ETag: media-$Media->ID");
+        header("ETag: media-$Media->ID-$maxWidth-$maxHeight-$fillColor-$cropped");
 		header("Content-Type: $Media->ThumbnailMIMEType");
 		header('Content-Length: ' . filesize($thumbPath));
 		readfile($thumbPath);

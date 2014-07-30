@@ -9,6 +9,46 @@ class Media extends AbstractItem
 
     public static $fullWidth = 1000;
     public static $fullHeight = 1000;
+    
+    protected $_media = false;
+    
+    public function getValue($name)
+    {
+        switch ($name) {
+            case 'Media':
+                if ($this->_media !== false) {
+                    return $this->_media;
+                }
+                
+                return $this->_media = $this->Data && !empty($this->Data['MediaID']) ? \Media::getByID($this->Data['MediaID']) : null;
+            default:
+                return parent::getValue($name);
+        } 
+    }
+    
+    public function getData()
+    {
+        $details = parent::getData();
+        $details['Media'] = $this->Media;
+        return $details;
+    }
+
+    public function save($deep = true)
+    {
+        if ($this->isFieldDirty('Data') && $this->Media) {
+            $this->Media->ContextClass = $this->Content->getRootClass();
+            $this->Media->ContextID = $this->ContentID;
+            
+            if (array_key_exists('Caption', $this->Data)) {
+                $this->Media->Caption = $this->Data['Caption'];
+                unset($this->Data['Caption']);
+            }
+            
+            $this->Media->save();
+        }
+        
+        parent::save($deep);
+    }
 
     public function renderBody()
     {
@@ -38,7 +78,7 @@ class Media extends AbstractItem
                     .'</a>';
             case 'PhotoMedia':
             default:
-                return '<a href="'.$Media->getThumbnailRequest(static::$fullWidth,static::$fullHeight).'" title="'.htmlspecialchars($Media->Caption).'" class="media-link image-link">'
+                return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link image-link">'
                     .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
                     .'</a>';
         }

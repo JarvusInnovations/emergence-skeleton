@@ -14,6 +14,8 @@ Ext.define('Site.page.ContentEditor', {
 
     onDocReady: function() {
         var contentEditorCt = Ext.getBody().down('#contentEditorCt'),
+            siteEnv = window.SiteEnvironment || {},
+            editorConfig = {},
             dualView;
 
         // initialize QuickTips
@@ -21,13 +23,21 @@ Ext.define('Site.page.ContentEditor', {
 
         // empty content editor container
         contentEditorCt.empty();
+        
+        // pass env data to initial editor config
+        if (siteEnv.cmsComposers) {
+            editorConfig.composers = siteEnv.cmsComposers;
+        }
+        
+        if (siteEnv.cmsContent) {
+            editorConfig.contentRecord = siteEnv.cmsContent;
+        }
 
         // render dual-view content editor
         dualView = Ext.create('Emergence.cms.view.DualView', {
-            renderTo: contentEditorCt
+            renderTo: contentEditorCt,
+            editorConfig: editorConfig
         });
-
-        dualView.lookupReference('editor').setContentRecord(window.ContentData);
 
         // recalculate content editor layout on window resize
         Ext.on('resize', function() {

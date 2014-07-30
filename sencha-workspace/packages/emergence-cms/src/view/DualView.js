@@ -12,17 +12,27 @@ Ext.define('Emergence.cms.view.DualView', {
     controller: 'emergence-cms-dualview',
 
     layout: 'hbox',
-    items: [{
-        reference: 'preview',
-        cls: 'emergence-cms-preview',
-        flex: 1,
 
-        xtype: 'emergence-cms-preview'
-    },{
-        reference: 'editor',
-        cls: 'emergence-cms-editor',
-        flex: 1,
+    initComponent: function() {
+        var me = this;
 
-        xtype: 'emergence-cms-editor'
-    }]
+        me.items = [
+            Ext.apply({
+                reference: 'preview',
+                cls: 'emergence-cms-preview',
+                flex: 1,
+        
+                xtype: 'emergence-cms-preview'
+            }, me.previewConfig),
+            Ext.apply({
+                reference: 'editor',
+                cls: 'emergence-cms-editor',
+                flex: 1,
+        
+                xtype: 'emergence-cms-editor'
+            }, me.editorConfig)
+        ];
+
+        me.callParent();
+    }
 });
