@@ -51,14 +51,14 @@ EOD;
         
         
         // write footer
-        $route = str_replace(' ', '-', $recordClass::$pluralNoun);
+        $route = $recordClass::$collectionRoute ? $recordClass::$collectionRoute : '/' . str_replace(' ', '-', $recordClass::$pluralNoun);
         $out .= <<<EOD
 
     ],
 
     proxy: {
         type: 'records',
-        url: '/$route'
+        url: '$route'
     }
 });
 EOD;
@@ -88,6 +88,8 @@ EOD;
                 $fieldConfig['type'] = 'int';
                 break;
 
+            case 'float':
+            case 'double':
             case 'decimal':
                 $fieldConfig['type'] = 'float';
                 break;
