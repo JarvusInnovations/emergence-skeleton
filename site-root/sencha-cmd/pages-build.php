@@ -87,18 +87,20 @@ foreach (glob('./src/page/*.js') AS $page) {
 
 // analyze packages, export, and add to classPath
 $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
-foreach($packages AS $package) {
-    $packageSource = "sencha-workspace/packages/$package/src";
-    $packageDest = "./packages/$package/src";
-    Benchmark::mark("importing package: $package from $packageSource");
-
-    $cachedFiles = Emergence_FS::cacheTree($packageSource);
-    Benchmark::mark("precached $cachedFiles files in $packageSource");
-
-    $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-    Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-
-    $classPaths[] = "./packages/$package/src";
+foreach ($packages AS $package) {
+    foreach (array('src', 'overrides') AS $subPath) { 
+        $packageSource = "sencha-workspace/packages/$package/$subPath";
+        $packageDest = "./packages/$package/$subPath";
+        Benchmark::mark("importing package: $package from $packageSource");
+    
+        $cachedFiles = Emergence_FS::cacheTree($packageSource);
+        Benchmark::mark("precached $cachedFiles files in $packageSource");
+    
+        $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+        Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+    
+        $classPaths[] = "./packages/$package/$subPath";
+    }
 }
 
 
