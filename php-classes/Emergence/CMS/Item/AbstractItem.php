@@ -58,7 +58,7 @@ abstract class AbstractItem extends \VersionedRecord
         )
         ,'Content' =>   array(
             'type'  =>  'one-one'
-            ,'class' => 'Emergence\CMS\Content'
+            ,'class' => 'Emergence\CMS\AbstractContent'
         )
     );
 
@@ -71,7 +71,7 @@ abstract class AbstractItem extends \VersionedRecord
         return $this->finishValidation();
     }
 
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
         // set author
         if (!$this->AuthorID) {
@@ -79,7 +79,7 @@ abstract class AbstractItem extends \VersionedRecord
         }
 
         // call parent
-        parent::save($deep, $createRevision);
+        parent::save($deep);
     }
 
 
