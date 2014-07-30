@@ -41,15 +41,7 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
         me.callParent();
 
         textarea = me.textarea = me.down('textarea').setValue(editorValue);
-        textarea.on('change', 'onTextareaChange', me);
-    },
-
-    onTextareaChange: function(textarea, value) {
-        var me = this;
-        
-        me.getPreviewHtml(function(html) {
-            me.fireEvent('previewchange', me, html);
-        });
+        textarea.on('change', 'firePreviewChange', me);
     },
 
     getPreviewHtml: function(callback) {
@@ -71,7 +63,6 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
 
     getItemData: function() {
         return Ext.applyIf({
-            Class: 'Emergence\\CMS\\Item\\Markdown',
             Data: this.textarea.getValue()
         }, this.callParent());
     }

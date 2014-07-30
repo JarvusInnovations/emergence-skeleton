@@ -28,12 +28,28 @@ Ext.define('Emergence.cms.view.composer.Abstract', {
         return me.phantomId || (me.phantomId = Ext.id(false, 'emergence-cms-phantom'));
     },
 
-    getPreviewHtml: function() {
-        return '';
+    getPreviewHtml: function(callback) {
+        callback('');
     },
 
     getItemData: function() {
-        return this.getContentItem();
+        var me = this,
+            data = {},
+            contentItemClass = me.self.contentItemClass;
+
+        if (contentItemClass) {
+            data.Class = Ext.isArray(contentItemClass) ? contentItemClass[0] : contentItemClass;
+        }
+
+        return data;
+    },
+    
+    firePreviewChange: function(html) {
+        var me = this;
+
+        me.getPreviewHtml(function(html) {
+            me.fireEvent('previewchange', me, html);
+        });
     }
 
 //     initComponent: function() {

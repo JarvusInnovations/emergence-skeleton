@@ -8,7 +8,7 @@ Ext.define('Emergence.cms.view.composer.Html', {
 
     inheritableStatics: {
         contentCls: 'content-html',
-        contentItemClass: ['Emergence\\CMS\\Item\\Text', 'Emergence\\CMS\\Item\\RichText'],
+        contentItemClass: ['Emergence\\CMS\\Item\\RichText', 'Emergence\\CMS\\Item\\Text'],
         buttonCfg: {
             text: 'Text',
             glyph: 0xf0f6+'@FontAwesome', // fa-file-text-o
@@ -55,7 +55,6 @@ Ext.define('Emergence.cms.view.composer.Html', {
 
     getItemData: function() {
         return Ext.applyIf({
-            Class: 'Emergence\\CMS\\Item\\RichText',
             Data: this.down('htmleditor').getValue()
         }, this.callParent());
     }

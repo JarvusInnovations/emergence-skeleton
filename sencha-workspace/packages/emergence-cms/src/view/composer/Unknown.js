@@ -1,7 +1,7 @@
 /*jslint browser: true, undef: true *//*global Ext*/
 Ext.define('Emergence.cms.view.composer.Unknown', {
     extend: 'Emergence.cms.view.composer.Abstract',
-    xtype: 'emergence-cms-composer-unknown',
+    alias: 'emergence-cms-composer.unknown',
 
     title: 'Unknown item type',
     resizable: false,

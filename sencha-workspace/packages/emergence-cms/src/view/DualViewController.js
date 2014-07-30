@@ -1,4 +1,4 @@
-/*jslint browser: true, undef: true *//*global Ext,Emergence*/
+/*jslint browser: true, undef: true *//*global Ext*/
 Ext.define('Emergence.cms.view.DualViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.emergence-cms-dualview',
@@ -45,10 +45,11 @@ Ext.define('Emergence.cms.view.DualViewController', {
 
     // event handlers
     onContentRecordChange: function(editor, contentRecord) {
-        var previewCmp = this.lookupReference('preview'),
-            author = contentRecord.phantom ? window.SiteUser : contentRecord.get('Author');
+        var view = this.getView(),
+            previewCmp = view.rendered && view.lookupReference('preview'),
+            author = contentRecord.phantom ? (window.SiteEnvironment && window.SiteEnvironment.user) : contentRecord.get('Author');
 
-        if (author) {
+        if (previewCmp && author) {
             previewCmp.authorLink.set({href: '/people/' + (author.Username || author.ID)}).update(author.FirstName + ' ' + author.LastName);
             previewCmp.authorWrapper.show();
             previewCmp.infoWrapper.show();

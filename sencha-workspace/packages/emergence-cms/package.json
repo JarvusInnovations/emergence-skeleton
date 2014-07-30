@@ -10,6 +10,6 @@
     "local": true,
     "requires": [
         "emergence-apikit",
-        "jarvus-ext-glyphs"
+        "jarvus-ext-uploadbox"
     ]
 }

@@ -9,8 +9,11 @@
 
 {block js-bottom}
     <script type="text/javascript">
-        window.SiteUser = {$.User->getData()|json_encode};
-        window.ContentData = {tif $data ? JSON::translateObjects($data->getDetails(array('tags','items','Author','Context')))|json_encode : 'null'};
+        var SiteEnvironment = SiteEnvironment || { };
+        SiteEnvironment.user = {$.User->getData()|json_encode};
+        SiteEnvironment.cmsContent = {tif $data ? JSON::translateObjects($data->getDetails(array('tags','items','Author','Context')))|json_encode : 'null'};
+        SiteEnvironment.cmsComposers = ['html', 'markdown', 'multimedia', 'embed'];
+        SiteEnvironment.mediaSupportedTypes = {Media::getSupportedTypes()|json_encode};
     </script>
 
     {$dwoo.parent}

@@ -30,15 +30,7 @@ Ext.define('Emergence.cms.view.composer.Embed', {
         me.callParent();
 
         textarea = me.textarea = me.down('textarea').setValue(editorValue);
-        textarea.on('change', 'onTextareaChange', me);
-    },
-
-    onTextareaChange: function(textarea, value) {
-        var me = this;
-        
-        me.getPreviewHtml(function(html) {
-            me.fireEvent('previewchange', me, html);
-        });
+        textarea.on('change', 'firePreviewChange', me);
     },
 
     getPreviewHtml: function(callback) {
@@ -47,7 +39,6 @@ Ext.define('Emergence.cms.view.composer.Embed', {
 
     getItemData: function() {
         return Ext.applyIf({
-            Class: 'Emergence\\CMS\\Item\\Embed',
             Data: this.textarea.getValue()
         }, this.callParent());
     }
