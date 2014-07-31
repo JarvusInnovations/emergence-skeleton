@@ -17,23 +17,6 @@ Ext.define('Emergence.cms.view.Toolbar', {
     
     items:[
         {
-            xtype: 'button',
-            text: 'Save',
-            glyph: 0xf0ee+'@FontAwesome', // fa-cloud-upload
-            action: 'save'
-        },
-//        '-',
-//        {
-//            reference: 'openBtn',
-//    
-//            xtype: 'button',
-//            text: 'Open',
-//            href: '#',
-//            disabled: true
-//        },
-        '-',
-        '->',
-        {
             reference: 'statusBtn',
     
             xtype: 'button',
@@ -41,7 +24,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
             menu: {
 //                plain: true,
                 items: [
-                   '<b class="menu-title">Publish status</b>',
+                   '<div class="menu-title">Publish status</div>',
                     {
                         xtype: 'menucheckitem',
                         group: 'status',
@@ -70,7 +53,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
             menu: {
 //                plain: true,
                 items: [
-                    '<b class="menu-title">Visibility</b>',
+                    '<div class="menu-title">Visibility</div>',
                     {
                         xtype: 'menucheckitem',
                         group: 'visibility',
@@ -90,10 +73,8 @@ Ext.define('Emergence.cms.view.Toolbar', {
                 ]
             }
         },
+        '->',
         {
-            // flex: 1,
-            // minWidth: 200,
-            // maxWidth: 250,
             reference: 'publishedTimeBtn',
     
             xtype: 'button',
@@ -103,18 +84,23 @@ Ext.define('Emergence.cms.view.Toolbar', {
                 plain: true,
                 width: 200,
                 items: [
-                    '<b class="menu-title">Publication time</b>',
+                    '<div class="menu-title">Publication time</div>',
                     {
                         xtype: 'menucheckitem',
                         text: 'Publish on save'
                     },
                     '-',
                     {
-                        xtype: 'datefield'
-                    },
-                    {
-                        xtype: 'timefield',
-                        submitFormat: 'H:i'
+                        xtype: 'fieldcontainer',
+                        layout: 'anchor',
+                        defaults: { anchor: '100%' },
+                        padding: '6 6 0',
+                        items: [{
+                            xtype: 'datefield'
+                        },{
+                            xtype: 'timefield',
+                            submitFormat: 'H:i'
+                        }]
                     }
                 ]
             }

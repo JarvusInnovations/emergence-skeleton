@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Embed', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.embed',
+    cls: 'embed-composer',
     requires: [
         'Ext.form.field.TextArea'
     ],

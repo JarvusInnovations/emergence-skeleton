@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Markdown', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.markdown',
+    cls: 'markdown-composer',
     requires: [
         'Ext.form.field.TextArea'
     ],
@@ -9,14 +10,14 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
     inheritableStatics: {
         contentItemClass: 'Emergence\\CMS\\Item\\Markdown',
         buttonCfg: {
-            text: 'Markdown Text',
+            text: 'Text',
             glyph: 0xf0f6+'@FontAwesome', // fa-file-text-o
             cls: 'icon-w-20',
             tooltip: 'A block of text formatted with Markdown'
         }
     },
 
-    title: 'Markdown',
+    title: 'Markdown Text',
     height: 200,
     tools: [{
         type: 'help',

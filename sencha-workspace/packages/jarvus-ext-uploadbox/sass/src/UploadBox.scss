@@ -1,9 +1,32 @@
 .jarvus-uploadbox {
+    border: 2px dashed #ccc;
+    margin-bottom: 8px;
     position: relative;
     text-align: center;
     
     &.file-drag-over {
-        background-color: #9F9;
+        background-color: #9f9;
+        
+        &::before {
+            content: 'Drop Here';
+            display: table-cell;
+            font-size: large;
+            font-weight: bold;
+            left: 50%;
+            padding: .5em 1em;
+            position: absolute;
+            top: 50%;
+            @include translate(-50%, -50%);
+            vertical-align: middle;
+        }
+        
+        .placeholder {
+            visibility: hidden;
+        }
+        
+        img {
+            opacity: .2;
+        }
     }
 
     input {
@@ -16,7 +39,10 @@
     }
     
     img {
+        display: block;
+        margin: auto;
         max-width: 100%;
+        pointer-events: none;
     }
     
     .progress {

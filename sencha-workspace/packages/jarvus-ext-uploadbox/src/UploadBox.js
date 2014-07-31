@@ -155,7 +155,8 @@ Ext.define('Jarvus.ext.uploadbox.UploadBox', {
     // event handlers
     onRender: function() {
         var me = this,
-            imageUrl = me.getImageUrl();
+            imageUrl = me.getImageUrl(),
+            placeholderCt;
 
         me.callParent();
 
@@ -167,9 +168,11 @@ Ext.define('Jarvus.ext.uploadbox.UploadBox', {
             drop: 'onDrop'
         });
         
+        placeholderCt = me.placeholderCt.setVisibilityMode(Ext.Element.DISPLAY);
+        
         if (imageUrl) {
             me.imgEl.set({src: imageUrl}).show();
-            me.placeholderCt.hide();
+            placeholderCt.hide();
         }
     },
     

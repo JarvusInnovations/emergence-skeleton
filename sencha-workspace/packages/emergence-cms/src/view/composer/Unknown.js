@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Unknown', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.unknown',
+    cls: 'unknown-composer',
 
     title: 'Unknown item type',
     resizable: false,
