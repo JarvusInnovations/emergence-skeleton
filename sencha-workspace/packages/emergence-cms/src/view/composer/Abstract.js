@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Abstract', {
     extend: 'Ext.dashboard.Panel',
     xtype: 'emergence-cms-composer',
+    componentCls: 'emergence-cms-composer',
 
     config: {
         /**

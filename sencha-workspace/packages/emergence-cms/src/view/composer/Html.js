@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Html', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.html',
+    cls: 'html-composer',
     requires: [
         'Ext.form.field.HtmlEditor'
     ],

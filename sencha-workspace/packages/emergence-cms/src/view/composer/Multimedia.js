@@ -2,6 +2,7 @@
 Ext.define('Emergence.cms.view.composer.Multimedia', {
     extend: 'Emergence.cms.view.composer.Abstract',
     alias: 'emergence-cms-composer.multimedia',
+    cls: 'multimedia-composer',
     requires: [
         'Jarvus.ext.uploadbox.UploadBox',
         'Emergence.cms.model.Media',
@@ -34,6 +35,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
     ],
 
     title: 'Multimedia',
+    bodyPadding: '8 8 0',
     layout: {
         type: 'vbox',
         align: 'stretch'
@@ -100,8 +102,8 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
         // check MIME type against supported types list if available
         if (supportedTypes && !Ext.Array.contains(supportedTypes, file.type)) {
             Ext.Msg.show({
-                title: 'File not supported',
-                message: 'This type of file is not currently supported, please try another file or reach out to your technical support contact if you think this is in error.',
+                title: 'File type not supported',
+                message: 'This type of file is not currently supported. Please try another file or reach out to your technical support contact if you think this is messgae is in error.',
                 buttons: Ext.Msg.OK,
                 icon: Ext.Msg.ERROR
             });
@@ -127,7 +129,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
                     
                     me.firePreviewChange();
                 } else {
-                    Ext.Msg.alert('Failed to upload media', response.data.message || 'The file you uploaded could not be processed, please try a different file. Details have been logged for the system administrator.');
+                    Ext.Msg.alert('Failed to upload media', response.data.message || 'The file you uploaded could not be processed. Please try a different file. Details have been logged for the system administrator.');
                 }
             }
         });

@@ -41,11 +41,25 @@ Ext.define('Emergence.cms.view.Editor', {
         padding: 0
     },
 
+    header: {
+        xtype: 'toolbar',
+        padding: '4 7',
+        items: [
+            '->',
+            {
+                cls: 'save-btn',
+                text: 'Save',
+                glyph: 0xf0ee+'@FontAwesome', // fa-cloud-upload
+                action: 'save'
+            }
+        ]
+    },
+
     dockedItems: [{
         dock: 'top',
 
         xtype: 'toolbar',
-        border: false,
+        border: '1 0 0',
         padding: '8 0 4 8',
         items: [
             {
