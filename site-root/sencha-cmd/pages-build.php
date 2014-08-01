@@ -76,7 +76,7 @@ foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
 
     $pageLoadCommands[] = "union -recursive -class Site.page.$pageName and save $pageName";
-    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
+    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat ./build/$pageName.js";
 
     // detect required packages
     if (preg_match_all('|//\s*@require-package\s*(\S+)|i', file_get_contents($page), $matches)) {
@@ -162,10 +162,11 @@ $cmd = Sencha::buildCmd(
                 'and intersect -min=2 -set ' . join(',', $pageNames)
                 .' and include -set common'
                 .' and exclude -namespace Site.page'
+                .' and save common'
             : 'and restore common'
 
         // output the common set to common.js
-        ,"and concat -yui ./build/common.js"
+        ,"and concat ./build/common.js"
 
         // if there's at least one page...
         ,count($pageBuildCommands)
