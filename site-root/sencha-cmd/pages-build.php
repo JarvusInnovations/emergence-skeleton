@@ -156,11 +156,13 @@ $cmd = Sencha::buildCmd(
             : ''
 
         // if there is more than one page being built for, add any dependencies that two or more share to the common set
+        // if not, just switch back to the common set
         ,count($pageNames) > 1
             ?
                 'and intersect -min=2 -set ' . join(',', $pageNames)
+                .' and include -set common'
                 .' and exclude -namespace Site.page'
-            : ''
+            : 'and restore common'
 
         // output the common set to common.js
         ,"and concat -yui ./build/common.js"
