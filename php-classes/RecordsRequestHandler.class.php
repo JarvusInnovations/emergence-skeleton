@@ -15,7 +15,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $editableFields = false;
     static public $searchConditions = false;
     
-	static public $calledClass = __CLASS__;
+    static public $calledClass = __CLASS__;
 	static public $responseMode = 'html';
     public static $userResponseModes = array(
         'application/json' => 'json'
@@ -233,8 +233,8 @@ abstract class RecordsRequestHandler extends RequestHandler
 			$conditions = array_merge(static::$browseConditions, $conditions);
 		}
 		
-		$limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault;
-		$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : false;
+		$limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
+		$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? (integer)$_REQUEST['offset'] : false;
 		
 		if(!empty($_REQUEST['sort'])) {
 			$dir = (empty($_REQUEST['dir']) || $_REQUEST['dir'] == 'ASC') ? 'ASC' : 'DESC';
@@ -259,6 +259,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			'limit' =>  $limit
 			,'offset' => $offset
 			,'order' => $order
+            ,'calcFoundRows' => true
 		), $options);
 		
 		// handle query search
