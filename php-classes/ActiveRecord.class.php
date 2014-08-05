@@ -31,7 +31,7 @@ class ActiveRecord
      * URL that can be prefixed to this record's identifier by $this->getURL
      * to generate a domain-relative address to this record
      * @var string
-	 */
+     */
     static public $collectionRoute;
 	
 	/**
@@ -1091,7 +1091,7 @@ class ActiveRecord
 			,'order' => false
 			,'limit' => false
 			,'offset' => 0
-			,'calcFoundRows' => !empty($options['limit'])
+			,'calcFoundRows' => false
 			,'joinRelated' => false
 			,'extraColumns' => false
 			,'having' => false
