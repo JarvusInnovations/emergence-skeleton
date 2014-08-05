@@ -14,9 +14,10 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $browseLimitDefault = false;
     static public $editableFields = false;
     static public $searchConditions = false;
+    public static $browseCalcFoundRows = true;
     
     static public $calledClass = __CLASS__;
-	static public $responseMode = 'html';
+    static public $responseMode = 'html';
     public static $userResponseModes = array(
         'application/json' => 'json'
         ,'text/csv' => 'csv'
@@ -195,9 +196,10 @@ abstract class RecordsRequestHandler extends RequestHandler
 			,array_merge($responseData, array(
 				'success' => true
 				,'data' => $className::getAllByQuery(
-					'SELECT SQL_CALC_FOUND_ROWS %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+					'SELECT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
 					,array(
-						join(',',$select)
+                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
+						,join(',',$select)
 						,$className::$tableName
 						,$tableAlias
 						,!empty($joins) ? implode(' ', $joins) : ''
@@ -259,7 +261,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			'limit' =>  $limit
 			,'offset' => $offset
 			,'order' => $order
-            ,'calcFoundRows' => true
+            ,'calcFoundRows' => static::$browseCalcFoundRows
 		), $options);
 		
 		// handle query search
