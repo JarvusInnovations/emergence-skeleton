@@ -144,6 +144,38 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $autoLoadPaths[] = $webPath;
         }
     }
+    
+    
+    // build loader overrides
+    $loaderOverrides = array();
+    
+    if ($patchLoader) {
+        
+#        if (Sencha::isVersionNewer('5', $frameworkVersion)) {
+        if ($framework == 'ext') {
+            $loaderOverrides['loadScript'] = 
+                'function(options) {'
+                    .'if (typeof options == "string") {'
+                        .'options = _versionScriptUrl(options);'
+                    .'} else {'
+                        .'options.url = _versionScriptUrl(options.url);'
+                    .'}'
+                    .'this.callParent([options]);'
+                .'}';
+        }
+
+        $loaderOverrides['loadScriptFile'] = 
+            'function(url, onLoad, onError, scope, synchronous) {'
+                .'this.callParent([_versionScriptUrl(url), onLoad, onError, scope, synchronous]);'
+            .'}';
+
+        // render to JS object
+        array_walk($loaderOverrides, function(&$value, $key) {
+            $value = "$key: $value";
+        });
+        
+        $loaderOverrides = '{' . implode(',', $loaderOverrides) . '}';
+    }
 
     // output loader patch and manifest
     return
@@ -167,26 +199,19 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         
                         .'return url;'
                     .'}'
-        
-                    .'Ext.Loader.loadScript = function(options) {'
-                        .'if (typeof options == "string") {'
-                            .'options = _versionScriptUrl(options);'
-                        .'} else {'
-                            .'options.url = _versionScriptUrl(options.url);'
-                        .'}'
-                        .'origLoadScript.call(Ext.Loader, options);'
-                    .'};'
-        
-                    .'Ext.Loader.loadScriptFile = function(url, onLoad, onError, scope, synchronous) {'
-                        .'origLoadScriptFile.call(Ext.Loader, _versionScriptUrl(url), onLoad, onError, scope, synchronous);'
-                    .'};'
-        
+
+                    .(
+                        count($loaderOverrides) ?
+                            'Ext.override(Ext.Loader, '.$loaderOverrides.');'
+                        :
+                            ''
+                    )
                     .'Ext.Loader.setConfig("disableCaching", false);'
                 :
                     ''
             )
 
             .'Ext.Loader.addClassPathMappings('.json_encode($manifest).');'
-            .( count($autoLoadPaths) ? 'Ext.Array.each('.json_encode($autoLoadPaths).', origLoadScript);' : '' )
+            .( count($autoLoadPaths) ? 'Ext.Array.each('.json_encode($autoLoadPaths).', function(url) {Ext.Loader.loadScriptFile(url, Ext.emptyFn)});' : '' )
         .'})()</script>';
 }
