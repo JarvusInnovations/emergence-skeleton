@@ -147,71 +147,79 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     
     
     // build loader overrides
-    $loaderOverrides = array();
+    $loaderPatch = '';
     
     if ($patchLoader) {
+        $loaderPatch .= 'Ext.Loader.setConfig("disableCaching", false);';
+
+        $loaderPatch .=
+            'function _versionScriptUrl(url) {'
+                .'if (url[0] != "/") {'
+                    .'url = window.location.pathname + url;'
+                    .'while (url.match(/\/\.\.\//)) url = url.replace(/\/[^\/]+\/\.\./g, "");'
+                .'}'
+    
+                .'if(!url.match(/\?_sha1=/)) {'
+                    .'console.warn("Fingerprinted URL not found for %o, it will be loaded with a cache-buster", url);'
+                    .'url += "?" + dcParam + "=" + now;'
+                .'}'
+    
+                .'return url;'
+            .'}';
+
+        $loaderPatch .= 
+            'function _overrideMethod(cls, method, override) {'
+                .'var parent = cls[method] || Ext.emptyFn;'
+                .'cls[method] = function() {'
+                    .'var me = this;'
+                    .'callArgs = Array.prototype.slice.call(arguments, 0);'
+                    .'callArgs.unshift(function() {'
+                        .'parent.apply(me, arguments);'
+                    .'});'
+                    .'return override.apply(this, callArgs);'
+                .'};'
+            .'}';
         
 #        if (Sencha::isVersionNewer('5', $frameworkVersion)) {
         if ($framework == 'ext') {
-            $loaderOverrides['loadScript'] = 
-                'function(options) {'
+            $loaderPatch .=
+                '_overrideMethod(Ext.Loader, "loadScript", function(parent, options) {'
                     .'if (typeof options == "string") {'
                         .'options = _versionScriptUrl(options);'
                     .'} else {'
                         .'options.url = _versionScriptUrl(options.url);'
                     .'}'
-                    .'this.callParent([options]);'
-                .'}';
+                    .'return parent(options);'
+                .'});';
+        } else {
+            $loaderPatch .=
+                '_overrideMethod(Ext.Loader, "loadScriptFile", function(parent, url, onLoad, onError, scope, synchronous) {'
+                    .'return parent(_versionScriptUrl(url), onLoad, onError, scope, synchronous);'
+                .'});';
         }
-
-        $loaderOverrides['loadScriptFile'] = 
-            'function(url, onLoad, onError, scope, synchronous) {'
-                .'this.callParent([_versionScriptUrl(url), onLoad, onError, scope, synchronous]);'
-            .'}';
-
-        // render to JS object
-        array_walk($loaderOverrides, function(&$value, $key) {
-            $value = "$key: $value";
-        });
-        
-        $loaderOverrides = '{' . implode(',', $loaderOverrides) . '}';
     }
 
     // output loader patch and manifest
     return
         '<script type="text/javascript">(function(){'
-            .'var origLoadScript = Ext.Loader.loadScript'
-                .',origLoadScriptFile = Ext.Loader.loadScriptFile'
-                .',dcParam = Ext.Loader.getConfig("disableCachingParam")'
+            .'var dcParam = Ext.Loader.getConfig("disableCachingParam")'
                 .',now = Ext.Date.now();'
-            .(
-                $patchLoader ?
-                    'function _versionScriptUrl(url) {'
-                        .'if (url[0] != "/") {'
-                            .'url = window.location.pathname + url;'
-                            .'while (url.match(/\/\.\.\//)) url = url.replace(/\/[^\/]+\/\.\./g, "");'
-                        .'}'
-        
-                        .'if(!url.match(/\?_sha1=/)) {'
-                            .'console.warn("Fingerprinted URL not found for %o, it will be loaded with a cache-buster", url);'
-                            .'url += "?" + dcParam + "=" + now;'
-                        .'}'
-        
-                        .'return url;'
-                    .'}'
+                
+            .$loaderPatch
 
-                    .(
-                        count($loaderOverrides) ?
-                            'Ext.override(Ext.Loader, '.$loaderOverrides.');'
-                        :
-                            ''
-                    )
-                    .'Ext.Loader.setConfig("disableCaching", false);'
+            .'Ext.Loader.addClassPathMappings('.json_encode($manifest).');'
+            .(
+                count($autoLoadPaths) ?
+                    'Ext.Array.each('.json_encode($autoLoadPaths).', function(url) {'
+                        .(
+                            $framework == 'ext' ?
+                                'Ext.Loader.loadScript(url);'
+                            :
+                                'Ext.Loader.loadScriptFile(url, Ext.emptyFn);'
+                        )
+                    .'});'
                 :
                     ''
             )
-
-            .'Ext.Loader.addClassPathMappings('.json_encode($manifest).');'
-            .( count($autoLoadPaths) ? 'Ext.Array.each('.json_encode($autoLoadPaths).', function(url) {Ext.Loader.loadScriptFile(url, Ext.emptyFn)});' : '' )
         .'})()</script>';
 }
