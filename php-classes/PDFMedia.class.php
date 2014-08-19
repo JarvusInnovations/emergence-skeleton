@@ -63,7 +63,11 @@ class PDFMedia extends Media
 	static public function analyzeFile($filename, $mediaInfo = array())
 	{
 		$cmd = sprintf(static::$extractPageCommand, $filename, static::$extractPageIndex);
-		$pageIm = imagecreatefromstring(shell_exec($cmd));
+		$pageIm = @imagecreatefromstring(shell_exec($cmd));
+        
+        if (!$pageIm) {
+            throw new MediaTypeException('Unable to convert PDF, ensure that imagemagick is installed on the server');
+        }
 
 		$mediaInfo['width'] = imagesx($pageIm);
 		$mediaInfo['height'] = imagesy($pageIm);

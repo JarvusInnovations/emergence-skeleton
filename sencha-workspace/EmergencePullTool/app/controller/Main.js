@@ -7,7 +7,7 @@ Ext.define('EmergencePullTool.controller.Main', {
     stores: ['ChangesTree'],
     
     refs: [{
-    	ref: 'treePanel',
+        ref: 'treePanel',
     	selector: 'app-main'
     },{
     	ref: 'diffPanel',
@@ -59,6 +59,9 @@ Ext.define('EmergencePullTool.controller.Main', {
     		url: '/emergence',
     		method: 'GET',
     		timeout: 600000,
+    		params: {
+    			'exclude[]': ['sencha-workspace/(ext|touch)-.*', 'js-library/ext3']
+    		},
     		callback: function(localOptions, localSuccess, localResponse) {
     			if (localResponse.status != 300) {
     				alert('Failed to load local tree');
@@ -87,7 +90,8 @@ Ext.define('EmergencePullTool.controller.Main', {
 		    		method: 'GET',
     				timeout: 600000,
 		    		params: {
-		    			remote: 'parent'
+		    			remote: 'parent',
+        		        'exclude[]': ['sencha-workspace/(ext|touch)-.*', 'js-library/ext3']
 		    		},
 		    		callback: function(remoteOptions, remoteSuccess, remoteResponse) {
 		    			if (remoteResponse.status != 300) {

@@ -6,7 +6,8 @@
 Ext.define('ContentEditor.Application', {
     extend: 'Ext.app.Application',
     requires: [
-        'Emergence.cms.view.Editor'
+        'Emergence.cms.view.DualView',
+        'Ext.plugin.Viewport'
     ],
 
     name: 'ContentEditor',
@@ -18,7 +19,7 @@ Ext.define('ContentEditor.Application', {
     launch: function () {
         var me = this,
             dualView = Ext.create('Emergence.cms.view.DualView', {
-                renderTo: Ext.getBody()
+                plugins: 'viewport'
             });
 
         // TODO - Launch the application

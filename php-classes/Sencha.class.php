@@ -16,7 +16,8 @@ class Sencha
 		,'touch' => array(
 			'defaultVersion' => '2.3.1'
 			,'mappedVersions' => array(
-				'2.2.1' => '2.2.1.2'
+    			'2.2.1' => '2.2.1.2'
+    			,'2.3.1.410' => '2.3.1'
 			)
 		)
 	);

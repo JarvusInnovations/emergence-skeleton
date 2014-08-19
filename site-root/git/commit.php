@@ -1,7 +1,7 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-	
+    
 	
 // get repo
 if(empty($_REQUEST['repo'])) {
@@ -84,8 +84,21 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
 		$treeOptions['path'] = $srcPath;
 	}
 	
-	$exportResult = Emergence_FS::exportTree($srcPath, $treeOptions['path'], $treeOptions);
-	Benchmark::mark("exported $srcPath to $treeOptions[path]: ".http_build_query($exportResult));
+    $srcFileNode = Site::resolvePath($srcPath);
+
+    if (is_a($srcFileNode, 'SiteFile')) {
+        $destDir = dirname($treeOptions['path']);
+        
+        if ($destDir && !is_dir($destDir)) {
+            mkdir($destDir, 0777, true);
+        }
+
+        copy($srcFileNode->RealPath, $treeOptions['path']);
+        Benchmark::mark("exported file $srcPath to $treeOptions[path]");
+    } else {
+    	$exportResult = Emergence_FS::exportTree($srcPath, $treeOptions['path'], $treeOptions);
+    	Benchmark::mark("exported directory $srcPath to $treeOptions[path]: ".http_build_query($exportResult));
+    }
 }
 
 

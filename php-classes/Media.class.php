@@ -475,7 +475,7 @@ class Media extends ActiveRecord
                 'exceptionClass' => get_class($e)
                 ,'exceptionMessage' => $e->getMessage()
                 ,'exceptionCode' => $e->getCode()
-                ,'recordData' => $Media->getData()
+                ,'recordData' => $Media ? $Media->getData() : null
                 ,'mediaInfo' => $mediaInfo
             ));
             // fall through to cleanup below

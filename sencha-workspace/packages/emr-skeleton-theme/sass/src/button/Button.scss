@@ -7,6 +7,10 @@
     }    
 }
 
+.x-btn-inner {
+    font-family: inherit;
+}
+
 @for $i from 15 through 30 {
     $w: $i * 1px;
 

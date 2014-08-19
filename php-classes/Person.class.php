@@ -65,7 +65,7 @@ class Person extends VersionedRecord
 	static public $relationships = array(
 		'GroupMemberships' => array(
 			'type' => 'one-many'
-			,'class' => 'GroupMember'
+			,'class' => 'Emergence\People\Groups\GroupMember'
 			,'indexField' => 'GroupID'
 			,'foreign' => 'PersonID'
 		)
@@ -77,8 +77,8 @@ class Person extends VersionedRecord
 		)
 		,'Groups' => array(
 			'type' => 'many-many'
-			,'class' => 'Group'
-			,'linkClass' => 'GroupMember'
+			,'class' => 'Emergence\People\Groups\Group'
+			,'linkClass' => 'Emergence\People\Groups\GroupMember'
 			,'linkLocal' => 'PersonID'
 			,'linkForeign' => 'GroupID'
 		)
@@ -143,8 +143,8 @@ class Person extends VersionedRecord
 			'qualifiers' => array('group')
 			,'points' => 1
 			,'join' => array(
-				'className' => 'GroupMember'
-				,'aliasName' => 'GroupMember'
+				'className' => 'Emergence\People\Groups\GroupMember'
+				,'aliasName' => 'Emergence\People\Groups\GroupMember'
 				,'localField' => 'ID'
 				,'foreignField' => 'PersonID'
 			)

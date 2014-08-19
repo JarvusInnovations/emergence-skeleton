@@ -19,7 +19,7 @@
     {$dwoo.parent}
 
     {if $.get.jsdebug}
-        {sencha_bootstrap patchLoader=false packages=array('emergence-cms', 'ext-theme-crisp-touch')}
+        {sencha_bootstrap patchLoader=false packages=array('emergence-cms', 'emr-skeleton-theme')}
     {else}
         <script src="{Site::getVersionedRootUrl('js/pages/ContentEditor.js')}"></script>
     {/if}

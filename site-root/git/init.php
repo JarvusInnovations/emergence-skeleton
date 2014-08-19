@@ -74,6 +74,10 @@ $repo = PHPGit_Repository::create($repoPath, !empty($_REQUEST['debug']));
 Benchmark::mark("initialized git repo in $repoPath");
 
 
+// add gitignore
+file_put_contents("$repoPath/.gitignore", ".emergence\n");
+
+
 // add remote
 $repo->git("remote add origin $repoCfg[remote]");
 Benchmark::mark("added origin $repoCfg[remote]");
