@@ -5,7 +5,7 @@ namespace Emergence\CMS;
 class ContentBlock extends \VersionedRecord
 {
     // VersionedRecord configuration
-    public static $historyTable = 'history_content_block';
+    public static $historyTable = 'history_content_blocks';
 
     // ActiveRecord configuration
     public static $tableName = 'content_blocks';
