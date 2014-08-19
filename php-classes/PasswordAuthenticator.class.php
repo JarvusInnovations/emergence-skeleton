@@ -3,7 +3,7 @@
 
 class PasswordAuthenticator extends Authenticator
 {
-	// configurable settings
+    // configurable settings
 	public static $requestContainer = '_LOGIN';
 	
 	
@@ -156,7 +156,7 @@ class PasswordAuthenticator extends Authenticator
 	 */
 	public function respondLoginPrompt($authException = false)
 	{
-		if(Site::$pathStack[0] == 'json') {
+		if(Site::$pathStack[0] == 'json' || $_REQUEST['format'] == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
 			RequestHandler::$responseMode = 'json';
 		}
 		

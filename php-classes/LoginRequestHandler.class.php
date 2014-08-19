@@ -3,7 +3,7 @@
 class LoginRequestHandler extends RequestHandler
 {
 
-	static public $defaultRedirect = '/';
+    static public $defaultRedirect = '/';
 	static public $forceRedirect = false;
 	
 	static public $onLoginComplete = false;
@@ -16,9 +16,10 @@ class LoginRequestHandler extends RequestHandler
 
 	static public function handleRequest($returnURL = null)
 	{
-		if(static::peekPath() == 'json')
-		{
+		if (static::peekPath() == 'json') {
 			static::$responseMode = static::shiftPath();
+		} elseif ($_REQUEST['format'] == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
+    		static::$responseMode = 'json';
 		}
 		
 		if(static::peekPath() == 'logout')
