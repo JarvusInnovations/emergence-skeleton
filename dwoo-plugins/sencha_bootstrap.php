@@ -1,15 +1,10 @@
 <?php
 
-function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths = array(), $packages = array(), $patchLoader = true, $framework = 'ext', $frameworkVersion = null)
+function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths = array(), $packages = array(), $patchLoader = true, $framework = 'ext', $frameworkVersion = null, $packageRequirers = null)
 {
     // retrieve app if available
     if (!$App) {
         $App = $dwoo->data['App'];
-    }
-
-    // resolve nested dependencies for manually supplied packages
-    if (!empty($packages)) {
-        $packages = Sencha::crawlRequiredPackages($packages);
     }
 
     // if app provided, load classpaths and packages
@@ -27,7 +22,20 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         }
 
         // include classpath files
-        $classPaths = array_merge($classPaths, explode(',', $App->getBuildCfg('app.classpath')), Sencha::aggregateClassPathsForPackages($packages));
+        $classPaths = array_merge($classPaths, explode(',', $App->getBuildCfg('app.classpath')));
+    }
+    
+    // pull package requirements from source files
+    if (!empty($packageRequirers)) {
+        if (is_string($packageRequirers)) {
+            $packageRequirers = array($packageRequirers);
+        }
+        
+        foreach ($packageRequirers AS $packageRequirer) {
+            if ($sourceNode = Site::resolvePath($packageRequirer)) {
+                $packages = array_merge($packages, Sencha::getRequiredPackagesForSourceFile($sourceNode->RealPath));
+            }
+        }
     }
 
     // apply default framework version and normalize
@@ -48,10 +56,14 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     }
 
     // add paths for packages
-    foreach (array_unique($packages) AS $packageName) {
+    $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
+    foreach ($packages AS $packageName) {
         $packagePath = "sencha-workspace/packages/$packageName";
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
+    
+    // include classpaths from packages
+    $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
 
     // build list of all source trees, resolving CMD variables and children
     $sources = array();
