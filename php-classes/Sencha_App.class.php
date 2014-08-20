@@ -6,7 +6,7 @@ class Sencha_App
     protected $_buildCfg;
     
     function __construct($name)
-	{
+    {
 		$this->_name = $name;
 	}
 	
@@ -195,6 +195,12 @@ class Sencha_App
 
     public function getRequiredPackages()
     {
-        return array_unique(Sencha::crawlRequiredPackages($this->getAppCfg('requires')));
+        $packages = $this->getAppCfg('requires');
+        
+        if ($themeName = $this->getBuildCfg('app.theme')) {
+            $packages[] = $themeName;
+        }
+
+        return array_unique(Sencha::crawlRequiredPackages($packages));
     }
 }

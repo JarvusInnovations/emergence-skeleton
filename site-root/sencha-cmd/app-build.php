@@ -14,7 +14,7 @@ if(empty($_GET['dumpWorkspace'])) {
 
 // get app name
 if(empty($_REQUEST['name'])) {
-	die('Parameter name required');
+    die('Parameter name required');
 }
 
 $appName = $_REQUEST['name'];
@@ -75,10 +75,6 @@ Benchmark::mark("exported $workspaceConfigPath to $workspaceConfigTmpPath: ".htt
 // ... packages
 if (!($requiredPackages = $App->getRequiredPackages()) || !is_array($requiredPackages)) {
     $requiredPackages = array();
-}
-
-if (($themeName = $App->getBuildCfg('app.theme')) && !in_array($themeName, $requiredPackages)) {
-    $requiredPackages[] = $themeName;
 }
 
 Benchmark::mark("aggregating classpaths from packages");
@@ -153,7 +149,18 @@ Benchmark::mark("chdir to: $appTmpPath");
 
 
 // prepare cmd
-$cmd = Sencha::buildCmd($cmdVersion, 'ant', "-Dbuild.dir=$buildTmpPath", $buildType, 'build');
+$cmd = Sencha::buildCmd(
+    $cmdVersion // first arg is CMD version, rest get passed to sencha command
+    ,'ant'
+        // preset build directory parameters
+        ,"-Dbuild.dir=$buildTmpPath"
+        ,"-Dapp.output.base=$buildTmpPath" // CMD 5.0.1 needs this set directly too or it gets loaded from app.defaults.json
+        
+        // ant targets
+        ,$buildType // buildType target (e.g. "production", "testing") sets up build parameters
+        ,'build'
+);
+
 Benchmark::mark("running CMD: $cmd");
 
 // optionally dump workspace and exit

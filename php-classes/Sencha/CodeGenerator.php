@@ -12,12 +12,14 @@ class CodeGenerator
 Ext.define('MyApp.model.$recordClass', {
     extend: 'Ext.data.Model',
     requires: [
-        'Emergence.ext.proxy.Records'
+        'Emergence.ext.proxy.Records',
+        'Ext.data.identifier.Negative'
     ],
 
 
     // model config
     idProperty: 'ID',
+    identifier: 'negative',
 
     fields: [
 EOD;
@@ -79,7 +81,7 @@ EOD;
 
         switch ($fieldOptions['type']) {
             case 'int':
-    		case 'uint':
+        	case 'uint':
 			case 'integer':
 			case 'tinyint':
 			case 'smallint':
