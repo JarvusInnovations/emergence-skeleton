@@ -15,10 +15,10 @@
 
 {block "content"}
 
-	{$User = $.Session->Person}
+	{$User = $data}
 
 
-	<h1>Manage Your Profile</h1>
+	<h1>Manage {tif $User->ID == $.User->ID ? 'Your' : $User->FullNamePossessive} Profile</h1>
 	<hr class="clear" />
 
 	{if $.get.status == 'photoUploaded'}
