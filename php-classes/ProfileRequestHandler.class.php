@@ -44,10 +44,23 @@ class ProfileRequestHandler extends RequestHandler
     public static function handleEditRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        $User = $GLOBALS['Session']->Person;
+        
+        if (!empty($_GET['person']) && $GLOBALS['Session']->hasAccountLevel('Administrator')) {
+            $User = Person::getByID($_GET['person']);
+
+            if (!$User) {
+                return static::throwNotFoundError('Person not found');
+            }
+        } else {
+            $User = $GLOBALS['Session']->Person;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
+            if (!$GLOBALS['Session']->hasAccountLevel('Administrator')) {
+                $profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
+            } else {
+                $profileChanges = $_REQUEST;
+            }
 
             $User->setFields($profileChanges);
 

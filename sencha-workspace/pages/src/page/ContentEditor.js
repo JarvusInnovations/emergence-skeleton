@@ -1,5 +1,6 @@
 /*jslint browser: true, undef: true *//*global Ext*/
 // @require-package emergence-cms
+// @require-package emergence-cms-summaries
 Ext.define('Site.page.ContentEditor', {
     singleton: true,
     requires: [

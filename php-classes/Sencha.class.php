@@ -4,13 +4,14 @@ class Sencha
 {
     static public $frameworks = array(
         'ext' => array(
-    		'defaultVersion' => '4.2.2.1144'
+        	'defaultVersion' => '4.2.2.1144'
 			,'mappedVersions' => array(
 				'4.2.1' => '4.2.1.883'
 				,'4.2.2' => '4.2.2.1144'
                 ,'4.2' => '4.2.2.1144'
                 ,'5.0.0' => '5.0.0.970'
-                ,'5.0' => '5.0.0.970'
+                ,'5.0.1' => '5.0.1.1255'
+                ,'5.0' => '5.0.1.1255'
 			)
 		)
 		,'touch' => array(
@@ -145,7 +146,9 @@ class Sencha
 
     public static function crawlRequiredPackages($packages)
     {
-        if (!is_array($packages)) {
+        if (is_string($packages) && $packages) {
+            $packages = array($packages);
+        } elseif (!is_array($packages)) {
             return array();
         }
 
@@ -157,8 +160,14 @@ class Sencha
             
             $packageConfig = json_decode(file_get_contents($packageConfigNode->RealPath), true);
             
-            if (is_array($packageConfig) && !empty($packageConfig['requires'])) {
-                $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['requires']));
+            if (is_array($packageConfig)) {
+                if (!empty($packageConfig['requires'])) {
+                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['requires']));
+                }
+                
+                if (!empty($packageConfig['extend'])) {
+                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['extend']));
+                }
             }
         }
 
@@ -186,5 +195,19 @@ class Sencha
         }
 
         return array_unique($classPaths);
+    }
+    
+    public static function getRequiredPackagesForSourceFile($sourcePath)
+    {
+        return static::getRequiredPackagesForSourceCode(file_get_contents($sourcePath));
+    }
+    
+    public static function getRequiredPackagesForSourceCode($code)
+    {
+        if (preg_match_all('|//\s*@require-package\s*(\S+)|i', $code, $matches)) {
+            return $matches[1];
+        } else {
+            return array();
+        }
     }
 }

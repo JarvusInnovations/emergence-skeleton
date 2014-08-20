@@ -66,6 +66,10 @@ abstract class AbstractContent extends \VersionedRecord
             ,'values' => array('Public','Private')
             ,'default' => 'Public'
         )
+        ,'Summary' => array(
+            'type' => 'clob'
+            ,'notnull' => false
+        )
     );
 
 

@@ -137,14 +137,14 @@ Ext.define('Emergence.cms.view.EditorController', {
 
     syncFromRecord: function() {
         var me = this,
-            contentRecord = me.getView().getContentRecord(),
+            editorView = me.getView(),
+            contentRecord = editorView.getContentRecord(),
             isPhantom = contentRecord.phantom,
             publishedTime = contentRecord.get('Published'),
             contentItems = contentRecord.get('items') || [],
             contentItemsLength = contentItems.length, contentItemsIndex = 0, contentItemData, contentItemClass,
             composers = me.composers,
             composersLength = composers.length, composersIndex, composer, composerItemClass,
-            editorView = me.getView(),
             composersColumn = editorView.items.getAt(0),
 //            openBtn = me.lookupReference('openBtn'),
             publishedTimeBtn = me.lookupReference('publishedTimeBtn'),
@@ -210,6 +210,8 @@ Ext.define('Emergence.cms.view.EditorController', {
                     contentItem: contentItemData
                 }));
              }
+
+            me.fireViewEvent('syncfromrecord', editorView, contentRecord);
         });
     },
 
@@ -247,5 +249,7 @@ Ext.define('Emergence.cms.view.EditorController', {
         }
 
         contentRecord.set('items', itemsData);
+
+        me.fireViewEvent('synctorecord', editorView, contentRecord);
     }
 });

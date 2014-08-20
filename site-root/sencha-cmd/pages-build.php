@@ -74,34 +74,44 @@ $classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildC
 
 foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
-
-    $pageLoadCommands[] = "union -recursive -class Site.page.$pageName and save $pageName";
-    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat ./build/$pageName.js";
+    $pageOverrides = array();
+    $pagePackages = array_unique(Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile($page)));
 
     // detect required packages
-    if (preg_match_all('|//\s*@require-package\s*(\S+)|i', file_get_contents($page), $matches)) {
-        $packages = array_merge($packages, $matches[1]);
+    $packages = array_merge($packages, $pagePackages);
+
+    // analyze packages, export, add to classPath, and register overrides per-page
+    foreach ($pagePackages AS $package) {
+        foreach (array('src', 'overrides') AS $subPath) { 
+            $packageSource = "sencha-workspace/packages/$package/$subPath";
+            $packageDest = "./packages/$package/$subPath";
+            Benchmark::mark("importing package: $package from $packageSource");
+        
+            $cachedFiles = Emergence_FS::cacheTree($packageSource);
+            Benchmark::mark("precached $cachedFiles files in $packageSource");
+        
+            $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+            Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+        
+            $classPaths[] = "./packages/$package/$subPath";
+            
+            if ($subPath == 'overrides') {
+                $pageOverrides[] = "include -recursive -file packages/$package/$subPath";
+            }
+        }
     }
+
+    $pageLoadCommands[] =
+        "union -recursive -class Site.page.$pageName"
+        .( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '')
+        ." and save $pageName";
+
+    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
 }
 
 
-// analyze packages, export, and add to classPath
-$packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
-foreach ($packages AS $package) {
-    foreach (array('src', 'overrides') AS $subPath) { 
-        $packageSource = "sencha-workspace/packages/$package/$subPath";
-        $packageDest = "./packages/$package/$subPath";
-        Benchmark::mark("importing package: $package from $packageSource");
-    
-        $cachedFiles = Emergence_FS::cacheTree($packageSource);
-        Benchmark::mark("precached $cachedFiles files in $packageSource");
-    
-        $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-        Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-    
-        $classPaths[] = "./packages/$package/$subPath";
-    }
-}
+// eliminate duplicate packages between pages
+$packages = array_unique($packages);
 
 
 // write any libraries from classpath
@@ -140,9 +150,12 @@ $cmd = Sencha::buildCmd(
     ,"-sdk ./$framework"
     ,'compile'
         ,"-classpath=".implode(',', array_unique($classPaths))
+        
+        // start common.js with bootstrap, the rest will be appended later
+        ,'union -class Ext.Boot and concat -yui ./build/common.js'
 
         // start with Site.Common and all its dependencies, store in set common
-        ,'union -recursive -class Site.Common'
+        ,'and union -recursive -class Site.Common'
         ,'and save common'
 
         // if there's at least one page...
@@ -166,7 +179,7 @@ $cmd = Sencha::buildCmd(
             : 'and restore common'
 
         // output the common set to common.js
-        ,"and concat ./build/common.js"
+        ,"and concat -yui -append ./build/common.js"
 
         // if there's at least one page...
         ,count($pageBuildCommands)
