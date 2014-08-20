@@ -3,9 +3,15 @@
 /**
  * @abstract
  * An abstract class for singletons that facilitates communication with backend services
+ * 
+ * TODO:
+ * - add events for all lifecycle events: beforerequest, request, beforexception, exception, unauthorized
  */
 Ext.define('Jarvus.util.AbstractAPI', {
     extend: 'Ext.data.Connection',
+    uses: [
+        'Jarvus.util.APIDomain'
+    ],
 
     config: {
         /**
