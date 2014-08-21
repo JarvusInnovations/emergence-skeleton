@@ -33,7 +33,7 @@ class ActiveRecord
      * @var string
      */
     static public $collectionRoute;
-	
+    
 	/**
 	 * Defaults values for field definitions
 	 * @var array
@@ -98,6 +98,7 @@ class ActiveRecord
 	* @var array
 	*/
 	static public $dynamicFields = array(
+        'Creator',
         'validationErrors' => array(
             'method' => 'getValidationErrors'
         )
