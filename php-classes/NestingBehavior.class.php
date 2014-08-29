@@ -4,7 +4,7 @@ class NestingBehavior extends RecordBehavior
 {
     static public function onSave($Record)
     {
-		// set Left & Right nesting positions
+    	// set Left & Right nesting positions
 		if (!$Record->Left && !$Record->Right) {
 			if ($Record->Parent) {	
 				// insert at right edge of parent
@@ -15,14 +15,14 @@ class NestingBehavior extends RecordBehavior
 				DB::nonQuery('LOCK TABLE `%s` WRITE', $Record::$tableName);
 				
 				DB::nonQuery(
-					'UPDATE `%s` SET `Right` = `Right` + 2 WHERE `Right` >= %u'
+					'UPDATE `%s` SET `Right` = `Right` + 2 WHERE `Right` >= %u ORDER BY `Right` DESC'
 					,array(
 						$Record::$tableName
 						,$Record->Left
 					)
 				);
 				DB::nonQuery(
-					'UPDATE `%s` SET `Left` = `Left` + 2 WHERE `Left` > %u'
+					'UPDATE `%s` SET `Left` = `Left` + 2 WHERE `Left` > %u ORDER BY `Left` DESC'
 					,array(
 						$Record::$tableName
 						,$Record->Left
