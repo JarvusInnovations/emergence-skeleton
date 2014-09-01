@@ -19,6 +19,7 @@ Git::$repositories['Emergence-Skeleton'] = array(
         ,'sencha-workspace/microloaders'
         ,'sencha-workspace/pages'
         ,'sencha-workspace/packages/jarvus-apikit'
+        ,'sencha-workspace/packages/jarvus-ext-actionevents'
         ,'sencha-workspace/packages/jarvus-ext-glyphs'
         ,'sencha-workspace/packages/jarvus-ext-lazydata'
         ,'sencha-workspace/packages/jarvus-ext-routing'
