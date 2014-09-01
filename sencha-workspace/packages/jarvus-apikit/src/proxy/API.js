@@ -28,7 +28,8 @@ Ext.define('Jarvus.ext.proxy.API', {
 
         request.setRawRequest(me.getConnection().request(Ext.applyIf({
             autoDecode: false,
-            disableCaching: false
+            disableCaching: false,
+            failureStatusCodes: [404] // TODO: verify this results in the proper failure method being called in the proxy
         }, request.getCurrentConfig())));
 
         me.lastRequest = request;
