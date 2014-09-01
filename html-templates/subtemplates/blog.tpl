@@ -1,5 +1,6 @@
 {load_templates "subtemplates/people.tpl"}
 {load_templates "subtemplates/comments.tpl"}
+{load_templates "subtemplates/contextLinks.tpl"}
 
 {template blogPost Post showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true headingLevel=h2}
     <article class="blog-post reading-width">
