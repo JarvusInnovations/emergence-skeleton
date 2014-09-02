@@ -85,7 +85,7 @@
 
                             formEl.destroy();
                             
-                            console.groupCollapsed('Executed migration', migrationData.key);
+                            console.groupCollapsed('%s migration %s', migrationData.status, migrationData.key);
                             console.log(responseData.output);
                             console.table(responseData.log);
                             console.groupEnd();
