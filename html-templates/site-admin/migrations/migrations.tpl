@@ -81,7 +81,7 @@
                                 migrationData = responseData.data;
 
                             formEl.up('tr').down('.migration-status').update(migrationData.status);
-                            formEl.up('tr').down('.migration-timestamp').update(Ext.Date.format(new Date(migrationData.executed*1000), 'Y-m-d H:i:sO'));
+                            formEl.up('tr').down('.migration-timestamp').update(Ext.Date.format(new Date(migrationData.executed*1000), 'Y-m-d H:i:s'));
 
                             formEl.destroy();
                             
