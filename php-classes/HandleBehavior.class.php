@@ -42,6 +42,7 @@ class HandleBehavior extends RecordBehavior
             ,'alwaysSuffix' => static::$alwaysSuffix
             ,'format' => static::$format
             ,'transliterate' => static::$transliterate
+            ,'case' => 'lower' // 'lower' / 'upper' / null
         ), $options);
 
         // strip bad characters
@@ -68,8 +69,12 @@ class HandleBehavior extends RecordBehavior
             $text = preg_replace('/[-_]*[^-\w\.]+[-_]*/u', '', $text);
         }
 
-        // lowercase
-        $text = strtolower($text);
+        // transform case
+        if ($options['case'] == 'lower') {
+            $text = strtolower($text);
+        } elseif ($options['case'] == 'upper') {
+            $text = strtoupper($text);
+        }
 
         // clean up any placeholder characters from ends
         $text = trim($text, '-_');
