@@ -17,7 +17,7 @@ if (static::columnExists('groups', 'Data')) {
 
 if (!static::columnExists('groups', 'About')) {
     print("Adding `About` column to `groups`\n");
-    DB::nonQuery('ALTER TABLE `groups` ADD `About` text NULL default NULL`');
+    DB::nonQuery('ALTER TABLE `groups` ADD `About` text NULL default NULL');
     $skipped = false;
 }
 
