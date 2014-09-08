@@ -1807,6 +1807,7 @@ class ActiveRecord
 				}
 				
 				
+                case 'year':
 	        	case 'int':
 	    		case 'uint':
 				case 'integer':
@@ -1932,6 +1933,7 @@ class ActiveRecord
 				break;
 			}
 			
+            case 'year':
         	case 'int':
     		case 'uint':
 			case 'integer':
