@@ -40,7 +40,9 @@ Ext.define('Emergence.ext.proxy.Records', {
 
     buildRequest: function(operation) {
         var me = this,
-            params = operation.params = Ext.apply({}, operation.params, me.extraParams),
+            initialParams = Ext.apply({}, operation.getParams()),
+            // Clone params right now so that they can be mutated at any point further down the call stack
+            params = Ext.applyIf(initialParams, me.getExtraParams() || {}),
             request = new Ext.data.Request({
                 action: operation.getAction(),
                 records: operation.getRecords(),

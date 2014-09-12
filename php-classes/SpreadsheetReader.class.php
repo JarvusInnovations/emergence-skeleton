@@ -2,7 +2,7 @@
 
 class SpreadsheetReader
 {
-	protected $_options = array(
+    protected $_options = array(
 		'parseHeader' => true
 		,'autoTrim' => true
 		,'packedColumn' => false // set to an integer index to pack extra columns into given column by comma
@@ -13,13 +13,17 @@ class SpreadsheetReader
 
 	static public function createFromFile($filename, $options = array())
 	{
-		// get MIME type
-		switch($mimeType = File::getMIMEType($filename))
+        return static::createFromStream(fopen($filename, 'r'), File::getMIMEType($filename), $options);
+	}
+	
+    static public function createFromStream($stream, $mimeType = 'text/csv', $options = array())
+    {
+		switch($mimeType)
 		{
 			case 'text/plain':
 			case 'text/csv':
 			{
-				return new static(fopen($filename, 'r'), $options);
+				return new static($stream, $options);
 			}
 			
 			case 'application/vnd.ms-office':

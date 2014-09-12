@@ -34,7 +34,7 @@ class ActiveRecord
      */
     static public $collectionRoute;
     
-	/**
+    /**
 	 * Defaults values for field definitions
 	 * @var array
 	 */
@@ -527,7 +527,11 @@ class ActiveRecord
         $validators = static::getStackedConfig('validators');
         if (count(static::getStackedConfig('validators'))) {
             foreach (static::getStackedConfig('validators') AS $validator => $options) {
-                if (isset($options['validator']) && is_callable($options['validator'])) {
+                if (isset($options['validator']) && $options['validator'] == 'require-relationship') {
+                    if (!$this->_getRelationshipValue($options['field'])) {
+                        $this->_validator->addError($options['field'], !empty($options['errorMessage']) ? $options['errorMessage'] : 'Required relationship missing');
+                    }
+                } elseif (isset($options['validator']) && is_callable($options['validator'])) {
                     call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
                 } else {
                     $this->_validator->validate($options);
@@ -1803,6 +1807,7 @@ class ActiveRecord
 				}
 				
 				
+                case 'year':
 	        	case 'int':
 	    		case 'uint':
 				case 'integer':
@@ -1928,6 +1933,7 @@ class ActiveRecord
 				break;
 			}
 			
+            case 'year':
         	case 'int':
     		case 'uint':
 			case 'integer':

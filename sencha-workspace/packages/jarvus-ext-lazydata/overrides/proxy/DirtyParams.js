@@ -11,6 +11,24 @@ Ext.define('Jarvus.ext.override.proxy.DirtyParams', {
             extraParams[name] = value;
         }
     },
+    
+    resetExtraParams: function() {
+        var me = this,
+            extraParams = me.extraParams,
+            dirty = false,
+            name;
+        
+        for (name in extraParams) {
+            if (extraParams.hasOwnProperty(name)) {
+                delete extraParams[name];
+                dirty = true;
+            }
+        }
+        
+        if (dirty) {
+            me.markParamsDirty();
+        }
+    },
 
     markParamsDirty: function() {
         this.extraParamsDirty = true;

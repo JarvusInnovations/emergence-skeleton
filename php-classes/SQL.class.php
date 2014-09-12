@@ -5,7 +5,7 @@ class SQL
     static public function getCreateTable($recordClass, $historyVariant = false)
     {
         $queryFields = array();
-    	$indexes = $historyVariant ? array() : $recordClass::aggregateStackedConfig('indexes');
+        $indexes = $historyVariant ? array() : $recordClass::aggregateStackedConfig('indexes');
 		$fulltextColumns = array();
 		
 		// history table revisionID field
@@ -35,11 +35,20 @@ class SQL
 			{
 				array_unshift($field['values'], $rootClass);
 			}
-			
+
 			$fieldDef = '`'.$field['columnName'].'`';
 			$fieldDef .= ' '.static::getSQLType($field);
+            
+            if (!empty($field['charset'])) {
+                $fieldDef .= " CHARACTER SET $field[charset]";
+            }
+
+            if (!empty($field['collate'])) {
+                $fieldDef .= " COLLATE $field[collate]";
+            }
+
 			$fieldDef .= ' '. ($field['notnull'] ? 'NOT NULL' : 'NULL');
-			
+
 			if($field['autoincrement'] && !$historyVariant)
 				$fieldDef .= ' auto_increment';
 			elseif( ($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP') )

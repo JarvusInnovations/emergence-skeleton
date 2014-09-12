@@ -19,7 +19,11 @@
     {$dwoo.parent}
 
     {if $.get.jsdebug}
-        {sencha_bootstrap patchLoader=false packages=array('emr-skeleton-theme') packageRequirers=array('sencha-workspace/pages/src/page/ContentEditor.js')}
+        {sencha_bootstrap
+            patchLoader=false
+            packages=array('emr-skeleton-theme')
+            packageRequirers=array('sencha-workspace/pages/src/page/ContentEditor.js')
+        }
     {else}
         <script src="{Site::getVersionedRootUrl('js/pages/ContentEditor.js')}"></script>
     {/if}

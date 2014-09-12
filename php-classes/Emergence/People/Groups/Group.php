@@ -5,6 +5,7 @@ namespace Emergence\People\Groups;
 use DB;
 use ActiveRecord;
 use HandleBehavior, NestingBehavior;
+use Emergence\People\IPerson;
 use Emergence\People\Person;
 use PeopleRequestHandler;
 use DuplicateKeyException;
@@ -213,17 +214,15 @@ class Group extends ActiveRecord
         return $assignedGroups;
     }
 
-    public function assignMember(Person $Person, $role = 'Member')
+    public function assignMember(IPerson $Person, $memberData = array())
     {
-        $memberData = array(
-            'GroupID' => $this->ID
-            ,'PersonID' => $Person->ID
-            ,'Role' => $role
-        );
+        $memberData['GroupID'] = $this->ID;
+        $memberData['PersonID'] = $Person->ID;
 
         try {
             return GroupMember::create($memberData, true);
         } catch (DuplicateKeyException $e) {
+            // TODO: should an existing group be updated by $memberData fields?
             return GroupMember::getByWhere($memberData);
         }
     }

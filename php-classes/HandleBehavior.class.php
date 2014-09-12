@@ -3,7 +3,7 @@
 class HandleBehavior extends RecordBehavior
 {
     public static $alwaysSuffix = false;
-    public static $format = '%s-%u';
+    public static $incrementerFormat = '%s-%u';
     public static $transliterate = true;
 
     public static function onSave(ActiveRecord $Record, $handleInput = false)
@@ -40,8 +40,9 @@ class HandleBehavior extends RecordBehavior
             'handleField' => 'Handle'
             ,'domainConstraints' => array()
             ,'alwaysSuffix' => static::$alwaysSuffix
-            ,'format' => static::$format
+            ,'incrementerFormat' => static::$incrementerFormat
             ,'transliterate' => static::$transliterate
+            ,'case' => 'lower' // 'lower' / 'upper' / null
         ), $options);
 
         // strip bad characters
@@ -68,8 +69,12 @@ class HandleBehavior extends RecordBehavior
             $text = preg_replace('/[-_]*[^-\w\.]+[-_]*/u', '', $text);
         }
 
-        // lowercase
-        $text = strtolower($text);
+        // transform case
+        if ($options['case'] == 'lower') {
+            $text = strtolower($text);
+        } elseif ($options['case'] == 'upper') {
+            $text = strtoupper($text);
+        }
 
         // clean up any placeholder characters from ends
         $text = trim($text, '-_');
@@ -87,7 +92,7 @@ class HandleBehavior extends RecordBehavior
             $incarnation++;
 
             if ($options['alwaysSuffix'] || $incarnation > 1) {
-                $handle = sprintf($options['format'], $text, $incarnation);
+                $handle = sprintf($options['incrementerFormat'], $text, $incarnation);
             }
             
             $where[$options['handleField']] = $handle;
