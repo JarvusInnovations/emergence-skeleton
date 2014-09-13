@@ -55,29 +55,16 @@ class Sencha_App
 		if (!$configNode = Site::resolvePath($configPath, true, false)) {
 			throw new Exception('Could not find .sencha/app/sencha.cfg for '.$this->_name);
 		}
-	
+
 		$this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
-
-        // merge properties from app.json
-        $appCfg = $this->getAppCfg();
-
-        if (!empty($appCfg) && is_array($appCfg)) {
-            $copyProperties = function($source, &$destination, $prefix) use(&$copyProperties) {
-                foreach ($source AS $key => $value) {
-                    if (is_array($value)) {
-                        $copyProperties($value, $destination, "$prefix.$key");
-                    } else {
-                        $destination["$prefix.$key"] = $value;
-                    }
-                }
-            };
-            
-            $copyProperties($appCfg, $this->_buildCfg, 'app');
-        }
+		
+		if ($jsonCfg = $this->getAppCfg()) {
+			$this->_buildCfg = array_merge($this->_buildCfg, Emergence\Util\Data::collapseTreeToDottedKeys($jsonCfg));
+		}
 
 		// store in cache
 #		Cache::store($cacheKey, $this->_buildCfg);
-		
+
 		return $key ? $this->_buildCfg[$key] : $this->_buildCfg;
 	}
 	
