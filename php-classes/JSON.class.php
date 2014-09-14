@@ -40,7 +40,7 @@ class JSON
 		));
 	}
 	
-	public static function translateObjects($input, $summary = null, $include = null)
+	public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
 	{
 		if (is_object($input)) {
             if ($summary && method_exists($input, 'getSummary')) {
@@ -83,7 +83,7 @@ class JSON
                     }
                 }
 
-				$input = $input->getDetails($includeThisLevel);
+				$input = $input->getDetails($includeThisLevel, $stringsOnly);
 			} elseif (method_exists($input, 'getData')) {
 				$input = $input->getData();
 			}

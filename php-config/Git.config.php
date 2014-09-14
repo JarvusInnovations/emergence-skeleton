@@ -55,6 +55,8 @@ Git::$repositories['sencha-hotfixes'] = array(
     ,'workingBranch' => 'master'
     ,'localOnly' => false
     ,'trees' => array(
+        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.736' => 'jarvus-hotfixes-ext-5.0.0.736',
+        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.970' => 'jarvus-hotfixes-ext-5.0.0.970',
         'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.1.1255' => 'jarvus-hotfixes-ext-5.0.1.1255'
 	)
 );

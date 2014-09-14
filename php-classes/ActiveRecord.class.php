@@ -100,7 +100,13 @@ class ActiveRecord
 	static public $dynamicFields = array(
         'Creator',
         'validationErrors' => array(
-            'method' => 'getValidationErrors'
+            'getter' => 'getValidationErrors'
+        ),
+        'recordTitle' => array(
+            'getter' => 'getTitle'
+        ),
+        'recordURL' => array(
+            'getter' => 'getURL'
         )
     );
     
@@ -192,13 +198,7 @@ class ActiveRecord
 
     public function __toString()
     {
-        if ($this->isPhantom) {
-            return $this->Class . ' [phantom]';
-        } elseif ($url = $this->getURL()) {
-            return $url;
-        } else {
-            return $this->Class . ' #' . $this->ID;
-        }
+        return $this->getTitle();
     }
     
     static protected function _initStackedConfig($propertyName)
@@ -684,11 +684,7 @@ class ActiveRecord
     public function getDetails($include = '*', $stringsOnly = false)
 	{
 		$data = $this->getData();
-		
-		if (($include == '*' || in_array('validationErrors', $include)) && $this->validationErrors) {
-			$data['validationErrors'] = $this->validationErrors;
-		}
-        
+
         foreach (static::getStackedConfig('dynamicFields') AS $field => $options) {
             if ($include != '*' && !in_array($field, $include)) {
                 continue;
@@ -699,11 +695,16 @@ class ActiveRecord
             }
             
             $method = $options['method'];
+            $getter = $options['getter'];
             
             if ($method && is_string($method) && method_exists($this, $method)) {
                 $value = $this->$method($stringsOnly, $options, $field);
             } elseif($method && is_callable($method)) {
                 $value = call_user_func($method, $this, $stringsOnly, $options, $field);
+            } elseif ($getter && is_string($getter) && method_exists($this, $getter)) {
+                $value = $this->$getter();
+            } elseif($getter && is_callable($getter)) {
+                $value = call_user_func($getter);
             } elseif(!empty($options['relationship']) && static::_relationshipExists($options['relationship'])) {
                 $value = $this->_getRelationshipValue($options['relationship']);
             } else {

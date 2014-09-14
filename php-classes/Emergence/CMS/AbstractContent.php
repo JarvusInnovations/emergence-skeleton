@@ -106,6 +106,7 @@ abstract class AbstractContent extends \VersionedRecord
         'tags' => 'Tags'
         ,'items' => 'Items'
         ,'Author'
+        ,'Context'
     );
 
 

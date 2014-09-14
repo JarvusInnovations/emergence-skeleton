@@ -47,12 +47,21 @@ Ext.define('Emergence.cms.view.DualViewController', {
     onContentRecordChange: function(editor, contentRecord) {
         var view = this.getView(),
             previewCmp = view.rendered && view.lookupReference('preview'),
-            author = contentRecord.phantom ? (window.SiteEnvironment && window.SiteEnvironment.user) : contentRecord.get('Author');
+            author = contentRecord.phantom ? (window.SiteEnvironment && window.SiteEnvironment.user) : contentRecord.get('Author'),
+            context = contentRecord.get('Context');
 
-        if (previewCmp && author) {
-            previewCmp.authorLink.set({href: '/people/' + (author.Username || author.ID)}).update(author.FirstName + ' ' + author.LastName);
-            previewCmp.authorWrapper.show();
-            previewCmp.infoWrapper.show();
+        if (previewCmp) {
+            if (author) {
+                previewCmp.authorLink.set({href: '/people/' + (author.Username || author.ID)}).update(author.FirstName + ' ' + author.LastName);
+                previewCmp.authorWrapper.show();
+            }
+            if (context) {
+                previewCmp.contextLink.set({href: context.recordURL}).update(context.recordTitle);
+                previewCmp.contextWrapper.show();
+            }
+            if (author || context) {
+                previewCmp.infoWrapper.show();
+            }
         }
     },
     

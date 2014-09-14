@@ -70,14 +70,40 @@ $packages = array();
 $pageNames = array();
 $pageLoadCommands = array();
 $pageBuildCommands = array();
+$commonOverrides = array();
 $classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildConfig['workspace.classpath']) : array();
 
+// analyze global package dependencies from Common.js
+$commonPackages = Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile('./src/Common.js'));
+$packages = array_merge($packages, $commonPackages);
+
+foreach ($commonPackages AS $package) {
+    foreach (array('src', 'overrides') AS $subPath) { 
+        $packageSource = "sencha-workspace/packages/$package/$subPath";
+        $packageDest = "./packages/$package/$subPath";
+        Benchmark::mark("importing package: $package from $packageSource");
+    
+        $cachedFiles = Emergence_FS::cacheTree($packageSource);
+        Benchmark::mark("precached $cachedFiles files in $packageSource");
+    
+        $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
+        Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
+    
+        $classPaths[] = "./packages/$package/$subPath";
+        
+        if ($subPath == 'overrides') {
+            $commonOverrides[] = "include -recursive -file packages/$package/$subPath";
+        }
+    }
+}
+
+// assemble page-specific builds and dependencies
 foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
     $pageOverrides = array();
     $pagePackages = array_unique(Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile($page)));
 
-    // detect required packages
+    // merge into global packages list
     $packages = array_merge($packages, $pagePackages);
 
     // analyze packages, export, add to classPath, and register overrides per-page
@@ -103,7 +129,7 @@ foreach (glob('./src/page/*.js') AS $page) {
 
     $pageLoadCommands[] =
         "union -recursive -class Site.page.$pageName"
-        .( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '')
+        .( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '' )
         ." and save $pageName";
 
     $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
@@ -156,6 +182,7 @@ $cmd = Sencha::buildCmd(
 
         // start with Site.Common and all its dependencies, store in set common
         ,'and union -recursive -class Site.Common'
+        ,( count($commonOverrides) ? ' and '.implode(' and ', $commonOverrides) : '' )
         ,'and save common'
 
         // if there's at least one page...
