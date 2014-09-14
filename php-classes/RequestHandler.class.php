@@ -9,22 +9,13 @@ abstract class RequestHandler
     
     // static properties
 	protected static $_path;
-	protected static $_parameters;
-	protected static $_options = array();
 	
 
 	// protected static methods
-
 	protected static function setPath($path = null)
 	{
 		static::$_path = isset($path) ? $path : Site::$pathStack;
 	}
-	
-	protected static function setOptions($options)
-	{
-		static::$_options = isset(self::$_options) ? array_merge(static::$_options, $options) : $options;
-	}
-	
 	
 	protected static function peekPath()
 	{
@@ -48,23 +39,6 @@ abstract class RequestHandler
 	{
 		if(!isset(static::$_path)) static::setPath();
 		return array_unshift(static::$_path, $string);
-	}
-	
-	// this doesn't seem to work, would be cool if it could
-	protected static function catchParentResponse(Closure $function)
-	{
-		// store response mode
-		$origResponseMode = static::$responseMode;
-		
-		// execute function and capture response
-		static::$responseMode = 'return';
-		$response = $function();
-
-		
-		// restore original response mode
-		static::$responseMode = $origResponseMode;
-		
-		return $response;
 	}
 	
 	static public function respond($responseID, $responseData = array(), $responseMode = false)
@@ -123,9 +97,7 @@ abstract class RequestHandler
         }
         
 		if (is_array($responseData['data'])) {
-			header('Content-Type: text/csv');
-			header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.csv"');
-			print(CSV::fromRecords($responseData['data']));
+            return CSV::respond($responseData['data'], $responseID, !empty($_GET['columns']) ? $_GET['columns'] : null);
 		} elseif ($responseID == 'error') {
 			print($responseData['message']);
 		} else {
@@ -238,17 +210,5 @@ abstract class RequestHandler
 			'success' => false
 			,'message' => vsprintf($message, array_slice($args, 1))
 		));
-	}
-
-	
-	// public static methods
-	public static function getOption($optionName)
-	{
-		return isset(static::$_options[$optionName]) ? static::$_options[$optionName] : null;
-	}
-	
-	public static function getOptions()
-	{
-		return static::$_options;
 	}
 }
