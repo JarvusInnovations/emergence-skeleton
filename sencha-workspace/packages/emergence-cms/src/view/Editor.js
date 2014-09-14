@@ -19,11 +19,7 @@ Ext.define('Emergence.cms.view.Editor', {
         'Emergence.cms.view.composer.Markdown',
         'Emergence.cms.view.composer.Html',
         'Emergence.cms.view.composer.Multimedia',
-        'Emergence.cms.view.composer.Embed',
-
-        // hotfixes
-        'Jarvus.ext.patch.form.field.TagFieldFilterPickList', // hotfix for http://www.sencha.com/forum/showthread.php?288294-tagfield-config-filterPickList-implementation-partly-broken&p=1053510
-        'Jarvus.ext.patch.button.HrefBeforeRender' // hotfix for http://www.sencha.com/forum/showthread.php?288306-button-setHref-setParams-doesn-t-check-if-rendered-before-touching-DOM&p=1053557
+        'Emergence.cms.view.composer.Embed'
     ],
 
     controller: 'emergence-cms-editor',
