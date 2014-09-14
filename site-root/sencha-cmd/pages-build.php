@@ -182,7 +182,7 @@ $cmd = Sencha::buildCmd(
 
         // start with Site.Common and all its dependencies, store in set common
         ,'and union -recursive -class Site.Common'
-        ,( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '' )
+        ,( count($commonOverrides) ? ' and '.implode(' and ', $commonOverrides) : '' )
         ,'and save common'
 
         // if there's at least one page...
