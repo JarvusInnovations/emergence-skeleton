@@ -29,6 +29,6 @@ class Inflector
     {
         $string = ucfirst(strtolower(static::spacifyCaps($string)));
         
-        return preg_replace('/\bid(s?)\b/', 'ID$1', $string);
+        return preg_replace('/\bid(s?)\b/i', 'ID$1', $string);
     }
 }
