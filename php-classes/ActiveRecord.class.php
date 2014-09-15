@@ -198,7 +198,7 @@ class ActiveRecord
 
     public function __toString()
     {
-        return $this->getTitle();
+        return sprintf('[%s](%s)', $this->getTitle(), $this->getURL());
     }
     
     static protected function _initStackedConfig($propertyName)
