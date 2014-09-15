@@ -59,6 +59,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 			{
 				return static::handleCreateRequest();
 			}
+            
+            case '*fields':
+            {
+                return static::handleFieldsRequest();
+            }
 			
 			case '':
 			case false:
@@ -196,7 +201,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			,array_merge($responseData, array(
 				'success' => true
 				,'data' => $className::getAllByQuery(
-					'SELECT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+					'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
 					,array(
                         static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
 						,join(',',$select)
@@ -650,6 +655,16 @@ abstract class RecordsRequestHandler extends RequestHandler
 			return static::throwInvalidRequestError();
 		}
 	}
+
+    public static function handleFieldsRequest()
+    {
+    	$className = static::$recordClass;
+
+        return static::respond('fields', array(
+            'fields' => $className::aggregateStackedConfig('fields'),
+            'dynamicFields' => $className::aggregateStackedConfig('dynamicFields')
+        ));
+    }
 
 	static protected function getTemplateName($noun)
 	{
