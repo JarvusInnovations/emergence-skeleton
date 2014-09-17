@@ -4,6 +4,11 @@ class NestingBehavior extends RecordBehavior
 {
     static public function onSave($Record)
     {
+        // if parent record is dirty or phantom, it must be saved first
+        if ($Record->Parent && $Record->Parent->isDirty) {
+            $Record->Parent->save();
+        }
+        
     	// set Left & Right nesting positions
 		if (!$Record->Left && !$Record->Right) {
 			if ($Record->Parent) {	
