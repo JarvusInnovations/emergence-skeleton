@@ -99,7 +99,7 @@ class Job extends ActiveRecord
             $entry['level'] = LogLevel::INFO;
         }
         
-        $this->log[] = $entry;
+        return $this->log[] = $entry;
     }
 
     public function logRecordDelta(ActiveRecord $Record, $options = array())
@@ -156,7 +156,7 @@ class Job extends ActiveRecord
 
     public function logInvalidRecord(\ActiveRecord $Record)
     {
-        $this->log(array(
+        return $this->log(array(
             'message' => 'Invalid ' . get_class($Record) . ' record: ' . $Record->getTitle()
             ,'validationErrors' => $Record->validationErrors
         ), LogLevel::WARNING);
@@ -164,7 +164,7 @@ class Job extends ActiveRecord
 
     public function logException(\Exception $e)
     {
-        $this->log(array(
+        return $this->log(array(
             'message' => get_class($e) . ': ' . $e->getMessage()
             ,'exception' => $e
         ), LogLevel::ERROR);
