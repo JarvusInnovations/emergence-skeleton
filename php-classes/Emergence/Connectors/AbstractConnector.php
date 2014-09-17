@@ -6,7 +6,9 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
 {
     public static $title;
     public static $connectorId;
-    public static $accountLevelSynchronize = 'Administrator';
+
+    public static $synchronizeRequiredAccountLevel = 'Administrator';
+    public static $synchronizeTimeLimit = 0;
 
     public static function getTitle()
     {
@@ -57,8 +59,8 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 return static::throwNotFoundError('Job not found');
             }
 
-            if (static::$accountLevelSynchronize) {
-                $GLOBALS['Session']->requireAccountLevel(static::$accountLevelSynchronize);
+            if (static::$synchronizeRequiredAccountLevel) {
+                $GLOBALS['Session']->requireAccountLevel(static::$synchronizeRequiredAccountLevel);
             }
 
             if (static::peekPath() == 'log') {
@@ -93,8 +95,8 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 ,'Config' => $TemplateJob->Config
             ));
         } else {
-            if (static::$accountLevelSynchronize) {
-                $GLOBALS['Session']->requireAccountLevel(static::$accountLevelSynchronize);
+            if (static::$synchronizeRequiredAccountLevel) {
+                $GLOBALS['Session']->requireAccountLevel(static::$synchronizeRequiredAccountLevel);
             }
 
             $Job = Job::create(array(
@@ -140,6 +142,10 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
             print(json_encode(array('data' => $Job->getData())));
             fastcgi_finish_request();
         }
+
+
+        // update execution time limit
+        set_time_limit(static::$synchronizeTimeLimit);
 
 
         // execute synchronization
