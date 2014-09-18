@@ -7,6 +7,7 @@ Git::$repositories['Emergence-Skeleton'] = array(
     ,'localOnly' => false
 	,'trees' => array(
         'dwoo-plugins'
+        ,'event-handlers'
 #        ,'ext-library'
         ,'html-templates'
         ,'js-library'
