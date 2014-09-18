@@ -59,6 +59,17 @@ class Cache
 
 		return CacheIterator::createFromPattern($pattern);
 	}
+    
+    static public function deleteByPattern($pattern)
+    {
+        $count = 0;
+        foreach (static::getIterator($pattern) AS $cacheEntry) {
+            apc_delete($cacheEntry['key']);
+            $count++;
+        }
+
+        return $count;
+    }
 	
 	static public function invalidateScript($path)
 	{
