@@ -1642,7 +1642,7 @@ class ActiveRecord
             }
             
             if (is_string($validator)) {
-                $validators[$validator] = static::_initValidator($validator, is_array($options) ? $options : array('field' => $options));
+                $validators[$validator] = static::_initValidator($validator, is_array($options) ? $options : array('validator' => $options));
             } elseif (is_string($options)) {
                 $validator = $options;
                 $validators[$validator] = static::_initValidator($validator);
