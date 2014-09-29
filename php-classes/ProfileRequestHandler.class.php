@@ -3,6 +3,7 @@
 class ProfileRequestHandler extends RequestHandler
 {
     public static $profileFields = array('Location','About','Phone','Email');
+    public static $accountLevelEditOthers = 'Staff';
 
     public static $onBeforeProfileValidated = false;
     public static $onBeforeProfileSaved = false;
@@ -44,16 +45,7 @@ class ProfileRequestHandler extends RequestHandler
     public static function handleEditRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        
-        if (!empty($_GET['person']) && $GLOBALS['Session']->hasAccountLevel('Administrator')) {
-            $User = Person::getByID($_GET['person']);
-
-            if (!$User) {
-                return static::throwNotFoundError('Person not found');
-            }
-        } else {
-            $User = $GLOBALS['Session']->Person;
-        }
+        $User = static::_getRequestedUser();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$GLOBALS['Session']->hasAccountLevel('Administrator')) {
@@ -99,7 +91,7 @@ class ProfileRequestHandler extends RequestHandler
     public static function handlePhotoUploadRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        $User = $GLOBALS['Session']->Person;
+        $User = static::_getRequestedUser();
 
         // process photo upload with MediaRequestHandler
         $Photo = \Media::createFromUpload($_FILES['photoFile'], array(
@@ -123,7 +115,7 @@ class ProfileRequestHandler extends RequestHandler
     public static function handlePhotoPrimaryRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        $User = $GLOBALS['Session']->Person;
+        $User = static::_getRequestedUser();
 
         if (empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID'])) {
             return static::throwInvalidRequestError();
@@ -149,7 +141,7 @@ class ProfileRequestHandler extends RequestHandler
     public static function handlePhotoDeleteRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        $User = $GLOBALS['Session']->Person;
+        $User = static::_getRequestedUser();
 
         if (empty($_REQUEST['MediaID']) || !is_numeric($_REQUEST['MediaID'])) {
             return static::throwInvalidRequestError();
@@ -163,6 +155,11 @@ class ProfileRequestHandler extends RequestHandler
             return static::throwUnauthorizedError();
         }
 
+        if ($User->PrimaryPhotoID == $Media->ID) {
+            $User->PrimaryPhotoID = null;
+            $User->save();
+        }
+
         $Media->destroy();
 
         return static::respond('profilePhotoDeleted', array(
@@ -174,7 +171,7 @@ class ProfileRequestHandler extends RequestHandler
     public static function handlePasswordRequest()
     {
         $GLOBALS['Session']->requireAuthentication();
-        $User = $GLOBALS['Session']->Person;
+        $User = static::_getRequestedUser();
 
         if (empty($_REQUEST['OldPassword'])) {
             return static::throwError('Enter your current password for verification');
@@ -191,6 +188,24 @@ class ProfileRequestHandler extends RequestHandler
 
         return static::respond('passwordChanged', array(
             'success' => true
+            ,'data' => $User
         ));
+    }
+
+    protected static function _getRequestedUser()
+    {
+        if (
+            !empty($_GET['person']) &&
+            static::$accountLevelEditOthers &&
+            $GLOBALS['Session']->hasAccountLevel(static::$accountLevelEditOthers)
+        ) {
+            if (!$User = Person::getByID($_GET['person'])) {
+                return static::throwNotFoundError('Person not found');
+            }
+        } else {
+            $User = $GLOBALS['Session']->Person;
+        }
+
+        return $User;
     }
 }
