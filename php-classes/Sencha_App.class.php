@@ -7,7 +7,7 @@ class Sencha_App
     
     function __construct($name)
     {
-		$this->_name = $name;
+    	$this->_name = $name;
 	}
 	
 	static public function getByName($name)
@@ -57,9 +57,9 @@ class Sencha_App
 		}
 
 		$this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
-		
+
 		if ($jsonCfg = $this->getAppCfg()) {
-			$this->_buildCfg = array_merge($this->_buildCfg, Emergence\Util\Data::collapseTreeToDottedKeys($jsonCfg));
+            Emergence\Util\Data::collapseTreeToDottedKeys($jsonCfg, $this->_buildCfg, 'app');
 		}
 
 		// store in cache

@@ -8,27 +8,26 @@ use Emergence_FS;
 
 class EventBus
 {
-    public static function fireEvent($event, $context, $payload = array())
+    public static function fireEvent($name, $context, $payload = array())
     {
-        $_EVENT = array(
-            'event' => $event,
-            'context' => $context,
-            'payload' => $payload,
-            'handlers' => static::getHandlers($event, $context),
-            'results' => array()
-        );
+        $_EVENT = array_merge($payload, array(
+            'NAME' => $name,
+            'CONTEXT' => $context,
+            'HANDLERS' => static::getHandlers($name, $context),
+            'RESULTS' => array()
+        ));
 
-        foreach ($_EVENT['handlers'] AS $handlerPath => $handlerNodeID) {
-            $_EVENT['currentHandlerPath'] = $handlerPath;
-            $_EVENT['currentHandlerNodeID'] = $handlerNodeID;
+        foreach ($_EVENT['HANDLERS'] AS $handlerPath => $handlerNodeID) {
+            $_EVENT['CURRENT_HANDLER_PATH'] = $handlerPath;
+            $_EVENT['CURRENT_HANDLER_ID'] = $handlerNodeID;
 
             // create a closure for executing hanlder so that $_EMAIL is the only variable pre-defined in its scope
-            $handler = function() use ($_EVENT) {
-                return include(SiteFile::getRealPathByID($_EVENT['currentHandlerNodeID']));
+            $handler = function() use (&$_EVENT) {
+                return include(SiteFile::getRealPathByID($_EVENT['CURRENT_HANDLER_ID']));
             };
 
             // execute handler and save status
-            $_EVENT['lastResult'] = $_EVENT['results'][$handlerPath] = $handler();
+            $_EVENT['LAST_RESULT'] = $_EVENT['RESULTS'][$handlerPath] = $handler();
         }
 
         return $_EVENT;
