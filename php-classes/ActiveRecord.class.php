@@ -35,7 +35,7 @@ class ActiveRecord
     static public $collectionRoute;
     
     /**
-	 * Defaults values for field definitions
+     * Defaults values for field definitions
 	 * @var array
 	 */
 	static public $fieldDefaults = array(
@@ -851,6 +851,12 @@ class ActiveRecord
 		{
 			$this->_postSaveRelationships();
 		}
+
+        // fire event
+        Emergence\EventBus::fireEvent('recordSave', $this->getRootClass(), array(
+            'Record' => $this,
+            'deep' => $deep
+        ));
 	}
 	
 	protected function _saveRelationships()
