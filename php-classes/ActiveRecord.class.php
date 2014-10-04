@@ -746,6 +746,12 @@ class ActiveRecord
 	
 	public function save($deep = true)
 	{
+        // fire event
+        Emergence\EventBus::fireEvent('beforeRecordSave', $this->getRootClass(), array(
+            'Record' => $this,
+            'deep' => $deep
+        ));
+
 		// set creator
 		if(static::_fieldExists('CreatorID') && !$this->CreatorID && !empty($_SESSION) && !empty($_SESSION['User']))
 		{
@@ -853,7 +859,7 @@ class ActiveRecord
 		}
 
         // fire event
-        Emergence\EventBus::fireEvent('recordSave', $this->getRootClass(), array(
+        Emergence\EventBus::fireEvent('afterRecordSave', $this->getRootClass(), array(
             'Record' => $this,
             'deep' => $deep
         ));

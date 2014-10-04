@@ -5,6 +5,18 @@
 
 {block "content"}
 	{$Person = $data}
+
+    <header class="page-header">
+        <h2 class="header-title">{$Person->FullName|escape}</h2>
+    	{if $Person->Location}
+		    <h3 class="header-details"><a href="http://maps.google.com/?q={$Person->Location|escape:url}" target="_blank">{$Person->Location|escape}</a></h3>
+		{/if}
+        <div class="header-buttons">
+            {if $.User->ID == $Person->ID || (ProfileRequestHandler::$accountLevelEditOthers && $.User->hasAccountLevel(ProfileRequestHandler::$accountLevelEditOthers))}
+                <a class="button" href="/profile{tif $.User->ID != $Person->ID ? cat('?person=', $Person->ID)}">Edit Profile</a>
+            {/if}
+        </div>
+    </header>
 	
 	<div id="photos">
 		{if $Person->PrimaryPhoto}
@@ -20,10 +32,7 @@
 	</div>
 	
 	<div id="page-intro" class="">
-		<h1 class="run-in">{$Person->FullName|escape}</h1>
-		{if $Person->Location}
-		<div class="quick-info"><a href="http://maps.google.com/?q={$Person->Location|escape}" target="_blank">{$Person->Location|escape}</a></div>
-		{/if}
+		<h1 class="run-in"></h1>
 	</div>
 
 	<div id="info" class="">
