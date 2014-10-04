@@ -6,7 +6,6 @@ use DB;
 use ActiveRecord;
 use HandleBehavior, NestingBehavior;
 use Emergence\People\IPerson;
-use Emergence\People\Person;
 use PeopleRequestHandler;
 use DuplicateKeyException;
 use TableNotFoundException;
@@ -59,7 +58,8 @@ class Group extends ActiveRecord
     public static $relationships = array(
         'Members' => array(
             'type' => 'one-many'
-            ,'class' => 'GroupMember'
+            ,'class' => 'Emergence\People\Groups\GroupMember'
+            ,'foreign' => 'GroupID'
         )
         ,'Parent' => array(
             'type' => 'one-one'
@@ -68,7 +68,9 @@ class Group extends ActiveRecord
         ,'People' => array(
             'type' => 'many-many'
             ,'class' => 'Person'
-            ,'linkClass' => 'GroupMember'
+            ,'linkClass' => 'Emergence\People\Groups\GroupMember'
+            ,'linkLocal' => 'GroupID'
+            ,'linkForeign' => 'PersonID'
         )
     );
 
@@ -149,12 +151,13 @@ class Group extends ActiveRecord
         );
     }
 
-    public function getFullPath()
+    public function getFullPath($separator = '/')
     {
         return DB::oneValue(
-            'SELECT GROUP_CONCAT(Name SEPARATOR "/") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
+            'SELECT GROUP_CONCAT(Name SEPARATOR "%s") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
             ,array(
-                static::$tableName
+                DB::escape($separator)
+                ,static::$tableName
                 ,$this->Left
                 ,$this->Right
             )
@@ -178,7 +181,7 @@ class Group extends ActiveRecord
         }
     }
 
-    public static function setPersonGroups(Person $Person, $groupIDs)
+    public static function setPersonGroups(IPerson $Person, $groupIDs)
     {
         $assignedGroups = array();
 
