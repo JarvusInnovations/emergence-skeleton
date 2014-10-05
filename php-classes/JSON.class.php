@@ -42,6 +42,9 @@ class JSON
             case 403:
                 header('HTTP/1.0 403 Forbidden');
                 break;
+            case 404:
+                header('HTTP/1.0 404 Not Found');
+                break;
             case 405:
                 header('HTTP/1.0 405 Method Not Allowed');
                 break;
