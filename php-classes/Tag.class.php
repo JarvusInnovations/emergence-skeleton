@@ -32,6 +32,15 @@ class Tag extends ActiveRecord
             ,'class' => 'TagItem'
         )
     );
+    
+    public static $searchConditions = array(
+        'Prefix' => array(
+            'qualifiers' => array('prefix')
+            ,'points' => 2
+            ,'sql' => 'Handle LIKE "%%%s%%.%"'
+        )
+    );
+    
 
 
     // public methods
