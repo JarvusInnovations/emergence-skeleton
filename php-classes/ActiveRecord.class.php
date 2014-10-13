@@ -36,7 +36,7 @@ class ActiveRecord
     
     /**
      * Defaults values for field definitions
-	 * @var array
+     * @var array
 	 */
 	static public $fieldDefaults = array(
 		'type' => 'string'
@@ -664,7 +664,13 @@ class ActiveRecord
 				$data[$field] = $this->_getFieldValue($field);
 			}
 		}
-		
+
+        foreach (static::$dynamicFields AS $field => $options) {
+            if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
+                $data[$field] = $this->getDynamicFieldValue($field, true);
+            }
+        }
+
 		return $data;
 	}
     
@@ -693,37 +699,8 @@ class ActiveRecord
             if (!$this->userCanEnumerateDynamicField($field)) {
                 continue;
             }
-            
-            $method = $options['method'];
-            $getter = $options['getter'];
-            
-            if ($method && is_string($method) && method_exists($this, $method)) {
-                $value = $this->$method($stringsOnly, $options, $field);
-            } elseif($method && is_callable($method)) {
-                $value = call_user_func($method, $this, $stringsOnly, $options, $field);
-            } elseif ($getter && is_string($getter) && method_exists($this, $getter)) {
-                $value = $this->$getter();
-            } elseif($getter && is_callable($getter)) {
-                $value = call_user_func($getter);
-            } elseif(!empty($options['relationship']) && static::_relationshipExists($options['relationship'])) {
-                $value = $this->_getRelationshipValue($options['relationship']);
-            } else {
-                continue;
-            }
-            
-            if ($stringsOnly && !is_string($value)) {
-                if (is_array($value)) {
-                    $strings = array();
-                    foreach ($value AS $key => $attr) {
-                        $strings[] = is_string($key) ? "$key=$attr" : $attr;
-                    }
-                    $value = implode(',', $strings);
-                } else {
-                    $value = (string)$value;
-                }
-            }
-            
-            $data[$field] = $value;
+
+            $data[$field] = $$this->getDynamicFieldValue($field, $stringsOnly);
         }
 		
 		return $data;
@@ -1635,6 +1612,41 @@ class ActiveRecord
         }
         
         return $options;
+    }
+    
+    public function getDynamicFieldValue($field, $stringsOnly = false)
+    {
+        $options = static::getStackedConfig('dynamicFields', $field);
+        $method = $options['method'];
+        $getter = $options['getter'];
+
+        if ($method && is_string($method) && method_exists($this, $method)) {
+            $value = $this->$method($stringsOnly, $options, $field);
+        } elseif($method && is_callable($method)) {
+            $value = call_user_func($method, $this, $stringsOnly, $options, $field);
+        } elseif ($getter && is_string($getter) && method_exists($this, $getter)) {
+            $value = $this->$getter();
+        } elseif($getter && is_callable($getter)) {
+            $value = call_user_func($getter);
+        } elseif(!empty($options['relationship']) && static::_relationshipExists($options['relationship'])) {
+            $value = $this->_getRelationshipValue($options['relationship']);
+        } else {
+            $value = null;
+        }
+
+        if ($stringsOnly && !is_string($value)) {
+            if (is_array($value)) {
+                $strings = array();
+                foreach ($value AS $key => $attr) {
+                    $strings[] = is_string($key) ? "$key=$attr" : $attr;
+                }
+                $value = implode(',', $strings);
+            } else {
+                $value = (string)$value;
+            }
+        }
+
+        return $value;
     }
     
     static protected function _initValidators($config)
