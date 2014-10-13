@@ -700,7 +700,7 @@ class ActiveRecord
                 continue;
             }
 
-            $data[$field] = $$this->getDynamicFieldValue($field, $stringsOnly);
+            $data[$field] = $this->getDynamicFieldValue($field, $stringsOnly);
         }
 		
 		return $data;
