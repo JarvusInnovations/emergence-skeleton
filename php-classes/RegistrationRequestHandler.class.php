@@ -22,6 +22,10 @@ class RegistrationRequestHandler extends RequestHandler
 	// RequestHandler
 	public static $responseMode = 'html';
 
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+    );
+
 	static public function handleRequest()
 	{
 	

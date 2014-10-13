@@ -9,6 +9,10 @@ class LoginRequestHandler extends RequestHandler
 	static public $onLoginComplete = false;
 	static public $onLogoutComplete = false;
 
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+    );
+
 	// event templates
 	static protected function onLoginComplete(Session $Session, $returnURL) {}
 	static protected function onLogoutComplete(Session $Session, $returnURL) {}
