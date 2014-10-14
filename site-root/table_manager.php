@@ -1,4 +1,3 @@
 <?php
 
-
-TableManagerRequestHandler::handleRequest();
+Site::redirect('/site-admin/table-manager');
