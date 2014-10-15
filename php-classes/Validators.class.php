@@ -6,7 +6,7 @@ class Validators
     {
         $options = array_merge(array(
             'value' => false
-		), $options);
+    	), $options);
 		
 		if($options['value'])
 		{
@@ -33,15 +33,18 @@ class Validators
 	public static function string_multiline($string, $options = array())
 	{
 		$options = array_merge(array(
-			'maxlength' => false
+			'maxlength' => false,
+			'maxwords' => false
 		), $options);
-		
-		return !empty($string) && ( ($options['maxlength'] == false) || (strlen($string) <= $options['maxlength']));
+        
+		return !empty($string) 
+	            && ( ($options['maxlength'] == false) || (strlen($string) <= $options['maxlength']))
+	            && ( ($options['maxwords'] == false) || ( str_word_count($string) <= $options['maxwords']));
 	}
 
 	public static function full_name($string)
 	{
-    	return !empty($string) && preg_match('/^[\\pL][\\pL\'\\-]+\s+([\\pL][\\pL\'.\\-]*\s+)*[\\pL][\\pL\'\\-]+$/u', $string);
+		return !empty($string) && ctype_print($string) && preg_match('/[a-zA-Z][a-zA-Z\']+\s+([a-zA-Z][a-zA-Z\'.]*\s+)*[a-zA-Z][a-zA-Z\']+/', $string);
 	}
 
 	public static function number($number, $options = array())
