@@ -5,6 +5,7 @@ namespace Emergence\People\Groups;
 use DB;
 use ActiveRecord;
 use HandleBehavior, NestingBehavior;
+use Person; // TODO: use Emergence\People\Person instead in skeleton-v2+
 use Emergence\People\IPerson;
 use PeopleRequestHandler;
 use DuplicateKeyException;
