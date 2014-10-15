@@ -4,7 +4,7 @@ class Sencha
 {
     static public $frameworks = array(
         'ext' => array(
-        	'defaultVersion' => '4.2.2.1144'
+            'defaultVersion' => '4.2.2.1144'
 			,'mappedVersions' => array(
 				'4.2.1' => '4.2.1.883'
 				,'4.2.2' => '4.2.2.1144'
@@ -15,10 +15,11 @@ class Sencha
 			)
 		)
 		,'touch' => array(
-			'defaultVersion' => '2.3.1'
+			'defaultVersion' => '2.4.0'
 			,'mappedVersions' => array(
     			'2.2.1' => '2.2.1.2'
-    			,'2.3.1.410' => '2.3.1'
+        		,'2.3.1.410' => '2.3.1'
+        		,'2.4.0.487' => '2.4.0'
 			)
 		)
 	);
@@ -27,6 +28,8 @@ class Sencha
 	
 	static public $cmdPath = '/usr/local/bin/Sencha/Cmd';
 	static public $binPaths = array('/bin','/usr/bin','/usr/local/bin');
+
+    protected static $_workspaceCfg;
 	
 	static public function buildCmd()
 	{
@@ -209,5 +212,21 @@ class Sencha
         } else {
             return array();
         }
+    }
+
+    public static function getWorkspaceCfg($key = null)
+    {
+        if (!static::$_workspaceCfg) {
+            // get from filesystem
+            $configPath = array('sencha-workspace', '.sencha', 'workspace', 'sencha.cfg');
+            
+            if ($configNode = Site::resolvePath($configPath, true, false)) {
+                static::$_workspaceCfg = Sencha::loadProperties($configNode->RealPath);
+            } else {
+                static::$_workspaceCfg = array();
+            }
+        }
+
+		return $key ? static::$_workspaceCfg[$key] : static::$_workspaceCfg;
     }
 }

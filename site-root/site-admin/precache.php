@@ -36,4 +36,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 RequestHandler::respond('precache', array(
     'message' => $message
 ));
-

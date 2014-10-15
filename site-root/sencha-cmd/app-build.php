@@ -22,7 +22,7 @@ $App = new Sencha_App($appName);
 
 // get build type
 if(empty($_REQUEST['buildType'])) {
-	$buildType = 'production';
+    $buildType = 'production';
 }
 else {	
 	$buildType = $_REQUEST['buildType'];
@@ -44,7 +44,10 @@ if (!$cmdVersion) {
 }
 
 // get app-level classpath
-$classPaths = explode(',', $App->getBuildCfg('app.classpath')); // TODO: load workspace classpaths as well
+$classPaths = array_unique(array_filter(array_merge(
+    explode(',', $App->getBuildCfg('app.classpath')),
+    explode(',', Sencha::getWorkspaceCfg('workspace.classpath'))
+)));
 
 // set paths
 $workspacePath = 'sencha-workspace';

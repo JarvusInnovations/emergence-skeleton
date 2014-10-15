@@ -66,7 +66,7 @@
     </form>
 
     <form method="POST" id="profileForm" class="generic">
-        {if ProfileRequestHandler::$accountLevelEditOthers}
+        {if ProfileRequestHandler::$accountLevelEditOthers && $.User->hasAccountLevel(ProfileRequestHandler::$accountLevelEditOthers)}
             <h2 class="legend">Account Settings ({ProfileRequestHandler::$accountLevelEditOthers} only)</h2>
             <fieldset class="section">
                 <div class="field">

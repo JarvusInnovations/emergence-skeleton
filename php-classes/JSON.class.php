@@ -4,7 +4,7 @@ class JSON
 {
     public static function getRequestData($subkey = false)
     {
-		if (!$requestText = file_get_contents('php://input')) {
+    	if (!$requestText = file_get_contents('php://input')) {
 			return false;
 		}
 		
@@ -30,8 +30,29 @@ class JSON
 	}
 
 	
-	public static function error($message)
+	public static function error($message, $statusCode = 200)
 	{
+        switch ($statusCode) {
+            case 400:
+                header('HTTP/1.0 400 Bad Request');
+                break;
+            case 401:
+                header('HTTP/1.0 401 Unauthorized');
+                break;
+            case 403:
+                header('HTTP/1.0 403 Forbidden');
+                break;
+            case 404:
+                header('HTTP/1.0 404 Not Found');
+                break;
+            case 405:
+                header('HTTP/1.0 405 Method Not Allowed');
+                break;
+            case 429:
+                header('HTTP/1.1 429 Too Many Requests');
+                break;
+        }
+
 		$args = func_get_args();
 		
 		self::respond(array(
