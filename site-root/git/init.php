@@ -74,9 +74,6 @@ $repo = PHPGit_Repository::create($repoPath, !empty($_REQUEST['debug']));
 Benchmark::mark("initialized git repo in $repoPath");
 
 
-// add gitignore
-file_put_contents("$repoPath/.gitignore", ".emergence\n");
-
 
 // add remote
 $repo->git("remote add origin $repoCfg[remote]");
@@ -97,3 +94,8 @@ if(!empty($repoCfg['originBranch'])) {
 else {
 	die('TODO: handle initializing repo without originBranch'); // see http://git.661346.n2.nabble.com/how-to-start-with-non-master-branch-td3284326.html
 }
+
+
+
+// add gitignore
+file_put_contents("$repoPath/.gitignore", ".emergence\n", FILE_APPEND);
