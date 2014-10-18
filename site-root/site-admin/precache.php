@@ -5,7 +5,9 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     Site::$autoPull = true;
     Site::$debug = true;
-    
+
+    set_time_limit(0);
+
     $trees = array(
         'dwoo-plugins'
         ,'event-handlers'
