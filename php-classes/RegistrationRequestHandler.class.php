@@ -4,7 +4,8 @@ class RegistrationRequestHandler extends RequestHandler
 {
     // configurables
     static public $enableRegistration = true;
-	static public $onRegisterComplete = false;
+    static public $createUser;
+    static public $onRegisterComplete;
 	static public $applyRegistrationData;
 	static public $registrationFields = array(
 		'FirstName'
@@ -69,28 +70,30 @@ class RegistrationRequestHandler extends RequestHandler
 		if (!static::$enableRegistration) {
 			return static::throwError('Sorry, self-registration is not currently available. Please contact an administrator.');
 		}
-        
-        $className = User::getStaticDefaultClass();
-		$User = new $className();
+
+    	$filteredRequestFields = array_intersect_key($_REQUEST, array_flip(static::$registrationFields));
+		$additionalErrors = array();
+
+        if (is_callable(static::$createUser)) {
+            $User = call_user_func_array(static::$createUser, array(&$filteredRequestFields, &$additionalErrors));
+        } else {
+            $className = User::getStaticDefaultClass();
+    		$User = new $className();
+        }
 
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			$requestFields = array_intersect_key($_REQUEST, array_flip(static::$registrationFields));
-
 			// save person fields
-			$User->setFields(array_merge($requestFields, array(
-				'AccountLevel' => User::$fields['AccountLevel']['default']
-			), $overrideFields));
+			$User->setFields(array_merge($filteredRequestFields, $overrideFields));
             
             if (!empty($_REQUEST['Password'])) {
                 $User->setClearPassword($_REQUEST['Password']);
             }
 			
 			// additional checks
-			$additionalErrors = array();
-			if(empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < User::$minPasswordLength))
+			if(empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < $User::$minPasswordLength))
 			{
-				$additionalErrors['Password'] = 'Password must be at least '.User::$minPasswordLength.' characters long.';
+				$additionalErrors['Password'] = 'Password must be at least '.$User::$minPasswordLength.' characters long.';
 			}
 			elseif(empty($_REQUEST['PasswordConfirm']) || ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm']))
 			{
@@ -153,7 +156,7 @@ class RegistrationRequestHandler extends RequestHandler
 	{
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			$userClass = User::$defaultClass;
+			$userClass = User::getStaticDefaultClass();
 		
 			if(empty($_REQUEST['username']))
 			{
@@ -182,6 +185,7 @@ class RegistrationRequestHandler extends RequestHandler
 		}
 
 		return static::respond('recoverPassword', array(
+            'success' => empty($error),
 			'error' => isset($error) ? $error : false
 		));
 	}
