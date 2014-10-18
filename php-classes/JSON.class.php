@@ -4,7 +4,7 @@ class JSON
 {
     public static function getRequestData($subkey = false)
     {
-    	if (!$requestText = file_get_contents('php://input')) {
+        if (!$requestText = file_get_contents('php://input')) {
 			return false;
 		}
 		
@@ -19,8 +19,14 @@ class JSON
 			newrelic_disable_autorum();
 		}
 		
-		header('Content-type: application/json', true);
-		print json_encode($data);
+		$text = json_encode($data);
+        
+        if ($text === false) {
+            throw new Exception('Failed to encode json data, json_last_error='.json_last_error());
+        }
+        
+    	header('Content-type: application/json', true);
+        print($text);
 		Site::finishRequest($exit);
 	}
 	

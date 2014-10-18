@@ -3,7 +3,7 @@
 class HandleBehavior extends RecordBehavior
 {
     public static $alwaysSuffix = false;
-    public static $incrementerFormat = '%s-%u';
+    public static $suffixFormat = '%s-%u';
     public static $transliterate = true;
 
     public static function onSave(ActiveRecord $Record, $handleInput = false)
@@ -40,7 +40,10 @@ class HandleBehavior extends RecordBehavior
             'handleField' => 'Handle'
             ,'domainConstraints' => array()
             ,'alwaysSuffix' => static::$alwaysSuffix
-            ,'incrementerFormat' => static::$incrementerFormat
+            ,'randomSuffix' => false
+            ,'randomSuffixMin' => 100
+            ,'randomSuffixMax' => 999
+            ,'suffixFormat' => static::$suffixFormat
             ,'transliterate' => static::$transliterate
             ,'case' => 'lower' // 'lower' / 'upper' / null
         ), $options);
@@ -92,7 +95,7 @@ class HandleBehavior extends RecordBehavior
             $incarnation++;
 
             if ($options['alwaysSuffix'] || $incarnation > 1) {
-                $handle = sprintf($options['incrementerFormat'], $text, $incarnation);
+                $handle = sprintf($options['suffixFormat'], $text, $options['randomSuffix'] ? mt_rand($options['randomSuffixMin'], $options['randomSuffixMax']) : $incarnation);
             }
             
             $where[$options['handleField']] = $handle;
