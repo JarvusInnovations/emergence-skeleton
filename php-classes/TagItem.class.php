@@ -4,7 +4,7 @@ class TagItem extends ActiveRecord
 {
 
     static public $tableName = 'tag_items';
-	static public $rootClass = __CLASS__;
+    static public $rootClass = __CLASS__;
 	
 	static public $fields = array(
 		'ID' => null
@@ -19,7 +19,6 @@ class TagItem extends ActiveRecord
 		)
 		,'TagID' => array(
 			'type' => 'integer'
-			,'index' => true
 		)
 	);
 	

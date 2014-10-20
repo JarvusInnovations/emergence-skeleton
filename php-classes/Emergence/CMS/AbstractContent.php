@@ -60,6 +60,7 @@ abstract class AbstractContent extends \VersionedRecord
         ,'Published' => array(
             'type'  =>  'timestamp'
             ,'notnull' => false
+            ,'index' => true
         )
         ,'Visibility' => array(
             'type' => 'enum'

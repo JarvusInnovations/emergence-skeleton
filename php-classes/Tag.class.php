@@ -290,6 +290,7 @@ class Tag extends ActiveRecord
             ,'limit' => is_numeric($options) ? $options : false
             ,'offset' => 0
             ,'overlayTag' => false
+            ,'calcFoundRows' => false
         ), $options);
 
         // build TagItem query
@@ -334,11 +335,15 @@ class Tag extends ActiveRecord
 
         // return objects
         $classQuery = sprintf(
-            'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` WHERE (%s) AND `%s` IN (%s)'
+            'SELECT %s'
+            .' Content.*'
+            .' FROM (%s) TagItem'
+            .' JOIN `%s` Content ON (Content.ID = TagItem.ContextID)'
+            .' WHERE (%s)'
+            , $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
+            , $tagQuery                                                 // tag_items query
             , $class::$tableName                                        // item's table name
             , count($classWhere) ? join(') AND (', $classWhere) : '1'   // optional where clause
-            , $class::getColumnName('ID')                               // item's id column name
-            , $tagQuery                                                 // tag_items query
         );
 
 
