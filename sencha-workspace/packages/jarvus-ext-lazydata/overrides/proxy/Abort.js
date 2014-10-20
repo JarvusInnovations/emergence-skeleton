@@ -1,3 +1,5 @@
+/* jshint undef: true, unused: true, browser: true, quotmark: single, curly: true */
+/* global Ext */
 Ext.define('Jarvus.ext.override.proxy.Abort', {
     override: 'Ext.data.proxy.Ajax',
 
