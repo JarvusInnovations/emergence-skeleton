@@ -68,7 +68,7 @@ class Tag extends ActiveRecord
         return $tags = preg_split('/\s*[,]+\s*/', trim($tags));
     }
 
-    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true)
+    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true, $prefix = null)
     {
         $assignedTags = array();
 
@@ -99,15 +99,23 @@ class Tag extends ActiveRecord
             }
         }
 
+        if ($prefix) {
+            $groupTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', [
+                \Tag::$tableName,
+                DB::escape($prefix)
+            ]);
+        }
+
         // delete tags
         try {
             DB::query(
-                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s)'
+                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s'
                 ,array(
                     TagItem::$tableName
                     ,DB::escape($Context->getRootClass())
                     ,$Context->ID
                     ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
+                    ,$prefix ? (' AND TagID IN ('.implode(',', $groupTags).')') : ''
                 )
             );
         } catch (TableNotFoundException $e) { }
