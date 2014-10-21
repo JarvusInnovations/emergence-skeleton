@@ -55,18 +55,20 @@ class Address extends ActiveRecord
 			,'length' => '5,0'
 			,'notnull' => false		
 	));
-	
-	static public function _defineFields()
+		
+    static protected function _initField($field, $options = array())
 	{
-		// init State/Province field values
-		self::$fields['State_Province']['values'] = array_merge(array_keys(static::$usStates), array_keys(static::$caProvinces), array_keys(static::$auStates));
-	
-		// init Country field values
-		self::$fields['Country']['values'] = array_keys(static::$countries);
-	
-		parent::_defineFields();
+		if ($field == 'State_Province') {
+			$options['values'] = array_merge(array_keys(static::$usStates), array_keys(static::$caProvinces), array_keys(static::$auStates));
+		}
+        
+        if ($field == 'Country') {
+    		$options['values'] = array_keys(static::$countries);
+		}
+
+        return parent::_initField($field, $options);
 	}
-	
+
 	public function getValue($name)
 	{
 		switch($name)
@@ -127,7 +129,7 @@ class Address extends ActiveRecord
 		$this->_validator->validate(array(
 			'field' => 'Country'
 			,'validator' => 'selection'
-			,'choices' => static::$fields['Country']['values']
+			,'choices' => static::getFieldOptions('Country', 'values')
 		));
 		
 		if(!$this->_validator->hasErrors('Country'))
