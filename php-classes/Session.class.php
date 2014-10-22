@@ -114,14 +114,6 @@ class Session extends ActiveRecord
 			return $Session;
 		}
 	}
-	
-	public function getData()
-	{
-		// embed related object(s)
-		return array_merge(parent::getData(), array(
-			'Person' => $this->Person ? $this->Person->getData() : null
-		));
-	}
 
 	public function save($deep = true)
 	{
