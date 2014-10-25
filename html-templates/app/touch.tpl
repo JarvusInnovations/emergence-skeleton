@@ -57,15 +57,6 @@
                 }
             </style>
         {/block}
-
-        {block js-loader}
-            {if $mode == 'production'}
-                <script type="text/javascript">
-                    {$App->getMicroloader($mode)}
-                    Ext.blink({ "id":"{$App->getAppId()}" })
-                </script>
-            {/if}
-        {/block}
     </head>
     <body class="{block body-class}{/block}">
         {block body}
@@ -97,7 +88,12 @@
         {/block}
 
         {block js-app}
-            {if $mode != 'production'}
+            {if $mode == 'production'}
+                <script type="text/javascript">
+                    {$App->getMicroloader($mode)}
+                    Ext.blink({ "id":"{$App->getAppId()}" })
+                </script>
+            {else}
                 {if $mode == 'development' || !$App->getAsset('build/production/app.js')}
                     {block js-app-devenv}
                         {capture assign=frameworkPath}sdk/sencha-touch{tif $.get.frameworkBuild!=core ? '-all'}{tif $mode == 'development' && $.get.frameworkBuild != allmin ? '-debug'}.js{/capture}
@@ -118,15 +114,15 @@
                         {/if}
                     {/foreach}
                 {/block}
-            {/if}
 
-            {block js-app-remote}
-                {foreach item=script from=$App->getAppCfg('js')}
-                    {if $script.remote}
-                        <script src="{$script.path|escape}"></script>
-                    {/if}
-                {/foreach}
-            {/block}
+                {block js-app-remote}
+                    {foreach item=script from=$App->getAppCfg('js')}
+                        {if $script.remote}
+                            <script src="{$script.path|escape}"></script>
+                        {/if}
+                    {/foreach}
+                {/block}
+            {/if}
         {/block}
     </body>
 </html>

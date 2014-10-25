@@ -14,8 +14,6 @@
         {block base}{/block}
 
         {block css-loader}{/block}
-
-        {block js-loader}{/block}
     </head>
 
     <body class="{block body-class}loading{/block}">
