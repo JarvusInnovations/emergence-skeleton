@@ -79,7 +79,7 @@
         {block js-data}
             <script type="text/javascript">
                 var SiteEnvironment = SiteEnvironment || { };
-                SiteEnvironment.user = {$.User->getData()|json_encode};
+                SiteEnvironment.user = {JSON::translateObjects($.User)|json_encode};
                 SiteEnvironment.appName = {$App->getName()|json_encode};
                 SiteEnvironment.appMode = {$mode|json_encode};
                 SiteEnvironment.appBaseUrl = '/app/{$App->getName()}/{tif $mode == production || $mode == testing ? "build/$mode/"}';
