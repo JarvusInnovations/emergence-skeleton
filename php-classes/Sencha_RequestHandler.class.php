@@ -6,7 +6,7 @@ class Sencha_RequestHandler extends RequestHandler
 
     static public $validModes = array(
         'development'
-		,'develop' => 'development'
+    	,'develop' => 'development'
 		,'testing'
 		,'production'
 	);
@@ -285,7 +285,7 @@ class Sencha_RequestHandler extends RequestHandler
 
         // check for app-specific config
         if (array_key_exists($appName, static::$appAccountLevels)) {
-            if (is_string(static::$appAccountLevels[$appName])) {
+            if (is_string(static::$appAccountLevels[$appName]) || !static::$appAccountLevels[$appName]) {
                 return static::$appAccountLevels[$appName];
             } elseif (array_key_exists($mode, static::$appAccountLevels[$appName])) {
                 return static::$appAccountLevels[$appName][$mode];
