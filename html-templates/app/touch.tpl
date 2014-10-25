@@ -88,10 +88,12 @@
         {/block}
 
         {block js-app}
+            <script type="text/javascript">
+                {$App->getMicroloader($mode)}
+            </script>
             {if $mode == 'production'}
                 <script type="text/javascript">
-                    {$App->getMicroloader($mode)}
-                    Ext.blink({ "id":"{$App->getAppId()}" })
+                    Ext.blink({ "id":"{$App->getAppId()}" });
                 </script>
             {else}
                 {if $mode == 'development' || !$App->getAsset('build/production/app.js')}

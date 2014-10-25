@@ -7,7 +7,7 @@ class Sencha_App
     
     function __construct($name)
     {
-    	$this->_name = $name;
+        $this->_name = $name;
 	}
 	
 	static public function getByName($name)
@@ -169,7 +169,8 @@ class Sencha_App
         $cacheKey = "app/$this->_name/microloader/$mode";
         
         if ($debug || !($code = Cache::fetch($cacheKey))) {
-            $code = file_get_contents(static::getAsset("microloaders/$mode.js")->RealPath);
+            $node = static::getAsset("microloaders/$mode.js");
+            $code = $node ? file_get_contents($node->RealPath) : '';
             
             if (!$debug) {
                 $code = JSMin::minify($code);
