@@ -22,7 +22,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         'application/json' => 'json'
         ,'text/csv' => 'csv'
     );
-	
+    
 	static public function handleRequest()
 	{
 		// save static class
@@ -68,6 +68,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 			case '':
 			case false:
 			{
+                if (count(static::getPath())) {
+                    // throw an error for URLs like /collection//foo
+                    return static::throwInvalidRequestError();
+                }
+
 				return static::handleBrowseRequest();
 			}
 
