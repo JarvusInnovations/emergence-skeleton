@@ -100,10 +100,10 @@ class Tag extends ActiveRecord
         }
 
         if ($prefix) {
-            $groupTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', [
+            $groupTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
                 \Tag::$tableName,
                 DB::escape($prefix)
-            ]);
+            ));
         }
 
         // delete tags
