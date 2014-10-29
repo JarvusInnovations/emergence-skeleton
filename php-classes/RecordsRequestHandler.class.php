@@ -23,7 +23,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         ,'text/csv' => 'csv'
     );
     
-	static public function handleRequest()
+    static public function handleRequest()
 	{
 		// save static class
 		static::$calledClass = get_called_class();
@@ -159,7 +159,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			
 			if($sqlSearchConditions['joins'])
 			{
-				$joins = array_merge($joins, $sqlSearchConditions['joins']);
+				$joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
 			}
 		}
         
