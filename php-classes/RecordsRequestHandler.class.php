@@ -22,8 +22,8 @@ abstract class RecordsRequestHandler extends RequestHandler
         'application/json' => 'json'
         ,'text/csv' => 'csv'
     );
-	
-	static public function handleRequest()
+    
+    static public function handleRequest()
 	{
 		// save static class
 		static::$calledClass = get_called_class();
@@ -68,6 +68,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 			case '':
 			case false:
 			{
+                if (count(static::getPath())) {
+                    // throw an error for URLs like /collection//foo
+                    return static::throwInvalidRequestError();
+                }
+
 				return static::handleBrowseRequest();
 			}
 
@@ -154,7 +159,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			
 			if($sqlSearchConditions['joins'])
 			{
-				$joins = array_merge($joins, $sqlSearchConditions['joins']);
+				$joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
 			}
 		}
         
@@ -374,7 +379,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 	static public function handleMultiSaveRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
@@ -465,7 +470,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	
 	static public function handleMultiDestroyRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}

@@ -300,18 +300,23 @@ class Media extends ActiveRecord
             $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
             $croppedImage->writeimage($thumbPath);
         } else {
-            $widthRatio = ($this->Width > $maxWidth) ? ($maxWidth / $this->Width) : 1;
-            $heightRatio = ($this->Height > $maxHeight) ? ($maxHeight / $this->Height) : 1;
+            if ($this->Width && $this->Height) {
+                $widthRatio = ($this->Width > $maxWidth) ? ($maxWidth / $this->Width) : 1;
+                $heightRatio = ($this->Height > $maxHeight) ? ($maxHeight / $this->Height) : 1;
 
-            // crop width/height to scale size if fill disabled
-            if ($cropped) {
-                $ratio = max($widthRatio, $heightRatio);
+                // crop width/height to scale size if fill disabled
+                if ($cropped) {
+                    $ratio = max($widthRatio, $heightRatio);
+                } else {
+                    $ratio = min($widthRatio, $heightRatio);
+                }
+
+                $scaledWidth = round($this->Width * $ratio);
+                $scaledHeight = round($this->Height * $ratio);
             } else {
-                $ratio = min($widthRatio, $heightRatio);
+                $scaledWidth = $maxWidth;
+                $scaledHeight = $maxHeight;
             }
-
-            $scaledWidth = round($this->Width * $ratio);
-            $scaledHeight = round($this->Height * $ratio);
 
             if (!$fillColor && !$cropped) {
                 $thumbWidth = $scaledWidth;

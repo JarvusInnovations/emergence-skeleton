@@ -48,10 +48,16 @@ class ProfileRequestHandler extends RequestHandler
         $User = static::_getRequestedUser();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (!$GLOBALS['Session']->hasAccountLevel('Administrator')) {
-                $profileChanges = array_intersect_key($_REQUEST, array_flip(static::$profileFields));
+            if ($_SERVER['CONTENT_TYPE'] == 'application/json') {
+                $requestData = JSON::getRequestData();
             } else {
-                $profileChanges = $_REQUEST;
+                $requestData = $_REQUEST;
+            }
+
+            if (!$GLOBALS['Session']->hasAccountLevel('Administrator')) {
+                $profileChanges = array_intersect_key($requestData, array_flip(static::$profileFields));
+            } else {
+                $profileChanges = $requestData;
             }
 
             $User->setFields($profileChanges);

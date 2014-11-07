@@ -68,7 +68,7 @@ class Tag extends ActiveRecord
         return $tags = preg_split('/\s*[,]+\s*/', trim($tags));
     }
 
-    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true)
+    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true, $prefix = null)
     {
         $assignedTags = array();
 
@@ -99,15 +99,23 @@ class Tag extends ActiveRecord
             }
         }
 
+        if ($prefix) {
+            $groupTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
+                \Tag::$tableName,
+                DB::escape($prefix)
+            ));
+        }
+
         // delete tags
         try {
             DB::query(
-                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s)'
+                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s'
                 ,array(
                     TagItem::$tableName
                     ,DB::escape($Context->getRootClass())
                     ,$Context->ID
                     ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
+                    ,$prefix ? (' AND TagID IN ('.implode(',', $groupTags).')') : ''
                 )
             );
         } catch (TableNotFoundException $e) { }
@@ -290,6 +298,7 @@ class Tag extends ActiveRecord
             ,'limit' => is_numeric($options) ? $options : false
             ,'offset' => 0
             ,'overlayTag' => false
+            ,'calcFoundRows' => false
         ), $options);
 
         // build TagItem query
@@ -334,11 +343,15 @@ class Tag extends ActiveRecord
 
         // return objects
         $classQuery = sprintf(
-            'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` WHERE (%s) AND `%s` IN (%s)'
+            'SELECT %s'
+            .' Content.*'
+            .' FROM (%s) TagItem'
+            .' JOIN `%s` Content ON (Content.ID = TagItem.ContextID)'
+            .' WHERE (%s)'
+            , $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
+            , $tagQuery                                                 // tag_items query
             , $class::$tableName                                        // item's table name
             , count($classWhere) ? join(') AND (', $classWhere) : '1'   // optional where clause
-            , $class::getColumnName('ID')                               // item's id column name
-            , $tagQuery                                                 // tag_items query
         );
 
 

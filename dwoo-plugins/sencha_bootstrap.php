@@ -7,6 +7,9 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $App = $dwoo->data['App'];
     }
 
+    // load workspace classpaths
+    $classPaths = array_merge($classPaths, explode(',', Sencha::getWorkspaceCfg('workspace.classpath')));
+
     // if app provided, load classpaths and packages
     if ($App) {
         $framework = $App->getFramework();
@@ -64,10 +67,13 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     
     // include classpaths from packages
     $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
+    
+    // filter classpaths
+    $classPaths = array_unique(array_filter($classPaths));
 
     // build list of all source trees, resolving CMD variables and children
     $sources = array();
-    foreach (array_unique($classPaths) AS $classPath) {
+    foreach ($classPaths AS $classPath) {
         if (strpos($classPath, '${workspace.dir}/x/') === 0) {
             $classPath = substr($classPath, 19);
             $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
@@ -98,6 +104,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     // process all source files and build manifest and list of classes to automatically load
     foreach ($sources AS $path => &$source) {
         $autoLoad = false;
+        $addToManifest = true;
 
         // rewrite path to canonican external URL
         if ($appPath && strpos($path, "$appPath/") === 0) {
@@ -110,6 +117,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             // package overrides should automatically be loaded
             if (substr($path, strpos($path, '/', 26), 11) == '/overrides/') {
                 $autoLoad = true;
+                $addToManifest = false;
             }
         } elseif (strpos($path, 'sencha-workspace/pages/') === 0) {
             $webPath = '/app/'.substr($path, 17);
@@ -149,7 +157,9 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $webPath = "$webPath?_sha1=$source[SHA1]";
 
         // map class name to path
-        $manifest[$source['Class']] = $webPath;
+        if ($addToManifest) {
+            $manifest[$source['Class']] = $webPath;
+        }
 
         // add path to autoLoad list
         if ($autoLoad) {
@@ -220,18 +230,20 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             .$loaderPatch
 
             .'Ext.Loader.addClassPathMappings('.json_encode($manifest).');'
-            .(
-                count($autoLoadPaths) ?
-                    'Ext.Array.each('.json_encode($autoLoadPaths).', function(url) {'
-                        .(
-                            $framework == 'ext' ?
-                                'Ext.Loader.loadScript(url);'
-                            :
-                                'Ext.Loader.loadScriptFile(url, Ext.emptyFn);'
-                        )
-                    .'});'
-                :
-                    ''
-            )
-        .'})()</script>';
+        .'})()</script>'
+
+        .(
+            count($autoLoadPaths) ?
+                implode(
+                    '',
+                    array_map(
+                        function($url) {
+                            return '<script type="text/javascript" src="'.$url.'"></script>';
+                        },
+                        $autoLoadPaths
+                    )
+                )
+            :
+                ''
+        );
 }

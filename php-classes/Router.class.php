@@ -45,7 +45,7 @@ class Router
         return false;
     }
 
-    public static function redirectViewRecord(ActiveRecord $Record, $path = array())
+    public static function redirectViewRecord(ActiveRecord $Record, $path = array(), $permanent = false)
     {
         if (is_array($path)) {
             $path = implode('/', $path);
@@ -63,6 +63,10 @@ class Router
             $url .= '/' . ltrim($path, '/');
         }
 
-        Site::redirect($url);
+        if ($permanent) {
+            Site::redirectPermanent($url);
+        } else {
+            Site::redirect($url);
+        }
     }
 }

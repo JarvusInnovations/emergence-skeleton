@@ -26,6 +26,12 @@ class ContentBlock extends \VersionedRecord
             'type' => 'clob'
         )
     );
+    
+    public static $dynamicFields = array(
+        'html' => array(
+            'getter' => 'getHtml'
+        )
+    );
 
 
     public static function getByHandle($contentHandle)
