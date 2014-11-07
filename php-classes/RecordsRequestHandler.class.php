@@ -379,7 +379,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 	static public function handleMultiSaveRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
@@ -470,7 +470,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 	
 	static public function handleMultiDestroyRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
