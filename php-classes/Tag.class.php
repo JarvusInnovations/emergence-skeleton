@@ -92,7 +92,7 @@ class Tag extends ActiveRecord
         }
 
         foreach ($tags AS $tag) {
-            if (is_string($tag) || is_int($tag)) {
+            if ($tag && (is_string($tag) || is_int($tag))) {
                 $tag = static::getFromHandle($tag, $autoCreate, $prefix);
             }
 
@@ -105,25 +105,27 @@ class Tag extends ActiveRecord
         }
 
         if ($prefix) {
-            $groupTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
+            $prefixTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
                 \Tag::$tableName,
                 DB::escape($prefix)
             ));
         }
 
         // delete tags
-        try {
-            DB::query(
-                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s'
-                ,array(
-                    TagItem::$tableName
-                    ,DB::escape($Context->getRootClass())
-                    ,$Context->ID
-                    ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
-                    ,$prefix ? (' AND TagID IN ('.implode(',', $groupTags).')') : ''
-                )
-            );
-        } catch (TableNotFoundException $e) { }
+        if (!$prefix || count($prefixTags)) { // if there are no existing tags with this prefix there are no items to delete
+            try {
+                DB::query(
+                    'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s'
+                    ,array(
+                        TagItem::$tableName
+                        ,DB::escape($Context->getRootClass())
+                        ,$Context->ID
+                        ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
+                        ,!empty($prefixTags) ? (' AND TagID IN ('.implode(',', $prefixTags).')') : ''
+                    )
+                );
+            } catch (TableNotFoundException $e) { }
+        }
 
         return $assignedTags;
     }
