@@ -8,7 +8,7 @@ abstract class RequestHandler
     
     
     // static properties
-	protected static $_path;
+    protected static $_path;
 	
 
 	// protected static methods
@@ -40,17 +40,22 @@ abstract class RequestHandler
 		if(!isset(static::$_path)) static::setPath();
 		return array_unshift(static::$_path, $string);
 	}
-	
+
+    public static function getResponseMode()
+    {
+        if (!empty($_GET['format']) && in_array($_GET['format'], static::$userResponseModes)) {
+            return $_GET['format'];
+        } elseif (!empty($_SERVER['HTTP_ACCEPT']) && array_key_exists($_SERVER['HTTP_ACCEPT'], static::$userResponseModes)) {
+            return static::$userResponseModes[$_SERVER['HTTP_ACCEPT']];
+        } else {
+		    return static::$responseMode;
+        }
+    }
+
 	static public function respond($responseID, $responseData = array(), $responseMode = false)
 	{
 		if (!$responseMode) {
-            if (!empty($_GET['format']) && in_array($_GET['format'], static::$userResponseModes)) {
-                $responseMode = $_GET['format'];
-            } elseif (!empty($_SERVER['HTTP_ACCEPT']) && array_key_exists($_SERVER['HTTP_ACCEPT'], static::$userResponseModes)) {
-                $responseMode = static::$userResponseModes[$_SERVER['HTTP_ACCEPT']];
-            } else {
-			    $responseMode = static::$responseMode;
-            }
+            $responseMode = static::getResponseMode();
 		}
 
 		if ($responseMode != 'return') {
