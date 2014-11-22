@@ -14,7 +14,8 @@ class PDFMedia extends Media
 		$className = get_called_class();
 
 		Media::$mimeHandlers['application/pdf'] = $className;
-        Media::$mimeHandlers['application/postscript'] = $className;
+        	Media::$mimeHandlers['application/postscript'] = $className;
+        	Media::$mimeHandlers['image/svg+xml'] = $className;
 
 		parent::__classLoaded();
 	}
@@ -35,6 +36,8 @@ class PDFMedia extends Media
 						return 'pdf';
 					case 'application/postscript':
 						return 'eps';
+					case 'image/svg+xml':
+						return 'svg';
 					default:
 						throw new Exception('Unable to find document extension for mime-type: ' . $this->MIMEType);
 				}
