@@ -1438,12 +1438,7 @@ class ActiveRecord
         return $relationships;
 	}
 	
-	public static function getDefaultForeignIdentifierColumnName()
-    {
-        $reflection = new \ReflectionClass(static::getStaticRootClass());
-        return $reflection->getShortName() . 'ID';
-    }
-    
+	
 	static protected function _initRelationship($relationship, $options)
 	{
 		// sanity checks
@@ -1474,10 +1469,13 @@ class ActiveRecord
 				$options['local'] = $relationship . 'ID';
 				
 			if(empty($options['foreign']))
-				$options['foreign'] = 'ID';	
-				
+				$options['foreign'] = 'ID';
+    			
 			if(!isset($options['conditions']))
-				$options['conditions'] = array();			
+				$options['conditions'] = array();
+    			
+			if(!isset($options['order']))
+				$options['order'] = false;			
 		}
 		elseif($options['type'] == 'one-many')
 		{
@@ -1485,7 +1483,7 @@ class ActiveRecord
 				$options['local'] = 'ID';
 					
 			if(empty($options['foreign']))
-				$options['foreign'] = static::getDefaultForeignIdentifierColumnName();
+				$options['foreign'] = static::getStaticRootClass() . 'ID';
 				
 			if(!isset($options['indexField']))
 				$options['indexField'] = false;
@@ -1561,10 +1559,10 @@ class ActiveRecord
 				die('required many-many option "linkClass" missing');
 				
 			if(empty($options['linkLocal']))
-				$options['linkLocal'] = static::getDefaultForeignIdentifierColumnName();
+				$options['linkLocal'] = static::getStaticRootClass() . 'ID';
 		
 			if(empty($options['linkForeign']))
-				$options['linkForeign'] = $options['class']::getDefaultForeignIdentifierColumnName();
+				$options['linkForeign'] = $options['class']::getStaticRootClass() . 'ID';
 		
 			if(empty($options['local']))
 				$options['local'] = 'ID';	
@@ -2099,9 +2097,11 @@ class ActiveRecord
 				{
 					$conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel, $value) : $rel['conditions'];
 					
-					if (!empty($conditions)) {
+					if (!empty($conditions) || !empty($rel['order'])) {
 						$conditions[$rel['foreign']] = $value;
-						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions);
+						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions, array(
+                            'order' => $rel['order']
+                        ));
 					} else {
 						// use cachable single-field lookup
 						$this->_relatedObjects[$relationship] = $rel['class']::getByField($rel['foreign'], $value);
