@@ -37,7 +37,7 @@ class ActiveRecord
     /**
      * Defaults values for field definitions
      * @var array
-	 */
+     */
 	static public $fieldDefaults = array(
 		'type' => 'string'
 		,'notnull' => true
@@ -1438,7 +1438,12 @@ class ActiveRecord
         return $relationships;
 	}
 	
-	
+	public static function getDefaultForeignIdentifierColumnName()
+    {
+        $reflection = new \ReflectionClass(static::getStaticRootClass());
+        return $reflection->getShortName() . 'ID';
+    }
+    
 	static protected function _initRelationship($relationship, $options)
 	{
 		// sanity checks
@@ -1480,7 +1485,7 @@ class ActiveRecord
 				$options['local'] = 'ID';
 					
 			if(empty($options['foreign']))
-				$options['foreign'] = static::getStaticRootClass() . 'ID';
+				$options['foreign'] = static::getDefaultForeignIdentifierColumnName();
 				
 			if(!isset($options['indexField']))
 				$options['indexField'] = false;
@@ -1556,10 +1561,10 @@ class ActiveRecord
 				die('required many-many option "linkClass" missing');
 				
 			if(empty($options['linkLocal']))
-				$options['linkLocal'] = static::getStaticRootClass() . 'ID';
+				$options['linkLocal'] = static::getDefaultForeignIdentifierColumnName();
 		
 			if(empty($options['linkForeign']))
-				$options['linkForeign'] = $options['class']::getStaticRootClass() . 'ID';
+				$options['linkForeign'] = $options['class']::getDefaultForeignIdentifierColumnName();
 		
 			if(empty($options['local']))
 				$options['local'] = 'ID';	
