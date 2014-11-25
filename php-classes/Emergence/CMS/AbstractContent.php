@@ -3,7 +3,7 @@
 namespace Emergence\CMS;
 
 use ActiveRecord;
-use Emergence\People\Person;
+use Emergence\People\IPerson;
 use HandleBehavior;
 use JSON;
 
@@ -132,7 +132,7 @@ abstract class AbstractContent extends \VersionedRecord
         return static::getAllByContextObject($Context, $options);
     }
 
-    public static function getAllPublishedByAuthor(Person $Author, $options = array())
+    public static function getAllPublishedByAuthor(IPerson $Author, $options = array())
     {
         $options = array_merge(array(
             'order' => array('Published' => 'DESC')
