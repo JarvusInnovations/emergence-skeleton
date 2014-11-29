@@ -107,7 +107,7 @@ class Group extends ActiveRecord
         return $this->finishValidation();
     }
 
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
         if (!$this->Founded) {
             $this->Founded = time();
