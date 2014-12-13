@@ -37,7 +37,7 @@ class ActiveRecord
     /**
      * Defaults values for field definitions
      * @var array
-	 */
+     */
 	static public $fieldDefaults = array(
 		'type' => 'string'
 		,'notnull' => true
@@ -1469,10 +1469,13 @@ class ActiveRecord
 				$options['local'] = $relationship . 'ID';
 				
 			if(empty($options['foreign']))
-				$options['foreign'] = 'ID';	
-				
+				$options['foreign'] = 'ID';
+    			
 			if(!isset($options['conditions']))
-				$options['conditions'] = array();			
+				$options['conditions'] = array();
+    			
+			if(!isset($options['order']))
+				$options['order'] = false;			
 		}
 		elseif($options['type'] == 'one-many')
 		{
@@ -2094,9 +2097,11 @@ class ActiveRecord
 				{
 					$conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel, $value) : $rel['conditions'];
 					
-					if (!empty($conditions)) {
+					if (!empty($conditions) || !empty($rel['order'])) {
 						$conditions[$rel['foreign']] = $value;
-						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions);
+						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions, array(
+                            'order' => $rel['order']
+                        ));
 					} else {
 						// use cachable single-field lookup
 						$this->_relatedObjects[$relationship] = $rel['class']::getByField($rel['foreign'], $value);

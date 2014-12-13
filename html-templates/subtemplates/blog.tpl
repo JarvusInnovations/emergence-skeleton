@@ -2,7 +2,7 @@
 {load_templates "subtemplates/comments.tpl"}
 {load_templates "subtemplates/contextLinks.tpl"}
 
-{template blogPost Post showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true headingLevel=h2}
+{template blogPost Post headingLevel=h2 showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true showContext=true}
     <article class="blog-post reading-width">
         {if $showHeader}
             <header class="article-header">
@@ -28,7 +28,7 @@
         {/if}
         <div class="section-info">
             <span class="author">Posted by {personLink $Post->Author}</span>
-            {if $Post->Context}
+            {if $showContext && $Post->Context}
                 in {contextLink $Post->Context}
             {/if}
             <span class="timestamp">on <time pubdate datetime="{$Post->Published|date_format:'%FT%T%z'}">{$Post->Published|date_format:"%A, %B %e, %Y at %l:%M %P"}</time></span>

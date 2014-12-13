@@ -105,10 +105,14 @@ class Tag extends ActiveRecord
         }
 
         if ($prefix) {
-            $prefixTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
-                \Tag::$tableName,
-                DB::escape($prefix)
-            ));
+            try {
+                $prefixTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
+                    \Tag::$tableName,
+                    DB::escape($prefix)
+                ));
+            }  catch (TableNotFoundException $e) {
+                $prefixTags = array();
+            }
         }
 
         // delete tags

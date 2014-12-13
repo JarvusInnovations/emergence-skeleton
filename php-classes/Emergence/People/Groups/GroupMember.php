@@ -47,7 +47,7 @@ class GroupMember extends ActiveRecord
         )
         ,'Group' => array(
             'type' => 'one-one'
-            ,'class' => 'Group'
+            ,'class' => 'Emergence\People\Groups\Group'
         )
     );
 
