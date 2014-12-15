@@ -6,7 +6,7 @@ class PhotoMedia extends Media
     // configurables
     public static $jpegCompression = 90;
 
-	// magic methods
+    // magic methods
 	static public function __classLoaded()
 	{
 		$className = get_called_class();

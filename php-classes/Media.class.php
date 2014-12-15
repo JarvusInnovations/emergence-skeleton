@@ -142,15 +142,7 @@ class Media extends ActiveRecord
                 );
 
             case 'Filename':
-
-                if ($this->ID)
-                {
-                    return $this->ID . '.' . $this->Extension;
-                }
-                else
-                {
-                    return 'default.' . $this->Extension;
-                }
+                return $this->getFilename();
 
             case 'ThumbnailMIMEType':
                 return $this->MIMEType;
@@ -172,13 +164,7 @@ class Media extends ActiveRecord
 
 
             case 'FilesystemPath':
-
-                if($this->ID == false)
-                {
-                    return false;
-                }
-
-                return Site::$rootPath.'/site-data/media/original/'.$this->Filename;
+                return $this->getFilesystemPath();
 
 
             case 'BlankPath':
@@ -243,12 +229,45 @@ class Media extends ActiveRecord
 
             default:
 
-                if(!$fileData = @file_get_contents($sourceFile))
-                {
+                if (!$fileData = @file_get_contents($sourceFile)) {
                     throw new Exception('Could not load media source: '.$sourceFile);
                 }
 
-                return imagecreatefromstring($fileData);
+                $image = imagecreatefromstring($fileData);
+
+                if ($this->MIMEType == 'image/jpeg') {
+                    $exifData = exif_read_data($sourceFile);
+
+                    switch ($exifData['Orientation']) {
+                        case 1: // nothing
+                            break;
+                        case 2: // horizontal flip
+                            imageflip($image, IMG_FLIP_HORIZONTAL); // TODO: need PHP 5.3 compat method
+                            break;
+                        case 3: // 180 rotate left
+                            $image = imagerotate($image, 180, null);
+                            break;
+                        case 4: // vertical flip
+                            imageflip($image, IMG_FLIP_VERTICAL); // TODO: need PHP 5.3 compat method
+                            break;
+                        case 5: // vertical flip + 90 rotate right
+                            imageflip($image, IMG_FLIP_VERTICAL); // TODO: need PHP 5.3 compat method
+                            $image = imagerotate($image, -90, null);
+                            break;
+                        case 6: // 90 rotate right
+                            $image = imagerotate($image, -90, null);
+                            break;
+                        case 7: // horizontal flip + 90 rotate right
+                            imageflip($image, IMG_FLIP_HORIZONTAL); // TODO: need PHP 5.3 compat method
+                            $image = imagerotate($image, -90, null);
+                            break;
+                        case 8: // 90 rotate left
+                            $image = imagerotate($image, 90, null);
+                            break;
+                    }
+                }
+
+                return $image;
         }
 
     }
@@ -300,9 +319,15 @@ class Media extends ActiveRecord
             $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
             $croppedImage->writeimage($thumbPath);
         } else {
-            if ($this->Width && $this->Height) {
-                $widthRatio = ($this->Width > $maxWidth) ? ($maxWidth / $this->Width) : 1;
-                $heightRatio = ($this->Height > $maxHeight) ? ($maxHeight / $this->Height) : 1;
+            // load source image
+            $srcImage = $this->getImage();
+            $srcWidth = imagesx($srcImage);
+            $srcHeight = imagesy($srcImage);
+
+            // calculate
+            if ($srcWidth && $srcHeight) {
+                $widthRatio = ($srcWidth > $maxWidth) ? ($maxWidth / $srcWidth) : 1;
+                $heightRatio = ($srcHeight > $maxHeight) ? ($maxHeight / $srcHeight) : 1;
 
                 // crop width/height to scale size if fill disabled
                 if ($cropped) {
@@ -311,8 +336,8 @@ class Media extends ActiveRecord
                     $ratio = min($widthRatio, $heightRatio);
                 }
 
-                $scaledWidth = round($this->Width * $ratio);
-                $scaledHeight = round($this->Height * $ratio);
+                $scaledWidth = round($srcWidth * $ratio);
+                $scaledHeight = round($srcHeight * $ratio);
             } else {
                 $scaledWidth = $maxWidth;
                 $scaledHeight = $maxHeight;
@@ -323,8 +348,7 @@ class Media extends ActiveRecord
                 $thumbHeight = $scaledHeight;
             }
 
-            // create images
-            $srcImage = $this->getImage();
+            // create thumbnail images
             $image = imagecreatetruecolor($thumbWidth, $thumbHeight);
 
             // paint fill color
@@ -373,7 +397,7 @@ class Media extends ActiveRecord
                     , ($thumbWidth - $scaledWidth) / 2, ($thumbHeight - $scaledHeight) / 2
                     , 0, 0
                     , $scaledWidth, $scaledHeight
-                    , $this->Width, $this->Height
+                    , $srcWidth, $srcHeight
                 );
             } else {
                 imagecopyresampled(
@@ -382,7 +406,7 @@ class Media extends ActiveRecord
                     , round( ($thumbWidth - $scaledWidth) / 2 ), round( ($thumbHeight - $scaledHeight) / 2 )
                     , 0, 0
                     , $scaledWidth, $scaledHeight
-                    , $this->Width, $this->Height
+                    , $srcWidth, $srcHeight
                 );
             }
 
@@ -461,20 +485,11 @@ class Media extends ActiveRecord
             // save media
             $Media->save();
     
-            // move file
-            $targetDirectory = dirname($Media->FilesystemPath);
-    
-            if(!is_dir($targetDirectory))
-            {
-                mkdir($targetDirectory, static::$newDirectoryPermissions, true);
-            }
-    
-            // set file permissions
-            if (rename($file, $Media->FilesystemPath))
-            {
-                chmod($Media->FilesystemPath, static::$newFilePermissions);
-                return $Media;
-            }
+            // write file
+            $Media->writeFile($file);
+            
+            return $Media;
+
         } catch (Exception $e) {
             \Emergence\Logger::general_warning('Caught exception while processing media upload, aborting upload and returning null', array(
                 'exceptionClass' => get_class($e)
@@ -623,5 +638,51 @@ class Media extends ActiveRecord
     public static function getSupportedTypes()
     {
         return array_unique(array_merge(array_keys(static::$mimeHandlers), array_keys(static::$mimeRewrites)));
+    }
+
+    public function getFilesystemPath($variant = 'original', $filename = null)
+    {
+        if ($this->isPhantom) {
+            return null;
+        }
+
+        return Site::$rootPath . '/site-data/media/' . $variant . '/' . ($filename ?: $this->getFilename($variant));
+    }
+    
+    public function getFilename($variant = 'original')
+    {
+        if ($this->isPhantom) {
+            return 'default.' . $this->Extension;
+        }
+        
+        return $this->ID . '.' . $this->Extension;
+    }
+    
+    public function getMIMEType($variant = 'original')
+    {
+        return $this->MIMEtype;
+    }
+
+    public function writeFile($sourceFile)
+    {
+        $targetDirectory = dirname($this->FilesystemPath);
+
+        // create target directory if needed
+        if (!is_dir($targetDirectory)) {
+            mkdir($targetDirectory, static::$newDirectoryPermissions, true);
+        }
+        
+        // move source file to target path
+        if (!rename($sourceFile, $this->FilesystemPath)) {
+            throw new \Exception('Failed to move source file to destination');
+        }
+
+        // set file permissions
+        chmod($this->FilesystemPath, static::$newFilePermissions);
+    }
+    
+    public function isVariantAvailable($variant)
+    {
+        return false;
     }
 }
