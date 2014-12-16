@@ -137,13 +137,15 @@ class CropBalanced extends Crop
     {
         $size = $image->getImageGeometry();
         // It's more performant doing random pixel uplook via GD
-        $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'image' . rand();
-        $image->writeimage($tmpFile);
-        $im = imagecreatefromjpeg($tmpFile);
+        $im = imagecreatefromstring($image->getImageBlob());
+        if ($im === false) {
+            $msg = 'GD failed to create image from string';
+            throw new \Exception($msg);
+        }
         $xcenter = 0;
         $ycenter = 0;
         $sum = 0;
-        // Sample only sample 1/50 of of all the pixels in the image
+        // Only sample 1/50 of all the pixels in the image
         $sampleSize = round($size['height']*$size['width'])/50;
 
         for ($k=0; $k<$sampleSize; $k++) {
