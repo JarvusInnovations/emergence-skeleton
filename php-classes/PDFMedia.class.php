@@ -4,7 +4,7 @@ class PDFMedia extends Media
 {
 
     // configurables
-	public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>/dev/null'; // 1=pdf path, 2=page
+    public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>/dev/null'; // 1=pdf path, 2=page
 	public static $extractPageIndex = 0;
 
 
@@ -15,7 +15,7 @@ class PDFMedia extends Media
 
 		Media::$mimeHandlers['application/pdf'] = $className;
         Media::$mimeHandlers['application/postscript'] = $className;
-
+        Media::$mimeHandlers['image/svg+xml'] = $className;
 		parent::__classLoaded();
 	}
 
@@ -35,6 +35,8 @@ class PDFMedia extends Media
 						return 'pdf';
 					case 'application/postscript':
 						return 'eps';
+                    case 'image/svg+xml':
+                        return 'svg';
 					default:
 						throw new Exception('Unable to find document extension for mime-type: ' . $this->MIMEType);
 				}
