@@ -5,6 +5,11 @@ class SearchRequestHandler extends RequestHandler
     static public $searchClasses = array();
 	static public $useBoolean = true;
 
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+        ,'text/csv' => 'csv'
+    );
+
 	public static function handleRequest()
 	{
 		if(static::peekPath() == 'json')
