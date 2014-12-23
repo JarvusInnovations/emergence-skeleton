@@ -39,7 +39,7 @@ class ActiveRecord
      * @var array
      */
     static public $fieldDefaults = array(
-		'type' => 'string'
+    	'type' => 'string'
 		,'notnull' => true
 	);
 	
@@ -708,7 +708,7 @@ class ActiveRecord
 	
 	public function isFieldDirty($field)
 	{
-		return $this->isPhantom || array_key_exists($field, $this->_originalValues);
+		return $this->isPhantom || $this->isNew || array_key_exists($field, $this->_originalValues);
 	}
 	
 	public function getOriginalValue($field)
