@@ -28,7 +28,7 @@
             name="{$name|escape}"
             {if $placeholder}placeholder="{$placeholder|escape}"{/if}
             {if $autofocus}autofocus{/if}
-            {if $required}required{/if}
+            {if $required}required aria-required="true"{/if}
             {$attribs}
             value="{refill field=$name default=$default}">
     {/capture}
@@ -59,7 +59,7 @@
             class="field-control"
             name="{$name|escape}"
             {if $placeholder}placeholder="{$placeholder|escape}"{/if}
-            {if $required}required{/if}
+            {if $required}required aria-required="true"{/if}
             {$attribs}
         >{refill field=$name default=$default}</textarea>
     {/capture}
@@ -67,5 +67,5 @@
     {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template loginField}{field name=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
+{template loginField}{field name=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
 {template passwordField}{field name=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}

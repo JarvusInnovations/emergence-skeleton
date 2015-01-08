@@ -66,7 +66,7 @@
 {template commentSection Item}
     <section class="comments reading-width" id="comments">
         <header class="section-header">
-            <h4 class="header-title">Comments {if $Item->Comments}({count($Item->Comments)}){/if}</h4>
+            <h2 class="header-title title-3">Comments {if $Item->Comments}({count($Item->Comments)}){/if}</h2>
         </header>
         {commentsList $Item->Comments}
         {commentForm $Item}
