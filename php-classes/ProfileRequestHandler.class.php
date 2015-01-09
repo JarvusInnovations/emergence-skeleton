@@ -63,20 +63,20 @@ class ProfileRequestHandler extends RequestHandler
             $User->setFields($profileChanges);
 
             if (static::$onBeforeProfileValidated) {
-                call_user_func(static::$onBeforeProfileValidated, $User, $profileChanges, $_REQUEST);
+                call_user_func(static::$onBeforeProfileValidated, $User, $profileChanges, $requestData);
             }
 
             // validate
             if ($User->validate()) {
                 if (static::$onBeforeProfileSaved) {
-                    call_user_func(static::$onBeforeProfileSaved, $User, $profileChanges, $_REQUEST);
+                    call_user_func(static::$onBeforeProfileSaved, $User, $profileChanges, $requestData);
                 }
 
                 // save session
                 $User->save();
 
                 if (static::$onProfileSaved) {
-                    call_user_func(static::$onProfileSaved, $User, $profileChanges, $_REQUEST);
+                    call_user_func(static::$onProfileSaved, $User, $profileChanges, $requestData);
                 }
 
                 // fire created response
@@ -107,13 +107,13 @@ class ProfileRequestHandler extends RequestHandler
         ));
 
         // set primary if none set
-        if (!$User->PrimaryPhoto) {
+        if ($Photo && (!$User->PrimaryPhoto || !empty($_POST['primary']))) {
             $User->PrimaryPhoto = $Photo;
             $User->save();
         }
 
         return static::respond('profilePhotoUploaded', array(
-            'success' => true
+            'success' => (boolean)$Photo
             ,'data' => $Photo
         ));
     }
