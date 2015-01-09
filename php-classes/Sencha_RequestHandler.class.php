@@ -6,9 +6,10 @@ class Sencha_RequestHandler extends RequestHandler
 
     static public $validModes = array(
         'development'
-    	,'develop' => 'development'
+        ,'develop' => 'development'
 		,'testing'
 		,'production'
+        ,'package'
 	);
 	static public $defaultMode = 'testing';
 	
@@ -16,6 +17,7 @@ class Sencha_RequestHandler extends RequestHandler
 		'development' => 'Developer'
         ,'testing' => false
         ,'production' => false
+        ,'package' => false
         ,'docs' => 'Developer'
 	);
     
