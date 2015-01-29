@@ -24,7 +24,7 @@
             </fieldset>
         </form>
     {else}
-        <p class="login-hint well"><a href="/login?return={$Context->getURL()|escape:url}">Log in</a> to post a comment.</p>
+        <p class="login-hint well"><a class="button primary" href="/login?return={$Context->getURL()|escape:url}">Log in</a> to post a comment.</p>
     {/if}
 {/template}
 
@@ -66,7 +66,7 @@
 {template commentSection Item}
     <section class="comments reading-width" id="comments">
         <header class="section-header">
-            <h4 class="header-title">Comments {if $Item->Comments}({count($Item->Comments)}){/if}</h4>
+            <h2 class="header-title title-3">Comments {if $Item->Comments}({count($Item->Comments)}){/if}</h2>
         </header>
         {commentsList $Item->Comments}
         {commentForm $Item}

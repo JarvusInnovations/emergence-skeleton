@@ -5,11 +5,12 @@ abstract class RequestHandler
     // configurables
     public static $responseMode = 'html';
     public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
+    public static $beforeRespond;
     
     
     // static properties
     protected static $_path;
-	
+    
 
 	// protected static methods
 	protected static function setPath($path = null)
@@ -61,6 +62,10 @@ abstract class RequestHandler
 		if ($responseMode != 'return') {
 			header('X-Response-ID: '.$responseID);
 		}
+
+		if (is_callable(static::$beforeRespond)) {
+    		call_user_func_array(static::$beforeRespond, array($responseID, &$responseData, $responseMode));
+        }
 	
 		switch($responseMode)
 		{

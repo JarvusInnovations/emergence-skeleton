@@ -2,7 +2,7 @@
 {load_templates "subtemplates/comments.tpl"}
 {load_templates "subtemplates/contextLinks.tpl"}
 
-{template blogPost Post headingLevel=h2 showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true showContext=true}
+{template blogPost Post headingLevel=h1 showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true showContext=true useSummary=false}
     <article class="blog-post reading-width">
         {if $showHeader}
             <header class="article-header">
@@ -34,7 +34,12 @@
             <span class="timestamp">on <time pubdate datetime="{$Post->Published|date_format:'%FT%T%z'}">{$Post->Published|date_format:"%A, %B %e, %Y at %l:%M %P"}</time></span>
         </div>
 
-        {if $showBody}
+        {if $useSummary && $Post->Summary}
+            <section class="section-body summary">
+                <p>{$Post->Summary|escape}</p>
+                <p><a href="{$Post->getURL()}">Read more&hellip;</a></p>
+            </section>
+        {elseif $showBody}
             <section class="section-body">
                 {$Post->renderBody()}
             </section>

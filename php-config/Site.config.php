@@ -1,7 +1,7 @@
 <?php
 
 // test disconnection from skeleton.mics.me
-if ($_SERVER['HTTP_HOST'] == 'skeleton.emr.ge') {
+if (Site::$hostname == 'skeleton.emr.ge') {
     Site::$autoPull = false;
 }
 

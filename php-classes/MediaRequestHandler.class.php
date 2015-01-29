@@ -8,7 +8,7 @@ class MediaRequestHandler extends RecordsRequestHandler
     static public $browseOrder = array('ID' => 'DESC');
 
     // configurables
-	public static $defaultPage = 'browse';
+    public static $defaultPage = 'browse';
 	public static $defaultThumbnailWidth = 100;
 	public static $defaultThumbnailHeight = 100;
 	public static $uploadFileFieldName = 'mediaFile';
@@ -268,23 +268,93 @@ class MediaRequestHandler extends RecordsRequestHandler
 				,'data' => $Media
 			));
 		} else {
+
+            // determine variant
+            if ($variant = static::shiftPath()) {
+                if (!$Media->isVariantAvailable($variant)) {
+                    return static::throwNotFoundError('Requested variant is not available');
+                }
+            } else {
+                $variant = 'original';
+            }
+
             // send caching headers
             $expires = 60*60*24*365;
     		header("Cache-Control: public, max-age=$expires");
     		header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
     		header('Pragma: public');
             
-            // thumbnails are immutable for a given URL, so no need to actually check anything if the browser wants to revalidate its cache
+            // media are immutable for a given URL, so no need to actually check anything if the browser wants to revalidate its cache
             if(!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
                 header('HTTP/1.0 304 Not Modified');
                 exit();
             }
 
-			header('Content-Type: ' . $Media->MIMEType);
-			header('Content-Length: ' . filesize($Media->FilesystemPath));
-            header('ETag: media-' . $Media->ID);
+            // initialize response
+            set_time_limit(0);
+            $filePath = $Media->getFilesystemPath($variant);
+            $fp = fopen($filePath, 'rb');
+            $size = filesize($filePath);
+            $length = $filesize;
+            $start = 0;
+            $end = $size - 1;
+
+			header('Content-Type: ' . $Media->getMIMEType($variant));
+            header('ETag: media-' . $Media->ID . '-' . $variant);
+            header('Accept-Ranges: bytes');
 			
-			readfile($Media->FilesystemPath);
+            // interpret range requests
+            if (!empty($_SERVER['HTTP_RANGE'])) {
+                $chunkStart = $start;
+                $chunkEnd = $end;
+
+                list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+
+                if (strpos($range, ',') !== false) {
+                    header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                    header("Content-Range: bytes $start-$end/$size");
+                    exit();
+                }
+
+                if ($range == '-') {
+                    $chunkStart = $size - substr($range, 1);
+                } else {
+                    $range = explode('-', $range);
+                    $chunkStart = $range[0];
+                    $chunkEnd = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
+                }
+
+                $chunkEnd = ($chunkEnd > $end) ? $end : $chunkEnd;
+                if ($chunkStart > $chunkEnd || $chunkStart > $size - 1 || $chunkEnd >= $size) {
+                    header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                    header("Content-Range: bytes $start-$end/$size");
+                    exit();
+                }
+
+                $start = $chunkStart;
+                $end = $chunkEnd;
+                $length = $end - $start + 1;
+
+                fseek($fp, $start);
+                header('HTTP/1.1 206 Partial Content');
+            }
+            
+            // finish response
+            header("Content-Range: bytes $start-$end/$size");
+    		header("Content-Length: $length");
+
+            $buffer = 1024 * 8;
+            while (!feof($fp) && ($p = ftell($fp)) <= $end) {
+                if ($p + $buffer > $end) {
+                    $buffer = $end - $p + 1;
+                }
+
+                echo fread($fp, $buffer);
+                flush();
+            }
+
+            fclose($fp);
+
 			Site::finishRequest();
 		}
 	}

@@ -39,7 +39,7 @@ class ActiveRecord
      * @var array
      */
     static public $fieldDefaults = array(
-    	'type' => 'string'
+        'type' => 'string'
 		,'notnull' => true
 	);
 	
@@ -514,11 +514,9 @@ class ActiveRecord
 		$this->_isValid = true;
 		$this->_validationErrors = array();
 		
-		if(!isset($this->_validator))
-		{
+		if (!isset($this->_validator)) {
 			$this->_validator = new RecordValidator($this->_record);
-		}
-		else
+		} else
 		{
 			$this->_validator->resetErrors();
 		}
@@ -542,20 +540,15 @@ class ActiveRecord
         }
 
 		// validate related objects
-		if($deep)
-		{
-			foreach(static::getStackedConfig('relationships') AS $relationship => $options)
-			{
-				if(empty($this->_relatedObjects[$relationship]))
-				{
+		if ($deep) {
+			foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
+				if (empty($this->_relatedObjects[$relationship])) {
 					continue;
 				}
 				
 				
-				if($options['type'] == 'one-one')
-				{
-					if($this->_relatedObjects[$relationship]->isDirty)
-					{
+				if ($options['type'] == 'one-one') {
+					if ($this->_relatedObjects[$relationship]->isDirty) {
 						$this->_relatedObjects[$relationship]->validate();
 						$this->_isValid = $this->_isValid && $this->_relatedObjects[$relationship]->isValid;
 						$validationErrors = $this->_relatedObjects[$relationship]->validationErrors;
@@ -564,13 +557,9 @@ class ActiveRecord
 							$this->_validationErrors[$relationship] = $validationErrors;
 						}
 					}
-				}
-				elseif($options['type'] == 'one-many')
-				{
-					foreach($this->_relatedObjects[$relationship] AS $i => $object)
-					{
-						if($object->isDirty)
-						{
+				} elseif ($options['type'] == 'one-many') {
+					foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
+						if ($object->isDirty) {
 							$object->validate();
 							$this->_isValid = $this->_isValid && $object->isValid;
 							$validationErrors = $object->validationErrors;
@@ -580,19 +569,20 @@ class ActiveRecord
 							}
 						}
 					}
-				}
-				/*elseif($options['type'] == 'contextual')
-				{
-					foreach($this->_relatedObjects[$relationship] AS $i => $object)
-					{
-						if($object->isDirty)
-						{
+				} elseif ($options['type'] == 'context-children') {
+					foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
+						if ($object->isDirty) {
 							$object->validate();
 							$this->_isValid = $this->_isValid && $object->isValid;
-							$this->_validationErrors[$relationship][$i] = $object->validationErrors;
-						}					
+                            
+							$validationErrors = $object->validationErrors;
+
+    						if (count($validationErrors)) {
+								$this->_validationErrors[$relationship][$i] = $validationErrors;
+							}
+						}
 					}
-				}*/
+				}
 				
 			}
 		}

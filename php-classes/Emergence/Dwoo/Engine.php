@@ -121,7 +121,7 @@ class Engine extends \Dwoo_Core
         }
 
         // set user
-        $this->globals['User'] = $GLOBALS['Session']->Person ? $GLOBALS['Session']->Person : null;
+        $this->globals['User'] = !empty($GLOBALS['Session']) && $GLOBALS['Session']->Person ? $GLOBALS['Session']->Person : null;
 
         if (is_callable(static::$onGlobalsSet)) {
             call_user_func(static::$onGlobalsSet, $this);
