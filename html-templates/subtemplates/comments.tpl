@@ -24,7 +24,7 @@
             </fieldset>
         </form>
     {else}
-        <p class="login-hint well"><a href="/login?return={$Context->getURL()|escape:url}">Log in</a> to post a comment.</p>
+        <p class="login-hint well"><a class="button primary" href="/login?return={$Context->getURL()|escape:url}">Log in</a> to post a comment.</p>
     {/if}
 {/template}
 
