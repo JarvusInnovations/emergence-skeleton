@@ -235,9 +235,7 @@ class Media extends ActiveRecord
 
                 $image = imagecreatefromstring($fileData);
 
-                if ($this->MIMEType == 'image/jpeg') {
-                    $exifData = exif_read_data($sourceFile);
-
+                if ($this->MIMEType == 'image/jpeg' && ($exifData = @exif_read_data($sourceFile)) && !empty($exifData['Orientation'])) {
                     switch ($exifData['Orientation']) {
                         case 1: // nothing
                             break;
