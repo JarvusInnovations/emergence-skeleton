@@ -2,6 +2,7 @@
 
 class Media extends ActiveRecord
 {
+    public static $useCache = true;
     public static $singularNoun = 'media item';
     public static $pluralNoun = 'media items';
 
