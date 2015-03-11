@@ -35,19 +35,23 @@ Benchmark::mark("exported $suitePath to $suiteTmpPath: ".http_build_query($expor
 // write phpunit configuration
 $timezone = date_default_timezone_get();
 
+// bootstrap path
+$bootstrapPath = dirname($_SERVER['SCRIPT_FILENAME']) . '/phpunit.php';
+
 file_put_contents($configTmpPath, <<<EOT
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="$_SERVER[SCRIPT_FILENAME]"
+<phpunit bootstrap="$bootstrapPath"
          convertErrorsToExceptions="false"
          convertNoticesToExceptions="false"
          convertWarningsToExceptions="false"
          stopOnError="false">
     <php>
-    	<ini name="date.timezone" value="$timezone" />
+        <ini name="date.timezone" value="$timezone" />
 		<server name="SITE_ROOT" value="$_SERVER[SITE_ROOT]" />
         <server name="HTTP_HOST" value="$_SERVER[HTTP_HOST]" />
         <server name="REQUEST_METHOD" value="GET" />
         <server name="REQUEST_URI" value="" />
+        <server name="REMOTE_ADDR" value="$_SERVER[REMOTE_ADDR]" />
 	</php>
 </phpunit>
 EOT

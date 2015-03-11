@@ -1,6 +1,6 @@
+{$subject = $subject|default:"Contact form submission"}
 <html>
     <body>
-
         <p>A contact form has been submitted from <a href="http://{$.server.HTTP_HOST}{$.server.REQUEST_URI}">http://{$.server.HTTP_HOST}{$.server.REQUEST_URI}</a>:</p>
         
         <table border="0">

@@ -50,7 +50,7 @@ class Logger extends \Psr\Log\AbstractLogger
         }
 
         if (in_array($level, static::$logLevelsEmail)) {
-            \Email::send(
+            \Emergence\Mailer\Mailer::send(
                 \Site::$webmasterEmail
                 ,"$level logged on $_SERVER[HTTP_HOST]"
                 ,'<dl>'
@@ -82,7 +82,7 @@ class Logger extends \Psr\Log\AbstractLogger
         
         // build friendly output lines from backtrace frames
         while ($frame = array_shift($backtrace)) {
-            if ($frame['file'] && strpos($frame['file'], \Site::$rootPath . '/data/') === 0) {
+            if (!empty($frame['file']) && strpos($frame['file'], \Site::$rootPath . '/data/') === 0) {
                 $fileNode = \SiteFile::getByID(basename($frame['file']));
                 
                 if ($fileNode) {
@@ -92,21 +92,24 @@ class Logger extends \Psr\Log\AbstractLogger
             
             // ignore log-routing frames
             if (
-                $frame['file'] == 'emergence:_parent/php-classes/Psr/Log/AbstractLogger.php'
-                || $frame['file'] == 'emergence:_parent/php-classes/Emergence/Logger.php'
-                || (!$frame['file'] && $frame['class'] == 'Psr\Log\AbstractLogger')
-                || ($frame['class'] == 'Emergence\Logger' && $frame['function'] == '__callStatic')
+                !empty($frame['file']) &&
+                (
+                    $frame['file'] == 'emergence:_parent/php-classes/Psr/Log/AbstractLogger.php' ||
+                    $frame['file'] == 'emergence:_parent/php-classes/Emergence/Logger.php'
+                ) ||
+                (empty($frame['file']) && $frame['class'] == 'Psr\Log\AbstractLogger') ||
+                (!empty($frame['class']) && $frame['class'] == 'Emergence\Logger' && $frame['function'] == '__callStatic')
             ) {
                 continue;
             }
             
             $lines[] = 
-                ($frame['class'] ? "$frame[class]$frame[type]" : '')
+                (!empty($frame['class']) ? "$frame[class]$frame[type]" : '')
                 . $frame['function']
-                . ($frame['args'] ? '('.implode(',', array_map(function($arg) {
-                    return is_string($arg) || is_numeric($string) ? var_export($arg, true) : gettype($arg);
+                . (!empty($frame['args']) ? '('.implode(',', array_map(function($arg) {
+                    return is_string($arg) || is_numeric($arg) ? var_export($arg, true) : gettype($arg);
                 }, $frame['args'])).')' : '')
-                . ($frame['file'] ? " called at $frame[file]:$frame[line]" : '');
+                . (!empty($frame['file']) ? " called at $frame[file]:$frame[line]" : '');
         }
         
         return $lines;

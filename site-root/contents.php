@@ -1,3 +1,0 @@
-<?php
-
-ContentsRequestHandler::handleRequest();

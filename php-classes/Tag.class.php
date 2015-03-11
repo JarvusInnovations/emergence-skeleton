@@ -14,10 +14,12 @@ class Tag extends ActiveRecord
     static public $collectionRoute = '/tags';
 
     public static $fields = array(
-        'Class' => null
-        ,'Title'
+        'Title' => array(
+            'includeInSummary' => true
+        )
         ,'Handle' => array(
-            'unique' => true
+            'unique' => true,
+            'includeInSummary' => true
         )
         ,'Description'
     );
@@ -33,6 +35,15 @@ class Tag extends ActiveRecord
             ,'class' => 'TagItem'
         )
     );
+    
+    public static $searchConditions = array(
+        'Prefix' => array(
+            'qualifiers' => array('prefix')
+            ,'points' => 2
+            ,'sql' => 'Handle LIKE "%%%s%%.%"'
+        )
+    );
+    
 
 
     // public methods
@@ -60,7 +71,7 @@ class Tag extends ActiveRecord
         return $tags = preg_split('/\s*[,]+\s*/', trim($tags));
     }
 
-    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true)
+    public static function setTags(ActiveRecord $Context, $tags, $autoCreate = true, $prefix = null)
     {
         $assignedTags = array();
 
@@ -80,34 +91,50 @@ class Tag extends ActiveRecord
             $tags = $newTags;
         }
 
-        foreach ($tags AS $tagTitle) {
-            if (!$tagTitle) {
+        foreach ($tags AS $tag) {
+            if ($tag && (is_string($tag) || is_int($tag))) {
+                $tag = static::getFromHandle($tag, $autoCreate, $prefix);
+            }
+
+            if (!$tag) {
                 continue;
             }
 
-            if ($Tag = static::getFromHandle($tagTitle, $autoCreate)) {
-                $Tag->assignItem($Context);
-                $assignedTags[$Tag->ID] = $Tag;
+            $tag->assignItem($Context);
+            $assignedTags[$tag->ID] = $tag;
+        }
+
+        if ($prefix) {
+            try {
+                $prefixTags = DB::allValues('ID', 'SELECT ID FROM `%s` WHERE Handle LIKE "%s.%%"', array(
+                    \Tag::$tableName,
+                    DB::escape($prefix)
+                ));
+            }  catch (TableNotFoundException $e) {
+                $prefixTags = array();
             }
         }
 
         // delete tags
-        try {
-            DB::query(
-                'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s)'
-                ,array(
-                    TagItem::$tableName
-                    ,DB::escape($Context->getRootClass())
-                    ,$Context->ID
-                    ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
-                )
-            );
-        } catch (TableNotFoundException $e) { }
+        if (!$prefix || count($prefixTags)) { // if there are no existing tags with this prefix there are no items to delete
+            try {
+                DB::query(
+                    'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s'
+                    ,array(
+                        TagItem::$tableName
+                        ,DB::escape($Context->getRootClass())
+                        ,$Context->ID
+                        ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
+                        ,!empty($prefixTags) ? (' AND TagID IN ('.implode(',', $prefixTags).')') : ''
+                    )
+                );
+            } catch (TableNotFoundException $e) { }
+        }
 
         return $assignedTags;
     }
 
-    public static function getFromHandle($handle, $autoCreate = true)
+    public static function getFromHandle($handle, $autoCreate = true, $prefix = null)
     {
         $Tag = false;
 
@@ -120,11 +147,14 @@ class Tag extends ActiveRecord
         }
 
         if (!$Tag) {
-            $Tag = Tag::getByTitle($handle);
+            $Tag = Tag::getByTitle($handle, $prefix);
         }
 
         if (!$Tag && $autoCreate) {
-            $Tag = Tag::create(array('Title' => $handle), true);
+            $Tag = Tag::create(array(
+                'Title' => $handle,
+                'Handle' => HandleBehavior::getUniqueHandle(__CLASS__, $prefix ? "$prefix.$handle" : $handle)
+            ), true);
         }
 
         return $Tag;
@@ -142,9 +172,16 @@ class Tag extends ActiveRecord
         ));
     }
 
-    public static function getByTitle($title)
+    public static function getByTitle($title, $prefix = null)
     {
-        return static::getByField('Title', $title, true);
+        if ($prefix) {
+            return static::getByWhere(array(
+                'Title' => $title,
+                'Handle LIKE "'.DB::escape($prefix).'.%%"'
+            ));
+        } else {
+            return static::getByField('Title', $title, true);
+        }
     }
 
     public function getValue($name)
@@ -194,7 +231,7 @@ class Tag extends ActiveRecord
 
     public function save($deep = true)
     {
-        HandleBehavior::onSave($this, strtolower($this->Title));
+        HandleBehavior::onSave($this, $this->Title);
 
         return parent::save(true);
     }
@@ -282,6 +319,7 @@ class Tag extends ActiveRecord
             ,'limit' => is_numeric($options) ? $options : false
             ,'offset' => 0
             ,'overlayTag' => false
+            ,'calcFoundRows' => false
         ), $options);
 
         // build TagItem query
@@ -326,11 +364,15 @@ class Tag extends ActiveRecord
 
         // return objects
         $classQuery = sprintf(
-            'SELECT SQL_CALC_FOUND_ROWS * FROM `%s` WHERE (%s) AND `%s` IN (%s)'
+            'SELECT %s'
+            .' Content.*'
+            .' FROM (%s) TagItem'
+            .' JOIN `%s` Content ON (Content.ID = TagItem.ContextID)'
+            .' WHERE (%s)'
+            , $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
+            , $tagQuery                                                 // tag_items query
             , $class::$tableName                                        // item's table name
             , count($classWhere) ? join(') AND (', $classWhere) : '1'   // optional where clause
-            , $class::getColumnName('ID')                               // item's id column name
-            , $tagQuery                                                 // tag_items query
         );
 
 
@@ -345,10 +387,16 @@ class Tag extends ActiveRecord
         return $class::instantiateRecords(DB::allRecords($classQuery));
     }
 
-    public static function getTagsString($tags)
+    public static function getTagsString($tags, $prefix = null)
     {
+        if ($prefix) {
+            $tags = array_filter($tags, function($Tag) use ($prefix) {
+                return $Tag->HandlePrefix == $prefix;
+            });
+        }
+
         return implode(', ', array_map(function($Tag) {
-            return $Tag->Handle;
+            return $Tag->Title;
         }, $tags));
     }
 

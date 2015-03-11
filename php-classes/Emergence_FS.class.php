@@ -2,14 +2,20 @@
 
 class Emergence_FS
 {
-    static public function cacheTree($path)
+    static public function cacheTree($path, $force = false)
     {
         // split path into array
         if (is_string($path)) {
             $path = Site::splitPath($path);
         }
+        
+        // check if this tree has already been cached
+        $cacheKey = 'cacheTree:' . implode('/', $path);
+        if (!$force && Cache::fetch($cacheKey)) {
+            return 0;
+        }
 
-		// get tree map from parent
+        // get tree map from parent
 		$remoteTree = Emergence::resolveCollectionFromParent($path);
 
 		if (!$remoteTree) {
@@ -26,7 +32,9 @@ class Emergence_FS
 				$filesResolved++;
 			}
 		}
-		
+
+        Cache::store($cacheKey, true);
+
 		return $filesResolved;
 	}
 	
@@ -71,20 +79,56 @@ class Emergence_FS
 			}
 
 			// append to tree conditions
-			$conditions[] = join(') OR (', $positionConditions);
+			$conditions[] = '(' . join(') OR (', $positionConditions) . ')';
+		} elseif($localOnly) {
+            $conditions['Site'] = 'Local';  
 		}
 		
 		// Filter out deleted collections
         if (!$includeDeleted) {
-		    $conditions[] = 'Status = "Normal"';
+		    $conditions['Status'] = 'Normal';
         }
+        
+        //  filter out excluded trees
+        if (array_key_exists('excludeTrees', $conditions)) {
+            $excludeTrees = $conditions['excludeTrees'];
+            unset($conditions['excludeTrees']);
+            
+            if (!$tableLocked) {
+        		DB::nonQuery('LOCK TABLES `%s` READ', SiteCollection::$tableName);
+    			$tableLocked = true;
+            }
+            
+            $positionConditions = array();
+            foreach ($excludeTrees AS $excludeTree) {
+                $positions = DB::oneRecord('SELECT PosLeft, PosRight FROM `%s` WHERE ID = %u', array(
+                    SiteCollection::$tableName
+                    ,$excludeTree
+                ));
+
+        		$positionConditions[] = sprintf('PosLeft NOT BETWEEN %u AND %u', $positions['PosLeft'], $positions['PosRight']);
+            }
+
+    		// append to tree conditions
+			$conditions[] = join(') AND (', $positionConditions);
+        }
+
+		// map conditions
+		$mappedConditions = array();
+		foreach($conditions AS $key => $value) {
+			if (is_string($key)) {
+				$mappedConditions[] = sprintf('`%s` = "%s"', $key, DB::escape($value));
+			} else {
+				$mappedConditions[] = $value;
+			}
+		}
 		
 		$tree = DB::table(
 			'ID'
 			,'SELECT ID, Site, Handle, ParentID, Status FROM `%s` WHERE (%s) ORDER BY Site = "Remote", PosLeft'
 			,array(
 				SiteCollection::$tableName
-				,join(') AND (', $conditions)
+				,join(') AND (', $mappedConditions)
 			)
 		);
 
@@ -95,8 +139,8 @@ class Emergence_FS
         return $tree;
 	}
 	
-	static public function getTreeFiles($path = null, $localOnly = false, $conditions = array()) {
-		return static::getTreeFilesFromTree(static::getTree($path, $localOnly), $conditions);
+	static public function getTreeFiles($path = null, $localOnly = false, $fileConditions = array(), $collectionConditions = array()) {
+		return static::getTreeFilesFromTree(static::getTree($path, $localOnly, false, $collectionConditions), $fileConditions);
 	}
 	
 	static public function getTreeFilesFromTree($tree, $conditions = array()) {
@@ -618,5 +662,38 @@ class Emergence_FS
         }
         
         return $children;
+    }
+    
+    public static function getNodesFromPattern($patterns, $localOnly = false)
+    {
+        $matchedNodes = array();
+
+        if (!is_array($patterns)) {
+            $patterns = array($patterns);
+        }
+
+        $rootCollections = SiteCollection::getAllRootCollections();
+        if (!$localOnly) {
+            $rootCollections = array_merge($rootCollections, SiteCollection::getAllRootCollections(true));
+        }
+        
+        $_findMatchingNodes = function($patternStack, $nodes) use (&$_findMatchingNodes, &$matchedNodes) {
+            $pattern = array_shift($patternStack);
+            foreach ($nodes AS $node) {
+                if (preg_match("{^$pattern\$}i", $node->Handle)) {
+                    if (!count($patternStack)) {
+                        $matchedNodes[] = $node;
+                    } elseif ($node->Class == 'SiteCollection') {
+                        $_findMatchingNodes($patternStack, $node->getChildren());
+                    }
+                }
+            }
+        };
+        
+        foreach ($patterns AS $pattern) {
+            $_findMatchingNodes(explode('/', $pattern), $rootCollections);
+        }
+        
+        return $matchedNodes;
     }
 }

@@ -4,7 +4,7 @@ class JSON
 {
     public static function getRequestData($subkey = false)
     {
-		if (!$requestText = file_get_contents('php://input')) {
+        if (!$requestText = file_get_contents('php://input')) {
 			return false;
 		}
 		
@@ -19,8 +19,14 @@ class JSON
 			newrelic_disable_autorum();
 		}
 		
-		header('Content-type: application/json', true);
-		print json_encode($data);
+		$text = json_encode($data);
+        
+        if ($text === false) {
+            throw new Exception('Failed to encode json data, json_last_error='.json_last_error());
+        }
+        
+    	header('Content-type: application/json', true);
+        print($text);
 		Site::finishRequest($exit);
 	}
 	
@@ -30,8 +36,29 @@ class JSON
 	}
 
 	
-	public static function error($message)
+	public static function error($message, $statusCode = 200)
 	{
+        switch ($statusCode) {
+            case 400:
+                header('HTTP/1.0 400 Bad Request');
+                break;
+            case 401:
+                header('HTTP/1.0 401 Unauthorized');
+                break;
+            case 403:
+                header('HTTP/1.0 403 Forbidden');
+                break;
+            case 404:
+                header('HTTP/1.0 404 Not Found');
+                break;
+            case 405:
+                header('HTTP/1.0 405 Method Not Allowed');
+                break;
+            case 429:
+                header('HTTP/1.1 429 Too Many Requests');
+                break;
+        }
+
 		$args = func_get_args();
 		
 		self::respond(array(
@@ -40,7 +67,7 @@ class JSON
 		));
 	}
 	
-	public static function translateObjects($input, $summary = null, $include = null)
+	public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
 	{
 		if (is_object($input)) {
             if ($summary && method_exists($input, 'getSummary')) {
@@ -83,7 +110,7 @@ class JSON
                     }
                 }
 
-				$input = $input->getDetails($includeThisLevel);
+				$input = $input->getDetails($includeThisLevel, $stringsOnly);
 			} elseif (method_exists($input, 'getData')) {
 				$input = $input->getData();
 			}

@@ -3,7 +3,7 @@
 class Session extends ActiveRecord
 {
 
-	// Session configurables
+    // Session configurables
 	static public $cookieName = 's';
 	static public $cookieDomain = null;
 	static public $cookiePath = '/';
@@ -33,6 +33,7 @@ class Session extends ActiveRecord
 		,'LastIP' => array(
 			'type' => 'integer'
 			,'unsigned' => true
+            ,'notnull' => false
 		)
 		,'CreatorID' => null
 	);
@@ -54,7 +55,7 @@ class Session extends ActiveRecord
 	static public function getFromRequest($create = true)
 	{
 		$sessionData = array(
-			'LastIP' => ip2long($_SERVER['REMOTE_ADDR'])
+			'LastIP' => !empty($_SERVER['REMOTE_ADDR']) ? ip2long($_SERVER['REMOTE_ADDR']) : null
 			,'LastRequest' => time()
 		);
 	
@@ -113,14 +114,6 @@ class Session extends ActiveRecord
 			
 			return $Session;
 		}
-	}
-	
-	public function getData()
-	{
-		// embed related object(s)
-		return array_merge(parent::getData(), array(
-			'Person' => $this->Person ? $this->Person->getData() : null
-		));
 	}
 
 	public function save($deep = true)

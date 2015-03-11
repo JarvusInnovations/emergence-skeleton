@@ -3,9 +3,8 @@
 class HandleBehavior extends RecordBehavior
 {
     public static $alwaysSuffix = false;
-    public static $format = '%s-%u';
+    public static $suffixFormat = '%s-%u';
     public static $transliterate = true;
-    public static $emptyHandle = 'n-a';
 
     public static function onSave(ActiveRecord $Record, $handleInput = false)
     {
@@ -41,8 +40,12 @@ class HandleBehavior extends RecordBehavior
             'handleField' => 'Handle'
             ,'domainConstraints' => array()
             ,'alwaysSuffix' => static::$alwaysSuffix
-            ,'format' => static::$format
+            ,'randomSuffix' => false
+            ,'randomSuffixMin' => 100
+            ,'randomSuffixMax' => 999
+            ,'suffixFormat' => static::$suffixFormat
             ,'transliterate' => static::$transliterate
+            ,'case' => 'lower' // 'lower' / 'upper' / null
         ), $options);
 
         // strip bad characters
@@ -66,18 +69,22 @@ class HandleBehavior extends RecordBehavior
             $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
 
             // trim any non-word characters created during transliterate and any adjacent placeholders
-            $text = preg_replace('/[-_]*[^-\w]+[-_]*/u', '', $text);
+            $text = preg_replace('/[-_]*[^-\w\.]+[-_]*/u', '', $text);
         }
 
-        // lowercase
-        $text = strtolower($text);
+        // transform case
+        if ($options['case'] == 'lower') {
+            $text = strtolower($text);
+        } elseif ($options['case'] == 'upper') {
+            $text = strtoupper($text);
+        }
 
         // clean up any placeholder characters from ends
         $text = trim($text, '-_');
 
-        // use empty handle if nothing is left
+        // restart with singular noun if nothing is left
         if (!$text) {
-            $text = static::$emptyHandle;
+            return static::getUniqueHandle($class, $class::$singularNoun, $options);
         }
 
         // search for unique handle
@@ -88,7 +95,7 @@ class HandleBehavior extends RecordBehavior
             $incarnation++;
 
             if ($options['alwaysSuffix'] || $incarnation > 1) {
-                $handle = sprintf($options['format'], $text, $incarnation);
+                $handle = sprintf($options['suffixFormat'], $text, $options['randomSuffix'] ? mt_rand($options['randomSuffixMin'], $options['randomSuffixMax']) : $incarnation);
             }
             
             $where[$options['handleField']] = $handle;
@@ -97,8 +104,8 @@ class HandleBehavior extends RecordBehavior
         return $handle;
     }
 
-	public static function generateRandomHandle($class, $length = 32, $options = array())
-	{
+    public static function generateRandomHandle($class, $length = 32, $options = array())
+    {
 		// apply default options
 		$options = array_merge(array(
 			'handleField' => 'Handle'

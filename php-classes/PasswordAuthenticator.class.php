@@ -3,7 +3,7 @@
 
 class PasswordAuthenticator extends Authenticator
 {
-	// configurable settings
+    // configurable settings
 	public static $requestContainer = '_LOGIN';
 	
 	
@@ -60,7 +60,7 @@ class PasswordAuthenticator extends Authenticator
 			}
 			else
 			{
-				$this->respondLoginPrompt(new PasswordAuthenticationFailedException('The username or password you entered was incorrect. You can try again, <a href="/register">create a new account</a>, or <a href="/register/recover">reset your password</a>.'));
+				$this->respondLoginPrompt(new PasswordAuthenticationFailedException(_('The username or password you entered was incorrect.')));
 				return false;
 			}
 		}
@@ -156,7 +156,7 @@ class PasswordAuthenticator extends Authenticator
 	 */
 	public function respondLoginPrompt($authException = false)
 	{
-		if(Site::$pathStack[0] == 'json') {
+		if(Site::$pathStack[0] == 'json' || $_REQUEST['format'] == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
 			RequestHandler::$responseMode = 'json';
 		}
 		

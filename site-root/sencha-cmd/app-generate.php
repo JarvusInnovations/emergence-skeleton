@@ -7,7 +7,7 @@ Benchmark::startLive();
 
 // get app name
 if (empty($_REQUEST['name'])) {
-	die('Parameter name required');
+    die('Parameter name required');
 }
 
 $appName = $_REQUEST['name'];
@@ -20,7 +20,7 @@ if (empty($_REQUEST['framework']) || !array_key_exists($_REQUEST['framework'], S
 $framework = $_REQUEST['framework'];
 	
 // get framework version
-$frameworkVersion = empty($_REQUEST['frameworkVersion']) ? Sencha::$frameworks[$framework]['defaultVersion'] : $_REQUEST['framework'];
+$frameworkVersion = Sencha::normalizeFrameworkVersion($framework, empty($_REQUEST['frameworkVersion']) ? Sencha::$frameworks[$framework]['defaultVersion'] : $_REQUEST['frameworkVersion']);
 
 Benchmark::mark("configured request: appName=$appName, framework=$framework, frameworkVersion=$frameworkVersion");
 

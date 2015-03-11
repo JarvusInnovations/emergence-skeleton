@@ -5,9 +5,11 @@ namespace Emergence\People\Groups;
 use DB;
 use ActiveRecord;
 use HandleBehavior, NestingBehavior;
-use Emergence\People\Person;
+use Person; // TODO: use Emergence\People\Person instead in skeleton-v2+
+use Emergence\People\IPerson;
 use PeopleRequestHandler;
 use DuplicateKeyException;
+use TableNotFoundException;
 
 class Group extends ActiveRecord
 {
@@ -57,7 +59,8 @@ class Group extends ActiveRecord
     public static $relationships = array(
         'Members' => array(
             'type' => 'one-many'
-            ,'class' => 'GroupMember'
+            ,'class' => 'Emergence\People\Groups\GroupMember'
+            ,'foreign' => 'GroupID'
         )
         ,'Parent' => array(
             'type' => 'one-one'
@@ -66,7 +69,9 @@ class Group extends ActiveRecord
         ,'People' => array(
             'type' => 'many-many'
             ,'class' => 'Person'
-            ,'linkClass' => 'GroupMember'
+            ,'linkClass' => 'Emergence\People\Groups\GroupMember'
+            ,'linkLocal' => 'GroupID'
+            ,'linkForeign' => 'PersonID'
         )
     );
 
@@ -102,7 +107,7 @@ class Group extends ActiveRecord
         return $this->finishValidation();
     }
 
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
         if (!$this->Founded) {
             $this->Founded = time();
@@ -147,12 +152,13 @@ class Group extends ActiveRecord
         );
     }
 
-    public function getFullPath()
+    public function getFullPath($separator = '/')
     {
         return DB::oneValue(
-            'SELECT GROUP_CONCAT(Name SEPARATOR "/") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
+            'SELECT GROUP_CONCAT(Name SEPARATOR "%s") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
             ,array(
-                static::$tableName
+                DB::escape($separator)
+                ,static::$tableName
                 ,$this->Left
                 ,$this->Right
             )
@@ -176,7 +182,7 @@ class Group extends ActiveRecord
         }
     }
 
-    public static function setPersonGroups(Person $Person, $groupIDs)
+    public static function setPersonGroups(IPerson $Person, $groupIDs)
     {
         $assignedGroups = array();
 
@@ -196,29 +202,31 @@ class Group extends ActiveRecord
         }
 
         // delete tags
-        DB::query(
-            'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)'
-            ,array(
-                GroupMember::$tableName
-                ,$Person->ID
-                ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
-            )
-        );
+        try {
+            DB::query(
+                'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)'
+                ,array(
+                    GroupMember::$tableName
+                    ,$Person->ID
+                    ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
+                )
+            );
+        } catch (TableNotFoundException $e) {
+            // no groups need to be deleted
+        }
 
         return $assignedGroups;
     }
 
-    public function assignMember(Person $Person, $role = 'Member')
+    public function assignMember(IPerson $Person, $memberData = array())
     {
-        $memberData = array(
-            'GroupID' => $this->ID
-            ,'PersonID' => $Person->ID
-            ,'Role' => $role
-        );
+        $memberData['GroupID'] = $this->ID;
+        $memberData['PersonID'] = $Person->ID;
 
         try {
             return GroupMember::create($memberData, true);
         } catch (DuplicateKeyException $e) {
+            // TODO: should an existing group be updated by $memberData fields?
             return GroupMember::getByWhere($memberData);
         }
     }

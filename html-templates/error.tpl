@@ -1,8 +1,9 @@
-{extends designs/site.tpl}
+{extends "designs/site.tpl"}
 
 {block "content"}
-	<section class="error">
-		<h1>Uh oh&hellip;</h1>
-		<p>{$message|default:"An error has occurred"}</p>
-	</section>
+    <header class="page-header">
+        <h2 class="header-title">Uh-oh&hellip;</h2>
+    </header>
+    
+    <p class="lead reading-width">{$message|default:'Something went wrong. Please try again or contact an administrator.'}</p>
 {/block}

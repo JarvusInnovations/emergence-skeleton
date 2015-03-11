@@ -3,25 +3,35 @@
 class Sencha
 {
     static public $frameworks = array(
-    	'ext' => array(
-			'defaultVersion' => '4.2.2.1144'
+        'ext' => array(
+            'defaultVersion' => '4.2.2.1144'
 			,'mappedVersions' => array(
-				'4.2.1' => '4.2.1.883'
-				,'4.2.2' => '4.2.2.1144'
+				'4.2.1'     => '4.2.1.883'
+    			,'4.2.2'    => '4.2.2.1144'
+    			,'4.2.3'    => '4.2.3.1477'
+                ,'4.2'      => '4.2.3.1477'
+                ,'5.0.0'    => '5.0.0.970'
+                ,'5.0.1'    => '5.0.1.1255'
+                ,'5.0'      => '5.0.1.1255'
 			)
 		)
 		,'touch' => array(
-			'defaultVersion' => '2.3.1'
+			'defaultVersion' => '2.4.0'
 			,'mappedVersions' => array(
-				'2.2.1' => '2.2.1.2'
+    			'2.2.1' => '2.2.1.2'
+        		,'2.3.1.410' => '2.3.1'
+            	,'2.4.0.487' => '2.4.0'
+            	,'2.4.1.527' => '2.4.1'
 			)
 		)
 	);
 	
-	static public $defaultCmdVersion = '4.0.4.84';
+	static public $defaultCmdVersion = '5.0.0.160';
 	
 	static public $cmdPath = '/usr/local/bin/Sencha/Cmd';
 	static public $binPaths = array('/bin','/usr/bin','/usr/local/bin');
+
+    protected static $_workspaceCfg;
 	
 	static public function buildCmd()
 	{
@@ -137,5 +147,88 @@ class Sencha
 		else {
 			return $assetPath;
 		}
+    }
+
+    public static function crawlRequiredPackages($packages)
+    {
+        if (is_string($packages) && $packages) {
+            $packages = array($packages);
+        } elseif (!is_array($packages)) {
+            return array();
+        }
+
+        foreach ($packages AS $package) {
+            $packageConfigNode = Site::resolvePath(array('sencha-workspace', 'packages', $package, 'package.json'));
+            if (!$packageConfigNode) {
+                continue;
+            }
+            
+            $packageConfig = json_decode(file_get_contents($packageConfigNode->RealPath), true);
+            
+            if (is_array($packageConfig)) {
+                if (!empty($packageConfig['requires'])) {
+                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['requires']));
+                }
+                
+                if (!empty($packageConfig['extend'])) {
+                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['extend']));
+                }
+            }
+        }
+
+        return $packages;
+    }
+
+    public static function aggregateClassPathsForPackages($packages, $skipPackageRelative = true)
+    {
+        if (!is_array($packages)) {
+            return array();
+        }
+
+        $classPaths = array();
+
+        foreach ($packages AS $packageName) {
+            $packageBuildConfigNode = Site::resolvePath("sencha-workspace/packages/$packageName/.sencha/package/sencha.cfg");
+            if ($packageBuildConfigNode) {
+                $packageBuildConfig = Sencha::loadProperties($packageBuildConfigNode->RealPath);
+                foreach (explode(',', $packageBuildConfig['package.classpath']) AS $classPath) {
+                    if(!$skipPackageRelative || strpos($classPath, '${package.dir}') !== 0) {
+                        $classPaths[] = $classPath;
+                    }
+                }
+            }
+        }
+
+        return array_unique($classPaths);
+    }
+    
+    public static function getRequiredPackagesForSourceFile($sourcePath)
+    {
+        return static::getRequiredPackagesForSourceCode(file_get_contents($sourcePath));
+    }
+    
+    public static function getRequiredPackagesForSourceCode($code)
+    {
+        if (preg_match_all('|//\s*@require-package\s*(\S+)|i', $code, $matches)) {
+            return $matches[1];
+        } else {
+            return array();
+        }
+    }
+
+    public static function getWorkspaceCfg($key = null)
+    {
+        if (!static::$_workspaceCfg) {
+            // get from filesystem
+            $configPath = array('sencha-workspace', '.sencha', 'workspace', 'sencha.cfg');
+            
+            if ($configNode = Site::resolvePath($configPath, true, false)) {
+                static::$_workspaceCfg = Sencha::loadProperties($configNode->RealPath);
+            } else {
+                static::$_workspaceCfg = array();
+            }
+        }
+
+		return $key ? static::$_workspaceCfg[$key] : static::$_workspaceCfg;
     }
 }

@@ -22,6 +22,10 @@
 			,'local' => 'PersonID'
 		)
 	);
+    
+    public static $dynamicFields = array(
+        'Person'
+    );
 	
 
 	// UserSession

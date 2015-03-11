@@ -4,10 +4,10 @@ class Sencha_App
 {
     protected $_name;
     protected $_buildCfg;
-	
-	function __construct($name)
-	{
-		$this->_name = $name;
+    
+    function __construct($name)
+    {
+        $this->_name = $name;
 	}
 	
 	static public function getByName($name)
@@ -37,8 +37,7 @@ class Sencha_App
 	
 	public function getBuildCfg($key = null)
 	{
-		if($this->_buildCfg)
-		{
+		if ($this->_buildCfg) {
 			return $key ? $this->_buildCfg[$key] : $this->_buildCfg;
 		}
 		
@@ -53,31 +52,32 @@ class Sencha_App
 		// get from filesystem
 		$configPath = array('sencha-workspace', $this->_name, '.sencha', 'app', 'sencha.cfg');
 		
-		if(!$configNode = Site::resolvePath($configPath, true, false))
-		{
+		if (!$configNode = Site::resolvePath($configPath, true, false)) {
 			throw new Exception('Could not find .sencha/app/sencha.cfg for '.$this->_name);
 		}
-	
+
 		$this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
-		
+
+		if ($jsonCfg = $this->getAppCfg()) {
+            Emergence\Util\Data::collapseTreeToDottedKeys($jsonCfg, $this->_buildCfg, 'app');
+		}
+
 		// store in cache
 #		Cache::store($cacheKey, $this->_buildCfg);
-		
+
 		return $key ? $this->_buildCfg[$key] : $this->_buildCfg;
 	}
 	
 	public function getAppCfg($key = null)
 	{
-		if($this->_appCfg)
-		{
+		if ($this->_appCfg) {
 			return $key ? $this->_appCfg[$key] : $this->_appCfg;
 		}
 		
 		// get from filesystem
 		$configPath = array('sencha-workspace', $this->_name, 'app.json');
 		
-		if(!$configNode = Site::resolvePath($configPath, true, false))
-		{
+		if (!$configNode = Site::resolvePath($configPath, true, false)) {
 			return null;
 		}
 		
@@ -169,7 +169,8 @@ class Sencha_App
         $cacheKey = "app/$this->_name/microloader/$mode";
         
         if ($debug || !($code = Cache::fetch($cacheKey))) {
-            $code = file_get_contents(static::getAsset("microloaders/$mode.js")->RealPath);
+            $node = static::getAsset("microloaders/$mode.js");
+            $code = $node ? file_get_contents($node->RealPath) : '';
             
             if (!$debug) {
                 $code = JSMin::minify($code);
@@ -178,5 +179,16 @@ class Sencha_App
         }
         
         return $code;
+    }
+
+    public function getRequiredPackages()
+    {
+        $packages = $this->getAppCfg('requires');
+        
+        if ($themeName = $this->getBuildCfg('app.theme')) {
+            $packages[] = $themeName;
+        }
+
+        return array_unique(Sencha::crawlRequiredPackages($packages));
     }
 }

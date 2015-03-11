@@ -2,12 +2,11 @@
 
 class RegistrationRequestHandler extends RequestHandler
 {
-	// configurables
-	static public $enableRegistration = true;
-	static public $onRegisterComplete = false;
-	static public $welcomeFrom = false;
-	static public $welcomeSubject = false;
-	static public $welcomeTemplate = 'registerComplete.email';
+    // configurables
+    static public $enableRegistration = true;
+    static public $createUser;
+    static public $onRegisterComplete;
+	static public $applyRegistrationData;
 	static public $registrationFields = array(
 		'FirstName'
 		,'LastName'
@@ -23,6 +22,10 @@ class RegistrationRequestHandler extends RequestHandler
 	
 	// RequestHandler
 	public static $responseMode = 'html';
+
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+    );
 
 	static public function handleRequest()
 	{
@@ -67,32 +70,39 @@ class RegistrationRequestHandler extends RequestHandler
 		if (!static::$enableRegistration) {
 			return static::throwError('Sorry, self-registration is not currently available. Please contact an administrator.');
 		}
-        
-        $className = User::getStaticDefaultClass();
-		$User = new $className();
+
+    	$filteredRequestFields = array_intersect_key($_REQUEST, array_flip(static::$registrationFields));
+		$additionalErrors = array();
+
+        if (is_callable(static::$createUser)) {
+            $User = call_user_func_array(static::$createUser, array(&$filteredRequestFields, &$additionalErrors));
+        } else {
+            $className = User::getStaticDefaultClass();
+    		$User = new $className();
+        }
 
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			$requestFields = array_intersect_key($_REQUEST, array_flip(static::$registrationFields));
-
 			// save person fields
-			$User->setFields(array_merge($requestFields, array(
-				'AccountLevel' => User::$fields['AccountLevel']['default']
-			), $overrideFields));
+			$User->setFields(array_merge($filteredRequestFields, $overrideFields));
             
             if (!empty($_REQUEST['Password'])) {
                 $User->setClearPassword($_REQUEST['Password']);
             }
 			
 			// additional checks
-			$additionalErrors = array();
-			if(empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < User::$minPasswordLength))
+			if(empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < $User::$minPasswordLength))
 			{
-				$additionalErrors['Password'] = 'Password must be at least '.User::$minPasswordLength.' characters long.';
+				$additionalErrors['Password'] = 'Password must be at least '.$User::$minPasswordLength.' characters long.';
 			}
 			elseif(empty($_REQUEST['PasswordConfirm']) || ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm']))
 			{
 				$additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
+			}
+
+			// configurable hook
+			if (is_callable(static::$applyRegistrationData)) {
+				call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
 			}
 
 			// validate
@@ -105,17 +115,16 @@ class RegistrationRequestHandler extends RequestHandler
 				$GLOBALS['Session'] = $GLOBALS['Session']->changeClass('UserSession', array(
 					'PersonID' => $User->ID
 				));
-				
+
 				// send welcome email
-				$welcomeSubject = static::$welcomeSubject ? static::$welcomeSubject : 'Welcome to '.$_SERVER['HTTP_HOST'];				
-				$welcomeBody = TemplateResponse::getSource(static::$welcomeTemplate, array(
+				Emergence\Mailer\Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', array(
 					'User' => $User
 				));
-										
-				Email::send($User->EmailRecipient, $welcomeSubject, $welcomeBody, static::$welcomeFrom);
-				if(static::$onRegisterComplete){
-					call_user_func(static::$onRegisterComplete,$User,$_REQUEST);
+
+				if (is_callable(static::$onRegisterComplete)) {
+					call_user_func(static::$onRegisterComplete, $User, $_REQUEST);
 				}
+
 				return static::respond('registerComplete', array(
 					'success' => true
 					,'data' => $User
@@ -147,7 +156,7 @@ class RegistrationRequestHandler extends RequestHandler
 	{
 		if($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			$userClass = User::$defaultClass;
+			$userClass = User::getStaticDefaultClass();
 		
 			if(empty($_REQUEST['username']))
 			{
@@ -169,14 +178,15 @@ class RegistrationRequestHandler extends RequestHandler
 				
 				$Token->sendEmail($User->Email);
 				
-				TemplateResponse::respond('recoverPasswordComplete');
+				return static::respond('recoverPasswordComplete', array(
+					'success' => true
+				));
 			}
 		}
-	
-	
-		TemplateResponse::respond('recoverPassword', array(
+
+		return static::respond('recoverPassword', array(
+            'success' => empty($error),
 			'error' => isset($error) ? $error : false
 		));
 	}
-
 }

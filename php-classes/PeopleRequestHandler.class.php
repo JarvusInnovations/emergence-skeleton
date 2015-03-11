@@ -32,19 +32,19 @@ class PeopleRequestHandler extends RecordsRequestHandler
         return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
 
-    static public function getRecordByHandle($handle)
-    {
-        if (ctype_digit($handle)) {
-            return Person::getByID($handle);
-        } else {
-            return User::getByUsername($handle);
-        }
-    }
-
     static protected function onRecordSaved(ActiveRecord $Person, $requestData)
     {
         if (isset($requestData['groupIDs'])) {
             Group::setPersonGroups($Person, $requestData['groupIDs']);
+        }
+    }
+
+    static public function getRecordByHandle($handle)
+    {
+        if (ctype_digit($handle) || is_int($handle)) {
+            return Person::getByID($handle);
+        } else {
+            return User::getByUsername($handle);
         }
     }
 }

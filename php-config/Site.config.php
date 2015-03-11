@@ -1,7 +1,7 @@
 <?php
 
 // test disconnection from skeleton.mics.me
-if ($_SERVER['HTTP_HOST'] == 'skeleton.emr.ge') {
+if (Site::$hostname == 'skeleton.emr.ge') {
     Site::$autoPull = false;
 }
 
@@ -14,3 +14,20 @@ Site::$skipSessionPaths[] = 'thumbnail.php';
 
 // uncomment or set to an array of specific hostnames to enable CORS
 //Site::$permittedOrigins = '*';
+
+// Custom routing called if a page isn't found in site-root
+/*Site::$onNotFound = function($message) {
+	switch($action = Site::$requestPath[0])
+	{
+		default:
+			if($Page = Page::getByHandle($action))
+			{
+				return Page::renderPage();
+			}
+			else
+			{
+				header('HTTP/1.0 404 Not Found');
+				die($message);
+			}
+	}
+};*/

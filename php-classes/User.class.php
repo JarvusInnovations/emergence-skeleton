@@ -119,6 +119,11 @@ class User extends Person
 		return parent::save($deep);
 	}
     
+    public function getTitle()
+    {
+        return sprintf('%s (%s)', $this->Username, $this->AccountLevel);
+    }
+    
     public function getHandle()
     {
         return $this->Username;

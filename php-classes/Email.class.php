@@ -10,7 +10,7 @@ class Email
 	{
 		if(empty(static::$defaultFrom))
 		{
-			static::$defaultFrom = 'hello@'.$_SERVER['HTTP_HOST'];
+			static::$defaultFrom = 'hello@'.Site::getConfig('primary_hostname');
 		}
 		
 		return static::$defaultFrom;

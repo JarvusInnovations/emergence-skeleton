@@ -30,16 +30,16 @@ class ActiveRecord
     /**
      * URL that can be prefixed to this record's identifier by $this->getURL
      * to generate a domain-relative address to this record
-	 * @var string
-	 */
+     * @var string
+     */
     static public $collectionRoute;
-	
-	/**
-	 * Defaults values for field definitions
-	 * @var array
-	 */
-	static public $fieldDefaults = array(
-		'type' => 'string'
+    
+    /**
+     * Defaults values for field definitions
+     * @var array
+     */
+    static public $fieldDefaults = array(
+        'type' => 'string'
 		,'notnull' => true
 	);
 	
@@ -98,8 +98,15 @@ class ActiveRecord
 	* @var array
 	*/
 	static public $dynamicFields = array(
+        'Creator',
         'validationErrors' => array(
-            'method' => 'getValidationErrors'
+            'getter' => 'getValidationErrors'
+        ),
+        'recordTitle' => array(
+            'getter' => 'getTitle'
+        ),
+        'recordURL' => array(
+            'getter' => 'getURL'
         )
     );
     
@@ -191,13 +198,7 @@ class ActiveRecord
 
     public function __toString()
     {
-        if ($this->isPhantom) {
-            return $this->Class . ' [phantom]';
-        } elseif ($url = $this->getURL()) {
-            return $url;
-        } else {
-            return $this->Class . ' #' . $this->ID;
-        }
+        return sprintf('[%s](%s)', $this->getTitle(), $this->getURL());
     }
     
     static protected function _initStackedConfig($propertyName)
@@ -513,11 +514,9 @@ class ActiveRecord
 		$this->_isValid = true;
 		$this->_validationErrors = array();
 		
-		if(!isset($this->_validator))
-		{
+		if (!isset($this->_validator)) {
 			$this->_validator = new RecordValidator($this->_record);
-		}
-		else
+		} else
 		{
 			$this->_validator->resetErrors();
 		}
@@ -526,7 +525,11 @@ class ActiveRecord
         $validators = static::getStackedConfig('validators');
         if (count(static::getStackedConfig('validators'))) {
             foreach (static::getStackedConfig('validators') AS $validator => $options) {
-                if (isset($options['validator']) && is_callable($options['validator'])) {
+                if (isset($options['validator']) && $options['validator'] == 'require-relationship') {
+                    if (!$this->_getRelationshipValue($options['field'])) {
+                        $this->_validator->addError($options['field'], !empty($options['errorMessage']) ? $options['errorMessage'] : 'Required relationship missing');
+                    }
+                } elseif (isset($options['validator']) && is_callable($options['validator'])) {
                     call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
                 } else {
                     $this->_validator->validate($options);
@@ -537,20 +540,15 @@ class ActiveRecord
         }
 
 		// validate related objects
-		if($deep)
-		{
-			foreach(static::getStackedConfig('relationships') AS $relationship => $options)
-			{
-				if(empty($this->_relatedObjects[$relationship]))
-				{
+		if ($deep) {
+			foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
+				if (empty($this->_relatedObjects[$relationship])) {
 					continue;
 				}
 				
 				
-				if($options['type'] == 'one-one')
-				{
-					if($this->_relatedObjects[$relationship]->isDirty)
-					{
+				if ($options['type'] == 'one-one') {
+					if ($this->_relatedObjects[$relationship]->isDirty) {
 						$this->_relatedObjects[$relationship]->validate();
 						$this->_isValid = $this->_isValid && $this->_relatedObjects[$relationship]->isValid;
 						$validationErrors = $this->_relatedObjects[$relationship]->validationErrors;
@@ -559,13 +557,9 @@ class ActiveRecord
 							$this->_validationErrors[$relationship] = $validationErrors;
 						}
 					}
-				}
-				elseif($options['type'] == 'one-many')
-				{
-					foreach($this->_relatedObjects[$relationship] AS $i => $object)
-					{
-						if($object->isDirty)
-						{
+				} elseif ($options['type'] == 'one-many') {
+					foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
+						if ($object->isDirty) {
 							$object->validate();
 							$this->_isValid = $this->_isValid && $object->isValid;
 							$validationErrors = $object->validationErrors;
@@ -575,19 +569,20 @@ class ActiveRecord
 							}
 						}
 					}
-				}
-				/*elseif($options['type'] == 'contextual')
-				{
-					foreach($this->_relatedObjects[$relationship] AS $i => $object)
-					{
-						if($object->isDirty)
-						{
+				} elseif ($options['type'] == 'context-children') {
+					foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
+						if ($object->isDirty) {
 							$object->validate();
 							$this->_isValid = $this->_isValid && $object->isValid;
-							$this->_validationErrors[$relationship][$i] = $object->validationErrors;
-						}					
+                            
+							$validationErrors = $object->validationErrors;
+
+    						if (count($validationErrors)) {
+								$this->_validationErrors[$relationship][$i] = $validationErrors;
+							}
+						}
 					}
-				}*/
+				}
 				
 			}
 		}
@@ -659,7 +654,13 @@ class ActiveRecord
 				$data[$field] = $this->_getFieldValue($field);
 			}
 		}
-		
+
+        foreach (static::$dynamicFields AS $field => $options) {
+            if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
+                $data[$field] = $this->getDynamicFieldValue($field, true);
+            }
+        }
+
 		return $data;
 	}
     
@@ -679,11 +680,7 @@ class ActiveRecord
     public function getDetails($include = '*', $stringsOnly = false)
 	{
 		$data = $this->getData();
-		
-		if (($include == '*' || in_array('validationErrors', $include)) && $this->validationErrors) {
-			$data['validationErrors'] = $this->validationErrors;
-		}
-        
+
         foreach (static::getStackedConfig('dynamicFields') AS $field => $options) {
             if ($include != '*' && !in_array($field, $include)) {
                 continue;
@@ -692,32 +689,8 @@ class ActiveRecord
             if (!$this->userCanEnumerateDynamicField($field)) {
                 continue;
             }
-            
-            $method = $options['method'];
-            
-            if ($method && is_string($method) && method_exists($this, $method)) {
-                $value = $this->$method($stringsOnly, $options, $field);
-            } elseif($method && is_callable($method)) {
-                $value = call_user_func($method, $this, $stringsOnly, $options, $field);
-            } elseif(!empty($options['relationship']) && static::_relationshipExists($options['relationship'])) {
-                $value = $this->_getRelationshipValue($options['relationship']);
-            } else {
-                continue;
-            }
-            
-            if ($stringsOnly && !is_string($value)) {
-                if (is_array($value)) {
-                    $strings = array();
-                    foreach ($value AS $key => $attr) {
-                        $strings[] = is_string($key) ? "$key=$attr" : $attr;
-                    }
-                    $value = implode(',', $strings);
-                } else {
-                    $value = (string)$value;
-                }
-            }
-            
-            $data[$field] = $value;
+
+            $data[$field] = $this->getDynamicFieldValue($field, $stringsOnly);
         }
 		
 		return $data;
@@ -725,7 +698,7 @@ class ActiveRecord
 	
 	public function isFieldDirty($field)
 	{
-		return $this->isPhantom || array_key_exists($field, $this->_originalValues);
+		return $this->isPhantom || $this->isNew || array_key_exists($field, $this->_originalValues);
 	}
 	
 	public function getOriginalValue($field)
@@ -740,6 +713,12 @@ class ActiveRecord
 	
 	public function save($deep = true)
 	{
+        // fire event
+        Emergence\EventBus::fireEvent('beforeRecordSave', $this->getRootClass(), array(
+            'Record' => $this,
+            'deep' => $deep
+        ));
+
 		// set creator
 		if(static::_fieldExists('CreatorID') && !$this->CreatorID && !empty($_SESSION) && !empty($_SESSION['User']))
 		{
@@ -845,6 +824,12 @@ class ActiveRecord
 		{
 			$this->_postSaveRelationships();
 		}
+
+        // fire event
+        Emergence\EventBus::fireEvent('afterRecordSave', $this->getRootClass(), array(
+            'Record' => $this,
+            'deep' => $deep
+        ));
 	}
 	
 	protected function _saveRelationships()
@@ -1091,7 +1076,7 @@ class ActiveRecord
 			,'order' => false
 			,'limit' => false
 			,'offset' => 0
-			,'calcFoundRows' => !empty($options['limit'])
+			,'calcFoundRows' => false
 			,'joinRelated' => false
 			,'extraColumns' => false
 			,'having' => false
@@ -1443,7 +1428,12 @@ class ActiveRecord
         return $relationships;
 	}
 	
-	
+	public static function getDefaultForeignIdentifierColumnName()
+    {
+        $reflection = new \ReflectionClass(static::getStaticRootClass());
+        return $reflection->getShortName() . 'ID';
+    }
+    
 	static protected function _initRelationship($relationship, $options)
 	{
 		// sanity checks
@@ -1477,7 +1467,10 @@ class ActiveRecord
 				$options['foreign'] = 'ID';	
 				
 			if(!isset($options['conditions']))
-				$options['conditions'] = array();			
+				$options['conditions'] = array();
+    			
+			if(!isset($options['order']))
+				$options['order'] = false;			
 		}
 		elseif($options['type'] == 'one-many')
 		{
@@ -1485,7 +1478,7 @@ class ActiveRecord
 				$options['local'] = 'ID';
 					
 			if(empty($options['foreign']))
-				$options['foreign'] = static::getStaticRootClass() . 'ID';
+				$options['foreign'] = static::getDefaultForeignIdentifierColumnName();
 				
 			if(!isset($options['indexField']))
 				$options['indexField'] = false;
@@ -1561,10 +1554,10 @@ class ActiveRecord
 				die('required many-many option "linkClass" missing');
 				
 			if(empty($options['linkLocal']))
-				$options['linkLocal'] = static::getStaticRootClass() . 'ID';
+				$options['linkLocal'] = static::getDefaultForeignIdentifierColumnName();
 		
 			if(empty($options['linkForeign']))
-				$options['linkForeign'] = $options['class']::getStaticRootClass() . 'ID';
+				$options['linkForeign'] = $options['class']::getDefaultForeignIdentifierColumnName();
 		
 			if(empty($options['local']))
 				$options['local'] = 'ID';	
@@ -1619,6 +1612,41 @@ class ActiveRecord
         return $options;
     }
     
+    public function getDynamicFieldValue($field, $stringsOnly = false)
+    {
+        $options = static::getStackedConfig('dynamicFields', $field);
+        $method = $options['method'];
+        $getter = $options['getter'];
+
+        if ($method && is_string($method) && method_exists($this, $method)) {
+            $value = $this->$method($stringsOnly, $options, $field);
+        } elseif($method && is_callable($method)) {
+            $value = call_user_func($method, $this, $stringsOnly, $options, $field);
+        } elseif ($getter && is_string($getter) && method_exists($this, $getter)) {
+            $value = $this->$getter();
+        } elseif($getter && is_callable($getter)) {
+            $value = call_user_func($getter);
+        } elseif(!empty($options['relationship']) && static::_relationshipExists($options['relationship'])) {
+            $value = $this->_getRelationshipValue($options['relationship']);
+        } else {
+            $value = null;
+        }
+
+        if ($stringsOnly && !is_string($value)) {
+            if (is_array($value)) {
+                $strings = array();
+                foreach ($value AS $key => $attr) {
+                    $strings[] = is_string($key) ? "$key=$attr" : $attr;
+                }
+                $value = implode(',', $strings);
+            } else {
+                $value = (string)$value;
+            }
+        }
+
+        return $value;
+    }
+    
     static protected function _initValidators($config)
     {
         $validators = array();
@@ -1630,7 +1658,7 @@ class ActiveRecord
             }
             
             if (is_string($validator)) {
-                $validators[$validator] = static::_initValidator($validator, is_array($options) ? $options : array('field' => $options));
+                $validators[$validator] = static::_initValidator($validator, is_array($options) ? $options : array('validator' => $options));
             } elseif (is_string($options)) {
                 $validator = $options;
                 $validators[$validator] = static::_initValidator($validator);
@@ -1802,6 +1830,7 @@ class ActiveRecord
 				}
 				
 				
+                case 'year':
 	        	case 'int':
 	    		case 'uint':
 				case 'integer':
@@ -1927,6 +1956,7 @@ class ActiveRecord
 				break;
 			}
 			
+            case 'year':
         	case 'int':
     		case 'uint':
 			case 'integer':
@@ -1938,7 +1968,7 @@ class ActiveRecord
 				if (!$fieldOptions['notnull'] && ($value === '' || $value === null)) {
 					$this->_convertedValues[$field] = $value = NULL;
 				} else {
-                    $value = round($value);
+                    $value = (integer)$value;
                     $this->_convertedValues[$field] = $value;
 					$value = (string)$value;
 				}
@@ -2062,9 +2092,11 @@ class ActiveRecord
 				{
 					$conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel, $value) : $rel['conditions'];
 					
-					if (!empty($conditions)) {
+					if (!empty($conditions) || !empty($rel['order'])) {
 						$conditions[$rel['foreign']] = $value;
-						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions);
+						$this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions, array(
+                            'order' => $rel['order']
+                        ));
 					} else {
 						// use cachable single-field lookup
 						$this->_relatedObjects[$relationship] = $rel['class']::getByField($rel['foreign'], $value);

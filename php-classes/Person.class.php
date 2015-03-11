@@ -1,6 +1,6 @@
 <?php
 
-class Person extends VersionedRecord
+class Person extends VersionedRecord implements Emergence\People\IPerson
 {
     // support subclassing
     static public $rootClass = __CLASS__;
@@ -65,7 +65,7 @@ class Person extends VersionedRecord
 	static public $relationships = array(
 		'GroupMemberships' => array(
 			'type' => 'one-many'
-			,'class' => 'GroupMember'
+			,'class' => 'Emergence\People\Groups\GroupMember'
 			,'indexField' => 'GroupID'
 			,'foreign' => 'PersonID'
 		)
@@ -77,8 +77,8 @@ class Person extends VersionedRecord
 		)
 		,'Groups' => array(
 			'type' => 'many-many'
-			,'class' => 'Group'
-			,'linkClass' => 'GroupMember'
+			,'class' => 'Emergence\People\Groups\Group'
+			,'linkClass' => 'Emergence\People\Groups\GroupMember'
 			,'linkLocal' => 'PersonID'
 			,'linkForeign' => 'GroupID'
 		)
@@ -143,8 +143,8 @@ class Person extends VersionedRecord
 			'qualifiers' => array('group')
 			,'points' => 1
 			,'join' => array(
-				'className' => 'GroupMember'
-				,'aliasName' => 'GroupMember'
+				'className' => 'Emergence\People\Groups\GroupMember'
+				,'aliasName' => 'Emergence\People\Groups\GroupMember'
 				,'localField' => 'ID'
 				,'foreignField' => 'PersonID'
 			)
@@ -168,7 +168,7 @@ class Person extends VersionedRecord
 			// name variations
 			case 'FullName':
 			{
-				return $this->FirstName . ' ' . $this->LastName;
+				return $this->getFullName();
 			}
 			
 			case 'FirstInitial':
@@ -218,7 +218,12 @@ class Person extends VersionedRecord
 
     public function getTitle()
     {
-        return $this->FullName;
+        return $this->getFullName();
+    }
+    
+    public function getFullName()
+    {
+        return $this->FirstName . ' ' . $this->LastName;
     }
 
 	static public function getByEmail($email)

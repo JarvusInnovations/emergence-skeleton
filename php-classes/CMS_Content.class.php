@@ -16,7 +16,7 @@ abstract class CMS_Content extends VersionedRecord
     static public $subClasses = array('CMS_Page','CMS_BlogPost');
     
     static public $searchConditions = array(
-    	'Title' => array(
+        'Title' => array(
     		'qualifiers' => array('any', 'title')
     		,'points' => 2
     		,'sql' => 'Title Like "%%%s%%"'
@@ -47,6 +47,7 @@ abstract class CMS_Content extends VersionedRecord
         ,'Published' => array(
             'type'  =>  'timestamp'
             ,'notnull' => false
+            ,'index' => true
         )
         ,'Visibility' => array(
         	'type' => 'enum'

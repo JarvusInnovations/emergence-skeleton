@@ -11,18 +11,19 @@ abstract class RecordsRequestHandler extends RequestHandler
     static public $accountLevelAPI = false;
     static public $browseOrder = false;
     static public $browseConditions = false;
-	static public $browseLimitDefault = false;
-	static public $editableFields = false;
-	static public $searchConditions = false;
-	
-	static public $calledClass = __CLASS__;
-	static public $responseMode = 'html';
+    static public $browseLimitDefault = false;
+    static public $editableFields = false;
+    static public $searchConditions = false;
+    public static $browseCalcFoundRows = true;
+    
+    static public $calledClass = __CLASS__;
+    static public $responseMode = 'html';
     public static $userResponseModes = array(
         'application/json' => 'json'
         ,'text/csv' => 'csv'
     );
-	
-	static public function handleRequest()
+    
+    static public function handleRequest()
 	{
 		// save static class
 		static::$calledClass = get_called_class();
@@ -58,10 +59,20 @@ abstract class RecordsRequestHandler extends RequestHandler
 			{
 				return static::handleCreateRequest();
 			}
+            
+            case '*fields':
+            {
+                return static::handleFieldsRequest();
+            }
 			
 			case '':
 			case false:
 			{
+                if (count(static::getPath())) {
+                    // throw an error for URLs like /collection//foo
+                    return static::throwInvalidRequestError();
+                }
+
 				return static::handleBrowseRequest();
 			}
 
@@ -88,10 +99,13 @@ abstract class RecordsRequestHandler extends RequestHandler
 	{
 		$className = static::$recordClass;
 		
-		if(method_exists($className, 'getByHandle'))
+        if (ctype_digit($handle) || is_int($handle)) {
+            return $className::getByID($handle);
+        } elseif (method_exists($className, 'getByHandle')) {
 			return $className::getByHandle($handle);
-		else
+		} else {
 			return null;
+		}
 	}
 	
 	static public function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
@@ -145,7 +159,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			
 			if($sqlSearchConditions['joins'])
 			{
-				$joins = array_merge($joins, $sqlSearchConditions['joins']);
+				$joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
 			}
 		}
         
@@ -192,9 +206,10 @@ abstract class RecordsRequestHandler extends RequestHandler
 			,array_merge($responseData, array(
 				'success' => true
 				,'data' => $className::getAllByQuery(
-					'SELECT %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+					'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
 					,array(
-						join(',',$select)
+                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
+						,join(',',$select)
 						,$className::$tableName
 						,$tableAlias
 						,!empty($joins) ? implode(' ', $joins) : ''
@@ -230,8 +245,8 @@ abstract class RecordsRequestHandler extends RequestHandler
 			$conditions = array_merge(static::$browseConditions, $conditions);
 		}
 		
-		$limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault;
-		$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : false;
+		$limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
+		$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? (integer)$_REQUEST['offset'] : false;
 		
 		if(!empty($_REQUEST['sort'])) {
 			$dir = (empty($_REQUEST['dir']) || $_REQUEST['dir'] == 'ASC') ? 'ASC' : 'DESC';
@@ -256,6 +271,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 			'limit' =>  $limit
 			,'offset' => $offset
 			,'order' => $order
+            ,'calcFoundRows' => static::$browseCalcFoundRows
 		), $options);
 		
 		// handle query search
@@ -267,8 +283,9 @@ abstract class RecordsRequestHandler extends RequestHandler
 
         // get results
         $results = $className::getAllByWhere($conditions, $options);
-        
-        
+        $resultsTotal = DB::foundRows();
+
+
         // embed tables
         if (!empty($_GET['relatedTable'])) {
             $relatedTables = is_array($_GET['relatedTable']) ? $_GET['relatedTable'] : explode(',', $_GET['relatedTable']);
@@ -307,7 +324,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 				'success' => true
 				,'data' => $results
 				,'conditions' => $conditions
-			    ,'total' => DB::foundRows()
+			    ,'total' => $resultsTotal
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
@@ -362,7 +379,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 	static public function handleMultiSaveRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
@@ -375,11 +392,12 @@ abstract class RecordsRequestHandler extends RequestHandler
 		$className = static::$recordClass;
 		$results = array();
 		$failed = array();
+        $message = null;
 
 		foreach($_REQUEST['data'] AS $datum)
 		{
 			// get record
-			if(empty($datum['ID']))
+			if(empty($datum['ID']) || !is_numeric($datum['ID']) || $datum['ID'] <= 0)
 			{
 				$subClasses = $className::getStaticSubClasses();
 				
@@ -434,6 +452,10 @@ abstract class RecordsRequestHandler extends RequestHandler
 					'record' => $Record->getData()
 					,'validationErrors' => $e->validationErrors
 				);
+                
+                if (!$message) {
+                    $message = reset($e->validationErrors); // store the first validation error in message
+                }
 			}
 		}
 		
@@ -441,13 +463,14 @@ abstract class RecordsRequestHandler extends RequestHandler
 			'success' => count($results) || !count($failed)
 			,'data' => $results
 			,'failed' => $failed
+            ,'message' => $message
 		));
 	}
 	
 	
 	static public function handleMultiDestroyRequest()
 	{
-		if($_SERVER['CONTENT_TYPE'] == 'application/json')
+		if(0===strpos($_SERVER['CONTENT_TYPE'],'application/json'))
 		{
 			$_REQUEST = JSON::getRequestData();
 		}
@@ -619,28 +642,34 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 	static public function handleCommentRequest(ActiveRecord $Record)
 	{
-		$className = static::$recordClass;
-
-		if(!static::checkCommentAccess($Record))
-		{
+		if (!static::checkCommentAccess($Record)) {
 			return static::throwUnauthorizedError();
 		}
-		
-		if($_SERVER['REQUEST_METHOD'] == 'POST')
-		{
-			$Comment = Comment::create(array(
+
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$Comment = Emergence\Comments\Comment::create(array(
 				'Context' => $Record
-				,'Author' => $GLOBALS['Session']->Person
-				,'Message' => $_REQUEST['Message']
-				,'Authored' => time()
+				,'Message' => $_POST['Message']
 			), true);
-			
-			Site::redirect(array(Site::$requestPath[0], $Record->Handle), false, "comment-$Comment->ID");
-		}
-		else {
-			static::throwInvalidRequestError();
+
+            return static::respond('commentSaved', array(
+                'success' => true
+                ,'data' => $Comment
+            ));
+		} else {
+			return static::throwInvalidRequestError();
 		}
 	}
+
+    public static function handleFieldsRequest()
+    {
+    	$className = static::$recordClass;
+
+        return static::respond('fields', array(
+            'fields' => $className::aggregateStackedConfig('fields'),
+            'dynamicFields' => $className::aggregateStackedConfig('dynamicFields')
+        ));
+    }
 
 	static protected function getTemplateName($noun)
 	{

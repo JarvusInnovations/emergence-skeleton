@@ -1,7 +1,7 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-	
+    
 	
 // get repo
 if(empty($_REQUEST['repo'])) {
@@ -71,9 +71,22 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
 	}
 	
 	$treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
-	
-	$exportResult = Emergence_FS::importTree($treeOptions['path'], $srcPath, $treeOptions);
-	Benchmark::mark("importing $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
+    
+    if (is_file($treeOptions['path'])) {
+        $sha1 = sha1_file($treeOptions['path']);
+        $existingNode = Site::resolvePath($srcPath);
+        
+        if (!$existingNode || $existingNode->SHA1 != $sha1) {
+            $fileRecord = SiteFile::createFromPath($srcPath, null, $existingNode ? $existingNode->ID : null);
+    		SiteFile::saveRecordData($fileRecord, fopen($treeOptions['path'], 'r'), $sha1);
+            Benchmark::mark("importing file $srcPath from $treeOptions[path]");
+        } else {
+            Benchmark::mark("skipped unchanged file $srcPath from $treeOptions[path]");
+        }
+    } else {
+        $exportResult = Emergence_FS::importTree($treeOptions['path'], $srcPath, $treeOptions);
+    	Benchmark::mark("importing directory $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
+    }
 }
 
 

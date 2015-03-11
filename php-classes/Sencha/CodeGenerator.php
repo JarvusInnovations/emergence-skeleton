@@ -12,12 +12,14 @@ class CodeGenerator
 Ext.define('MyApp.model.$recordClass', {
     extend: 'Ext.data.Model',
     requires: [
-        'Emergence.ext.proxy.Records'
+        'Emergence.ext.proxy.Records',
+        'Ext.data.identifier.Negative'
     ],
 
 
     // model config
     idProperty: 'ID',
+    identifier: 'negative',
 
     fields: [
 EOD;
@@ -51,14 +53,14 @@ EOD;
         
         
         // write footer
-        $route = str_replace(' ', '-', $recordClass::$pluralNoun);
+        $route = $recordClass::$collectionRoute ? $recordClass::$collectionRoute : '/' . str_replace(' ', '-', $recordClass::$pluralNoun);
         $out .= <<<EOD
 
     ],
 
     proxy: {
         type: 'records',
-        url: '/$route'
+        url: '$route'
     }
 });
 EOD;
@@ -79,7 +81,7 @@ EOD;
 
         switch ($fieldOptions['type']) {
             case 'int':
-    		case 'uint':
+        	case 'uint':
 			case 'integer':
 			case 'tinyint':
 			case 'smallint':
@@ -88,6 +90,8 @@ EOD;
                 $fieldConfig['type'] = 'int';
                 break;
 
+            case 'float':
+            case 'double':
             case 'decimal':
                 $fieldConfig['type'] = 'float';
                 break;

@@ -5,26 +5,18 @@ abstract class RequestHandler
     // configurables
     public static $responseMode = 'html';
     public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
+    public static $beforeRespond;
     
     
     // static properties
-	protected static $_path;
-	protected static $_parameters;
-	protected static $_options = array();
-	
+    protected static $_path;
+    
 
 	// protected static methods
-
 	protected static function setPath($path = null)
 	{
 		static::$_path = isset($path) ? $path : Site::$pathStack;
 	}
-	
-	protected static function setOptions($options)
-	{
-		static::$_options = isset(self::$_options) ? array_merge(static::$_options, $options) : $options;
-	}
-	
 	
 	protected static function peekPath()
 	{
@@ -49,39 +41,31 @@ abstract class RequestHandler
 		if(!isset(static::$_path)) static::setPath();
 		return array_unshift(static::$_path, $string);
 	}
-	
-	// this doesn't seem to work, would be cool if it could
-	protected static function catchParentResponse(Closure $function)
-	{
-		// store response mode
-		$origResponseMode = static::$responseMode;
-		
-		// execute function and capture response
-		static::$responseMode = 'return';
-		$response = $function();
 
-		
-		// restore original response mode
-		static::$responseMode = $origResponseMode;
-		
-		return $response;
-	}
-	
+    public static function getResponseMode()
+    {
+        if (!empty($_GET['format']) && in_array($_GET['format'], static::$userResponseModes)) {
+            return $_GET['format'];
+        } elseif (!empty($_SERVER['HTTP_ACCEPT']) && array_key_exists($_SERVER['HTTP_ACCEPT'], static::$userResponseModes)) {
+            return static::$userResponseModes[$_SERVER['HTTP_ACCEPT']];
+        } else {
+		    return static::$responseMode;
+        }
+    }
+
 	static public function respond($responseID, $responseData = array(), $responseMode = false)
 	{
 		if (!$responseMode) {
-            if (!empty($_GET['format']) && in_array($_GET['format'], static::$userResponseModes)) {
-                $responseMode = $_GET['format'];
-            } elseif (!empty($_SERVER['HTTP_ACCEPT']) && array_key_exists($_SERVER['HTTP_ACCEPT'], static::$userResponseModes)) {
-                $responseMode = static::$userResponseModes[$_SERVER['HTTP_ACCEPT']];
-            } else {
-			    $responseMode = static::$responseMode;
-            }
+            $responseMode = static::getResponseMode();
 		}
 
 		if ($responseMode != 'return') {
 			header('X-Response-ID: '.$responseID);
 		}
+
+		if (is_callable(static::$beforeRespond)) {
+    		call_user_func_array(static::$beforeRespond, array($responseID, &$responseData, $responseMode));
+        }
 	
 		switch($responseMode)
 		{
@@ -123,9 +107,7 @@ abstract class RequestHandler
         }
         
 		if (is_array($responseData['data'])) {
-			header('Content-Type: text/csv');
-			header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.csv"');
-			print(CSV::fromRecords($responseData['data']));
+            return CSV::respond($responseData['data'], $responseID, !empty($_GET['columns']) ? $_GET['columns'] : null);
 		} elseif ($responseID == 'error') {
 			print($responseData['message']);
 		} else {
@@ -238,17 +220,5 @@ abstract class RequestHandler
 			'success' => false
 			,'message' => vsprintf($message, array_slice($args, 1))
 		));
-	}
-
-	
-	// public static methods
-	public static function getOption($optionName)
-	{
-		return isset(static::$_options[$optionName]) ? static::$_options[$optionName] : null;
-	}
-	
-	public static function getOptions()
-	{
-		return static::$_options;
 	}
 }

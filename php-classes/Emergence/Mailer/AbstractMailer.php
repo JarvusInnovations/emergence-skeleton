@@ -5,8 +5,8 @@ namespace Emergence\Mailer;
 abstract class AbstractMailer implements IMailer
 {
     static public function getDefaultFrom()
-	{
-		return Mailer::$defaultFrom ? Mailer::$defaultFrom : 'support@'.$_SERVER['HTTP_HOST'];
+    {
+		return Mailer::$defaultFrom ? Mailer::$defaultFrom : \Site::getConfig('label') . ' <support@'.\Site::getConfig('primary_hostname').'>';
 	}
 	
 	static public function sendFromTemplate($to, $template, $data = array(), $options = array())
@@ -18,13 +18,22 @@ abstract class AbstractMailer implements IMailer
 	
 	static public function renderTemplate($template, $data = array())
 	{
-		$body = trim(\Emergence\Dwoo\Engine::getSource($template.'.email', $data));
+        $email = array(
+            'from' => null,
+            'subject' => null,
+            'body' => trim(\Emergence\Dwoo\Engine::getSource($template.'.email', $data))
+        );
+
 		$templateVars = \Emergence\Dwoo\Engine::getInstance()->scope;
-		
-		return array(
-			'from' => $templateVars['from'] ? $templateVars['from'] : false
-			,'subject' => $templateVars['subject'] ? $templateVars['subject'] : false
-			,'body' => $body
-		);
+        
+        if (isset($templateVars['from'])) {
+            $email['from'] = trim(preg_replace('/\s+/', ' ', $templateVars['from']));
+        }
+
+        if (isset($templateVars['subject'])) {
+            $email['subject'] = trim(preg_replace('/\s+/', ' ', $templateVars['subject']));
+        }
+
+		return $email;
 	}
 }

@@ -5,10 +5,10 @@ class MediaRequestHandler extends RecordsRequestHandler
     // RecordRequestHandler configuration
     static public $recordClass = 'Media';
     static public $browseLimit = 100;
-	static public $browseOrder = array('ID' => 'DESC');
+    static public $browseOrder = array('ID' => 'DESC');
 
-	// configurables
-	public static $defaultPage = 'browse';
+    // configurables
+    public static $defaultPage = 'browse';
 	public static $defaultThumbnailWidth = 100;
 	public static $defaultThumbnailHeight = 100;
 	public static $uploadFileFieldName = 'mediaFile';
@@ -63,7 +63,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 			{
 				$mediaID = static::shiftPath();
 				
-				return static::handleOpenRequest($mediaID);
+				return static::handleMediaRequest($mediaID);
 			}
 			
 			case 'download':
@@ -107,17 +107,18 @@ class MediaRequestHandler extends RecordsRequestHandler
 			case '':
 			case 'browse':
 			{
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    return static::handleUploadRequest();
+                }
+
 				return static::handleBrowseRequest();
 			}
 
 			default:
 			{
-				if(is_numeric($action))
-				{
-					return static::handleOpenRequest($action);
-				}
-				else
-				{
+                if (ctype_digit($action)) {
+					return static::handleMediaRequest($action);
+				} else {
 					return parent::handleRecordsRequest($action);
 				}
 			}
@@ -136,7 +137,6 @@ class MediaRequestHandler extends RecordsRequestHandler
 		}
 		
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
-		
 			// init options
 			$options = array_merge(array(
 				'fieldName' => static::$uploadFileFieldName
@@ -238,53 +238,123 @@ class MediaRequestHandler extends RecordsRequestHandler
 		}
 
 		return static::respond('uploadComplete', array(
-			'success' => true
+			'success' => (boolean)$Media
 			,'data' => $Media
 			,'TagID' => isset($Tag) ? $Tag->ID : null
 		));
 	}
 	
 	
-	public static function handleOpenRequest($media_id)
+	public static function handleMediaRequest($mediaID)
 	{
-		if(empty($media_id) || !is_numeric($media_id))
-		{
+		if (empty($mediaID) || !is_numeric($mediaID)) {
 			static::throwError('Missing or invalid media_id');
 		}
 		
 		// get media
-		try
-		{
-			$Media = Media::getById($media_id);
-		}
-		catch(UserUnauthorizedException $e)
-		{
+		try {
+			$Media = Media::getById($mediaID);
+		} catch (UserUnauthorizedException $e) {
 			return static::throwUnauthorizedError('You are not authorized to download this media');
 		}
 		
-		
-		if(!$Media)
-		{
+		if (!$Media) {
 			static::throwNotFoundError('Media ID #%u was not found', $media_id);
 		}
 		
-		if(static::$responseMode == 'json')
-		{
+		if (static::$responseMode == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
 			JSON::translateAndRespond(array(
 				'success' => true
 				,'data' => $Media
 			));
-		}
-		else
-		{
-			$expires = 60*60*24*365;
-			header('Cache-Control: public, max-age='.$expires);
-			header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
-			header('Pragma: public');
-			header('Content-Type: ' . $Media->MIMEType);
-			header('Content-Length: ' . filesize($Media->FilesystemPath));
+		} else {
+
+            // determine variant
+            if ($variant = static::shiftPath()) {
+                if (!$Media->isVariantAvailable($variant)) {
+                    return static::throwNotFoundError('Requested variant is not available');
+                }
+            } else {
+                $variant = 'original';
+            }
+
+            // send caching headers
+            $expires = 60*60*24*365;
+    		header("Cache-Control: public, max-age=$expires");
+    		header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
+    		header('Pragma: public');
+            
+            // media are immutable for a given URL, so no need to actually check anything if the browser wants to revalidate its cache
+            if(!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+                header('HTTP/1.0 304 Not Modified');
+                exit();
+            }
+
+            // initialize response
+            set_time_limit(0);
+            $filePath = $Media->getFilesystemPath($variant);
+            $fp = fopen($filePath, 'rb');
+            $size = filesize($filePath);
+            $length = $filesize;
+            $start = 0;
+            $end = $size - 1;
+
+			header('Content-Type: ' . $Media->getMIMEType($variant));
+            header('ETag: media-' . $Media->ID . '-' . $variant);
+            header('Accept-Ranges: bytes');
 			
-			readfile($Media->FilesystemPath);
+            // interpret range requests
+            if (!empty($_SERVER['HTTP_RANGE'])) {
+                $chunkStart = $start;
+                $chunkEnd = $end;
+
+                list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+
+                if (strpos($range, ',') !== false) {
+                    header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                    header("Content-Range: bytes $start-$end/$size");
+                    exit();
+                }
+
+                if ($range == '-') {
+                    $chunkStart = $size - substr($range, 1);
+                } else {
+                    $range = explode('-', $range);
+                    $chunkStart = $range[0];
+                    $chunkEnd = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
+                }
+
+                $chunkEnd = ($chunkEnd > $end) ? $end : $chunkEnd;
+                if ($chunkStart > $chunkEnd || $chunkStart > $size - 1 || $chunkEnd >= $size) {
+                    header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                    header("Content-Range: bytes $start-$end/$size");
+                    exit();
+                }
+
+                $start = $chunkStart;
+                $end = $chunkEnd;
+                $length = $end - $start + 1;
+
+                fseek($fp, $start);
+                header('HTTP/1.1 206 Partial Content');
+            }
+            
+            // finish response
+            header("Content-Range: bytes $start-$end/$size");
+    		header("Content-Length: $length");
+
+            $buffer = 1024 * 8;
+            while (!feof($fp) && ($p = ftell($fp)) <= $end) {
+                if ($p + $buffer > $end) {
+                    $buffer = $end - $p + 1;
+                }
+
+                echo fread($fp, $buffer);
+                flush();
+            }
+
+            fclose($fp);
+
 			Site::finishRequest();
 		}
 	}
@@ -337,7 +407,9 @@ class MediaRequestHandler extends RecordsRequestHandler
 		if(empty($filename))
 		{
 			$filename = $Media->Caption ? $Media->Caption : sprintf('%s_%u', $Media->ContextClass, $Media->ContextID);
-			
+		}
+        
+        if (strpos($filename, '.') === false) {
 			// add extension
 			$filename .= '.'.$Media->Extension;
 		}
@@ -528,12 +600,24 @@ class MediaRequestHandler extends RecordsRequestHandler
     		// get thumbnail
     		$thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
         } catch (Exception $e) {
+            \Emergence\Logger::general_warning('Caught exception while creating thumbnail for media, returning server error', array(
+                'exceptionClass' => get_class($e)
+                ,'exceptionMessage' => $e->getMessage()
+                ,'exceptionCode' => $e->getCode()
+                ,'recordData' => $Media->getData()
+                ,'thumbFormat' => array(
+                    'maxWidth' => $maxWidth
+                    ,'maxHeight' => $maxHeight
+                    ,'fillColor' => $fillColor
+                    ,'cropped' => $cropped
+                )
+            ));
     		return static::throwServerError('Thumbnail unavailable');
         }
 
 
 		// dump it out
-        header("ETag: media-$Media->ID");
+        header("ETag: media-$Media->ID-$maxWidth-$maxHeight-$fillColor-$cropped");
 		header("Content-Type: $Media->ThumbnailMIMEType");
 		header('Content-Length: ' . filesize($thumbPath));
 		readfile($thumbPath);
