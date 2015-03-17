@@ -39,13 +39,19 @@ class CSV
 			$columnNames = array_keys($firstRecord);
             $columnNames = array_combine($columnNames, $columnNames);
 		} else {
-			$columnNames = array_keys(JSON::translateObjects($firstRecord, false, $columns, true));
+            $dynamicFields = $firstRecord->aggregateStackedConfig('dynamicFields');
+            $fields = $firstRecord->aggregateStackedConfig('fields');
+            
+            $columnNames = array_merge(array_keys($fields), array_keys($dynamicFields));
             $columnNames = array_combine($columnNames, $columnNames);
             
             foreach ($columnNames AS &$columnName) {
-                if (($dynamicField = $firstRecord->getStackedConfig('dynamicFields', $columnName)) && !empty($dynamicField['label'])) {
+                $dynamicField = $dynamicFields[$columnName];
+                $field = $fields[$columnName];
+                
+                if ($dynamicField && !empty($dynamicField['label'])) {
                     $columnName = $dynamicField['label'];
-                } elseif(($field = $firstRecord->getStackedConfig('fields', $columnName)) && !empty($field['label'])) {
+                } elseif ($field && !empty($field['label'])) {
                     $columnName = $field['label'];
                 }
             }
