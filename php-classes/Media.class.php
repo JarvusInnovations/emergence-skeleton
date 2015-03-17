@@ -2,6 +2,7 @@
 
 class Media extends ActiveRecord
 {
+    public static $useCache = true;
     public static $singularNoun = 'media item';
     public static $pluralNoun = 'media items';
 
@@ -235,9 +236,7 @@ class Media extends ActiveRecord
 
                 $image = imagecreatefromstring($fileData);
 
-                if ($this->MIMEType == 'image/jpeg') {
-                    $exifData = exif_read_data($sourceFile);
-
+                if ($this->MIMEType == 'image/jpeg' && ($exifData = @exif_read_data($sourceFile)) && !empty($exifData['Orientation'])) {
                     switch ($exifData['Orientation']) {
                         case 1: // nothing
                             break;

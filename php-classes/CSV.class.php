@@ -2,17 +2,28 @@
 
 class CSV
 {
+    public static function fromRecords($records, $columns = '*')
+    {
+        $tmp = fopen('php://temp', 'r+');
+        static::writeToStream($tmp, $records, $columns);
+        rewind($tmp);
+        $output = file_get_contents($tmp);
+        fclose($tmp);
+
+        return $output;
+	}
+
     public static function respond($records, $filename = null, $columns = '*')
     {
 		header('Content-Type: text/csv');
 		header('Content-Disposition: attachment' . ($filename ? '; filename="'.str_replace('"', '', $filename).'.csv"' : ''));
-        print(static::fromRecords($records, $columns));
+        static::writeToStream(fopen('php://output', 'w'), $records, $columns);
         exit();
     }
 
-    static public function fromRecords($records, $columns = '*')
+    public static function writeToStream($stream, $records, $columns = '*')
     {
-		if (!is_array($records)) {
+    	if (!is_array($records)) {
 			throw new Exception('fromRecords expects an array');
 		} elseif (empty($records)) {
 			return 'No data';
@@ -23,12 +34,11 @@ class CSV
         }
 
 		$firstRecord = $records[0];
-		
+
 		if (is_array($firstRecord)) {
 			$columnNames = array_keys($firstRecord);
             $columnNames = array_combine($columnNames, $columnNames);
 		} else {
-            
             $dynamicFields = $firstRecord->aggregateStackedConfig('dynamicFields');
             $fields = $firstRecord->aggregateStackedConfig('fields');
             
@@ -41,21 +51,26 @@ class CSV
                 
                 if ($dynamicField && !empty($dynamicField['label'])) {
                     $columnName = $dynamicField['label'];
-                } elseif($field && !empty($field['label'])) {
+                } elseif ($field && !empty($field['label'])) {
                     $columnName = $field['label'];
                 }
             }
 		}
-		$csv = static::rowFromArray($columnNames, $columns);
-		
-		foreach ($records AS $record) {			
-			$csv .= static::rowFromArray(is_array($record) ? $record : JSON::translateObjects($record, false, $columns, true), $columns);
-		}
-		
-		return $csv;
-	}
 
-	static public function rowFromArray($array, $columns = null)
+		fputcsv($stream, static::getColumns($columnNames, $columns));
+		
+		foreach ($records AS $record) {
+            fputcsv(
+                $stream,
+                static::getColumns(
+                    is_array($record) ? $record : JSON::translateObjects($record, false, $columns, true),
+                    $columns
+                )
+            );
+		}
+    }
+
+	public static function getColumns($array, $columns = null)
 	{
         if (is_array($columns)) {
             $newArray = array();
@@ -65,8 +80,6 @@ class CSV
             $array = $newArray;
         }
         
-		return join(',', array_map(function($value) {
-			return '"'.str_replace('"', '\"', $value).'"';
-		}, $array)) . "\r\n";
+		return $array;
 	}
 }

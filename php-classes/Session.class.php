@@ -4,7 +4,7 @@ class Session extends ActiveRecord
 {
 
     // Session configurables
-	static public $cookieName = 's';
+    static public $cookieName = 's';
 	static public $cookieDomain = null;
 	static public $cookiePath = '/';
 	static public $cookieSecure = false;
@@ -58,39 +58,45 @@ class Session extends ActiveRecord
 			'LastIP' => !empty($_SERVER['REMOTE_ADDR']) ? ip2long($_SERVER['REMOTE_ADDR']) : null
 			,'LastRequest' => time()
 		);
-	
-		// try to load from cookie
-		if(!empty($_COOKIE[static::$cookieName]))
-		{
-			if($Session = static::getByHandle($_COOKIE[static::$cookieName]))
-			{
-				// update session & check expiration
+
+
+        // try to load from authorization header
+        if (!empty($_SERVER['HTTP_AUTHORIZATION']) && 0 === strpos($_SERVER['HTTP_AUTHORIZATION'], 'Token ')) {
+            if ($Session = static::getByHandle(substr($_SERVER['HTTP_AUTHORIZATION'], 6))) {
+                $Session = static::updateSession($Session, $sessionData);
+            }
+        }
+
+		// try to load from POST data
+		if (empty($Session) && !empty($_POST[static::$cookieName])) {
+			if ($Session = static::getByHandle($_POST[static::$cookieName])) {
 				$Session = static::updateSession($Session, $sessionData);
 			}
 		}
-		
-		// try to load from any request method
-		if(empty($Session) && !empty($_REQUEST[static::$cookieName]))
-		{
-			if($Session = static::getByHandle($_REQUEST[static::$cookieName]))
-			{
-				// update session & check expiration
+
+		// try to load from GET data
+		if (empty($Session) && !empty($_GET[static::$cookieName])) {
+			if ($Session = static::getByHandle($_GET[static::$cookieName])) {
 				$Session = static::updateSession($Session, $sessionData);
 			}
 		}
-		
-		if(!empty($Session))
-		{
+
+		// try to load from cookie data
+		if (empty($Session) && !empty($_COOKIE[static::$cookieName])) {
+			if ($Session = static::getByHandle($_COOKIE[static::$cookieName])) {
+				$Session = static::updateSession($Session, $sessionData);
+			}
+		}
+
+
+        // return found or create new session
+		if (!empty($Session)) {
 			// session found
 			return $Session;
-		}
-		elseif($create)
-		{
+		} elseif($create) {
 			// create session
 			return static::create($sessionData, true);
-		}
-		else
-		{
+		} else {
 			// no session available
 			return false;
 		}

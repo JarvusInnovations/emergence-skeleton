@@ -40,7 +40,7 @@ class ActiveRecord
      */
     static public $fieldDefaults = array(
         'type' => 'string'
-		,'notnull' => true
+    	,'notnull' => true
 	);
 	
 	/**
@@ -243,7 +243,11 @@ class ActiveRecord
         }
         
         if ($key) {
-            return static::$_stackedConfigs[$className][$propertyName][$key];
+            if (array_key_exists($key, static::$_stackedConfigs[$className][$propertyName])) {
+                return static::$_stackedConfigs[$className][$propertyName][$key];
+            } else {
+                return null;
+            }
         } else {
             return static::$_stackedConfigs[$className][$propertyName];
         }

@@ -1,6 +1,7 @@
 /* line 13, ../../sass/features/content-editable.scss */
 .content-editable {
   border: 2px dashed rgba(222, 182, 0, 0.8) !important;
+  min-height: 1em;
 }
 /* line 16, ../../sass/features/content-editable.scss */
 .content-editable:hover {
