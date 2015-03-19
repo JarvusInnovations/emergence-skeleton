@@ -1,8 +1,8 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-    
-	
+
+
 // get repo
 if(empty($_REQUEST['repo'])) {
 	die('Parameter "repo" required');
@@ -84,6 +84,9 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
             Benchmark::mark("skipped unchanged file $srcPath from $treeOptions[path]");
         }
     } else {
+        $cachedFiles = Emergence_FS::cacheTree($srcPath);
+        Benchmark::mark("precached $srcPath: ".$cachedFiles);
+
         $exportResult = Emergence_FS::importTree($treeOptions['path'], $srcPath, $treeOptions);
     	Benchmark::mark("importing directory $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
     }
