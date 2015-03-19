@@ -24,7 +24,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     );
     
     static public function handleRequest()
-	{
+    {
 		// save static class
 		static::$calledClass = get_called_class();
 	
@@ -201,27 +201,29 @@ abstract class RecordsRequestHandler extends RequestHandler
                 $options['order'] = $className::mapFieldOrder(static::$browseOrder);
         }
 
+        $responseData = $className::getAllByQuery(
+			'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+			,array(
+                static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
+				,join(',',$select)
+				,$className::$tableName
+				,$tableAlias
+				,!empty($joins) ? implode(' ', $joins) : ''
+				,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
+				,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
+				,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
+				,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
+			)
+		);
+        
 		return static::respond(
 			isset($responseID) ? $responseID : static::getTemplateName($className::$pluralNoun)
 			,array_merge($responseData, array(
 				'success' => true
-				,'data' => $className::getAllByQuery(
-					'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
-					,array(
-                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
-						,join(',',$select)
-						,$className::$tableName
-						,$tableAlias
-						,!empty($joins) ? implode(' ', $joins) : ''
-						,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
-						,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-						,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
-						,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
-					)
-				)
+				,'data' => $responseData
 				,'query' => $query
 				,'conditions' => $conditions
-			    ,'total' => DB::foundRows()
+			    ,'total' => !empty($responseData) ? DB::foundRows() : 0
 			    ,'limit' => $options['limit']
 			    ,'offset' => $options['offset']
 			))
@@ -283,7 +285,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
         // get results
         $results = $className::getAllByWhere($conditions, $options);
-        $resultsTotal = DB::foundRows();
+        $resultsTotal = !empty($results) ? DB::foundRows() : 0;
 
 
         // embed tables
