@@ -45,6 +45,8 @@
             {if $mode != 'development' && $App->getAsset($jsBuildPath)}
                 {$jsEntryPath = $jsBuildPath}
             {else}
+                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
+
                 {block js-app-devenv}
                     {$frameworkBuild = 'ext'}
 
@@ -68,7 +70,6 @@
             {/if}
 
             {block js-app-local}
-                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
                 <script type="text/javascript" src="{$App->getVersionedPath($jsEntryPath)}"></script>
             {/block}
 
