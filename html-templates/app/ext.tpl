@@ -65,12 +65,10 @@
 
                     {sencha_bootstrap}
                 {/block}
-
-                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
-                <script type="text/javascript" src="{$jsEntryPath}"></script>
             {/if}
 
             {block js-app-local}
+                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
                 <script type="text/javascript" src="{$App->getVersionedPath($jsEntryPath)}"></script>
             {/block}
 
