@@ -25,7 +25,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
     
     previewTpl: [
         '<tpl for="Data">',
-            '<a class="media-link" title="{Caption:htmlEncode}" href="/media/{MediaID}/open" target="_blank">',
+            '<a class="media-link" title="{Caption:htmlEncode}" href="/media/{MediaID}" target="_blank">',
                 '<figure>',
                     '<img src="/thumbnail/{MediaID}/1000x1000" alt="{Caption:htmlEncode}">',
                     '<tpl if="caption"><figcaption>{Caption:htmlEncode}</figcaption></tpl>',
