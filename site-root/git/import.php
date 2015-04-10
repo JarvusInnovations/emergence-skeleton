@@ -1,8 +1,8 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-
-
+    
+    
 // get repo
 if(empty($_REQUEST['repo'])) {
 	die('Parameter "repo" required');
@@ -25,34 +25,14 @@ Benchmark::mark("configured request: repoName=$repoName");
 
 // get paths
 $repoPath = "$_SERVER[SITE_ROOT]/site-data/git/$repoName";
-$keyPath = "$repoPath.key";
-$gitWrapperPath = "$repoPath.git.sh";
-putenv("GIT_SSH=$gitWrapperPath");
-
 
 // check if there is an existing repo
 if(!is_dir("$repoPath/.git")) {
 	die("$repoPath does not contain .git");
 }
 
-
 // get repo
 chdir($repoPath);
-$repo = new PHPGit_Repository($repoPath, !empty($_REQUEST['debug']));
-Benchmark::mark("loaded git repo in $repoPath");
-
-
-// verify repo state
-if($repo->getCurrentBranch() != $repoCfg['workingBranch']) {
-	die("Current branch in $repoPath is not $repoCfg[workingBranch]; aborting.");
-}
-Benchmark::mark("verified working branch");
-
-
-// pull changes
-$repo->git("pull origin $repoCfg[workingBranch]");
-Benchmark::mark("pulled from origin/$repoCfg[workingBranch]");
-
 
 // sync trees
 foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
@@ -71,6 +51,7 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
 	}
 	
 	$treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
+    $treeOptions['dataPath'] = false;
     
     if (is_file($treeOptions['path'])) {
         $sha1 = sha1_file($treeOptions['path']);
@@ -84,22 +65,7 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
             Benchmark::mark("skipped unchanged file $srcPath from $treeOptions[path]");
         }
     } else {
-        $cachedFiles = Emergence_FS::cacheTree($srcPath);
-        Benchmark::mark("precached $srcPath: ".$cachedFiles);
-
         $exportResult = Emergence_FS::importTree($treeOptions['path'], $srcPath, $treeOptions);
     	Benchmark::mark("importing directory $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
     }
 }
-
-
-// commit changes
-#$repo->git('add --all');
-#
-#$repo->git(sprintf(
-#	'commit -n -m "%s" --author="%s <%s>"'
-#	,addslashes($_POST['message'])
-#	,$GLOBALS['Session']->Person->FullName
-#	,$GLOBALS['Session']->Person->Email
-#));
-#Benchmark::mark("committed all changes");

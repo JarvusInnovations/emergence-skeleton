@@ -2,6 +2,8 @@
 
 namespace Emergence\CMS;
 
+use Cache;
+
 class ContentBlock extends \VersionedRecord
 {
     // VersionedRecord configuration
@@ -54,20 +56,46 @@ class ContentBlock extends \VersionedRecord
         return $this->finishValidation();
     }
 
+    public function save($deep = true)
+	{
+		// call parent
+		parent::save($deep);
+
+        if ($this->isFieldDirty('Content')) {
+            Cache::delete($this->getHtmlCacheKey());
+        }
+	}
+
+    protected function getHtmlCacheKey()
+    {
+        return 'content-block-html/' . $this->Handle;
+    }
+
     public function getHtml()
     {
-        switch ($this->Renderer) {
-            case 'text':
-                return htmlspecialchars($this->Content);
-            case 'html':
-                return $this->Content;
-            case 'markdown':
-                return
-                    \Michelf\SmartyPantsTypographer::defaultTransform(
-                        \Michelf\MarkdownExtra::defaultTransform($this->Content)
-                    );
+        $cacheKey = $this->getHtmlCacheKey();
+
+        if (false === ($result = Cache::fetch($cacheKey))) {
+            $result = '';
+
+            switch ($this->Renderer) {
+                case 'text':
+                    $result = htmlspecialchars($this->Content);
+                    break;
+                case 'html':
+                    $result = $this->Content;
+                    break;
+                case 'markdown':
+                    $result =
+                        \Michelf\SmartyPantsTypographer::defaultTransform(
+                            \Michelf\MarkdownExtra::defaultTransform($this->Content)
+                        );
+                    break;
+            }
+
+            Cache::store($cacheKey, $result);
         }
 
-        return '';
+        return $result;
     }
 }

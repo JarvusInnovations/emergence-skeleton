@@ -50,14 +50,14 @@ Git::$repositories['ext-library'] = array(
 	)
 );
 
-Git::$repositories['sencha-hotfixes'] = array(
-    'remote' => 'git@github.com:JarvusInnovations/sencha-hotfixes.git'
-    ,'originBranch' => 'master'
-    ,'workingBranch' => 'master'
-    ,'localOnly' => false
-    ,'trees' => array(
-        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.736' => 'jarvus-hotfixes-ext-5.0.0.736',
-        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.970' => 'jarvus-hotfixes-ext-5.0.0.970',
-        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.1.1255' => 'jarvus-hotfixes-ext-5.0.1.1255'
-	)
-);
+#Git::$repositories['sencha-hotfixes'] = array(
+#    'remote' => 'git@github.com:JarvusInnovations/sencha-hotfixes.git'
+#    ,'originBranch' => 'master'
+#    ,'workingBranch' => 'master'
+#    ,'localOnly' => false
+#    ,'trees' => array(
+#        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.736' => 'jarvus-hotfixes-ext-5.0.0.736',
+#        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.0.970' => 'jarvus-hotfixes-ext-5.0.0.970',
+#        'sencha-workspace/packages/jarvus-hotfixes-ext-5.0.1.1255' => 'jarvus-hotfixes-ext-5.0.1.1255'
+#	)
+#);

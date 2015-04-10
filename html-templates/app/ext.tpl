@@ -45,6 +45,8 @@
             {if $mode != 'development' && $App->getAsset($jsBuildPath)}
                 {$jsEntryPath = $jsBuildPath}
             {else}
+                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
+
                 {block js-app-devenv}
                     {$frameworkBuild = 'ext'}
 
@@ -65,9 +67,6 @@
 
                     {sencha_bootstrap}
                 {/block}
-
-                {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
-                <script type="text/javascript" src="{$jsEntryPath}"></script>
             {/if}
 
             {block js-app-local}
