@@ -14,6 +14,7 @@ class ContentBlock extends \VersionedRecord
     public static $singularNoun = 'content block';
     public static $pluralNoun = 'content blocks';
     public static $collectionRoute = '/content-blocks';
+    public static $useCache = true;
 
     public static $fields = array(
         'Handle' => array(
