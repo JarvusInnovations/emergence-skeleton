@@ -50,11 +50,10 @@ class PostmarkMailer extends AbstractMailer
 		}
 		else
 		{
-            $resultDecode = json_decode($result);
             \Emergence\Logger::general_error('PostmarkMailer Delivery Error', [
                 'exceptionClass' => \PostmarkMailer::class,
-                'exceptionMessage' => $resultDecode->Message,
-                'exceptionCode' => $resultDecode->ErrorCode
+                'exceptionMessage' => $result,
+                'exceptionCode' => $httpStatus
             ]);
 
 			return false;
