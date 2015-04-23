@@ -34,13 +34,21 @@ class ActiveRecord
      */
     static public $collectionRoute;
     
+    
+    /**
+     * False to automatically update instead of insert when a duplicate
+     * key exception is thrown during save
+     * @var string
+     */
+    public static $updateOnDuplicateKey = false;
+    
     /**
      * Defaults values for field definitions
      * @var array
      */
     static public $fieldDefaults = array(
         'type' => 'string'
-    	,'notnull' => true
+        ,'notnull' => true
 	);
 	
 	/**
@@ -715,7 +723,7 @@ class ActiveRecord
 		Debug::dump($this->getData(), $exit, get_class($this));
 	}
 	
-	public function save($deep = true)
+    public function save($deep = true)
 	{
         // fire event
         Emergence\EventBus::fireEvent('beforeRecordSave', $this->getRootClass(), array(
@@ -776,30 +784,54 @@ class ActiveRecord
 			// create new or update existing
 			if($this->_isPhantom)
 			{
-				try {
-					DB::nonQuery(
-						'INSERT INTO `%s` SET %s'
-						, array(
-							static::$tableName
-							, join(',', $set)
-						)
-					);
-				} catch(TableNotFoundException $e) {
-					// auto-create table and try insert again
-					DB::multiQuery(SQL::getCreateTable(get_called_class()));
-					
-					DB::nonQuery(
-						'INSERT INTO `%s` SET %s'
-						, array(
-							static::$tableName
-							, join(',', $set)
-						)
-					);
-				}
-				
-				$this->_record['ID'] = DB::insertID();
-				$this->_isPhantom = false;
-				$this->_isNew = true;
+                $insertQuery = DB::prepareQuery(
+    				'INSERT INTO `%s` SET %s'
+					, array(
+						static::$tableName
+						, join(',', $set)
+					)
+                );
+
+                try {
+    				try {
+    					DB::nonQuery($insertQuery);
+    				} catch(TableNotFoundException $e) {
+    					// auto-create table and try insert again
+    					DB::multiQuery(SQL::getCreateTable(get_called_class()));
+    					
+    					DB::nonQuery($insertQuery);
+    				}
+
+    				$this->_record['ID'] = DB::insertID();
+    				$this->_isPhantom = false;
+    				$this->_isNew = true;
+                } catch (DuplicateKeyException $e) {
+                    if (
+                        static::$updateOnDuplicateKey &&
+                        preg_match('/Duplicate entry \'.*?\' for key \'([^\']+)\'/', $e->getMessage(), $errorMatches) &&
+                        ($duplicateKeyName = $errorMatches[1]) &&
+                        ($duplicateKeyConfig = static::getStackedConfig('indexes', $duplicateKeyName))
+                    ) {
+                        $keyValues = array_intersect_key($recordValues, array_flip($duplicateKeyConfig['fields']));
+                        $deltaValues = array_diff_key($recordValues, array_flip(array('Created', 'CreatorID')));
+
+            			DB::nonQuery(
+        					'UPDATE `%s` SET %s WHERE %s',
+        					array(
+        						static::$tableName,
+        						join(',', static::_mapValuesToSet($deltaValues)),
+        						join(' AND ', static::_mapConditions($keyValues))
+        					)
+        				);
+
+                        $this->_record = static::getRecordByWhere($keyValues);
+
+            			$this->_isPhantom = false;
+        				$this->_isUpdated = true;
+                    } else {
+                        throw $e;
+                    }
+                }
 			}
 			elseif(count($set))
 			{
