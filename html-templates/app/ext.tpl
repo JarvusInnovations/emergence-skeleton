@@ -35,7 +35,6 @@
                 <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath($cssBuildPath)}" />
             {elseif $appTheme}
                 <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/resources/' $appTheme '-all.css'))}" />
-                <script type="text/javascript" src="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/' $appTheme '.js'))}"></script>
             {else}
                 <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath('sdk/resources/css/ext-all.css')}" />
             {/if}
@@ -64,6 +63,10 @@
                     {/if}
 
                     <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
+
+                    {if $appTheme}
+                        <script type="text/javascript" src="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/' $appTheme '.js'))}"></script>
+                    {/if}
 
                     {sencha_bootstrap}
                 {/block}
