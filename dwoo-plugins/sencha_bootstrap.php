@@ -26,8 +26,13 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
 
         // include classpath files
         $classPaths = array_merge($classPaths, explode(',', $App->getBuildCfg('app.classpath')));
+
+        // include override files
+        if ($overridesPath = $App->getBuildCfg('app.overrides')) {
+            $classPaths = array_merge($classPaths, explode(',', $overridesPath));
+        }
     }
-    
+
     // pull package requirements from source files
     if (!empty($packageRequirers)) {
         if (is_string($packageRequirers)) {
@@ -109,6 +114,12 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         // rewrite path to canonican external URL
         if ($appPath && strpos($path, "$appPath/") === 0) {
             $webPath = '/app/'.substr($path, 17);
+
+            // app overrides should automatically be loaded
+            if (substr($path, strlen($appPath), 11)== '/overrides/') {
+                $autoLoad = true;
+                $addToManifest = false;
+            }
         } elseif (strpos($path, 'ext-library/') === 0) {
             $webPath = '/app/x'.substr($path, 11);
         } elseif (strpos($path, 'sencha-workspace/packages/') === 0) {
