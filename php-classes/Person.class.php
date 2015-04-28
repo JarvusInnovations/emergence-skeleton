@@ -16,6 +16,8 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
 	static public $pluralNoun = 'people';
     static public $collectionRoute = '/people';
 	
+	static public $existingEmailError = 'Email already registered to another account.';
+	
 	static public $fields = array(
     	'FirstName' => array(
 			'includeInSummary' => true
@@ -309,7 +311,7 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
 			
 			if($ExistingUser && ($ExistingUser->ID != $this->ID))
 			{
-				$this->_validator->addError('Email', 'Email already registered to another account.');
+				$this->_validator->addError('Email', static::$existinEmailError);
 			}
 		}
 
