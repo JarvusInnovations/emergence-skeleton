@@ -4,7 +4,7 @@ class Sencha
 {
     static public $frameworks = array(
         'ext' => array(
-            'defaultVersion' => '4.2.2.1144'
+            'defaultVersion' => '5.0.1.1255'
 			,'mappedVersions' => array(
 				'4.2.1'     => '4.2.1.883'
     			,'4.2.2'    => '4.2.2.1144'
@@ -26,7 +26,7 @@ class Sencha
 		)
 	);
 	
-	static public $defaultCmdVersion = '5.0.0.160';
+	static public $defaultCmdVersion = '5.1.2.52';
 	
 	static public $cmdPath = '/usr/local/bin/Sencha/Cmd';
 	static public $binPaths = array('/bin','/usr/bin','/usr/local/bin');
