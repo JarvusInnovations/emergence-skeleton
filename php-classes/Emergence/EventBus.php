@@ -50,6 +50,7 @@ class EventBus
 
         $contextOriginalLength = count($context);
         $handlers = array();
+        Emergence_FS::cacheTree($rootCollection);
 
         while (true) {
             $contextPath = $rootCollection;
