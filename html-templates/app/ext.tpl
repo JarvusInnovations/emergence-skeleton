@@ -43,6 +43,10 @@
         {block js-app}
             {if $mode != 'development' && $App->getAsset($jsBuildPath)}
                 {$jsEntryPath = $jsBuildPath}
+
+                {if $App->getAsset('.sencha/app/Boot.js')}
+                    <script type="text/javascript" src="{$App->getVersionedPath('.sencha/app/Boot.js')}"></script>
+                {/if}
             {else}
                 {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
 
