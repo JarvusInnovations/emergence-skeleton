@@ -659,7 +659,7 @@ class Media extends ActiveRecord
     
     public function getMIMEType($variant = 'original')
     {
-        return $this->MIMEtype;
+        return $this->MIMEType;
     }
 
     public function writeFile($sourceFile)
