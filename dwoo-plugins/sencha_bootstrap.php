@@ -147,7 +147,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $sourceReadHandle = $sourceNode->get();
 
             while (($line = fgets($sourceReadHandle, 4096)) !== false) {
-                if (preg_match('/(Ext\.define\(\s*([\'"])([^\2]+)\2|\/\/\s*@define[ \t]+(\S+))/i', $line, $matches)) {
+                if (preg_match('/^\s*(Ext\.define\(\s*([\'"])([^\2]+)\2|\/\/\s*@define[ \t]+(\S+))/i', $line, $matches)) {
                     $source['Class'] = empty($matches[4]) ? $matches[3] : $matches[4];
                     break;
                 }
