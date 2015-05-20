@@ -11,13 +11,13 @@ class Sencha_RequestHandler extends RequestHandler
 		,'production'
         ,'package'
 	);
-	static public $defaultMode = 'testing';
+	static public $defaultMode = 'production';
 	
 	static public $defaultAccountLevels = array(
 		'development' => 'Developer'
-        ,'testing' => false
-        ,'production' => false
-        ,'package' => false
+        ,'testing' => 'User'
+        ,'production' => 'User'
+        ,'package' => 'User'
         ,'docs' => 'Developer'
 	);
     
