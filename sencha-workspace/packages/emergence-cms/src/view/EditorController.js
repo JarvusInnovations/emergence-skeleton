@@ -74,12 +74,19 @@ Ext.define('Emergence.cms.view.EditorController', {
         me.syncToRecord();
 
         contentRecord.save({
-            callback: function(records, operation, success) {
+            callback: function(record, operation, success) {
+                var contentItemsData = contentRecord.get('items');
+
                 if (success && wasPhantom) {
                     editorView.setLoading('Opening new post&hellip;');
                     location.href = contentRecord.toUrl() + '/edit';
                 } else {
                     editorView.setLoading(false);
+
+                    // write server-returned content item data to each composer
+                    editorView.items.getAt(0).items.each(function(composer, composerIndex) {
+                        composer.setContentItem(contentItemsData[composerIndex]);
+                    });
 
                     if (!success) {
                         Ext.Msg.show({
