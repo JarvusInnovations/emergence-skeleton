@@ -36,7 +36,12 @@ Ext.define('Emergence.cms.view.composer.Abstract', {
     getItemData: function() {
         var me = this,
             data = {},
+            contentItem = me.getContentItem(),
             contentItemClass = me.self.contentItemClass;
+
+        if (contentItem && contentItem.ID) {
+            data.ID = contentItem.ID;
+        }
 
         if (contentItemClass) {
             data.Class = Ext.isArray(contentItemClass) ? contentItemClass[0] : contentItemClass;
