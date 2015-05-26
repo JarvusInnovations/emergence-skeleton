@@ -316,7 +316,8 @@ class Media extends ActiveRecord
                 $cropper = new stojg\crop\CropEntropy($this->FilesystemPath);
             }
             $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
-            $croppedImage->writeimage($thumbPath);
+            $croppedImage->stripImage();
+            $croppedImage->writeImage($thumbPath);
         } else {
             // load source image
             $srcImage = $this->getImage();
