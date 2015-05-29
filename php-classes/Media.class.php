@@ -317,6 +317,7 @@ class Media extends ActiveRecord
             }
             $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
             $croppedImage->stripImage();
+            $croppedImage->setImageCompressionQuality(static::$thumbnailJPEGCompression);
             $croppedImage->writeImage($thumbPath);
         } else {
             // load source image
