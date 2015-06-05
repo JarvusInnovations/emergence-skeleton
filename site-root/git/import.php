@@ -11,7 +11,7 @@ if(empty($_REQUEST['repo'])) {
 $repoName = $_REQUEST['repo'];
 
 if(!array_key_exists($repoName, Git::$repositories)) {
-	die("Repo '$repoName' is not defined in Git::\$repositories");
+    die("Repo '$repoName' is not defined in Git::\$repositories");
 }
 
 $repoCfg = Git::$repositories[$repoName];
@@ -49,7 +49,11 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
 	elseif(!$treeOptions['path']) {
 		$treeOptions['path'] = $srcPath;
 	}
-	
+
+    if (is_string($treeOptions['exclude'])) {
+        $treeOptions['exclude'] = array($treeOptions['exclude']);
+    }
+
 	$treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
     $treeOptions['dataPath'] = false;
     
