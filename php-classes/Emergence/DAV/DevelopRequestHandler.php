@@ -2,8 +2,6 @@
 
 namespace Emergence\DAV;
 
-use Emergence\People\User;
-
 class DevelopRequestHandler extends \RequestHandler
 {
     public static $userResponseModes = array(
@@ -25,7 +23,7 @@ class DevelopRequestHandler extends \RequestHandler
             $authUserPass = $authEngine->getUserPass();
     
             // try to get user
-            $userClass = User::$defaultClass;
+            $userClass = \User::$defaultClass;
             $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
         }
 
