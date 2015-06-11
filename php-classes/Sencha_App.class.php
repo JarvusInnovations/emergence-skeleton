@@ -8,7 +8,7 @@ class Sencha_App
     function __construct($name)
     {
         $this->_name = $name;
-	}
+    }
 	
 	static public function getByName($name)
 	{
@@ -181,7 +181,7 @@ class Sencha_App
         return $code;
     }
 
-    public function getRequiredPackages()
+    public function getRequiredPackages($deep = true)
     {
         $packages = $this->getAppCfg('requires');
         
@@ -189,6 +189,10 @@ class Sencha_App
             $packages[] = $themeName;
         }
 
-        return array_unique(Sencha::crawlRequiredPackages($packages));
+        if ($deep) {
+            $packages = array_unique(Sencha::crawlRequiredPackages($packages, $this->getFramework(), $this->getFrameworkVersion()));
+        }
+
+        return $packages;
     }
 }

@@ -8,6 +8,9 @@
     <head>
         {block meta}
             <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
             <title>{if $title}{$title}{else}{$appName}-{$mode}{/if}</title>
         {/block}
 
@@ -69,7 +72,14 @@
                     <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
 
                     {if $appTheme}
-                        <script type="text/javascript" src="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/' $appTheme '.js'))}"></script>
+                        {$workspaceThemeIncludePath = cat('packages/$appTheme/build/' $appTheme '.js')}
+                        {$sdkThemeIncludePath = cat('sdk/packages/$appTheme/build/' $appTheme '.js')}
+                        
+                        {if $App->getAsset($workspaceThemeIncludePath)}
+                            <script type="text/javascript" src="{$App->getVersionedPath($workspaceThemeIncludePath)}"></script>
+                        {elseif $App->getAsset($sdkThemeIncludePath)}
+                            <script type="text/javascript" src="{$App->getVersionedPath($sdkThemeIncludePath)}"></script>
+                        {/if}
                     {/if}
 
                     {sencha_bootstrap}

@@ -17,7 +17,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $appPath = 'sencha-workspace/'.$App->getName();
 
         // recursively merge app's required packages and their required packages into packages list
-        $packages = array_merge($packages, $App->getRequiredPackages());
+        $packages = array_merge($packages, $App->getRequiredPackages(false)); // false to skip crawling decendents, we'll do it here later
 
         // add theme to packages list
         if ($themeName = $App->getBuildCfg('app.theme')) {
@@ -64,9 +64,20 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     }
 
     // add paths for packages
-    $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
+    $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages), $framework, $frameworkVersion));
+
     foreach ($packages AS $packageName) {
+        // check workspace and framework package dirs
         $packagePath = "sencha-workspace/packages/$packageName";
+        
+        if (!Site::resolvePath($packagePath)) {
+            $packagePath = "$frameworkPath/packages/$packageName";
+            
+            if (!Site::resolvePath($packagePath)) {
+                throw new Exception("Source for package $packageName not found in workspace or framework");
+            }
+        }
+
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
     
@@ -127,6 +138,14 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
 
             // package overrides should automatically be loaded
             if (substr($path, strpos($path, '/', 26), 11) == '/overrides/') {
+                $autoLoad = true;
+                $addToManifest = false;
+            }
+        } elseif (strpos($path, $frameworkPath) === 0) {
+            $webPath = "/app/$framework-$frameworkVersion/".substr($path, strlen($frameworkPath) + 1);
+
+            // package overrides should automatically be loaded
+            if (substr($path, strpos($path, '/', strlen($frameworkPath) + 10), 11) == '/overrides/') {
                 $autoLoad = true;
                 $addToManifest = false;
             }
