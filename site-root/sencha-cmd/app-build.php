@@ -24,7 +24,7 @@ $App = new Sencha_App($appName);
 if(empty($_REQUEST['buildType'])) {
     $buildType = 'production';
 }
-else {	
+else {    
 	$buildType = $_REQUEST['buildType'];
 }
 
@@ -60,7 +60,7 @@ $archivePath = "sencha-build/$appName/archive";
 // get temporary directory and set paths
 $tmpPath = Emergence_FS::getTmpDir();
 $workspaceConfigTmpPath = "$tmpPath/.sencha";
-$frameworkTmpPath = "$tmpPath/$framework";
+$frameworkTmpPath = "$tmpPath/$framework-$frameworkVersion";
 $packagesTmpPath = "$tmpPath/packages";
 $appTmpPath = "$tmpPath/$appName";
 $archiveTmpPath = "$appTmpPath/archive";
@@ -158,6 +158,7 @@ $cmd = Sencha::buildCmd(
         // preset build directory parameters
         ,"-Dbuild.dir=$buildTmpPath"
         ,"-Dapp.output.base=$buildTmpPath" // CMD 5.0.1 needs this set directly too or it gets loaded from app.defaults.json
+        ,"-D{$framework}.dir=$frameworkTmpPath"
         
         // ant targets
         ,$buildType // buildType target (e.g. "production", "testing") sets up build parameters
