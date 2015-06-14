@@ -5,7 +5,7 @@ class Sencha
     static public $frameworks = array(
         'ext' => array(
             'defaultVersion' => '5.0.1.1255'
-    		,'mappedVersions' => array(
+        	,'mappedVersions' => array(
 				'4.2.1'     => '4.2.1.883'
     			,'4.2.2'    => '4.2.2.1144'
     			,'4.2.3'    => '4.2.3.1477'
@@ -250,5 +250,13 @@ class Sencha
         }
 
 		return $key ? static::$_workspaceCfg[$key] : static::$_workspaceCfg;
+    }
+
+    public static function cleanJson($json)
+    {
+    	$json = preg_replace('#/\*.*?\*/#s', '', $json);
+		$json = preg_replace('#([^\\\\])\\\\\\.#', '$1\\\\\\.', $json); // replace sencha-included "\." with "\\."
+
+        return $json;
     }
 }

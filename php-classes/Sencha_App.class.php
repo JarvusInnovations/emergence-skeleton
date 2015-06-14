@@ -9,7 +9,7 @@ class Sencha_App
     {
         $this->_name = $name;
     }
-	
+    
 	static public function getByName($name)
 	{
 		return new static($name);
@@ -84,8 +84,7 @@ class Sencha_App
 		$json = file_get_contents($configNode->RealPath);
 		
 		// patch invalid json
-		$json = preg_replace('#/\*.*?\*/#s', '', $json);
-		$json = preg_replace('#([^\\\\])\\\\\\.#', '$1\\\\\\.', $json); // replace sencha-included "\." with "\\."
+        $json = Sencha::cleanJson($json);
 
 		$this->_appCfg = json_decode($json, true);
 		
