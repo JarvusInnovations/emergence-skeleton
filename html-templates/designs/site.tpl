@@ -29,26 +29,24 @@
     <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
     
-    <div class="wrapper site clearfix">
-    
-    <header class="header site clearfix">
-        <div class="inner">
-            {block "user-tools"}
-                {include includes/site.user-tools.tpl}
-            {/block}
+    {block "user-tools"}
+        {include includes/site.user-tools.tpl}
+    {/block}
 
-            {block "branding"}
-                {include includes/site.branding.tpl}
-            {/block}
-            
-            {block "header-bottom"}
-                {include includes/site.header-bottom.tpl}
-            {/block}
-        </div>
+    <div class="wrapper site">
+    
+    <header class="header site {block "header-class"}{/block}">
+        {block "branding"}
+            {include includes/site.branding.tpl}
+        {/block}
+        
+        {block "header-bottom"}
+            {include includes/site.header-bottom.tpl}
+        {/block}
     </header>
     
-    <main class="content site clearfix" role="main"> {* !.site.content *}
-        <div class="inner">
+    <main class="content site" role="main"> {* !.site.content *}
+        <div class="inner {block "content-inner-class"}{/block}">
             {block "content"}
                 <header class="page-header">
                     <h1 class="header-title title-1">Site Section Name</h1>

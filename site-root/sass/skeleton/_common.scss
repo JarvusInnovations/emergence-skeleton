@@ -54,6 +54,11 @@ body {
 
         @media #{$mq-wide} {
             width: 85%;
+
+            &.full-bleed {
+                padding: 0;
+                width: 100%;
+            }
         }
     }
 }
@@ -127,11 +132,7 @@ body {
     
     .text {
         display: inline-block;
-    }
-    
-    small {
-        color: $muted-color;
-        font-size: .5em;
+        padding-left: 1em;
     }
     
     @media #{$mq-phone} {
@@ -149,48 +150,16 @@ body {
         	vertical-align: -1em;
     	}
     	
-    	.site-name {
-        	display: block;
-        	font-size: 1.75em;
-        	line-height: 1;
-    	}
-    	
-    	.site-slogan {
-        	display: block;
-        	font-size: 1.25em;
-        	line-height: 1.25;
-        	margin-top: .125em;
-    	}
-    	
-    	.site-logo {
-        	margin-right: .5em;
-    	}
-    	
     	@media #{$mq-phone} {
     	    float: none;
     	    margin: 0;
         	padding: .75em 0 0;
         	overflow: hidden;
         	
-        	.site-logo {
-            	float: left;
-            	height: 48px;
-            	margin-right: .75em;
-        	}
-        	
         	.text {
             	display: block;
             	margin-top: .25em;
             	overflow: hidden;
-        	}
-        	
-        	.site-name {
-            	font-size: 1.25em;
-        	}
-        	
-        	.site-slogan {
-            	font-size: 1em;
-            	margin-bottom: .75em;
         	}
     	}
 
@@ -201,6 +170,49 @@ body {
     	@media #{$mq-wide} {
         	margin: 0;
     	}
+    }
+}
+
+.site-logo {
+    .has-slogan & {
+        @media #{$mq-phone} {
+        	float: left;
+        	height: 48px;
+        	margin-right: .75em;
+        }
+    }
+}
+
+.site-name {
+    font-family: $heading-font;
+    font-size: 2em;
+    vertical-align: middle;
+
+    .has-slogan & {
+    	display: block;
+    	line-height: 1;
+
+        @media #{$mq-phone} {
+            font-size: 1.25em;
+        }
+    }
+
+    small {
+        color: $muted-color;
+        font-size: .5em;
+    }
+}
+
+.site-slogan {
+    color: $muted-color;
+	display: block;
+	font-size: 1.125em;
+	line-height: 1.125;
+	margin-top: .125em;
+
+    @media #{$mq-phone} {
+        font-size: 1em;
+        margin-bottom: .75em;
     }
 }
 
