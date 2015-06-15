@@ -1,0 +1,28 @@
+$base-color:        #e0c7a3 !default;
+$accent-color:      #61748c !default;
+$info-color:        #5bc0de !default;
+$success-color:     #23ad23 !default;
+$alert-color:       #f09b24 !default;
+$danger-color:      #d43734 !default;
+$text-color:        #333    !default;
+$heading-color:     $text-color !default;
+
+$page-bg-color:     change-color($base-color, $saturation: 40, $lightness: 95) !default;
+$link-color:        change-color($accent-color, $saturation: 40) !default;
+
+$muted-color:       mix($text-color, $page-bg-color)      !default;
+$shaded-color:      mix($text-color, $base-color)         !default;
+$border-color:      mix($text-color, $page-bg-color, 17%) !default;
+                    
+$body-font:         'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif !default;
+$heading-font:      $body-font !default; // Georgia, Times, "Times New Roman", serif !default;
+$mono-font:         Consolas, monospace !default;
+                    
+$font-size:         16px !default;
+$line-height:       1.5  !default;
+
+$reading-width:     38em !default;
+                    
+$mq-phone:          'screen and (max-width: 568px)' !default;
+$mq-tablet:         'screen and (min-width: 569px)' !default;
+$mq-wide:           'screen and (min-width: 769px)' !default;

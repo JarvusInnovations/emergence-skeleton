@@ -1,0 +1,98 @@
+// configure compass color contrast helpers
+$contrasted-lightness-threshold: 60%;
+
+// default button colors
+$button-color:      darken($page-bg-color, 10) !default;
+$destructive-color: $danger-color !default;
+$submit-color:      $link-color !default;
+
+// mixin to add button background, border, color, shadow, hover styles, etc to an element
+@mixin button-colors($color) {
+    @include contrasted($color);
+    border: none;
+//	@if (lightness($color) > $contrasted-lightness-threshold) {
+//    	box-shadow: 0 2px 0 darken($color, 15);
+//	} @else {
+//    	box-shadow: 0 2px 0 lighten($color, 20);
+//	}
+//
+	box-shadow: 0 2px 0 darken($color, 12);
+	
+	&:hover,
+	&:focus {
+		background-color: lighten($color, 7);
+	}
+	
+	&:active,
+    &.active {
+	    box-shadow: 0 1px 0 tint($color, 50%), 0 -1px 0 tint($color, 50%);
+	    top: 1px;
+	}
+}
+
+// set up base class for all buttons
+.button {
+	@include button-colors($button-color);
+	@include border-radius(5px);
+    display: inline-block;
+    font-family: $body-font;
+    font-size: medium;
+    letter-spacing: 0;
+	line-height: $line-height;
+	margin-bottom: .25em;
+	padding: .25em .75em;
+    position: relative;
+	text-align: center;
+	@include transition(background-color 75ms ease-in-out);
+	white-space: nowrap;
+	width: auto;
+	
+	&[disabled],
+	&.disabled,
+	&:disabled {
+    	opacity: .3;
+    	pointer-events: none;
+	}
+	
+	&.destructive { @include button-colors($destructive-color); }
+
+	&.primary,
+	&.submit,
+	&[type="submit"] { @include button-colors($link-color); }
+
+    &.block { display: block; }
+    
+    &.small {
+        font-size: small;
+    }
+    
+    &.tiny  {
+        font-size: small;
+        letter-spacing: .5px;
+        padding: 0 .375em;
+        vertical-align: middle;
+        width: auto;
+    }
+    
+    h1 &,
+    h2 & {
+        margin-left: .4em;
+        vertical-align: .4em;
+    }
+
+	@media #{$mq-phone} {
+		& + & {
+			margin-top: 1em;
+		}
+	}
+}
+
+// extend the class to elements that are buttons
+button,
+a.button, // sometimes links need a little extra specificity
+// input[type="reset"],  // uncomment if you actually use one of these. otherwise, leave them out to reduce selector complexity
+// input[type="button"], // (these will get repeated for every custom button style)
+input[type="submit"] {
+	@extend .button;
+	text-decoration: none !important;
+}
