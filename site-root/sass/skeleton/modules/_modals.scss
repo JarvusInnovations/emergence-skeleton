@@ -44,10 +44,10 @@
     @include border-radius(.25em);
     @include box-shadow(0 .25em 1em -.25em rgba($text-color, .4));
     margin: 5em auto;
-    max-width: 80%;
-    padding: 1em;
+    max-width: 75%;
+    padding: 1.5em 1.5em 1em;
     @include transform-origin(top);
-    width: 25em;
+    width: 23em;
     
     &.waiting {
         background-image: inline-image('spinner.gif');
@@ -79,12 +79,12 @@
 }
 
 .modal-title {
-    font-size: 1.25em;
+    font-size: 1.5em;
     margin: 0 0 .5em;
 }
 
 .modal-body {
-    margin: 1em 0;
+    margin: 1.5em 0;
 }
 
 .modal-buttons {
