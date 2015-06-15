@@ -5,7 +5,7 @@ Git::$repositories['emergence-skeleton-v2'] = [
     'originBranch' => 'master',
     'workingBranch' => 'master',
     'trees' => [
-        'html/templates',
+        'html-templates',
         'php-classes' => [
             'exclude' => [
                 '#^/(Symfony|Gitonomy|Chaki|Jarvus/Sencha)/#' // exclude namespaces pulled from external layers
