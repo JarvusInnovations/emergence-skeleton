@@ -49,7 +49,7 @@ class ActiveRecord
     static public $fieldDefaults = array(
         'type' => 'string'
         ,'notnull' => true
-	);
+    );
 	
 	/**
 	 * Field definitions
@@ -412,7 +412,7 @@ class ActiveRecord
         return $url;
     }
 
-	public function userCanReadRecord()
+	public function userCanReadRecord(Emergence\People\IPerson $User = null)
 	{
 		return true;
 	}
@@ -732,9 +732,10 @@ class ActiveRecord
         ));
 
 		// set creator
-		if(static::_fieldExists('CreatorID') && !$this->CreatorID && !empty($_SESSION) && !empty($_SESSION['User']))
+		if(static::_fieldExists('CreatorID') && !$this->CreatorID)
 		{
-			$this->CreatorID = $_SESSION['User']->ID;
+            $Creator = $this->getUserFromEnvironment();
+			$this->CreatorID = $Creator ? $Creator->ID : null;
 		}
 		
 		// set created
@@ -769,10 +770,9 @@ class ActiveRecord
 		{
             if (!$this->_isPhantom && static::$trackModified) {
                 $this->Modified = time();
-                
-                if (!empty($_SESSION) && !empty($_SESSION['User'])) {
-                    $this->ModifierID = $_SESSION['User']->ID;
-                }
+
+                $Modifier = $this->getUserFromEnvironment();
+                $this->ModifierID = $Modifier ? $Modifier->ID : null;
             }
             
 			// prepare record values
@@ -2650,5 +2650,14 @@ class ActiveRecord
     static public function getTableAlias()
     {
         return str_replace('\\', '_', static::getStaticRootClass());
+    }
+
+    protected function getUserFromEnvironment()
+    {
+        if (!empty($_SESSION) && !empty($_SESSION['User'])) {
+            return $_SESSION['User'];
+        }
+
+        return null;
     }
 }

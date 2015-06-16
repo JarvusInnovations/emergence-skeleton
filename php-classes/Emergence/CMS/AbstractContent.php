@@ -111,6 +111,21 @@ abstract class AbstractContent extends \VersionedRecord
     );
 
 
+    public function userCanReadRecord(IPerson $User = null)
+    {
+        $User = $User ?: $this->getUserFromEnvironment();
+
+        if ($this->Status != 'Published' && (!$User || !$User->hasAccountLevel('Staff'))) {
+            return false;
+        }
+
+        if ($this->Visibility != 'Public' && !$User->hasAccountLevel('User')) {
+            return false;
+        }
+
+		return true;
+	}
+
     public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
         $options = array_merge(array(
