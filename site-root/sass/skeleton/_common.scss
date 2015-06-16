@@ -132,6 +132,9 @@ body {
     
     .text {
         display: inline-block;
+    }
+
+    .site-logo + .text {
         padding-left: 1em;
     }
     
