@@ -191,13 +191,13 @@ class Media extends ActiveRecord
         );
     }
 
-    public function getThumbnailRequest($width, $height, $fillColor = null, $cropped = false)
+    public function getThumbnailRequest($width, $height = null, $fillColor = null, $cropped = false)
     {
         return sprintf(
             static::$thumbnailRequestFormat
             , $this->ID
             , $width
-            , $height
+            , $height ?: $width
             , ( is_string($fillColor) ? 'x'.$fillColor : '' )
         ) . ($cropped ? '/cropped' : '');
     }
