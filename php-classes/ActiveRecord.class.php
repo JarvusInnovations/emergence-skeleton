@@ -50,7 +50,7 @@ class ActiveRecord
         'type' => 'string'
         ,'notnull' => true
     );
-	
+    
 	/**
 	 * Field definitions
 	 * @var array
@@ -135,11 +135,16 @@ class ActiveRecord
 	 */
 	static public $useCache = false;
     
-	/**
+    /**
 	 * True to track modification time/person
 	 */
 	static public $trackModified = false;
-	
+
+    /**
+	 * Name of relationship to use for thumbnail media by default
+	 */
+	static public $thumbnailRelationship = 'PrimaryPhoto';
+
 	// support subclassing
 	static public $rootClass = null;
 	static public $defaultClass = null;
@@ -410,6 +415,25 @@ class ActiveRecord
         }
         
         return $url;
+    }
+    
+    public function getThumbnailURL($width, $height = null, $exactSize = true)
+    {
+        if (
+            static::$thumbnailRelationship &&
+            static::_relationshipExists(static::$thumbnailRelationship) &&
+            ($ThumbMedia = $this->_getRelationshipValue(static::$thumbnailRelationship)) &&
+            $ThumbMedia->isA('Media')
+        ) {
+            return $ThumbMedia->getThumbnailRequest(
+                $width,
+                $height,
+                $exactSize && is_string($exactSize) ? $exactSize : null,
+                $exactSize && !is_string($exactSize)
+            );
+        }
+
+        return null;
     }
 
 	public function userCanReadRecord(Emergence\People\IPerson $User = null)
