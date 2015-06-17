@@ -1,20 +1,30 @@
 <?php
 
-function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = null)
+function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = null, $exclude = array(), $deep = true)
 {
     $attributes = array();
 
+    if (is_string($exclude)) {
+        $exclude = explode(',', $exclude);
+    }
+
     foreach ($array AS $key => $value) {
-        if ($value === false || $value === null) {
+        if ($value === false || $value === null || in_array($key, $exclude)) {
             continue;
         }
 
         $attribute = ($prefix ?: '') . $key;
 
         if ($value !== true) {
-            $attribute .= '="' . htmlspecialchars(
-                (is_string($value) || is_int($value)) ? $value : json_encode($value)
-            ). '"';
+            if (!is_scalar($value)) {
+                if ($deep) {
+                    $value = json_encode($value);
+                } else {
+                    continue;
+                }
+            }
+
+            $attribute .= '="' . htmlspecialchars($value). '"';
         }
 
         $attributes[] = $attribute;
