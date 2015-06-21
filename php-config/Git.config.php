@@ -5,6 +5,9 @@ Git::$repositories['emergence-skeleton-v2'] = [
     'originBranch' => 'master',
     'workingBranch' => 'master',
     'trees' => [
+        'event-handlers' => [
+            'exclude' => '#/emergence-sencha\.php$#'
+        ],
         'html-templates',
         'php-classes' => [
             'exclude' => [
@@ -29,6 +32,9 @@ Git::$repositories['emergence-sencha'] = [
     'originBranch' => 'master',
     'workingBranch' => 'master',
     'trees' => [
+        'event-handlers' => [
+            'exclude' => '#.*(?<!/emergence-sencha\\.php)$#'
+        ],
         'packages/sencha',
         'php-classes/Jarvus/Sencha',
         'site-root/sencha-cmd'
