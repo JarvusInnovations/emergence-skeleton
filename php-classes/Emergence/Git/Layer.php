@@ -5,6 +5,7 @@ namespace Emergence\Git;
 use Exception;
 
 use Site;
+use SiteFile;
 use Emergence_FS;
 
 class Layer
@@ -229,7 +230,7 @@ class Layer
 
             try {
     			if ($srcFileNode = Site::resolvePath($treeOptions['vfsPath'])) {
-    			    if (is_a($srcFileNode, 'SiteFile')) {
+    			    if ($srcFileNode instanceof SiteFile) {
     			        $destDir = dirname($treeOptions['gitPath']);
     	
     			        if ($destDir && !is_dir($destDir)) {
