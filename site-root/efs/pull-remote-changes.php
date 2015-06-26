@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['Session']->requireAccountLevel('Developer');
+
 $requestData = JSON::getRequestData();
 
 if (!is_array($requestData['nodes'])) {
