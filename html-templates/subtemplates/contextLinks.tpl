@@ -10,7 +10,8 @@
         {$suffix}
     </a>
 {else}
-    <a href="{$Context->getURL()|escape}" class="{$class}">{$prefix}{$Context->getTitle()|escape}{$suffix}</a>
+    {$url = $Context->getUrl()}
+    <{if $url}a href="{$url|escape}"{else}span{/if} class="{$class}">{$prefix}{$Context->getTitle()|escape}{$suffix}</{tif $url ? a : span}>
 {/if}
 
 {/strip}{/template}
