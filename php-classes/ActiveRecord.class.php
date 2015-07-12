@@ -48,10 +48,9 @@ class ActiveRecord
      */
     static public $fieldDefaults = array(
         'type' => 'string'
-        ,'notnull' => true
     );
     
-	/**
+    /**
 	 * Field definitions
 	 * @var array
 	 */
@@ -1441,7 +1440,7 @@ class ActiveRecord
 			,'primary' => null
 			,'unique' => null
 			,'autoincrement' => null
-			,'notnull' => null
+			,'notnull' => array_key_exists('default', $options) && $options['default'] === null ? false : true
 			,'unsigned' => null
 			,'default' => null
 			,'values' => null
