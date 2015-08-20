@@ -614,7 +614,7 @@ class ActiveRecord
 		return $this->_isValid;
 	}
 	
-	public function changeClass($className = false, $fieldValues = false)
+	public function changeClass($className = false, $fieldValues = false, $autoSave = true)
 	{
 		if(!$className)
 		{
@@ -637,8 +637,11 @@ class ActiveRecord
 			$ActiveRecord->setFields($fieldValues);
 		}
 		
-		if(!$this->isPhantom)
-			$ActiveRecord->save();
+		if(!$this->isPhantom && $autoSave)
+		{
+			$ActiveRecord->save();	
+		}
+			
 		
 		return $ActiveRecord;
 	}
