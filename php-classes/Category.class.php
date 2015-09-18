@@ -65,17 +65,26 @@ class Category extends ActiveRecord
     public function destroy() {
     	
     	// delete all CategoryItems
-    	DB::nonQuery("DELETE FROM `" . CategoryItem::$tableName . "` WHERE `CategoryID`='" . $this->ID ."'");
     	
     	return parent::destroy();
     }
+    static public function delete($id)
+	{
+        DB::nonQuery('DELETE FROM `%s` WHERE CategoryID = %u', array(
+            CategoryItem::$tableName,
+            $id
+        ));
+
+        return parent::delete($id);
+	}
 	
-	public function save()
+	
+	public function save($deep = true)
 	{
 		// set handle
 		if(!$this->Handle)
 			$this->Handle = strtolower(static::getUniqueHandle($this->Title));
 		
-		return parent::save(true);
+		return parent::save($deep);
 	}
 }

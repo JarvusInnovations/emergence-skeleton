@@ -54,16 +54,16 @@ abstract class CMS_ContentItem extends VersionedRecord
         )
     );
     
-    public function validate()
+    public function validate($deep = true)
     {
         // call parent
-        parent::validate();
+        parent::validate($deep);
         
         // save results
         return $this->finishValidation();
     }
     
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
     	// set author
     	if(!$this->AuthorID)
@@ -72,7 +72,7 @@ abstract class CMS_ContentItem extends VersionedRecord
     	}
         
         // call parent
-        parent::save($deep, $createRevision);
+        parent::save($deep);
     }
     
     
