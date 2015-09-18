@@ -139,7 +139,7 @@ Ext.define('Site.widget.ContentBlocks', {
         
         switch (renderer) {
     		case 'markdown':
-				currentEditingEl.setHtml(markdown.toHTML(value));
+				currentEditingEl.setHtml(markdown && value ? markdown.toHTML(value) : (value||''));
 				break;
 			case 'html':
 				currentEditingEl.setHtml(value);
