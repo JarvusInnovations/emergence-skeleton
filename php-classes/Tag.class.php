@@ -21,7 +21,9 @@ class Tag extends ActiveRecord
             'unique' => true,
             'includeInSummary' => true
         )
-        ,'Description'
+        ,'Description' => array(
+            'notnull' => false
+        )
     );
 
     public static $relationships = array(

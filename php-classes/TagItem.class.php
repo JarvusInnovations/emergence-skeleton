@@ -5,7 +5,7 @@ class TagItem extends ActiveRecord
 
     static public $tableName = 'tag_items';
     static public $rootClass = __CLASS__;
-	
+    
 	static public $fields = array(
 		'ID' => null
 		,'Class' => null
@@ -39,7 +39,11 @@ class TagItem extends ActiveRecord
 		)
 	);
 
-	
+    public function getTitle()
+    {
+        return sprintf('TagItem %s-%u + %s', $this->ContextClass, $this->ContextID, $this->Tag ? $this->Tag->getTitle() : '[tag not found]');
+    }
+
 	public function validate($deep = true)
 	{
 		// call parent
@@ -69,18 +73,6 @@ class TagItem extends ActiveRecord
 
 
 		return $this->_isValid;
-	}
-	
-	public function save($deep = true)
-	{
-		global $Session;
-		
-		if($Session->Person)
-		{
-			$this->Creator = $Session->Person;
-		}
-		
-		return parent::save($deep);
 	}
 	
 	public function destroy()
