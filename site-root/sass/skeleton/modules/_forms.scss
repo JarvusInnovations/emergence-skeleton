@@ -116,7 +116,9 @@ ul.errors {
 // ========================================================================
 
 input,
-textarea { // styles for text-box-like controls
+textarea,
+input.form-control,
+textarea.form-control { // styles for text-box-like controls
     background-color: white;
     border: 1px solid darken($border-color, 5);
     border-width: 0 0 1px;
