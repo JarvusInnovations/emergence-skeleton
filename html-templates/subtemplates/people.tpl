@@ -1,4 +1,4 @@
-{template avatar Person size=32 pixelRatio=2 urlOnly=false forceSquare=true}{strip}
+{template avatar Person size=32 pixelRatio=2 urlOnly=false forceSquare=true imgCls=no}{strip}
     {$pixels = $size * $pixelRatio}
 
     {if $Person->PrimaryPhoto}
@@ -10,12 +10,12 @@
     {if $urlOnly}
         {$src}
     {else}
-        <img height={$size} alt="{$Person->FullName|escape}" src="{$src}" class="avatar">
+        <img height={$size} alt="{$Person->FullName|escape}" src="{$src}" class="avatar" {if $imgCls}class="{$imgCls}"{/if}>
     {/if}
 {/strip}{/template}
 
-{template personLink Person photo=no photoSize=64 pixelRatio=2}{strip}
-    <a href="{$Person->getURL()}" title="{$Person->FullName|escape}">
+{template personLink Person photo=no photoSize=64 pixelRatio=2 linkCls=no imgCls=no nameCls=no}{strip}
+    <a href="{$Person->getURL()}" title="{$Person->FullName|escape}" {if $linkCls}class="{$linkCls}"{/if}>
         {if $photo}
             {$pixels = $photoSize}
             {if $pixelRatio}
@@ -26,8 +26,8 @@
             {else}
                 {$src = cat("//www.gravatar.com/avatar/", md5(strtolower($Person->Email)), "?s=", $pixels, "&r=g&d=mm")}
             {/if}
-            <div class="avatar" style="width:{$photoSize}px;height:{$photoSize}px;background-image:url({$src})"></div>
+            <div class="avatar" style="width:{$photoSize}px;height:{$photoSize}px;background-image:url({$src})" {if $imgCls}class="{$imgCls}"{/if}></div>
         {/if}
-        <span class="name">{$Person->FullName|escape}</span>
+        <span class="name {$imgCls}">{$Person->FullName|escape}</span>
     </a>
 {/strip}{/template}
