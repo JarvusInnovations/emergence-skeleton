@@ -15,7 +15,7 @@ class DevelopRequestHandler extends \RequestHandler
         }
 
         // retrieve authentication attempt
-        if ($GLOBALS['Session']->Person) {
+        if ($GLOBALS['Session']->hasAccountLevel('Developer')) {
             $User = $GLOBALS['Session']->Person;
         } else {
             $authEngine = new \Sabre\HTTP\BasicAuth();
@@ -25,12 +25,12 @@ class DevelopRequestHandler extends \RequestHandler
             // try to get user
             $userClass = \User::$defaultClass;
             $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
-        }
 
-        // send auth request if login is inadiquate
-        if (!$User || !$User->hasAccountLevel('Developer')) {
-            $authEngine->requireLogin();
-            die("Authentication required\n");
+            // send auth request if login is inadiquate
+            if (!$User || !$User->hasAccountLevel('Developer')) {
+                $authEngine->requireLogin();
+                die("You must login using a ".\Site::getConfig('primary_hostname')." account with Developer access\n");
+            }
         }
 
         // store login to session
