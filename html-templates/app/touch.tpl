@@ -126,5 +126,9 @@
                 {/block}
             {/if}
         {/block}
+
+        {block "js-analytics"}
+            {include includes/site.analytics.tpl}
+        {/block}
     </body>
 </html>
