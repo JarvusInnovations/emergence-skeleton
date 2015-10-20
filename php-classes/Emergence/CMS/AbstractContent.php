@@ -98,7 +98,7 @@ abstract class AbstractContent extends \VersionedRecord
         )
         ,'Comments' => array(
             'type' => 'context-children'
-            ,'class' => 'Comment'
+            ,'class' => 'Emergence\Comments\Comment'
             ,'order' => array('ID' => 'DESC')
         )
     );
