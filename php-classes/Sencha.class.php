@@ -5,7 +5,7 @@ class Sencha
     static public $frameworks = array(
         'ext' => array(
             'defaultVersion' => '5.0.1.1255'
-        	,'mappedVersions' => array(
+            ,'mappedVersions' => array(
 				'4.2.1'     => '4.2.1.883'
     			,'4.2.2'    => '4.2.2.1144'
     			,'4.2.3'    => '4.2.3.1477'
@@ -254,8 +254,8 @@ class Sencha
 
     public static function cleanJson($json)
     {
-    	$json = preg_replace('#/\*.*?\*/#s', '', $json);
-		$json = preg_replace('#([^\\\\])\\\\\\.#', '$1\\\\\\.', $json); // replace sencha-included "\." with "\\."
+        $json = preg_replace('#(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|([\s\t]//.*)|(^//.*)#', '', $json); // comment stripper from http://php.net/manual/en/function.json-decode.php#112735
+    	$json = preg_replace('#([^\\\\])\\\\\\.#', '$1\\\\\\.', $json); // replace sencha-included "\." with "\\."
 
         return $json;
     }

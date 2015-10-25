@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {$appName = $App->getName()}
-{$appTheme = default($.get.theme, $App->getBuildCfg('app.theme'))}
+{$appTheme = default($.get.theme, default($App->getAppCfg('theme'), $App->getBuildCfg('app.theme')))}
 {$jsBuildPath = tif($App->getAsset("build/$mode/app.js"), "build/$mode/app.js", "build/$mode/all-classes.js")}
 {$cssMode = tif($mode == 'development' ? 'production' : $mode)}
 {$cssBuildPath = tif($appTheme, "build/$cssMode/resources/$appName-all.css", "build/$cssMode/resources/default/app.css")}
