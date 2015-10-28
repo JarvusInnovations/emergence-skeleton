@@ -1123,6 +1123,7 @@ class ActiveRecord
 
 		
 		// handle joining related tables
+		$tableAlias = static::getTableAlias();
 		$join = '';
 		if($options['joinRelated'])
 		{
@@ -1144,7 +1145,7 @@ class ActiveRecord
 				{
 					case 'one-one':
 					{
-						$join .= sprintf(' JOIN `%1$s` AS `%2$s` ON(`%2$s`.`%3$s` = `%4$s`)', $rel['class']::$tableName, $rel['class']::getTableAlias(), $rel['foreign'], $rel['local']);
+						$join .= sprintf(' JOIN `%1$s` AS `%2$s` ON(`%2$s`.`%3$s` = `%4$s`.`%5$s`)', $rel['class']::$tableName, $rel['class']::getTableAlias(), $rel['foreign'], $tableAlias, $rel['local']);
 						break;
 					}
 					default:
@@ -1194,7 +1195,7 @@ class ActiveRecord
 		$params = array(
 			$options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
 			, static::$tableName
-			, static::getTableAlias()
+			, $tableAlias
 			, $join
 			, $conditions ? join(') AND (', $conditions) : '1'
 		);
