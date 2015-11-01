@@ -50,13 +50,13 @@ class PostmarkMailer extends AbstractMailer
 		}
 		else
 		{
-			$fh = fopen("$_SERVER[SITE_ROOT]/logs/postmark-post-fail.log", 'a');
-			fwrite($fh, date('Y-m-d h:i:s')."\t$httpStatus\t$url\tREQUEST:\$data\n--END REQUEST--\nRESPONSE:\n$result\n--END RESPONSE--\n\n");
-			fclose($fh);
-			
+            \Emergence\Logger::general_error('PostmarkMailer Delivery Error', [
+                'exceptionClass' => \PostmarkMailer::class,
+                'exceptionMessage' => $result,
+                'exceptionCode' => $httpStatus
+            ]);
+
 			return false;
 		}
-
 	}
-
 }
