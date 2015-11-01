@@ -1,7 +1,7 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-	
+    
 	
 // get repo
 if(empty($_REQUEST['repo'])) {
@@ -98,4 +98,18 @@ else {
 
 
 // add gitignore
-file_put_contents("$repoPath/.gitignore", ".emergence\n", FILE_APPEND);
+$gitIgnorePath = "$repoPath/.gitignore";
+$gitIgnoreContent = file_exists($gitIgnorePath) ? file_get_contents($gitIgnorePath) : '';
+
+if (!preg_match('/^\\.emergence$/m', $gitIgnoreContent)) {
+    
+    if (!trim($gitIgnoreContent) || !substr($gitIgnoreContent, -1) == PHP_EOL) {
+        $gitIgnoreContent .= PHP_EOL;
+    }
+
+    $gitIgnoreContent .= "\n# ignore emergence VFS markers:\n.emergence\n";
+
+    file_put_contents($gitIgnorePath, $gitIgnoreContent);
+
+    Benchmark::mark("added .emergence to .gitignore");
+}

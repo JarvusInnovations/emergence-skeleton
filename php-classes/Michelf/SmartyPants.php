@@ -34,7 +34,7 @@ const  SMARTYPANTS_ATTR_DEFAULT  =  SMARTYPANTS_ATTR_EM_DASH;
 
 class SmartyPants {
 
-	### Version ###
+    ### Version ###
 
 	const  SMARTYPANTSLIB_VERSION  =  "1.6.0-beta1";
 
@@ -556,7 +556,7 @@ class _SmartyPantsTypographer_TmpImpl extends \Michelf\SmartyPants {
 	public $space_unit        = "&#160;";
 	
 	# Expression of a space (breakable or not):
-	public $space = '(?: | |&nbsp;|&#0*160;|&#x0*[aA]0;)';
+	public $space = '(?: | |&nbsp;|&#0*160;|&#x0*[aA]0;)';
 
 
 	### Parser Implementation ###

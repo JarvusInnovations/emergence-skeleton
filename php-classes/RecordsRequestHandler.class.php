@@ -24,7 +24,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     );
     
     static public function handleRequest()
-	{
+    {
 		// save static class
 		static::$calledClass = get_called_class();
 	
@@ -78,7 +78,13 @@ abstract class RecordsRequestHandler extends RequestHandler
 
 			default:
 			{
-				if($Record = static::getRecordByHandle(urldecode($action)))
+                try {
+                    $Record = static::getRecordByHandle(urldecode($action));
+                } catch (UserUnauthorizedException $e) {
+                    return static::throwUnauthorizedError();
+                }
+
+				if($Record)
 				{
 					if(!static::checkReadAccess($Record))
 					{

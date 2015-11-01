@@ -48,11 +48,10 @@ class ActiveRecord
      */
     static public $fieldDefaults = array(
         'type' => 'string'
-        ,'notnull' => true
-	);
-	
-	/**
-	 * Field definitions
+    );
+    
+    /**
+     * Field definitions
 	 * @var array
 	 */
 	static public $fields = array(
@@ -135,11 +134,16 @@ class ActiveRecord
 	 */
 	static public $useCache = false;
     
-	/**
+    /**
 	 * True to track modification time/person
 	 */
 	static public $trackModified = false;
-	
+
+    /**
+	 * Name of relationship to use for thumbnail media by default
+	 */
+	static public $thumbnailRelationship = 'PrimaryPhoto';
+
 	// support subclassing
 	static public $rootClass = null;
 	static public $defaultClass = null;
@@ -411,8 +415,27 @@ class ActiveRecord
         
         return $url;
     }
+    
+    public function getThumbnailURL($width, $height = null, $exactSize = true)
+    {
+        if (
+            static::$thumbnailRelationship &&
+            static::_relationshipExists(static::$thumbnailRelationship) &&
+            ($ThumbMedia = $this->_getRelationshipValue(static::$thumbnailRelationship)) &&
+            $ThumbMedia->isA('Media')
+        ) {
+            return $ThumbMedia->getThumbnailRequest(
+                $width,
+                $height,
+                $exactSize && is_string($exactSize) ? $exactSize : null,
+                $exactSize && !is_string($exactSize)
+            );
+        }
 
-	public function userCanReadRecord()
+        return null;
+    }
+
+	public function userCanReadRecord(Emergence\People\IPerson $User = null)
 	{
 		return true;
 	}
@@ -735,9 +758,10 @@ class ActiveRecord
         ));
 
 		// set creator
-		if(static::_fieldExists('CreatorID') && !$this->CreatorID && !empty($_SESSION) && !empty($_SESSION['User']))
+		if(static::_fieldExists('CreatorID') && !$this->CreatorID)
 		{
-			$this->CreatorID = $_SESSION['User']->ID;
+            $Creator = $this->getUserFromEnvironment();
+			$this->CreatorID = $Creator ? $Creator->ID : null;
 		}
 		
 		// set created
@@ -772,10 +796,9 @@ class ActiveRecord
 		{
             if (!$this->_isPhantom && static::$trackModified) {
                 $this->Modified = time();
-                
-                if (!empty($_SESSION) && !empty($_SESSION['User'])) {
-                    $this->ModifierID = $_SESSION['User']->ID;
-                }
+
+                $Modifier = $this->getUserFromEnvironment();
+                $this->ModifierID = $Modifier ? $Modifier->ID : null;
             }
             
 			// prepare record values
@@ -1421,7 +1444,7 @@ class ActiveRecord
 			,'primary' => null
 			,'unique' => null
 			,'autoincrement' => null
-			,'notnull' => null
+			,'notnull' => array_key_exists('default', $options) && $options['default'] === null ? false : true
 			,'unsigned' => null
 			,'default' => null
 			,'values' => null
@@ -2654,5 +2677,14 @@ class ActiveRecord
     static public function getTableAlias()
     {
         return str_replace('\\', '_', static::getStaticRootClass());
+    }
+
+    protected function getUserFromEnvironment()
+    {
+        if (!empty($_SESSION) && !empty($_SESSION['User'])) {
+            return $_SESSION['User'];
+        }
+
+        return null;
     }
 }

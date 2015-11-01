@@ -7,8 +7,8 @@ class Media extends AbstractItem
     public static $thumbWidth = 400;
     public static $thumbHeight = 400;
 
-    public static $fullWidth = 1000;
-    public static $fullHeight = 1000;
+    public static $fullWidth = 1920;
+    public static $fullHeight = 1920;
     
     protected $_media = false;
     
@@ -78,9 +78,16 @@ class Media extends AbstractItem
                     .'</a>';
             case 'PhotoMedia':
             default:
-                return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link image-link">'
-                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
-                    .'</a>';
+                return '<figure class="media-figure">'
+                        .'<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link image-link">'
+                            .'<img class="media-img" src="'.$Media->getThumbnailRequest(static::$fullWidth,static::$fullHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
+                        .'</a>'
+                        .(
+                            $Media->Caption ?
+                            '<figcaption class="media-caption">'.htmlspecialchars($Media->Caption).'</figcaption>' :
+                            ''
+                        )
+                    .'</figure>';
         }
     }
 }

@@ -38,10 +38,10 @@ class CategoryItem extends ActiveRecord
 	);
 
 	
-	public function validate()
+	public function validate($deep = true)
 	{
 		// call parent
-		parent::validate();
+		parent::validate($deep);
 		
 		$this->_validator->validate(array(
 			'field' => 'CategoryID'
@@ -68,36 +68,21 @@ class CategoryItem extends ActiveRecord
 
 		return $this->_isValid;
 	}
-	
-	public function destroy()
+
+    public function destroy()
 	{
-		return static::delete($this->ContextClass,$this->ContextID,$this->CategoryID);
-	}
-	
-	static public function delete($ContextClass,$ContextID,$CategoryID)
-	{
-		DB::nonQuery('DELETE FROM `%s` WHERE `%s` = \'%s\' AND `%s` = %u AND `%s` = %u', array(
-			static::$tableName
-			,static::_cn('ContextClass')
-			,$ContextClass
-			,static::_cn('ContextID')
-			,$ContextID
-			,static::_cn('CategoryID')
-			,$CategoryID
+    	DB::nonQuery('DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND CategoryID = %u', array(
+			static::$tableName,
+			DB::escape($ContextClass),
+			$ContextID,
+			$CategoryID
 		));
 		
 		return DB::affectedRows() > 0;
 	}
 	
-	public function save()
+	static public function delete($id)
 	{
-		global $Session;
-		
-		if($Session->Person)
-		{
-			$this->Creator = $Session->Person;
-		}
-		
-		return parent::save(true);
+		throw new \Exception('Static destruction not supported');
 	}
 }

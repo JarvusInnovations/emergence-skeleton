@@ -32,7 +32,7 @@ use \Michelf\SmartyPants;
 
 class SmartyPantsTypographer extends \Michelf\_SmartyPantsTypographer_TmpImpl {
 
-	### Parser Implementation ###
+    ### Parser Implementation ###
 
 	# Temporarily, the implemenation is in the _SmartyPantsTypographer_TmpImpl
 	# class. See note above.

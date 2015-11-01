@@ -1,5 +1,14 @@
 /* FONT PATH
  * -------------------------- */
-@import "compass/css3";
 
-@include font-face("FontAwesome", inline-font-files("fontawesome-webfont.woff", woff));
+// CUSTOM for Emergence
+
+@import "compass/css3/font-face";
+
+@include font-face(
+    'FontAwesome',
+    inline-font-files(
+        // 'fontawesome-webfont.woff2', woff2, // broken for now due to mime type bug in compass
+        'fontawesome-webfont.woff', woff
+    )
+);

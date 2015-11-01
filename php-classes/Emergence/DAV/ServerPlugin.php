@@ -20,7 +20,7 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
     }
 
     public function httpGetInterceptor($method, $uri) {
-        if ($method !== 'GET' || DevelopRequestHandler::$responseMode != 'json') {
+        if ($method !== 'GET' || DevelopRequestHandler::getResponseMode() != 'json') {
             return true;
         }
 

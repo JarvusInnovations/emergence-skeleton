@@ -81,7 +81,7 @@ EOD;
 
         switch ($fieldOptions['type']) {
             case 'int':
-        	case 'uint':
+            case 'uint':
 			case 'integer':
 			case 'tinyint':
 			case 'smallint':
@@ -130,12 +130,12 @@ EOD;
             $fieldConfig['defaultValue'] = $defaultClass;
         } elseif (isset($fieldOptions['default'])) {
             if ($fieldOptions['type'] == 'timestamp' && $fieldOptions['default'] == 'CURRENT_TIMESTAMP') {
-                $fieldConfig['useNull'] = true;
+                $fieldConfig['allowNull'] = true;
             } else {
                 $fieldConfig['defaultValue'] = $fieldOptions['default'];
             }
         } elseif (!$fieldOptions['notnull'] || $fieldOptions['autoincrement']) {
-            $fieldConfig['useNull'] = true;
+            $fieldConfig['allowNull'] = true;
         }
         
         return $fieldConfig;

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {$appName = $App->getName()}
-{$appTheme = default($.get.theme, $App->getBuildCfg('app.theme'))}
+{$appTheme = default($.get.theme, default($App->getAppCfg('theme'), $App->getBuildCfg('app.theme')))}
 {$jsBuildPath = tif($App->getAsset("build/$mode/app.js"), "build/$mode/app.js", "build/$mode/all-classes.js")}
 {$cssMode = tif($mode == 'development' ? 'production' : $mode)}
 {$cssBuildPath = tif($appTheme, "build/$cssMode/resources/$appName-all.css", "build/$cssMode/resources/default/app.css")}
@@ -8,6 +8,9 @@
     <head>
         {block meta}
             <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
             <title>{if $title}{$title}{else}{$appName}-{$mode}{/if}</title>
         {/block}
 
@@ -43,6 +46,10 @@
         {block js-app}
             {if $mode != 'development' && $App->getAsset($jsBuildPath)}
                 {$jsEntryPath = $jsBuildPath}
+
+                {if $App->getAsset('.sencha/app/Boot.js')}
+                    <script type="text/javascript" src="{$App->getVersionedPath('.sencha/app/Boot.js')}"></script>
+                {/if}
             {else}
                 {$jsEntryPath = tif($App->getAsset('app.js') ? 'app.js' : 'app/app.js')}
 
@@ -65,7 +72,14 @@
                     <script type="text/javascript" src="{$App->getVersionedPath($frameworkPath)}"></script>
 
                     {if $appTheme}
-                        <script type="text/javascript" src="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/' $appTheme '.js'))}"></script>
+                        {$workspaceThemeIncludePath = cat('packages/$appTheme/build/' $appTheme '.js')}
+                        {$sdkThemeIncludePath = cat('sdk/packages/$appTheme/build/' $appTheme '.js')}
+                        
+                        {if $App->getAsset($workspaceThemeIncludePath)}
+                            <script type="text/javascript" src="{$App->getVersionedPath($workspaceThemeIncludePath)}"></script>
+                        {elseif $App->getAsset($sdkThemeIncludePath)}
+                            <script type="text/javascript" src="{$App->getVersionedPath($sdkThemeIncludePath)}"></script>
+                        {/if}
                     {/if}
 
                     {sencha_bootstrap}
@@ -84,6 +98,9 @@
                 {/foreach}
             {/block}
         {/block}
+
+        {block "js-analytics"}
+            {include includes/site.analytics.tpl}
+        {/block}
     </body>
-    
 </html>

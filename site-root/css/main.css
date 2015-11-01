@@ -14,7 +14,7 @@
  * v1.6.1 2010-09-17 | Authors: Eric Meyer & Richard Clark
  * html5doctor.com/html-5-reset-stylesheet/
  */
-/* line 28, ../sass/skeleton/_normalize.scss */
+/* line 20, ../sass/skeleton/_normalize.scss */
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
@@ -32,7 +32,7 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 
-/* line 38, ../sass/skeleton/_normalize.scss */
+/* line 37, ../sass/skeleton/_normalize.scss */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;
@@ -43,7 +43,7 @@ blockquote, q {
   quotes: none;
 }
 
-/* line 45, ../sass/skeleton/_normalize.scss */
+/* line 44, ../sass/skeleton/_normalize.scss */
 blockquote:before, blockquote:after,
 q:before, q:after {
   content: '';
@@ -167,7 +167,7 @@ h6 {
   font-weight: bold;
 }
 
-/* line 94, ../sass/skeleton/_normalize.scss */
+/* line 93, ../sass/skeleton/_normalize.scss */
 h1 img, h2 img, h3 img,
 h4 img, h5 img, h6 img {
   margin: 0;
@@ -206,7 +206,7 @@ p .right {
   padding: 0;
 }
 
-/* line 113, ../sass/skeleton/_normalize.scss */
+/* line 112, ../sass/skeleton/_normalize.scss */
 a:focus,
 a:hover {
   color: #09f;
@@ -240,7 +240,7 @@ sup, sub {
   line-height: 0;
 }
 
-/* line 122, ../sass/skeleton/_normalize.scss */
+/* line 121, ../sass/skeleton/_normalize.scss */
 abbr,
 acronym {
   border-bottom: 1px dotted #666;
@@ -271,7 +271,7 @@ pre, code, tt {
 
 /* Lists
 -------------------------------------------------------------- */
-/* line 134, ../sass/skeleton/_normalize.scss */
+/* line 133, ../sass/skeleton/_normalize.scss */
 li ul,
 li ol {
   margin: 0;
@@ -340,7 +340,7 @@ th, td, caption {
 	You can zebra-stripe your tables in outdated browsers by adding 
 	the class "even" to every other table row. 
  */
-/* line 162, ../sass/skeleton/_normalize.scss */
+/* line 161, ../sass/skeleton/_normalize.scss */
 tbody tr:nth-child(even) td,
 tbody tr.even td {
   background: #e5ecf9;
@@ -521,7 +521,7 @@ textarea {
 input[type="radio"] { vertical-align: text-bottom; }
 input[type="checkbox"] { vertical-align: bottom; }
 */
-/* line 232, ../sass/skeleton/_normalize.scss */
+/* line 231, ../sass/skeleton/_normalize.scss */
 input[type="radio"],
 input[type="checkbox"] {
   margin: 0;
@@ -637,7 +637,7 @@ a:hover {
 }
 
 /* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: drupal.org/node/897638 */
-/* line 297, ../sass/skeleton/_normalize.scss */
+/* line 296, ../sass/skeleton/_normalize.scss */
 .visuallyhidden.focusable:active,
 .visuallyhidden.focusable:focus {
   clip: auto;
@@ -749,8 +749,7 @@ a:hover {
 
   @page {
     margin: 0.5cm;
-}
-
+  }
   /* line 353, ../sass/skeleton/_normalize.scss */
   p, h2, h3 {
     orphans: 3;
@@ -762,7 +761,7 @@ a:hover {
     page-break-after: avoid;
   }
 }
-/* line 4, ../sass/skeleton/_common.scss */
+/* line 3, ../sass/skeleton/_common.scss */
 html,
 body {
   background: #666;
@@ -775,13 +774,13 @@ body {
   width: 960px;
 }
 
-/* line 15, ../sass/skeleton/_common.scss */
+/* line 14, ../sass/skeleton/_common.scss */
 header.site,
 footer.site {
   background: #ddd;
 }
 
-/* line 21, ../sass/skeleton/_common.scss */
+/* line 19, ../sass/skeleton/_common.scss */
 header.site,
 #content,
 footer.site {
@@ -829,7 +828,7 @@ aside {
   width: 26em;
 }
 
-/* line 60, ../sass/skeleton/_common.scss */
+/* line 59, ../sass/skeleton/_common.scss */
 #login,
 #register {
   display: inline-block;

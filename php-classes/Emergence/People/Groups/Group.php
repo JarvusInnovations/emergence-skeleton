@@ -120,7 +120,7 @@ class Group extends ActiveRecord
         NestingBehavior::onSave($this);
 
         // call parent
-        parent::save($deep, $createRevision);
+        parent::save($deep);
     }
 
     public function destroy()

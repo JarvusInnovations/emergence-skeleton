@@ -4,6 +4,10 @@ namespace Emergence\DAV;
 
 class DevelopRequestHandler extends \RequestHandler
 {
+    public static $userResponseModes = array(
+        'application/json' => 'json'
+    );
+
     static public function handleRequest()
     {
         if (extension_loaded('newrelic')) {
@@ -11,18 +15,22 @@ class DevelopRequestHandler extends \RequestHandler
         }
 
         // retrieve authentication attempt
-        $authEngine = new \Sabre\HTTP\BasicAuth();
-        $authEngine->setRealm('Develop '.\Site::$title);
-        $authUserPass = $authEngine->getUserPass();
+        if ($GLOBALS['Session']->hasAccountLevel('Developer')) {
+            $User = $GLOBALS['Session']->Person;
+        } else {
+            $authEngine = new \Sabre\HTTP\BasicAuth();
+            $authEngine->setRealm('Develop '.\Site::$title);
+            $authUserPass = $authEngine->getUserPass();
+    
+            // try to get user
+            $userClass = \User::$defaultClass;
+            $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
 
-        // try to get user
-        $userClass = \User::$defaultClass;
-        $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
-
-        // send auth request if login is inadiquate
-        if (!$User || !$User->hasAccountLevel('Developer')) {
-            $authEngine->requireLogin();
-            die("Authentication required\n");
+            // send auth request if login is inadiquate
+            if (!$User || !$User->hasAccountLevel('Developer')) {
+                $authEngine->requireLogin();
+                die("You must login using a ".\Site::getConfig('primary_hostname')." account with Developer access\n");
+            }
         }
 
         // store login to session
@@ -32,24 +40,21 @@ class DevelopRequestHandler extends \RequestHandler
             ));
         }
 
+        // detect base path
+        $basePath = array_slice(\Site::$requestPath, 0, count(\Site::$resolvedPath));
+
+        // switch to JSON response mode
+        if (static::peekPath() == 'json') {
+            $basePath[] = static::$responseMode = static::shiftPath();
+        }
+
         // handle /develop request
-        if ($_SERVER['REQUEST_METHOD'] == 'GET' && !static::peekPath()) {
+        if ($_SERVER['REQUEST_METHOD'] == 'GET' && static::getResponseMode() == 'html' && !static::peekPath()) {
             \RequestHandler::respond('app/ext', array(
                 'App' => \Sencha_App::getByName('EmergenceEditor')
                 ,'mode' => 'production'
                 ,'title' => 'EmergenceEditor'
             ));
-        }
-
-        // switch to JSON response mode
-        if (static::peekPath() == 'json') {
-            static::$responseMode = static::shiftPath();
-        }
-
-        // detect base path
-        $basePath = array_slice(\Site::$requestPath, 0, count(\Site::$resolvedPath));
-        if (static::$responseMode == 'json') {
-            $basePath[] = 'json';
         }
 
         // initial and configure SabreDAV

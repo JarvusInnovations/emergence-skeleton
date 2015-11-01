@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['Session']->requireAccountLevel('Developer');
+
 header('Content-Type: text/plain');
 
 // delete orphan collections

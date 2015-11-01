@@ -130,10 +130,10 @@ abstract class CMS_Content extends VersionedRecord
 	    return static::getAllByWhere($conditions, $options);
     }
     
-    public function validate()
+    public function validate($deep = true)
     {
         // call parent
-        parent::validate();
+        parent::validate($deep);
         
         $this->_validator->validate(array(
             'field' => 'Title'
@@ -148,7 +148,7 @@ abstract class CMS_Content extends VersionedRecord
         return $this->finishValidation();
     }
     
-    public function save($deep = true, $createRevision = true)
+    public function save($deep = true)
     {
     	// set author
     	if(!$this->AuthorID)
@@ -166,7 +166,7 @@ abstract class CMS_Content extends VersionedRecord
 		GlobalHandleBehavior::onSave($this, $this->Title);				
     
         // call parent
-        parent::save($deep, $createRevision);
+        parent::save($deep);
     }
 
 	public function getData()

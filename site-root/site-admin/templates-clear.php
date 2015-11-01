@@ -2,11 +2,10 @@
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
 
-if($_SERVER['REQUEST_METHOD'] == 'POST')
-{			
-	$templateDir = TemplateResponse::$pathCompile . $_SERVER['SITE_ROOT'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {    		
+	$templateDir = Emergence\Dwoo\Engine::$pathCompile . '/' . Site::getConfig('handle');
 	
-	exec("find $templateDir -name \"*.d16.php\" -delete");
+	exec("find $templateDir -name \"*.d*.php\" -type f -delete");
 	die('Templates cleared');
 }
 

@@ -17,7 +17,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         $appPath = 'sencha-workspace/'.$App->getName();
 
         // recursively merge app's required packages and their required packages into packages list
-        $packages = array_merge($packages, $App->getRequiredPackages());
+        $packages = array_merge($packages, $App->getRequiredPackages(false)); // false to skip crawling decendents, we'll do it here later
 
         // add theme to packages list
         if ($themeName = $App->getBuildCfg('app.theme')) {
@@ -64,9 +64,20 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     }
 
     // add paths for packages
-    $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages)));
+    $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages), $framework, $frameworkVersion));
+
     foreach ($packages AS $packageName) {
+        // check workspace and framework package dirs
         $packagePath = "sencha-workspace/packages/$packageName";
+        
+        if (!Site::resolvePath($packagePath)) {
+            $packagePath = "$frameworkPath/packages/$packageName";
+            
+            if (!Site::resolvePath($packagePath)) {
+                throw new Exception("Source for package $packageName not found in workspace or framework");
+            }
+        }
+
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
     
@@ -130,6 +141,14 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
                 $autoLoad = true;
                 $addToManifest = false;
             }
+        } elseif (strpos($path, $frameworkPath) === 0) {
+            $webPath = "/app/$framework-$frameworkVersion/".substr($path, strlen($frameworkPath) + 1);
+
+            // package overrides should automatically be loaded
+            if (substr($path, strpos($path, '/', strlen($frameworkPath) + 10), 11) == '/overrides/') {
+                $autoLoad = true;
+                $addToManifest = false;
+            }
         } elseif (strpos($path, 'sencha-workspace/pages/') === 0) {
             $webPath = '/app/'.substr($path, 17);
         } elseif (strpos($path, $frameworkPath) === 0) {
@@ -147,8 +166,8 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $sourceReadHandle = $sourceNode->get();
 
             while (($line = fgets($sourceReadHandle, 4096)) !== false) {
-                if (preg_match('/\s*Ext\.define\(([\'"])([^\'"]+)\1/i', $line, $matches)) {
-                    $source['Class'] = $matches[2];
+                if (preg_match('/^\s*(Ext\.define\(\s*([\'"])([^\2]+)\2|\/\/\s*@define[ \t]+(\S+))/i', $line, $matches)) {
+                    $source['Class'] = empty($matches[4]) ? $matches[3] : $matches[4];
                     break;
                 }
             }

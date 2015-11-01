@@ -39,7 +39,7 @@
                 <header>
                     {personLink $Comment->Creator}
                 </header>
-                <div class="message-body">{$Comment->Message|markdown}</div>
+                <div class="message-body">{$Comment->Message|escape|markdown}</div>
                 <footer>
                     <time><a href="#comment-{$Comment->ID}">{$Comment->Created|date_format:'%a, %b %e, %Y &middot; %-l:%M %P'}</a></time>
                     {if Emergence\Comments\CommentsRequestHandler::checkWriteAccess($Comment)}

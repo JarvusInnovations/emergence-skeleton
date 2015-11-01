@@ -4,8 +4,8 @@ class Sencha
 {
     static public $frameworks = array(
         'ext' => array(
-            'defaultVersion' => '4.2.2.1144'
-			,'mappedVersions' => array(
+            'defaultVersion' => '5.0.1.1255'
+            ,'mappedVersions' => array(
 				'4.2.1'     => '4.2.1.883'
     			,'4.2.2'    => '4.2.2.1144'
     			,'4.2.3'    => '4.2.3.1477'
@@ -26,12 +26,13 @@ class Sencha
 		)
 	);
 	
-	static public $defaultCmdVersion = '5.0.0.160';
+	static public $defaultCmdVersion = '5.1.2.52';
 	
 	static public $cmdPath = '/usr/local/bin/Sencha/Cmd';
 	static public $binPaths = array('/bin','/usr/bin','/usr/local/bin');
 
     protected static $_workspaceCfg;
+    protected static $_packageDependencies = array();
 	
 	static public function buildCmd()
 	{
@@ -149,8 +150,9 @@ class Sencha
 		}
     }
 
-    public static function crawlRequiredPackages($packages)
+    public static function crawlRequiredPackages($packages, $framework = null, $frameworkVersion = null)
     {
+        // cache results
         if (is_string($packages) && $packages) {
             $packages = array($packages);
         } elseif (!is_array($packages)) {
@@ -158,22 +160,40 @@ class Sencha
         }
 
         foreach ($packages AS $package) {
-            $packageConfigNode = Site::resolvePath(array('sencha-workspace', 'packages', $package, 'package.json'));
-            if (!$packageConfigNode) {
+            $cacheKey = "$package@$framework-$frameworkVersion";
+
+            // check cache
+            if (isset(static::$_packageDependencies[$cacheKey])) {
+                $packages = array_merge($packages, static::$_packageDependencies[$cacheKey]);
                 continue;
             }
-            
+
+            $packagePackages = array();
+            $packageConfigNode = Site::resolvePath(array('sencha-workspace', 'packages', $package, 'package.json'));
+
+            // check framework packages directory
+            if (!$packageConfigNode && $framework && $frameworkVersion) {
+                $packageConfigNode = Site::resolvePath(array('sencha-workspace', "$framework-$frameworkVersion", 'packages', $package, 'package.json'));
+            }
+
+            if (!$packageConfigNode) {
+                throw new Exception("Could not find package.json for Sencha package $package");
+            }
+
             $packageConfig = json_decode(file_get_contents($packageConfigNode->RealPath), true);
             
             if (is_array($packageConfig)) {
                 if (!empty($packageConfig['requires'])) {
-                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['requires']));
+                    $packagePackages = array_merge($packagePackages, static::crawlRequiredPackages($packageConfig['requires'], $framework, $frameworkVersion));
                 }
                 
                 if (!empty($packageConfig['extend'])) {
-                    $packages = array_merge($packages, static::crawlRequiredPackages($packageConfig['extend']));
+                    $packagePackages = array_merge($packagePackages, static::crawlRequiredPackages($packageConfig['extend'], $framework, $frameworkVersion));
                 }
             }
+            
+            $packages = array_merge($packages, $packagePackages);
+            static::$_packageDependencies[$cacheKey] = $packagePackages;
         }
 
         return $packages;
@@ -230,5 +250,13 @@ class Sencha
         }
 
 		return $key ? static::$_workspaceCfg[$key] : static::$_workspaceCfg;
+    }
+
+    public static function cleanJson($json)
+    {
+        $json = preg_replace('#(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|([\s\t]//.*)|(^//.*)#', '', $json); // comment stripper from http://php.net/manual/en/function.json-decode.php#112735
+    	$json = preg_replace('#([^\\\\])\\\\\\.#', '$1\\\\\\.', $json); // replace sencha-included "\." with "\\."
+
+        return $json;
     }
 }

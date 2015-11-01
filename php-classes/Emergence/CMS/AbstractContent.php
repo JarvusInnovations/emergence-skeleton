@@ -98,7 +98,7 @@ abstract class AbstractContent extends \VersionedRecord
         )
         ,'Comments' => array(
             'type' => 'context-children'
-            ,'class' => 'Comment'
+            ,'class' => 'Emergence\Comments\Comment'
             ,'order' => array('ID' => 'DESC')
         )
     );
@@ -110,6 +110,21 @@ abstract class AbstractContent extends \VersionedRecord
         ,'Context'
     );
 
+
+    public function userCanReadRecord(IPerson $User = null)
+    {
+        $User = $User ?: $this->getUserFromEnvironment();
+
+        if ($this->Status != 'Published' && (!$User || !$User->hasAccountLevel('Staff'))) {
+            return false;
+        }
+
+        if ($this->Visibility != 'Public' && !$User->hasAccountLevel('User')) {
+            return false;
+        }
+
+		return true;
+	}
 
     public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {

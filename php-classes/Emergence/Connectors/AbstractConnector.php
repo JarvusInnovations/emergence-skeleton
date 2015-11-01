@@ -45,6 +45,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         ));
     }
 
+    // TODO: this should be moved to SychronizeTrait
     public static function handleSynchronizeRequest()
     {
         // read request/response configuration
