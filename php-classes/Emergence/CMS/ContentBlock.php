@@ -29,7 +29,7 @@ class ContentBlock extends \VersionedRecord
             'type' => 'clob'
         )
     );
-    
+
     public static $dynamicFields = array(
         'html' => array(
             'getter' => 'getHtml'
@@ -58,18 +58,18 @@ class ContentBlock extends \VersionedRecord
     }
 
     public function save($deep = true)
-	{
-		// call parent
-		parent::save($deep);
+    {
+        // call parent
+        parent::save($deep);
 
         if ($this->isFieldDirty('Content')) {
             Cache::delete($this->getHtmlCacheKey());
         }
-	}
+    }
 
     protected function getHtmlCacheKey()
     {
-        return 'content-block-html/' . $this->Handle;
+        return 'content-block-html/'.$this->Handle;
     }
 
     public function getHtml()

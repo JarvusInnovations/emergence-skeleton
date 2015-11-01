@@ -27,7 +27,7 @@ class MigrationsRequestHandler extends \RequestHandler
         if (count(array_filter($migrationKey = static::getPath()))) {
             return static::handleMigrationRequest(implode('/', $migrationKey));
         }
-        
+
         return static::handleBrowseRequest();
     }
 
@@ -50,7 +50,7 @@ class MigrationsRequestHandler extends \RequestHandler
 
             $migrations[$migrationKey] = array(
                 'key' => $migrationKey
-                ,'path' => 'php-migrations/' . $migrationKey . '.php'
+                ,'path' => 'php-migrations/'.$migrationKey.'.php'
                 ,'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW
                 ,'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null
                 ,'sha1' => $migrationNodeData['SHA1']
@@ -73,9 +73,9 @@ class MigrationsRequestHandler extends \RequestHandler
 
     public static function handleMigrationRequest($migrationKey)
     {
-        $migrationPath = 'php-migrations/' . $migrationKey . '.php';
+        $migrationPath = 'php-migrations/'.$migrationKey.'.php';
         $migrationNode = Site::resolvePath($migrationPath);
-        
+
         if (!$migrationNode) {
             return static::throwNotFoundError('Migration not found');
         }
@@ -96,13 +96,12 @@ class MigrationsRequestHandler extends \RequestHandler
 
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
             if ($migrationRecord) {
                 return static::throwError('Cannot execute requested migration, it has already been skipped, started, or executed');
             }
-            
+
             $insertSql = sprintf('INSERT INTO `_e_migrations` SET `Key` = "%s", SHA1 = "%s", Timestamp = FROM_UNIXTIME(%u), Status = "%s"', $migrationKey, $migrationNode->SHA1, time(), static::STATUS_STARTED);
-            
+
             try {
                 DB::nonQuery($insertSql);
             } catch (TableNotFoundException $e) {
@@ -116,7 +115,7 @@ class MigrationsRequestHandler extends \RequestHandler
             ob_start();
             $migrationStatus = include($migrationNode->RealPath);
             $output = ob_get_clean();
-            
+
             if (!in_array($migrationStatus, array(static::STATUS_SKIPPED, static::STATUS_EXECUTED))) {
                 $migrationStatus = static::STATUS_FAILED;
             }
@@ -124,9 +123,9 @@ class MigrationsRequestHandler extends \RequestHandler
             $migration['executed'] = time();
             $migration['status'] = $migrationStatus;
             $log = array_slice(\Debug::$log, $debugLogStartIndex);
-            
+
             DB::nonQuery('UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"', array($migration['executed'], $migration['status'], $migrationKey));
-            
+
             return static::respond('migrationExecuted', array(
                 'data' => $migration
                 ,'log' => $log
@@ -143,11 +142,11 @@ class MigrationsRequestHandler extends \RequestHandler
     {
         DB::nonQuery(
             'CREATE TABLE `_e_migrations` ('
-                . '`Key` varchar(255) NOT NULL'
-                . ',`SHA1` char(40) NOT NULL'
-                . ',`Timestamp` timestamp NOT NULL'
-                . ',`Status` enum("skipped","started","failed","executed") NOT NULL'
-                . ',PRIMARY KEY (`Key`)'
+                .'`Key` varchar(255) NOT NULL'
+                .',`SHA1` char(40) NOT NULL'
+                .',`Timestamp` timestamp NOT NULL'
+                .',`Status` enum("skipped","started","failed","executed") NOT NULL'
+                .',PRIMARY KEY (`Key`)'
             .')'
         );
     }
@@ -178,12 +177,12 @@ class MigrationsRequestHandler extends \RequestHandler
     {
         return DB::oneValue('SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
     }
-    
+
     protected static function getColumnKey($tableName, $columnName)
     {
         return DB::oneValue('SELECT COLUMN_KEY FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
     }
-    
+
     protected static function getColumnIsNullable($tableName, $columnName)
     {
         return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));

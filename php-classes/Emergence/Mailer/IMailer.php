@@ -4,7 +4,7 @@ namespace Emergence\Mailer;
 
 interface IMailer
 {
-    static public function send($to, $subject, $body, $from = false);
-    static public function sendFromTemplate($to, $template, $data = array(), $options = array());
-	static public function renderTemplate($template, $data = array());
+    public static function send($to, $subject, $body, $from = false);
+    public static function sendFromTemplate($to, $template, $data = array(), $options = array());
+    public static function renderTemplate($template, $data = array());
 }

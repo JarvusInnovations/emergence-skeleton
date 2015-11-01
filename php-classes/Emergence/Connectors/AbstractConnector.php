@@ -65,7 +65,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
             }
 
             if (static::peekPath() == 'log') {
-                $logPath = $Job->getLogPath() . '.bz2';
+                $logPath = $Job->getLogPath().'.bz2';
 
                 if (file_exists($logPath)) {
                     header('Content-Type: application/json');
@@ -152,7 +152,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         // execute synchronization
         try {
             $success = static::synchronize($Job, $pretend);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $Job->logException($e);
             $success = false;
         }
@@ -198,7 +198,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
             $url = (empty($_SERVER['HTTPS']) ? 'http' : 'https').'://'.$_SERVER['HTTP_HOST'];
         }
 
-        $url .= '/' . preg_replace('/\.php$/i', '', join('/', \Site::$resolvedPath));
+        $url .= '/'.preg_replace('/\.php$/i', '', join('/', \Site::$resolvedPath));
         return $url;
     }
 

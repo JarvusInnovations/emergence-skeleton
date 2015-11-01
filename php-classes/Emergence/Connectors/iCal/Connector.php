@@ -46,7 +46,6 @@ class Connector extends \Emergence\Connectors\AbstractConnector implements \Emer
             $ics = new iCal($Feed->Link);
 
             foreach ($ics->getEvents() AS $icsEvent) {
-
                 if ($Feed->MinimumDate && $Feed->MinimumDate > $icsEvent->getStart()) {
                     $results['events']['skipped']++;
                     continue;
@@ -56,7 +55,7 @@ class Connector extends \Emergence\Connectors\AbstractConnector implements \Emer
 
                 $icsId = $icsEvent->getUID();
                 if ($recurrenceId = $icsEvent->getProperty('recurrence-id')) {
-                    $icsId .= '+' . $recurrenceId;
+                    $icsId .= '+'.$recurrenceId;
                 }
 
                 // try to get existing

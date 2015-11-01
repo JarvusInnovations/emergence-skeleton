@@ -4,10 +4,10 @@ namespace Emergence\DAV;
 
 class File extends \SiteFile implements \Sabre\DAV\IFile
 {
-    static public $localizedAncestorThreshold = 3600;
+    public static $localizedAncestorThreshold = 3600;
 
     // localize all changes
-    function put($data, $ancestorID = NULL)
+    public function put($data, $ancestorID = NULL)
     {
         if ($this->Collection->Site == 'Local') {
             return parent::put($data, $ancestorID);
@@ -28,7 +28,7 @@ class File extends \SiteFile implements \Sabre\DAV\IFile
         }
     }
 
-    static public function getByHandle($collectionID, $handle)
+    public static function getByHandle($collectionID, $handle)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_SERVER['HTTP_X_REVISION_ID'])) {
             return static::getByID($_SERVER['HTTP_X_REVISION_ID']);

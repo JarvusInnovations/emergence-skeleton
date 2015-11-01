@@ -32,15 +32,15 @@ class CommentsRequestHandler extends \RecordsRequestHandler
 
     public static function checkWriteAccess(ActiveRecord $Comment, $suppressLogin = false)
     {
-		// only allow creating, editing your own, and staff editing
-		if (!$Comment->isPhantom && ($Comment->CreatorID != $GLOBALS['Session']->PersonID) && !$GLOBALS['Session']->hasAccountLevel('Staff')) {
-			return false;
-		}
-		
-		if ($Comment->isPhantom && !$GLOBALS['Session']->PersonID) {
-			return false;
-		}
-		
-		return true;
-	}
+        // only allow creating, editing your own, and staff editing
+        if (!$Comment->isPhantom && ($Comment->CreatorID != $GLOBALS['Session']->PersonID) && !$GLOBALS['Session']->hasAccountLevel('Staff')) {
+            return false;
+        }
+
+        if ($Comment->isPhantom && !$GLOBALS['Session']->PersonID) {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -4,7 +4,7 @@ namespace Sencha;
 
 class CodeGenerator
 {
-    static public function getRecordModel($recordClass)
+    public static function getRecordModel($recordClass)
     {
         // write header
         $out = <<<EOD
@@ -30,7 +30,7 @@ EOD;
         $firstField = true;
         foreach ($recordClass::aggregateStackedConfig('fields') AS $field => $fieldOptions) {
             $fieldConfig = static::getFieldConfig($field, $fieldOptions, $recordClass);
-            
+
             if (!$firstField) {
                 $out .= ',';
             }
@@ -41,19 +41,19 @@ EOD;
                 if (!$firstKey) {
                     $out .= ',';
                 }
-                
-                $out .= "\n$indent    $key: " . json_encode($value);
-                
+
+                $out .= "\n$indent    $key: ".json_encode($value);
+
                 $firstKey = false;
             }
             $out .= "\n$indent}";
-    
+
             $firstField = false;
         }
-        
-        
+
+
         // write footer
-        $route = $recordClass::$collectionRoute ? $recordClass::$collectionRoute : '/' . str_replace(' ', '-', $recordClass::$pluralNoun);
+        $route = $recordClass::$collectionRoute ? $recordClass::$collectionRoute : '/'.str_replace(' ', '-', $recordClass::$pluralNoun);
         $out .= <<<EOD
 
     ],
@@ -64,16 +64,15 @@ EOD;
     }
 });
 EOD;
-        
+
         return $out;
     }
 
-    static public function getRecordColumns($recordClass)
+    public static function getRecordColumns($recordClass)
     {
-        
     }
 
-    static public function getFieldConfig($field, $fieldOptions, $recordClass = null)
+    public static function getFieldConfig($field, $fieldOptions, $recordClass = null)
     {
         $fieldConfig = array(
             'name' => $field
@@ -82,11 +81,11 @@ EOD;
         switch ($fieldOptions['type']) {
             case 'int':
             case 'uint':
-			case 'integer':
-			case 'tinyint':
-			case 'smallint':
-			case 'mediumint':
-			case 'bigint':
+            case 'integer':
+            case 'tinyint':
+            case 'smallint':
+            case 'mediumint':
+            case 'bigint':
                 $fieldConfig['type'] = 'int';
                 break;
 
@@ -104,7 +103,7 @@ EOD;
             case 'password':
                 $fieldConfig['type'] = 'string';
                 break;
-                
+
             case 'timestamp':
                 $fieldConfig['type'] = 'date';
                 $fieldConfig['dateFormat'] = 'timestamp';
@@ -117,15 +116,15 @@ EOD;
                 $fieldConfig['type'] = 'date';
                 $fieldConfig['dateFormat'] = 'Y';
                 break;
-                
+
             case 'serialized':
                 $fieldConfig['type'] = 'auto';
                 break;
-                
+
             default:
                 throw new \Exception("getExtTypeConfig: unhandled type $fieldOptions[type]");
         }
-        
+
         if ($field == 'Class' && $recordClass && ($defaultClass = $recordClass::getStaticDefaultClass())) {
             $fieldConfig['defaultValue'] = $defaultClass;
         } elseif (isset($fieldOptions['default'])) {
@@ -137,7 +136,7 @@ EOD;
         } elseif (!$fieldOptions['notnull'] || $fieldOptions['autoincrement']) {
             $fieldConfig['allowNull'] = true;
         }
-        
+
         return $fieldConfig;
     }
 }

@@ -15,7 +15,7 @@ trait IdentityConsumerTrait
         if (static::$requiredAccountLevel && !$Person->hasAccountLevel(static::$requiredAccountLevel)) {
             return false;
         }
-        
+
         if (is_callable(static::$userIsPermitted)) {
             return call_user_func(static::$userIsPermitted, $Person);
         }
@@ -35,7 +35,7 @@ trait IdentityConsumerTrait
     }
 
     public static function handleRequest($action = null)
-    {        
+    {
         switch ($action ? $action : $action = static::shiftPath()) {
             case 'login':
                 $GLOBALS['Session']->requireAuthentication();
@@ -54,7 +54,7 @@ trait IdentityConsumerTrait
                 return parent::handleRequest($action);
         }
     }
-    
+
     public static function handleLoginRequest(IPerson $Person)
     {
         return static::throwInvalidRequestError('Login method not implemented');

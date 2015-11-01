@@ -15,9 +15,9 @@ class Album extends AbstractItem
                 .'Ext.require("Jarvus.Media.Slideshow", function() {'
                     .'Ext.create("Jarvus.Media.Slideshow", {'
                         .'renderTo: Ext.get("contentItem-'.$this->ID.'")'
-                        .',title: ' . json_encode($this->Data ? $this->Data['Title'] : null)
-                        .',credit: ' . json_encode($this->Data ? $this->Data['Credit'] : null)
-                        .',items: ' . json_encode($this->Data ? $this->Data['items'] : null)
+                        .',title: '.json_encode($this->Data ? $this->Data['Title'] : null)
+                        .',credit: '.json_encode($this->Data ? $this->Data['Credit'] : null)
+                        .',items: '.json_encode($this->Data ? $this->Data['items'] : null)
                     .'});'
                 .'});'
             .'</script>';

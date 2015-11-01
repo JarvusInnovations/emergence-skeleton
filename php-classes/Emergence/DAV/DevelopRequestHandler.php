@@ -8,7 +8,7 @@ class DevelopRequestHandler extends \RequestHandler
         'application/json' => 'json'
     );
 
-    static public function handleRequest()
+    public static function handleRequest()
     {
         if (extension_loaded('newrelic')) {
             newrelic_disable_autorum();
@@ -21,7 +21,7 @@ class DevelopRequestHandler extends \RequestHandler
             $authEngine = new \Sabre\HTTP\BasicAuth();
             $authEngine->setRealm('Develop '.\Site::$title);
             $authUserPass = $authEngine->getUserPass();
-    
+
             // try to get user
             $userClass = \User::$defaultClass;
             $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
@@ -59,7 +59,7 @@ class DevelopRequestHandler extends \RequestHandler
 
         // initial and configure SabreDAV
         $server = new \Sabre\DAV\Server(new RootCollection());
-        $server->setBaseUri('/' . join('/', $basePath));
+        $server->setBaseUri('/'.join('/', $basePath));
 
         // The lock manager is reponsible for making sure users don't overwrite each others changes. Change 'data' to a different
         // directory, if you're storing your data somewhere else.

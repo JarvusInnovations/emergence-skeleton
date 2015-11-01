@@ -24,7 +24,7 @@ class Logger extends \Psr\Log\AbstractLogger
     public static function __classLoaded()
     {
         if (!static::$logPath) {
-            static::$logPath = \Site::$rootPath . '/site-data/site.log';
+            static::$logPath = \Site::$rootPath.'/site-data/site.log';
         }
     }
 
@@ -41,9 +41,9 @@ class Logger extends \Psr\Log\AbstractLogger
             file_put_contents(
                 static::$logPath
                 ,
-                    date('Y-m-d H:i:s') . " [$level] $message\n\t"
-                    ."context: " . trim(str_replace(PHP_EOL, "\n\t", print_r($context, true))) . "\n"
-                    ."\tbacktrace:\n\t\t" . implode("\n\t\t", static::buildBacktraceLines())
+                    date('Y-m-d H:i:s')." [$level] $message\n\t"
+                    ."context: ".trim(str_replace(PHP_EOL, "\n\t", print_r($context, true)))."\n"
+                    ."\tbacktrace:\n\t\t".implode("\n\t\t", static::buildBacktraceLines())
                     ."\n\n"
                 ,FILE_APPEND
             );
@@ -54,11 +54,11 @@ class Logger extends \Psr\Log\AbstractLogger
                 \Site::$webmasterEmail
                 ,"$level logged on $_SERVER[HTTP_HOST]"
                 ,'<dl>'
-                    .'<dt>Timestamp</dt><dd>' . date('Y-m-d H:i:s') . '</dd>'
-                    .'<dt>Level</dt><dd>' . $level . '</dd>'
-                    .'<dt>Message</dt><dd>' . htmlspecialchars($message) . '</dd>'
-                    .'<dt>Context</dt><dd><pre>' . htmlspecialchars(print_r($context, true)) . '</pre></dd>'
-                    .'<dt>Context</dt><dd><pre>' . htmlspecialchars(implode("\n", static::buildBacktraceLines())) . '</pre></dd>'
+                    .'<dt>Timestamp</dt><dd>'.date('Y-m-d H:i:s').'</dd>'
+                    .'<dt>Level</dt><dd>'.$level.'</dd>'
+                    .'<dt>Message</dt><dd>'.htmlspecialchars($message).'</dd>'
+                    .'<dt>Context</dt><dd><pre>'.htmlspecialchars(print_r($context, true)).'</pre></dd>'
+                    .'<dt>Context</dt><dd><pre>'.htmlspecialchars(implode("\n", static::buildBacktraceLines())).'</pre></dd>'
             );
         }
     }
@@ -79,17 +79,17 @@ class Logger extends \Psr\Log\AbstractLogger
 
         // trim call to this method
         array_shift($backtrace);
-        
+
         // build friendly output lines from backtrace frames
         while ($frame = array_shift($backtrace)) {
-            if (!empty($frame['file']) && strpos($frame['file'], \Site::$rootPath . '/data/') === 0) {
+            if (!empty($frame['file']) && strpos($frame['file'], \Site::$rootPath.'/data/') === 0) {
                 $fileNode = \SiteFile::getByID(basename($frame['file']));
-                
+
                 if ($fileNode) {
-                    $frame['file'] = 'emergence:' . $fileNode->FullPath;
+                    $frame['file'] = 'emergence:'.$fileNode->FullPath;
                 }
             }
-            
+
             // ignore log-routing frames
             if (
                 !empty($frame['file']) &&
@@ -102,16 +102,16 @@ class Logger extends \Psr\Log\AbstractLogger
             ) {
                 continue;
             }
-            
-            $lines[] = 
+
+            $lines[] =
                 (!empty($frame['class']) ? "$frame[class]$frame[type]" : '')
-                . $frame['function']
-                . (!empty($frame['args']) ? '('.implode(',', array_map(function($arg) {
+                .$frame['function']
+                .(!empty($frame['args']) ? '('.implode(',', array_map(function($arg) {
                     return is_string($arg) || is_numeric($arg) ? var_export($arg, true) : gettype($arg);
                 }, $frame['args'])).')' : '')
-                . (!empty($frame['file']) ? " called at $frame[file]:$frame[line]" : '');
+                .(!empty($frame['file']) ? " called at $frame[file]:$frame[line]" : '');
         }
-        
+
         return $lines;
     }
 

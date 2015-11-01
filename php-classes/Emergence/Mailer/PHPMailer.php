@@ -36,14 +36,14 @@ class PHPMailer extends AbstractMailer
 
 
         if ($from) {
-            $headers .= "From: $from" . PHP_EOL;
+            $headers .= "From: $from".PHP_EOL;
 
             $fromAddress = preg_replace('/^[^<]*<([^>]+)>?$/', '$1', $from);
             $sendmailParams .= sprintf(' -f%1$s -F%1$s', $fromAddress);
         }
 
-        $headers .= 'MIME-Version: 1.0' . PHP_EOL;
-        $headers .= 'Content-Type: text/html; charset=iso-8859-1' . PHP_EOL;
+        $headers .= 'MIME-Version: 1.0'.PHP_EOL;
+        $headers .= 'Content-Type: text/html; charset=iso-8859-1'.PHP_EOL;
 
         return @mail($to, $subject, $body, $headers, $sendmailParams);
     }

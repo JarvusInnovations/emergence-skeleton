@@ -24,7 +24,7 @@ class Locale
         if (static::$_requestedLocale) {
             return static::$_requestedLocale;
         }
-        
+
         $availableLocales = static::getAvailableLocales();
 
         // prefer user-selected locale
@@ -86,7 +86,7 @@ class Locale
 
     public static function loadLocale($locale)
     {
-        $localesPath = Site::$rootPath . '/site-data/locales';
+        $localesPath = Site::$rootPath.'/site-data/locales';
         $localePath = "$localesPath/$locale";
         $messagesPath = "$localePath/LC_MESSAGES";
         $poPath = "$messagesPath/site.po";
@@ -103,7 +103,7 @@ class Locale
             if (!is_dir($messagesPath)) {
                 mkdir($messagesPath, 0777, true);
             }
-            
+
             copy($node->RealPath, $poPath);
 
             // erase any old files
@@ -115,15 +115,15 @@ class Locale
             exec("msgfmt -o \"$messagesPath/site-$node->SHA1.mo\" -v \"$poPath\"");
             Cache::store("locale/$locale", $node->SHA1);
         }
-        
+
         // configure gettext
         $domain = "site-$node->SHA1";
-        putenv("LANG=$locale"); 
+        putenv("LANG=$locale");
         setlocale(LC_ALL, $locale);
         bindtextdomain($domain, $localesPath);
         bind_textdomain_codeset($domain, 'UTF-8');
         textdomain($domain);
-        
+
         return $locale;
     }
 

@@ -4,15 +4,15 @@ namespace Emergence\DAV;
 
 class ParentCollection extends RootCollection
 {
-    static public $handle;
-    static protected $_children;
+    public static $handle;
+    protected static $_children;
 
-    function __construct($handle)
+    public function __construct($handle)
     {
         static::$handle = $handle;
     }
 
-    function __get($name)
+    public function __get($name)
     {
         switch ($name) {
             case 'Class':
@@ -26,7 +26,7 @@ class ParentCollection extends RootCollection
         }
     }
 
-    function getChildren()
+    public function getChildren()
     {
         if (!isset(static::$_children)) {
             $results = \DB::query(
@@ -45,7 +45,7 @@ class ParentCollection extends RootCollection
         return static::$_children;
     }
 
-    function resolvePath($path)
+    public function resolvePath($path)
     {
         if (!is_array($path)) {
             $path = \Site::splitPath($path);
@@ -64,7 +64,7 @@ class ParentCollection extends RootCollection
         return $node;
     }
 
-    function getChild($name)
+    public function getChild($name)
     {
         // filter name
         $name = static::filterName($name);
@@ -75,14 +75,14 @@ class ParentCollection extends RootCollection
         }
 
         if (empty(static::$_children[$name])) {
-            throw new \Sabre\DAV\Exception\FileNotFound('The collection with name: ' . $name . ' could not be found');
+            throw new \Sabre\DAV\Exception\FileNotFound('The collection with name: '.$name.' could not be found');
         }
 
         // check if name is an alias
         return static::$_children[$name];
     }
 
-    function childExists($name)
+    public function childExists($name)
     {
         // filter name
         $name = static::filterName($name);
@@ -95,7 +95,7 @@ class ParentCollection extends RootCollection
         return array_key_exists($name, static::$_children);
     }
 
-    function getName()
+    public function getName()
     {
         if ($parentHostname = \Site::getConfig('parent_hostname')) {
             return static::$handle.' ('.$parentHostname.')';
@@ -104,7 +104,7 @@ class ParentCollection extends RootCollection
         }
     }
 
-    function getData()
+    public function getData()
     {
         return array(
             'Class' => 'SiteCollection'

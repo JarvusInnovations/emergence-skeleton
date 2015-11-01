@@ -45,7 +45,7 @@ class Comment extends \VersionedRecord
             ,'class' => __CLASS__
         )
     );
-    
+
     public static $validations = array(
         'Message' => array(
             'validator' => 'string_multiline'

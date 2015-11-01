@@ -27,7 +27,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 
         if (count($missingColumns)) {
             throw new \Exception(
-                $noun.' spreadsheet is missing required column' . (count($missingColumns) != 1 ? 's' : '') . ': '
+                $noun.' spreadsheet is missing required column'.(count($missingColumns) != 1 ? 's' : '').': '
                 .join(',', $missingColumns)
             );
         }
@@ -60,7 +60,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             'Analyzing %s row #%03u: %s',
             $noun,
             $rowNumber,
-            http_build_query($summaryColumns) . (count($nonEmptyColumns) > count($summaryColumns) ? '&...' : '')
+            http_build_query($summaryColumns).(count($nonEmptyColumns) > count($summaryColumns) ? '&...' : '')
         ), LogLevel::DEBUG);
     }
 

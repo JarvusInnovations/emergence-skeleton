@@ -22,7 +22,7 @@ class Capitalizer
 
         if (preg_match('/^[ea]l-\pL/u', $word)) {
             // el- / al- prefixes stay lowercase
-            return strtolower(substr($word, 0, 2)) . '-' . static::capitalizePronoun(substr($word, 3));
+            return strtolower(substr($word, 0, 2)).'-'.static::capitalizePronoun(substr($word, 3));
         } elseif (strpos($word, '-') !== false) {
             // process hyphenated-separated bits independently
             return implode('-', array_map($_recurse, explode('-', $word)));
@@ -67,7 +67,7 @@ class Capitalizer
                         // skip if only one letter is left after the prefix
                         strlen($word) > $prefixLen + 1
                     ) {
-                        $word = substr($word, 0, $prefixLen) . ucfirst(substr($word, $prefixLen));
+                        $word = substr($word, 0, $prefixLen).ucfirst(substr($word, $prefixLen));
                     }
                     break;
                 }

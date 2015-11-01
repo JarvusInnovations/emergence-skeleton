@@ -13,7 +13,7 @@ class StreamWrapper
     {
         stream_wrapper_register($protocolName, __CLASS__, STREAM_IS_URL);
     }
-    
+
     public static function getNodeByPath($path)
     {
         // truncate protocol

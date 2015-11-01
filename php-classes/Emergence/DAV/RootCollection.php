@@ -4,13 +4,13 @@ namespace Emergence\DAV;
 
 class RootCollection extends \Sabre\DAV\Collection
 {
-    static public $allowCreateRootCollections = true;
+    public static $allowCreateRootCollections = true;
 
-    static public $siteDirectories = array(
+    public static $siteDirectories = array(
         '_parent' => '\Emergence\DAV\ParentCollection'
     );
 
-    function getChildren()
+    public function getChildren()
     {
         $children = array();
 
@@ -27,7 +27,7 @@ class RootCollection extends \Sabre\DAV\Collection
         return array_merge($children, Collection::getAllRootCollections());
     }
 
-    function createDirectory($name)
+    public function createDirectory($name)
     {
         if (static::$allowCreateRootCollections) {
             return Collection::getOrCreateRootCollection($name);
@@ -36,34 +36,36 @@ class RootCollection extends \Sabre\DAV\Collection
         }
     }
 
-    function getChild($name)
+    public function getChild($name)
     {
         // filter name
         $name = static::filterName($name);
 
         // check if child exists
         if (array_key_exists($name, static::$siteDirectories)) {
-            $className = static::$siteDirectories[$name];    
+            $className = static::$siteDirectories[$name];
             return new $className($name);
         } elseif ($collection = Collection::getByHandle($name)) {
             return $collection;
         }
 
-        throw new \Sabre\DAV\Exception\FileNotFound('The file with name: ' . $name . ' could not be found');
+        throw new \Sabre\DAV\Exception\FileNotFound('The file with name: '.$name.' could not be found');
     }
 
-    function childExists($name) {
+    public function childExists($name)
+    {
         // filter name
         $name = static::filterName($name);
 
         return (boolean)$this->getChild($name);
     }
 
-    function getName() {
-        return basename(realpath('../')) . ' ('.$_SERVER['HTTP_HOST'].')';
+    public function getName()
+    {
+        return basename(realpath('../')).' ('.$_SERVER['HTTP_HOST'].')';
     }
 
-    static public function filterName($name)
+    public static function filterName($name)
     {
         return preg_replace('/\s*\([^)]*\)$/', '', $name);
     }

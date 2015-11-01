@@ -25,7 +25,7 @@ class GroupsRequestHandler extends RecordsRequestHandler
         }
 
         if (!empty($_REQUEST['q'])) {
-            $conditions[] = 'Name LIKE "%' . DB::escape($_REQUEST['q']) . '%"';
+            $conditions[] = 'Name LIKE "%'.DB::escape($_REQUEST['q']).'%"';
         }
 
         return parent::handleBrowseRequest($options, $conditions);

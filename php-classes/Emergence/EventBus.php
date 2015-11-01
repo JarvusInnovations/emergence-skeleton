@@ -41,9 +41,9 @@ class EventBus
         if (is_string($context)) {
             $context = preg_split('{[\\\\\\/]}', $context);
         }
-        
-        $cacheKey = 'event-handlers:' . implode('/', $context) . '|' . $key;
-        
+
+        $cacheKey = 'event-handlers:'.implode('/', $context).'|'.$key;
+
         if ($handlers = Cache::fetch($cacheKey)) {
             return $handlers;
         }
@@ -56,24 +56,24 @@ class EventBus
             $contextPath = $rootCollection;
 
             if (count($context)) {
-                $contextPath .= '/' . implode('/', $context);
+                $contextPath .= '/'.implode('/', $context);
             }
 
             if (count($context) < $contextOriginalLength) {
                 $contextPath .= '/_';
             }
 
-            $eventPath = $contextPath . '/' . $key;
+            $eventPath = $contextPath.'/'.$key;
             foreach (Emergence_FS::getAggregateChildren($eventPath) AS $filename => $node) {
                 if ($node->Type == 'application/php') {
-                    $handlers[$eventPath . '/' . $filename] = $node->ID;
+                    $handlers[$eventPath.'/'.$filename] = $node->ID;
                 }
             }
 
-            $eventPath = $contextPath . '/~';
+            $eventPath = $contextPath.'/~';
             foreach (Emergence_FS::getAggregateChildren($eventPath) AS $filename => $node) {
                 if ($node->Type == 'application/php') {
-                    $handlers[$eventPath . '/' . $filename] = $node->ID;
+                    $handlers[$eventPath.'/'.$filename] = $node->ID;
                 }
             }
 
@@ -83,7 +83,7 @@ class EventBus
                 break;
             }
         }
-        
+
         Cache::store($cacheKey, $handlers);
 
         return $handlers;

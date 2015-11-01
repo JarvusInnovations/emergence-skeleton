@@ -12,7 +12,7 @@ class Data
         foreach ($input AS $key => $value) {
             $keys = explode('.', $key);
             $target =& $output;
-            
+
             while (count($keys) > 0) {
                 $subKey = array_shift($keys);
 
@@ -27,7 +27,7 @@ class Data
                 }
             }
         }
-        
+
         return $output;
     }
 
@@ -41,7 +41,7 @@ class Data
                 $output[$key] = $value;
             }
         }
-        
+
         return $output;
     }
 
@@ -62,14 +62,14 @@ class Data
             if (!is_array($value)) {
                 continue;
             }
-            
+
             if (count($value) == 2 && array_key_exists('from', $value) && array_key_exists('to', $value)) {
                 $output[$key] = $value['to'];
             } else {
                 $output[$key] = static::extractToFromDelta($value);
             }
         }
-        
+
         return $output;
     }
 }

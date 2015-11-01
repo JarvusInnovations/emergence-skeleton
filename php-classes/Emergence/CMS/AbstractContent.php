@@ -123,8 +123,8 @@ abstract class AbstractContent extends \VersionedRecord
             return false;
         }
 
-		return true;
-	}
+        return true;
+    }
 
     public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
@@ -204,7 +204,7 @@ abstract class AbstractContent extends \VersionedRecord
 
     public function renderBody()
     {
-        return join('', array_map(function($Item){
+        return join('', array_map(function($Item) {
             return $Item->renderBody();
         }, $this->Items));
     }

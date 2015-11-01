@@ -92,13 +92,13 @@ class Job extends ActiveRecord
         } else {
             $entry = $message;
         }
-        
+
         if ($level !== null) {
             $entry['level'] = $level;
         } elseif (!array_key_exists('level', $entry)) {
             $entry['level'] = LogLevel::INFO;
         }
-        
+
         return $this->log[] = $entry;
     }
 
@@ -157,7 +157,7 @@ class Job extends ActiveRecord
     public function logInvalidRecord(\ActiveRecord $Record)
     {
         return $this->log(array(
-            'message' => 'Invalid ' . get_class($Record) . ' record: ' . $Record->getTitle()
+            'message' => 'Invalid '.get_class($Record).' record: '.$Record->getTitle()
             ,'validationErrors' => $Record->validationErrors
         ), LogLevel::WARNING);
     }
@@ -165,14 +165,14 @@ class Job extends ActiveRecord
     public function logException(\Exception $e)
     {
         return $this->log(array(
-            'message' => get_class($e) . ': ' . $e->getMessage()
+            'message' => get_class($e).': '.$e->getMessage()
             ,'exception' => $e
         ), LogLevel::ERROR);
     }
 
     public function getLogPath()
     {
-        return $this->isPhantom ? null : \Site::$rootPath . '/site-data/connector-jobs/' . $this->ID . '.json';
+        return $this->isPhantom ? null : \Site::$rootPath.'/site-data/connector-jobs/'.$this->ID.'.json';
     }
 
     public function writeLog()

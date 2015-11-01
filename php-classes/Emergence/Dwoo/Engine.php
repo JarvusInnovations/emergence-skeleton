@@ -18,12 +18,12 @@ class Engine extends \Dwoo_Core
 
 
     // protected properties
-    static protected $_instance_dwoo;
-    static protected $_instance_compiler;
-    static protected $_instance_dwoo_loader;
+    protected static $_instance_dwoo;
+    protected static $_instance_compiler;
+    protected static $_instance_dwoo_loader;
 
     // contructor
-    function __construct()
+    public function __construct()
     {
         if (!file_exists(static::$pathCompile)) {
             mkdir(static::$pathCompile);
@@ -92,7 +92,8 @@ class Engine extends \Dwoo_Core
 
 
     // overrides
-    public function getLoader() {
+    public function getLoader()
+    {
         if (!isset(static::$_instance_dwoo_loader)) {
             static::$_instance_dwoo_loader = new PluginLoader();
         }

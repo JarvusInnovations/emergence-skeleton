@@ -11,7 +11,8 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
      */
     protected $server;
 
-    public function initialize(\Sabre\DAV\Server $server) {
+    public function initialize(\Sabre\DAV\Server $server)
+    {
         $this->server = $server;
 
         $server->subscribeEvent('beforeMethod', array($this, 'httpGetInterceptor'));
@@ -19,7 +20,8 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
         $server->subscribeEvent('beforeCreateFile', array($this, 'beforeCreateFile'));
     }
 
-    public function httpGetInterceptor($method, $uri) {
+    public function httpGetInterceptor($method, $uri)
+    {
         if ($method !== 'GET' || DevelopRequestHandler::getResponseMode() != 'json') {
             return true;
         }
@@ -68,8 +70,8 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
+    public function beforeMethod($method, $uri)
+    {
         switch ($method) {
             case 'GET' :
                 if (!$node) {
@@ -86,7 +88,6 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
         }
 
         return true;
-
     }
 
     public function beforeCreateFile($uri, $data)

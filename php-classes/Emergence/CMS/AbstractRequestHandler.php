@@ -8,7 +8,7 @@ use Tag;
 
 abstract class AbstractRequestHandler extends \RecordsRequestHandler
 {
-#    public static $contentTypes = array(
+    #    public static $contentTypes = array(
 #        'Emergence\CMS\Page' => array(
 #            'handler' => '/pages'
 #            ,'editor' => 'CMS.PageEditor'
@@ -60,7 +60,7 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
             $url = $Record->getURL();
 
             if ($rest = static::getPath()) {
-                $url .= '/' . implode('/', $rest);
+                $url .= '/'.implode('/', $rest);
             }
 
             \Site::redirect($url);
@@ -169,7 +169,6 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
 
                 $Content->LayoutConfig = $requestData['LayoutConfig'];
             }
-
         }
 
         // assign context to media

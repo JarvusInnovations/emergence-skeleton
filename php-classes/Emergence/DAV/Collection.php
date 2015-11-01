@@ -4,16 +4,16 @@ namespace Emergence\DAV;
 
 class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
 {
-    static public $autoCreate = true;
-    static public $fileClass = '\Emergence\DAV\File';
+    public static $autoCreate = true;
+    public static $fileClass = '\Emergence\DAV\File';
 
-    function __construct($handle, $record = null)
+    public function __construct($handle, $record = null)
     {
-       try {
+        try {
             parent::__construct($handle, $record);
-       } catch(Exception $e) {
-           throw new \Sabre\DAV\Exception\FileNotFound($e->getMessage());
-       }
+        } catch (Exception $e) {
+            throw new \Sabre\DAV\Exception\FileNotFound($e->getMessage());
+        }
     }
 
     // localize file creation
@@ -33,12 +33,12 @@ class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
         return parent::delete();
     }
 
-    function getChild($handle, $record = null)
+    public function getChild($handle, $record = null)
     {
         if ($child = parent::getChild($handle, $record)) {
             return $child;
         } else {
-            throw new \Sabre\DAV\Exception\FileNotFound('The file with name: ' . $handle . ' could not be found');
+            throw new \Sabre\DAV\Exception\FileNotFound('The file with name: '.$handle.' could not be found');
         }
     }
 
@@ -47,7 +47,7 @@ class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
         try {
             $this->getChild($name);
             return true;
-        } catch(\Sabre\DAV\Exception\FileNotFound $e) {
+        } catch (\Sabre\DAV\Exception\FileNotFound $e) {
             return false;
         }
     }

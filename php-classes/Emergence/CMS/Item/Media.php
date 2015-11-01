@@ -9,9 +9,9 @@ class Media extends AbstractItem
 
     public static $fullWidth = 1920;
     public static $fullHeight = 1920;
-    
+
     protected $_media = false;
-    
+
     public function getValue($name)
     {
         switch ($name) {
@@ -19,13 +19,13 @@ class Media extends AbstractItem
                 if ($this->_media !== false) {
                     return $this->_media;
                 }
-                
+
                 return $this->_media = $this->Data && !empty($this->Data['MediaID']) ? \Media::getByID($this->Data['MediaID']) : null;
             default:
                 return parent::getValue($name);
-        } 
+        }
     }
-    
+
     public function getData()
     {
         $details = parent::getData();
@@ -38,15 +38,15 @@ class Media extends AbstractItem
         if ($this->isFieldDirty('Data') && $this->Media) {
             $this->Media->ContextClass = $this->Content->getRootClass();
             $this->Media->ContextID = $this->ContentID;
-            
+
             if (array_key_exists('Caption', $this->Data)) {
                 $this->Media->Caption = $this->Data['Caption'];
                 unset($this->Data['Caption']);
             }
-            
+
             $this->Media->save();
         }
-        
+
         parent::save($deep);
     }
 

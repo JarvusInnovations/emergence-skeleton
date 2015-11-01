@@ -13,7 +13,7 @@ class Template extends \Dwoo_Template_String
     public function __construct($template)
     {
         if (is_a($template, 'SiteFile')) {
-            $this->path = '/' . implode('/', $template->getFullPath(null, false));
+            $this->path = '/'.implode('/', $template->getFullPath(null, false));
             $this->node = $template;
         } elseif (is_string($template)) {
             $this->path = $template;
@@ -27,7 +27,7 @@ class Template extends \Dwoo_Template_String
     {
         return 'emergence';
     }
-    
+
     public function getResourceIdentifier()
     {
         return $this->path;
@@ -48,22 +48,22 @@ class Template extends \Dwoo_Template_String
     {
         return $this->node->SHA1;
     }
-    
+
     protected function getCompiledFilename(Dwoo_Core $dwoo)
     {
         if (!$this->compileId) {
             $this->compileId = $this->node->SHA1;
         }
 
-        return $dwoo->getCompileDir() . Site::getConfig('handle') . '/' . $this->compileId . '.d'.Engine::RELEASE_TAG.'.php';
+        return $dwoo->getCompileDir().Site::getConfig('handle').'/'.$this->compileId.'.d'.Engine::RELEASE_TAG.'.php';
     }
-    
+
     public function getSource()
     {
         return file_get_contents($this->node->RealPath);
     }
 
-    static public function findNode($path, $throwExceptionOnNotFound = true)
+    public static function findNode($path, $throwExceptionOnNotFound = true)
     {
         $templateNode = null;
 
@@ -96,7 +96,7 @@ class Template extends \Dwoo_Template_String
         if (!$templateNode && $throwExceptionOnNotFound) {
             throw new \Exception(
                 "Could not find template match for \"".implode('/', $path)."\", checked paths:\n\n"
-                .implode(PHP_EOL, array_map(function($a){
+                .implode(PHP_EOL, array_map(function($a) {
                     return implode('/', $a);
                 }, $searchHistory))
             );
@@ -105,7 +105,7 @@ class Template extends \Dwoo_Template_String
         return $templateNode;
     }
 
-    static public function templateFactory(Dwoo_Core $dwoo, $resourceId, $cacheTime = null, $cacheId = null, $compileId = null, \Dwoo_ITemplate $parentTemplate = null)
+    public static function templateFactory(Dwoo_Core $dwoo, $resourceId, $cacheTime = null, $cacheId = null, $compileId = null, \Dwoo_ITemplate $parentTemplate = null)
     {
         // return Dwoo_Template_File for absolute path
         if (substr($resourceId, 0, strlen(Site::$rootPath)) == Site::$rootPath) {
