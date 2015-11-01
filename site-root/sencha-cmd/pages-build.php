@@ -22,6 +22,21 @@
 $GLOBALS['Session']->requireAccountLevel('Developer');
 set_time_limit(0);
 
+function getRecursiveTreePaths($origanalPath) {
+    if(substr($origanalPath, -1) != '/') {
+        $origanalPath .= '/';
+    }
+
+    $pages = glob($origanalPath.'*.js');
+    $folders = glob($origanalPath.'*', GLOB_ONLYDIR);
+
+    foreach($folders as $folder) {
+        $pages = array_merge($pages, getRecursiveTreePaths($folder));
+    }
+
+    return $pages;
+}
+
 if(empty($_GET['dumpWorkspace'])) {
     Benchmark::startLive();
 }
@@ -64,7 +79,6 @@ Benchmark::mark("precached $cachedFiles files in $frameworkPath");
 
 $exportResult = Emergence_FS::exportTree($frameworkPath, $framework);
 Benchmark::mark("exported $frameworkPath to ./$framework: ".http_build_query($exportResult));
-
 // build command and scan for dependencies and pages
 $packages = array();
 $pageNames = array();
@@ -96,16 +110,15 @@ foreach ($commonPackages AS $package) {
         }
     }
 }
-
 // assemble page-specific builds and dependencies
-foreach (glob('./src/page/*.js') AS $page) {
-    $pageNames[] = $pageName = basename($page, '.js');
+foreach (getRecursiveTreePaths('./src/page/') AS $page) {
+    $pageNames[] = $pageName = substr($page, 11);//basename($page, '.js');
+
     $pageOverrides = array();
     $pagePackages = array_unique(Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile($page)));
 
     // merge into global packages list
     $packages = array_merge($packages, $pagePackages);
-
     // analyze packages, export, add to classPath, and register overrides per-page
     foreach ($pagePackages AS $package) {
         foreach (array('src', 'overrides') AS $subPath) { 
@@ -127,14 +140,17 @@ foreach (glob('./src/page/*.js') AS $page) {
         }
     }
 
+    //ensure any file deeper than page is namespaced in filename without folder
+    $pagePath = preg_match("/.+\/.+\.js/", $pageName) ? preg_replace('/\//', '.', $pageName) : $pageName;
+    $pagePath = substr($pagePath, 0,strlen($pagePath)-3);
+
     $pageLoadCommands[] =
-        "union -recursive -class Site.page.$pageName"
+        "union -recursive -class Site.page.$pagePath"
         .( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '' )
-        ." and save $pageName";
+        ." and save $pagePath";
 
-    $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
+    $pageBuildCommands[] = "restore ".$pagePath." and exclude -set common and concat -yui ./build/{$pagePath}.js";
 }
-
 
 // eliminate duplicate packages between pages
 $packages = array_unique($packages);
@@ -145,6 +161,7 @@ Benchmark::mark("crawling packages for classpaths");
 $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
 
 Benchmark::mark("processing all classpaths");
+
 foreach($classPaths AS &$classPath) {
     if(strpos($classPath, '${workspace.dir}/x/') === 0) {
         $extensionPath = substr($classPath, 19);
@@ -167,6 +184,8 @@ foreach($classPaths AS &$classPath) {
         }
     }
 }
+
+
 
 
 // prepare cmd
@@ -199,7 +218,10 @@ $cmd = Sencha::buildCmd(
         // if not, just switch back to the common set
         ,count($pageNames) > 1
             ?
-                'and intersect -min=2 -set ' . join(',', $pageNames)
+                'and intersect -min=2 -set ' . join(',', array_map(function($page){
+                    $page = preg_replace('/\//', '.', $page);
+                    return substr($page, 0, strlen($page)-3);
+                }, $pageNames))
                 .' and include -set common'
                 .' and exclude -namespace Site.page'
                 .' and save common'
