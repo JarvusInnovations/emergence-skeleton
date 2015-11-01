@@ -36,7 +36,7 @@ Benchmark::mark("exported $suitePath to $suiteTmpPath: ".http_build_query($expor
 $timezone = date_default_timezone_get();
 
 // bootstrap path
-$bootstrapPath = dirname($_SERVER['SCRIPT_FILENAME']) . '/phpunit.php';
+$bootstrapPath = dirname($_SERVER['SCRIPT_FILENAME']).'/phpunit.php';
 
 file_put_contents($configTmpPath, <<<EOT
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -73,6 +73,6 @@ Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // clean up
 if (empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

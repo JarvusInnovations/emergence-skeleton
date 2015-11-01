@@ -2,21 +2,18 @@
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
 
-if($_SERVER['REQUEST_METHOD'] == 'POST')
-{    		
-	if($_REQUEST['target'] != 'System')
-	{
-		apc_clear_cache('user');
-		print "Cleared user cache.<br>\n";
-	}
-	
-	if($_REQUEST['target'] != 'User')
-	{
-		apc_clear_cache();
-		print "Cleared system cache.<br>\n";
-	}
-	
-	die('APC cache cleared.');
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_REQUEST['target'] != 'System') {
+        apc_clear_cache('user');
+        print "Cleared user cache.<br>\n";
+    }
+
+    if ($_REQUEST['target'] != 'User') {
+        apc_clear_cache();
+        print "Cleared system cache.<br>\n";
+    }
+
+    die('APC cache cleared.');
 }
 
 ?>

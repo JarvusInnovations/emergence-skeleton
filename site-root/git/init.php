@@ -1,34 +1,34 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-    
-	
+
+
 // get repo
-if(empty($_REQUEST['repo'])) {
-	die('Parameter "repo" required');
+if (empty($_REQUEST['repo'])) {
+    die('Parameter "repo" required');
 }
 
 $repoName = $_REQUEST['repo'];
 
-if(!array_key_exists($repoName, Git::$repositories)) {
-	die("Repo '$repoName' is not defined in Git::\$repositories");
+if (!array_key_exists($repoName, Git::$repositories)) {
+    die("Repo '$repoName' is not defined in Git::\$repositories");
 }
 
 $repoCfg = Git::$repositories[$repoName];
 
 
 // get key
-if(empty($_POST['privateKey'])) {
-	die(
-		'<form method="POST">'
-			.'<label>Deploy private key:<br>'
-				.'<textarea name="privateKey" rows="30" cols="65">'
-				."-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE KEY-----"
-				.'</textarea>'
-			.'</label>'
-			.'<p><input type="submit" value="Create repo"></p>'
-		.'</form>'
-	);
+if (empty($_POST['privateKey'])) {
+    die(
+        '<form method="POST">'
+            .'<label>Deploy private key:<br>'
+                .'<textarea name="privateKey" rows="30" cols="65">'
+                ."-----BEGIN RSA PRIVATE KEY-----\n-----END RSA PRIVATE KEY-----"
+                .'</textarea>'
+            .'</label>'
+            .'<p><input type="submit" value="Create repo"></p>'
+        .'</form>'
+    );
 }
 
 
@@ -43,15 +43,15 @@ $repoPath = "$_SERVER[SITE_ROOT]/site-data/git/$repoName";
 $keyPath = "$repoPath.key";
 $gitWrapperPath = "$repoPath.git.sh";
 
-if(!is_dir($repoPath)) {
-	mkdir($repoPath, 0777, true);
-	Benchmark::mark("created directory: $repoPath");
+if (!is_dir($repoPath)) {
+    mkdir($repoPath, 0777, true);
+    Benchmark::mark("created directory: $repoPath");
 }
 
 
 // check if there is an existing repo
-if(is_dir("$repoPath/.git")) {
-	die("$repoPath already contains a .git repo directory");
+if (is_dir("$repoPath/.git")) {
+    die("$repoPath already contains a .git repo directory");
 }
 
 
@@ -81,18 +81,17 @@ Benchmark::mark("added origin $repoCfg[remote]");
 
 
 // fetch remote branch
-if(!empty($repoCfg['originBranch'])) {
-	$repo->git("fetch origin $repoCfg[originBranch]");
-	Benchmark::mark("fetched origin/$repoCfg[originBranch]");
+if (!empty($repoCfg['originBranch'])) {
+    $repo->git("fetch origin $repoCfg[originBranch]");
+    Benchmark::mark("fetched origin/$repoCfg[originBranch]");
 }
 
 // create local working branch
-if(!empty($repoCfg['originBranch'])) {
-	$repo->git("checkout -b $repoCfg[workingBranch] FETCH_HEAD");
-	Benchmark::mark("created local branch $repoCfg[workingBranch]");
-}
-else {
-	die('TODO: handle initializing repo without originBranch'); // see http://git.661346.n2.nabble.com/how-to-start-with-non-master-branch-td3284326.html
+if (!empty($repoCfg['originBranch'])) {
+    $repo->git("checkout -b $repoCfg[workingBranch] FETCH_HEAD");
+    Benchmark::mark("created local branch $repoCfg[workingBranch]");
+} else {
+    die('TODO: handle initializing repo without originBranch'); // see http://git.661346.n2.nabble.com/how-to-start-with-non-master-branch-td3284326.html
 }
 
 
@@ -102,7 +101,6 @@ $gitIgnorePath = "$repoPath/.gitignore";
 $gitIgnoreContent = file_exists($gitIgnorePath) ? file_get_contents($gitIgnorePath) : '';
 
 if (!preg_match('/^\\.emergence$/m', $gitIgnoreContent)) {
-    
     if (!trim($gitIgnoreContent) || !substr($gitIgnoreContent, -1) == PHP_EOL) {
         $gitIgnoreContent .= PHP_EOL;
     }

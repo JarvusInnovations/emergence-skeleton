@@ -6,9 +6,10 @@ Benchmark::startLive();
 
 
 // get framework
-if(empty($_REQUEST['framework']))
-	die('Parameter framework required');
-	
+if (empty($_REQUEST['framework'])) {
+    die('Parameter framework required');
+}
+
 $framework = $_REQUEST['framework'];
 
 Benchmark::mark("configured request: framework=$framework");
@@ -41,13 +42,12 @@ passthru($cmd, $cmdStatus);
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import app
-if($cmdStatus == 0)
-{
-	$destPath = 'sencha-workspace';
-	Benchmark::mark("importing to: $destPath");
-	
-	$filesImported = Emergence_FS::importTree($tmpPath, $destPath);
-	Benchmark::mark("imported $filesImported files");
+if ($cmdStatus == 0) {
+    $destPath = 'sencha-workspace';
+    Benchmark::mark("importing to: $destPath");
+
+    $filesImported = Emergence_FS::importTree($tmpPath, $destPath);
+    Benchmark::mark("imported $filesImported files");
 }
 
 

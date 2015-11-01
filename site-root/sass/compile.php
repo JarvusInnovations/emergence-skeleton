@@ -43,8 +43,7 @@ passthru($cmd, $cmdStatus);
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import build
-if($cmdStatus == 0)
-{
+if ($cmdStatus == 0) {
     Benchmark::mark("importing $cssTmpPath");
 
     $importResults = Emergence_FS::importTree($cssTmpPath, "site-root/css", array('transferDelete' => false));
@@ -52,8 +51,7 @@ if($cmdStatus == 0)
 }
 
 // clean up
-if(empty($_GET['leaveWorkspace']))
-{
+if (empty($_GET['leaveWorkspace'])) {
     exec("rm -R $tmpPath");
     Benchmark::mark("erased $tmpPath");
 }

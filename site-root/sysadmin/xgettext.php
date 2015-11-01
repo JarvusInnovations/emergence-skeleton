@@ -32,18 +32,18 @@ foreach ($files AS $path => $fileData) {
 
 // write pot file
 foreach ($strings AS $string => $sources) {
-    fwrite($pot, '#: ' . implode(' ', $sources) . PHP_EOL);
+    fwrite($pot, '#: '.implode(' ', $sources).PHP_EOL);
 
     // switch output format if embedded newlines found (see https://www.gnu.org/software/gettext/manual/html_node/Normalizing.html)
     if (preg_match('/[^\n]\n+[^\n]/', $string)) {
         // multiline output format
-        fwrite($pot, 'msgid ""' . PHP_EOL);
-        fwrite($pot, str_replace('\n', '\n"' . PHP_EOL . '"', _encodeString($string)) . PHP_EOL);
+        fwrite($pot, 'msgid ""'.PHP_EOL);
+        fwrite($pot, str_replace('\n', '\n"'.PHP_EOL.'"', _encodeString($string)).PHP_EOL);
     } else {
-        fwrite($pot, 'msgid ' . _encodeString($string) . PHP_EOL);
+        fwrite($pot, 'msgid '._encodeString($string).PHP_EOL);
     }
-    
-    fwrite($pot, 'msgstr ""' . PHP_EOL . PHP_EOL);
+
+    fwrite($pot, 'msgstr ""'.PHP_EOL.PHP_EOL);
 }
 
 rewind($pot);
@@ -54,14 +54,16 @@ fpassthru($pot);
 
 
 // utility methods
-function _extractStrings($pattern, $contents, $fileVirtualPath, &$strings) {
+function _extractStrings($pattern, $contents, $fileVirtualPath, &$strings)
+{
     preg_match_all($pattern, $contents, $matches, PREG_OFFSET_CAPTURE);
 
     foreach ($matches[3] AS list($string, $offset)) {
-        $strings[stripslashes($string)][] = $fileVirtualPath . ':' . (substr_count(substr($contents, 0, $offset), "\n") + 1);
+        $strings[stripslashes($string)][] = $fileVirtualPath.':'.(substr_count(substr($contents, 0, $offset), "\n") + 1);
     }
 }
 
-function _encodeString($string) {
-    return '"' . str_replace(PHP_EOL, '\n', addcslashes($string, '"\\')) . '"';
+function _encodeString($string)
+{
+    return '"'.str_replace(PHP_EOL, '\n', addcslashes($string, '"\\')).'"';
 }

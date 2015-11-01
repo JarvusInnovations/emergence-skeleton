@@ -1,17 +1,17 @@
 <?php
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
-	
-	
+
+
 // get repo
-if(empty($_REQUEST['repo'])) {
-	die('Parameter "repo" required');
+if (empty($_REQUEST['repo'])) {
+    die('Parameter "repo" required');
 }
 
 $repoName = $_REQUEST['repo'];
 
-if(!array_key_exists($repoName, Git::$repositories)) {
-	die("Repo '$repoName' is not defined in Git::\$repositories");
+if (!array_key_exists($repoName, Git::$repositories)) {
+    die("Repo '$repoName' is not defined in Git::\$repositories");
 }
 
 $repoCfg = Git::$repositories[$repoName];
@@ -32,8 +32,8 @@ putenv("GIT_SSH=$gitWrapperPath");
 
 
 // check if there is an existing repo
-if(!is_dir("$repoPath/.git")) {
-	die("$repoPath does not contain .git");
+if (!is_dir("$repoPath/.git")) {
+    die("$repoPath does not contain .git");
 }
 
 
@@ -44,8 +44,8 @@ Benchmark::mark("loaded git repo in $repoPath");
 
 
 // verify repo state
-if($repo->getCurrentBranch() != $repoCfg['workingBranch']) {
-	die("Current branch in $repoPath is not $repoCfg[workingBranch]; aborting.");
+if ($repo->getCurrentBranch() != $repoCfg['workingBranch']) {
+    die("Current branch in $repoPath is not $repoCfg[workingBranch]; aborting.");
 }
 Benchmark::mark("verified working branch");
 

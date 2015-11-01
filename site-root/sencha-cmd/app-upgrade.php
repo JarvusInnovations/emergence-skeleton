@@ -8,7 +8,7 @@ Benchmark::startLive();
 
 // get app name
 if (empty($_REQUEST['name'])) {
-	die('Parameter name required');
+    die('Parameter name required');
 }
 
 $appName = $_REQUEST['name'];
@@ -16,7 +16,7 @@ $App = new Sencha_App($appName);
 
 // get target framework version
 if (empty($_REQUEST['cmdVersion'])) {
-	die('Parameter cmdVersion required');
+    die('Parameter cmdVersion required');
 }
 
 $cmdVersion = $_REQUEST['cmdVersion'];
@@ -30,7 +30,7 @@ $framework = $App->getFramework();
 $frameworkVersion = $App->getFrameworkVersion();
 
 if (!$frameworkVersion) {
-	die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
+    die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
 }
 
 // set paths
@@ -80,14 +80,14 @@ Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportRes
 // write any libraries from classpath
 $classPaths = explode(',', $App->getBuildCfg('app.classpath'));
 
-foreach($classPaths AS $classPath) {
-	if(substr($classPath, 0, 2) == 'x/') {
-		$classPathSource = 'ext-library' . substr($classPath, 1);
-		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
-		Benchmark::mark("precached $cachedFiles files from $classPathSource");
-		$exportResult = Emergence_FS::exportTree($classPathSource, "$appTmpPath/$classPath");
-		Benchmark::mark("exported $classPathSource to $appTmpPath/$classPath: ".http_build_query($exportResult));
-	}
+foreach ($classPaths AS $classPath) {
+    if (substr($classPath, 0, 2) == 'x/') {
+        $classPathSource = 'ext-library'.substr($classPath, 1);
+        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
+        Benchmark::mark("precached $cachedFiles files from $classPathSource");
+        $exportResult = Emergence_FS::exportTree($classPathSource, "$appTmpPath/$classPath");
+        Benchmark::mark("exported $classPathSource to $appTmpPath/$classPath: ".http_build_query($exportResult));
+    }
 }
 
 
@@ -107,18 +107,18 @@ Benchmark::mark("Upgrade CMD finished: exitCode=$upgradeCmdStatus");
 Benchmark::mark("importing $appTmpPath");
 
 $importResults = Emergence_FS::importTree($appTmpPath, $appPath, array(
-	'exclude' => array(
-		"#^/x(/|$)#"
-		,"#/\\.sass-cache(/|$)#"
-		,"#/\\.sencha-backup(/|$)#"
-		,"#/\\.emergence(/|$)#"
-	)
+    'exclude' => array(
+        "#^/x(/|$)#"
+        ,"#/\\.sass-cache(/|$)#"
+        ,"#/\\.sencha-backup(/|$)#"
+        ,"#/\\.emergence(/|$)#"
+    )
 ));
 Benchmark::mark("imported files: ".http_build_query($importResults));
 
 
 // clean up
-if(empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+if (empty($_GET['leaveWorkspace'])) {
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

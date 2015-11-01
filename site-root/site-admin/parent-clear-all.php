@@ -2,8 +2,7 @@
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
 
-if($_SERVER['REQUEST_METHOD'] == 'POST')
-{           
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     DB::nonQuery(
         'DELETE FROM `%s` WHERE CollectionID IN (SELECT ID FROM `%s` WHERE Site != "Local")'
         ,array(
@@ -11,16 +10,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
             ,SiteCollection::$tableName
         )
     );
-    
+
     print('Cleared '.DB::affectedRows().' cached files<br>'.PHP_EOL);
-    
+
     DB::nonQuery(
         'DELETE FROM `%s` WHERE Site != "Local"'
         ,array(
             SiteCollection::$tableName
         )
     );
-    
+
     die('Cleared '.DB::affectedRows().' cached collections');
 }
 

@@ -8,12 +8,12 @@ $defaultExclude = array(
     ,"#/\\.emergence(/|$)#"
 );
 
-if(empty($_GET['dumpWorkspace'])) {
+if (empty($_GET['dumpWorkspace'])) {
     Benchmark::startLive();
 }
 
 // get app name
-if(empty($_REQUEST['name'])) {
+if (empty($_REQUEST['name'])) {
     die('Parameter name required');
 }
 
@@ -21,11 +21,10 @@ $appName = $_REQUEST['name'];
 $App = new Sencha_App($appName);
 
 // get build type
-if(empty($_REQUEST['buildType'])) {
+if (empty($_REQUEST['buildType'])) {
     $buildType = 'production';
-}
-else {    
-	$buildType = $_REQUEST['buildType'];
+} else {
+    $buildType = $_REQUEST['buildType'];
 }
 
 Benchmark::mark("configured request: appName=$appName");
@@ -36,11 +35,11 @@ $frameworkVersion = $App->getFrameworkVersion();
 $cmdVersion = $App->getBuildCfg('app.cmd.version');
 
 if (!$frameworkVersion) {
-	die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
+    die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
 }
 
 if (!$cmdVersion) {
-	die("Unable to determine CMD version, if this is an old application you need to manually set app.cmd.version in .sencha/app/sencha.cfg");
+    die("Unable to determine CMD version, if this is an old application you need to manually set app.cmd.version in .sencha/app/sencha.cfg");
 }
 
 // get app-level classpath
@@ -112,37 +111,36 @@ Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportRes
 
 // write any libraries from classpath
 foreach (array_unique($classPaths) AS $classPath) {
-	if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-		$extensionPath = substr($classPath, 19);
-		$classPathSource = "ext-library/$extensionPath";
-		$classPathDest = "$tmpPath/x/$extensionPath";
-		Benchmark::mark("importing classPathSource: $classPathSource"); 
-		
-		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
-		Benchmark::mark("precached $cachedFiles files in $classPathSource");
-		
+    if (strpos($classPath, '${workspace.dir}/x/') === 0) {
+        $extensionPath = substr($classPath, 19);
+        $classPathSource = "ext-library/$extensionPath";
+        $classPathDest = "$tmpPath/x/$extensionPath";
+        Benchmark::mark("importing classPathSource: $classPathSource");
+
+        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
+        Benchmark::mark("precached $cachedFiles files in $classPathSource");
+
         $sourceNode = Site::resolvePath($classPathSource);
-        
+
         if (is_a($sourceNode, SiteFile)) {
             mkdir(dirname($classPathDest), 0777, true);
             copy($sourceNode->RealPath, $classPathDest);
-    		Benchmark::mark("copied file $classPathSource to $classPathDest");
+            Benchmark::mark("copied file $classPathSource to $classPathDest");
         } else {
-        	$exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-    		Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
+            $exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
+            Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
         }
-	}
+    }
 }
 
 // write archive
-if(!empty($_GET['archive'])) {
-	try {
-		$exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
-		Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
-	}
-	catch(Exception $e) {
-		Benchmark::mark("failed to export $archivePath, continueing");
-	}
+if (!empty($_GET['archive'])) {
+    try {
+        $exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
+        Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
+    } catch (Exception $e) {
+        Benchmark::mark("failed to export $archivePath, continueing");
+    }
 }
 
 
@@ -159,7 +157,7 @@ $cmd = Sencha::buildCmd(
         ,"-Dbuild.dir=$buildTmpPath"
         ,"-Dapp.output.base=$buildTmpPath" // CMD 5.0.1 needs this set directly too or it gets loaded from app.defaults.json
         ,"-D{$framework}.dir=$frameworkTmpPath"
-        
+
         // ant targets
         ,$buildType // buildType target (e.g. "production", "testing") sets up build parameters
         ,'build'
@@ -168,58 +166,57 @@ $cmd = Sencha::buildCmd(
 Benchmark::mark("running CMD: $cmd");
 
 // optionally dump workspace and exit
-if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
-	header('Content-Type: application/x-bzip-compressed-tar');
-	header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
-	chdir($tmpPath);
-	passthru("tar -cjf - ./");
-	exec("rm -R $tmpPath");
-	exit();
+if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
+    header('Content-Type: application/x-bzip-compressed-tar');
+    header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
+    chdir($tmpPath);
+    passthru("tar -cjf - ./");
+    exec("rm -R $tmpPath");
+    exit();
 }
 
 // execute CMD
 //  - optionally dump workspace and exit
-if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
-	exec($cmd);
-	
-	header('Content-Type: application/x-bzip-compressed-tar');
-	header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
-	chdir($tmpPath);
-	passthru("tar -cjf - ./");
-	exec("rm -R $tmpPath");
-	exit();
-}
-else {
-	passthru("$cmd 2>&1", $cmdStatus);
+if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
+    exec($cmd);
+
+    header('Content-Type: application/x-bzip-compressed-tar');
+    header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
+    chdir($tmpPath);
+    passthru("tar -cjf - ./");
+    exec("rm -R $tmpPath");
+    exit();
+} else {
+    passthru("$cmd 2>&1", $cmdStatus);
 }
 
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import build
-if($cmdStatus == 0) {	
-	Benchmark::mark("importing $buildTmpPath");
-	
-	$importResults = Emergence_FS::importTree($buildTmpPath, "sencha-build/$appName/$buildType", array(
-		'exclude' => $defaultExclude
-	));
-	Benchmark::mark("imported files: ".http_build_query($importResults));
-	
-	if ($framework == 'ext') {
-		Emergence_FS::importFile("$appTmpPath/bootstrap.js", "$appPath/bootstrap.js");
-		Benchmark::mark("imported bootstrap.js");
-	}
-	
-	if(!empty($_GET['archive'])) {
-		Benchmark::mark("importing $archiveTmpPath to $archivePath");
-		
-		$importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
-		Benchmark::mark("imported files: ".http_build_query($importResults));
-	}
+if ($cmdStatus == 0) {
+    Benchmark::mark("importing $buildTmpPath");
+
+    $importResults = Emergence_FS::importTree($buildTmpPath, "sencha-build/$appName/$buildType", array(
+        'exclude' => $defaultExclude
+    ));
+    Benchmark::mark("imported files: ".http_build_query($importResults));
+
+    if ($framework == 'ext') {
+        Emergence_FS::importFile("$appTmpPath/bootstrap.js", "$appPath/bootstrap.js");
+        Benchmark::mark("imported bootstrap.js");
+    }
+
+    if (!empty($_GET['archive'])) {
+        Benchmark::mark("importing $archiveTmpPath to $archivePath");
+
+        $importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
+        Benchmark::mark("imported files: ".http_build_query($importResults));
+    }
 }
 
 
 // clean up
-if(empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+if (empty($_GET['leaveWorkspace'])) {
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

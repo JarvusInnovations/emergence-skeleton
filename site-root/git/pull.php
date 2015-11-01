@@ -4,14 +4,14 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 
 
 // get repo
-if(empty($_REQUEST['repo'])) {
-	die('Parameter "repo" required');
+if (empty($_REQUEST['repo'])) {
+    die('Parameter "repo" required');
 }
 
 $repoName = $_REQUEST['repo'];
 
-if(!array_key_exists($repoName, Git::$repositories)) {
-	die("Repo '$repoName' is not defined in Git::\$repositories");
+if (!array_key_exists($repoName, Git::$repositories)) {
+    die("Repo '$repoName' is not defined in Git::\$repositories");
 }
 
 $repoCfg = Git::$repositories[$repoName];
@@ -31,8 +31,8 @@ putenv("GIT_SSH=$gitWrapperPath");
 
 
 // check if there is an existing repo
-if(!is_dir("$repoPath/.git")) {
-	die("$repoPath does not contain .git");
+if (!is_dir("$repoPath/.git")) {
+    die("$repoPath does not contain .git");
 }
 
 
@@ -43,8 +43,8 @@ Benchmark::mark("loaded git repo in $repoPath");
 
 
 // verify repo state
-if($repo->getCurrentBranch() != $repoCfg['workingBranch']) {
-	die("Current branch in $repoPath is not $repoCfg[workingBranch]; aborting.");
+if ($repo->getCurrentBranch() != $repoCfg['workingBranch']) {
+    die("Current branch in $repoPath is not $repoCfg[workingBranch]; aborting.");
 }
 Benchmark::mark("verified working branch");
 
@@ -55,30 +55,28 @@ Benchmark::mark("pulled from origin/$repoCfg[workingBranch]");
 
 
 // sync trees
-foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
-	
-	if(is_string($treeOptions)) {
-		$treeOptions = array(
-			'path' => $treeOptions
-		);
-	}
+foreach ($repoCfg['trees'] AS $srcPath => $treeOptions) {
+    if (is_string($treeOptions)) {
+        $treeOptions = array(
+            'path' => $treeOptions
+        );
+    }
 
-	if(!is_string($srcPath)) {
-		$srcPath = $treeOptions['path'];
-	}
-	elseif(!$treeOptions['path']) {
-		$treeOptions['path'] = $srcPath;
-	}
-	
-	$treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
-    
+    if (!is_string($srcPath)) {
+        $srcPath = $treeOptions['path'];
+    } elseif (!$treeOptions['path']) {
+        $treeOptions['path'] = $srcPath;
+    }
+
+    $treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
+
     if (is_file($treeOptions['path'])) {
         $sha1 = sha1_file($treeOptions['path']);
         $existingNode = Site::resolvePath($srcPath);
-        
+
         if (!$existingNode || $existingNode->SHA1 != $sha1) {
             $fileRecord = SiteFile::createFromPath($srcPath, null, $existingNode ? $existingNode->ID : null);
-    		SiteFile::saveRecordData($fileRecord, fopen($treeOptions['path'], 'r'), $sha1);
+            SiteFile::saveRecordData($fileRecord, fopen($treeOptions['path'], 'r'), $sha1);
             Benchmark::mark("importing file $srcPath from $treeOptions[path]");
         } else {
             Benchmark::mark("skipped unchanged file $srcPath from $treeOptions[path]");
@@ -88,7 +86,7 @@ foreach($repoCfg['trees'] AS $srcPath => $treeOptions) {
         Benchmark::mark("precached $srcPath: ".$cachedFiles);
 
         $exportResult = Emergence_FS::importTree($treeOptions['path'], $srcPath, $treeOptions);
-    	Benchmark::mark("importing directory $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
+        Benchmark::mark("importing directory $srcPath from $treeOptions[path]: ".http_build_query($exportResult));
     }
 }
 

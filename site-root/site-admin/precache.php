@@ -27,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ,'sencha-workspace/EmergencePullTool'
         ,'sencha-workspace/ContentEditor'
     );
-    
+
     $message = "";
     foreach ($_POST['collections'] AS $collection) {
         $filesCached = Emergence_FS::cacheTree($collection, true);
-        $message .= sprintf('Precached %03u files in %s' . PHP_EOL, $filesCached, $collection);
+        $message .= sprintf('Precached %03u files in %s'.PHP_EOL, $filesCached, $collection);
     }
 }
 

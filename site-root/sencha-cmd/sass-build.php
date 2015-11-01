@@ -8,12 +8,12 @@ $defaultExclude = array(
     ,"#/\\.emergence(/|$)#"
 );
 
-if(empty($_GET['dumpWorkspace'])) {
+if (empty($_GET['dumpWorkspace'])) {
     Benchmark::startLive();
 }
 
 // get app name
-if(empty($_REQUEST['name'])) {
+if (empty($_REQUEST['name'])) {
     die('Parameter name required');
 }
 
@@ -28,11 +28,11 @@ $frameworkVersion = $App->getFrameworkVersion();
 $cmdVersion = $App->getBuildCfg('app.cmd.version');
 
 if (!$frameworkVersion) {
-	die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
+    die("Unable to determine framework version, if this is an old application you need to manually set app.framework.version in .sencha/app/sencha.cfg");
 }
 
 if (!$cmdVersion) {
-	die("Unable to determine CMD version, if this is an old application you need to manually set app.cmd.version in .sencha/app/sencha.cfg");
+    die("Unable to determine CMD version, if this is an old application you need to manually set app.cmd.version in .sencha/app/sencha.cfg");
 }
 
 // set paths
@@ -93,38 +93,37 @@ Benchmark::mark("exported $buildPath to $buildTmpPath: ".http_build_query($expor
 // write any libraries from classpath
 $classPaths = explode(',', $App->getBuildCfg('app.classpath'));
 
-foreach($classPaths AS $classPath) {
-	if(strpos($classPath, '${workspace.dir}/x/') === 0) {
-		$extensionPath = substr($classPath, 19);
-		$classPathSource = "ext-library/$extensionPath";
-		$classPathDest = "$tmpPath/x/$extensionPath";
-		Benchmark::mark("importing classPathSource: $classPathSource"); 
-		
+foreach ($classPaths AS $classPath) {
+    if (strpos($classPath, '${workspace.dir}/x/') === 0) {
+        $extensionPath = substr($classPath, 19);
+        $classPathSource = "ext-library/$extensionPath";
+        $classPathDest = "$tmpPath/x/$extensionPath";
+        Benchmark::mark("importing classPathSource: $classPathSource");
+
 #		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
 #		Benchmark::mark("precached $cachedFiles files in $classPathSource");
-		
+
         $sourceNode = Site::resolvePath($classPathSource);
-        
+
         if (is_a($sourceNode, SiteFile)) {
             mkdir(dirname($classPathDest), 0777, true);
             copy($sourceNode->RealPath, $classPathDest);
-    		Benchmark::mark("copied file $classPathSource to $classPathDest");
+            Benchmark::mark("copied file $classPathSource to $classPathDest");
         } else {
-        	$exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-    		Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
+            $exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
+            Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
         }
-	}
+    }
 }
 
 // write archive
-if(!empty($_GET['archive'])) {
-	try {
-		$exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
-		Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
-	}
-	catch(Exception $e) {
-		Benchmark::mark("failed to export $archivePath, continueing");
-	}
+if (!empty($_GET['archive'])) {
+    try {
+        $exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
+        Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
+    } catch (Exception $e) {
+        Benchmark::mark("failed to export $archivePath, continueing");
+    }
 }
 
 // change into app's directory
@@ -142,18 +141,18 @@ passthru("$cmd 2>&1", $cmdStatus);
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import resources directory
-if($cmdStatus == 0) {
-	Benchmark::mark("importing $buildTmpPath/resources to $buildPath/resources");
-	
-	$importResults = Emergence_FS::importTree("$buildTmpPath/resources", "$buildPath/resources", array(
-		'exclude' => $defaultExclude
-	));
-	Benchmark::mark("imported files: ".http_build_query($importResults));
+if ($cmdStatus == 0) {
+    Benchmark::mark("importing $buildTmpPath/resources to $buildPath/resources");
+
+    $importResults = Emergence_FS::importTree("$buildTmpPath/resources", "$buildPath/resources", array(
+        'exclude' => $defaultExclude
+    ));
+    Benchmark::mark("imported files: ".http_build_query($importResults));
 }
 
 
 // clean up
-if(empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+if (empty($_GET['leaveWorkspace'])) {
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

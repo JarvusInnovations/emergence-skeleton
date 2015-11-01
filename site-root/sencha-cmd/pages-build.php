@@ -22,7 +22,7 @@
 $GLOBALS['Session']->requireAccountLevel('Developer');
 set_time_limit(0);
 
-if(empty($_GET['dumpWorkspace'])) {
+if (empty($_GET['dumpWorkspace'])) {
     Benchmark::startLive();
 }
 
@@ -32,7 +32,7 @@ $framework = $buildConfig['pages.framework'];
 $frameworkVersion = Sencha::normalizeFrameworkVersion($framework, $buildConfig['pages.framework.version']);
 $cmdVersion = $buildConfig['workspace.cmd.version'];
 
-if(!$framework) {
+if (!$framework) {
     die("app.framework not found in sencha.cfg");
 }
 
@@ -78,19 +78,19 @@ $commonPackages = Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSo
 $packages = array_merge($packages, $commonPackages);
 
 foreach ($commonPackages AS $package) {
-    foreach (array('src', 'overrides') AS $subPath) { 
+    foreach (array('src', 'overrides') AS $subPath) {
         $packageSource = "sencha-workspace/packages/$package/$subPath";
         $packageDest = "./packages/$package/$subPath";
         Benchmark::mark("importing package: $package from $packageSource");
-    
+
         $cachedFiles = Emergence_FS::cacheTree($packageSource);
         Benchmark::mark("precached $cachedFiles files in $packageSource");
-    
+
         $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
         Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-    
+
         $classPaths[] = "./packages/$package/$subPath";
-        
+
         if ($subPath == 'overrides') {
             $commonOverrides[] = "include -recursive -file packages/$package/$subPath";
         }
@@ -108,19 +108,19 @@ foreach (glob('./src/page/*.js') AS $page) {
 
     // analyze packages, export, add to classPath, and register overrides per-page
     foreach ($pagePackages AS $package) {
-        foreach (array('src', 'overrides') AS $subPath) { 
+        foreach (array('src', 'overrides') AS $subPath) {
             $packageSource = "sencha-workspace/packages/$package/$subPath";
             $packageDest = "./packages/$package/$subPath";
             Benchmark::mark("importing package: $package from $packageSource");
-        
+
             $cachedFiles = Emergence_FS::cacheTree($packageSource);
             Benchmark::mark("precached $cachedFiles files in $packageSource");
-        
+
             $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
             Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-        
+
             $classPaths[] = "./packages/$package/$subPath";
-            
+
             if ($subPath == 'overrides') {
                 $pageOverrides[] = "include -recursive -file packages/$package/$subPath";
             }
@@ -129,7 +129,7 @@ foreach (glob('./src/page/*.js') AS $page) {
 
     $pageLoadCommands[] =
         "union -recursive -class Site.page.$pageName"
-        .( count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '' )
+        .(count($pageOverrides) ? ' and '.implode(' and ', $pageOverrides) : '')
         ." and save $pageName";
 
     $pageBuildCommands[] = "restore $pageName and exclude -set common and concat -yui ./build/$pageName.js";
@@ -145,8 +145,8 @@ Benchmark::mark("crawling packages for classpaths");
 $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
 
 Benchmark::mark("processing all classpaths");
-foreach($classPaths AS &$classPath) {
-    if(strpos($classPath, '${workspace.dir}/x/') === 0) {
+foreach ($classPaths AS &$classPath) {
+    if (strpos($classPath, '${workspace.dir}/x/') === 0) {
         $extensionPath = substr($classPath, 19);
         $classPathSource = "ext-library/$extensionPath";
         $classPath = "./x/$extensionPath";
@@ -176,30 +176,30 @@ $cmd = Sencha::buildCmd(
     ,"-sdk ./$framework"
     ,'compile'
         ,"-classpath=".implode(',', array_unique($classPaths))
-        
+
         // start common.js with bootstrap, the rest will be appended later
         ,'union -class Ext.Boot and concat -yui ./build/common.js'
 
         // start with Site.Common and all its dependencies, store in set common
         ,'and union -recursive -class Site.Common'
-        ,( count($commonOverrides) ? ' and '.implode(' and ', $commonOverrides) : '' )
+        ,(count($commonOverrides) ? ' and '.implode(' and ', $commonOverrides) : '')
         ,'and save common'
 
         // if there's at least one page...
         ,count($pageLoadCommands)
             ?
                 // create a set for each Site.page.* class and its dependencies
-                'and ' . join(' and ', $pageLoadCommands)
+                'and '.join(' and ', $pageLoadCommands)
 
                 // switch back to the common set
-                .' and restore common'
+.' and restore common'
             : ''
 
         // if there is more than one page being built for, add any dependencies that two or more share to the common set
         // if not, just switch back to the common set
         ,count($pageNames) > 1
             ?
-                'and intersect -min=2 -set ' . join(',', $pageNames)
+                'and intersect -min=2 -set '.join(',', $pageNames)
                 .' and include -set common'
                 .' and exclude -namespace Site.page'
                 .' and save common'
@@ -210,13 +210,13 @@ $cmd = Sencha::buildCmd(
 
         // if there's at least one page...
         ,count($pageBuildCommands)
-            ? 'and ' . join(' and ', $pageBuildCommands)
+            ? 'and '.join(' and ', $pageBuildCommands)
             : ''
 );
 Benchmark::mark("running CMD: $cmd");
 
 // optionally dump workspace and exit
-if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
+if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
     header('Content-Type: application/x-bzip-compressed-tar');
     header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
     passthru("tar -cjf - ./");
@@ -226,7 +226,7 @@ if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
 
 // execute CMD
 //  - optionally dump workspace and exit
-if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
+if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
     exec($cmd);
 
     header('Content-Type: application/x-bzip-compressed-tar');
@@ -234,21 +234,20 @@ if(!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
     passthru("tar -cjf - ./");
     exec("rm -R $tmpPath");
     exit();
-}
-else {
+} else {
     passthru("$cmd 2>&1", $cmdStatus);
 }
 
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import build
-if($cmdStatus == 0) {
+if ($cmdStatus == 0) {
     Benchmark::mark("importing ./build");
 
     $importResults = Emergence_FS::importTree('build', 'site-root/js/pages');
     Benchmark::mark("imported files: ".http_build_query($importResults));
 
-    if(!empty($_GET['archive'])) {
+    if (!empty($_GET['archive'])) {
         Benchmark::mark("importing $archiveTmpPath to $archivePath");
 
         $importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
@@ -258,7 +257,7 @@ if($cmdStatus == 0) {
 
 
 // clean up
-if(empty($_GET['leaveWorkspace'])) {
+if (empty($_GET['leaveWorkspace'])) {
     exec("rm -R $tmpPath");
     Benchmark::mark("erased $tmpPath");
 }

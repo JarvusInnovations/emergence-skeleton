@@ -6,11 +6,10 @@ Benchmark::startLive();
 
 
 // get framework
-if(empty($_REQUEST['framework'])) {
-	$framework = null;
-}
-else {
-	$framework = $_REQUEST['framework'];
+if (empty($_REQUEST['framework'])) {
+    $framework = null;
+} else {
+    $framework = $_REQUEST['framework'];
 }
 
 Benchmark::mark("configured request: framework=$framework");
@@ -45,18 +44,17 @@ passthru($cmd, $cmdStatus);
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import app
-if($cmdStatus == 0)
-{
-	$destPath = 'sencha-workspace';
-	Benchmark::mark("importing to: $destPath");
-	
-	$filesImported = Emergence_FS::importTree($tmpPath, $destPath);
-	Benchmark::mark("imported ".http_build_query($filesImported)." files");
+if ($cmdStatus == 0) {
+    $destPath = 'sencha-workspace';
+    Benchmark::mark("importing to: $destPath");
+
+    $filesImported = Emergence_FS::importTree($tmpPath, $destPath);
+    Benchmark::mark("imported ".http_build_query($filesImported)." files");
 }
 
 
 // clean up
-if(empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+if (empty($_GET['leaveWorkspace'])) {
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

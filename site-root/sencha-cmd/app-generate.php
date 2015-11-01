@@ -11,14 +11,14 @@ if (empty($_REQUEST['name'])) {
 }
 
 $appName = $_REQUEST['name'];
-	
+
 // get framework
 if (empty($_REQUEST['framework']) || !array_key_exists($_REQUEST['framework'], Sencha::$frameworks)) {
-	die('Parameter framework required');
+    die('Parameter framework required');
 }
 
 $framework = $_REQUEST['framework'];
-	
+
 // get framework version
 $frameworkVersion = Sencha::normalizeFrameworkVersion($framework, empty($_REQUEST['frameworkVersion']) ? Sencha::$frameworks[$framework]['defaultVersion'] : $_REQUEST['frameworkVersion']);
 
@@ -62,19 +62,19 @@ Benchmark::mark("CMD finished: exitCode=$cmdStatus");
 
 // import app
 if ($cmdStatus == 0) {
-	Benchmark::mark("importing $appTmpPath to $appPath");
-	
-	$importResults = Emergence_FS::importTree($appTmpPath, $appPath, array(
-		'exclude' => array(
-			"#^/$framework/#"
-		)
-	));
-	Benchmark::mark("imported files: ".http_build_query($importResults));
+    Benchmark::mark("importing $appTmpPath to $appPath");
+
+    $importResults = Emergence_FS::importTree($appTmpPath, $appPath, array(
+        'exclude' => array(
+            "#^/$framework/#"
+        )
+    ));
+    Benchmark::mark("imported files: ".http_build_query($importResults));
 }
 
 
 // clean up
 if (empty($_GET['leaveWorkspace'])) {
-	exec("rm -R $tmpPath");
-	Benchmark::mark("erased $tmpPath");
+    exec("rm -R $tmpPath");
+    Benchmark::mark("erased $tmpPath");
 }

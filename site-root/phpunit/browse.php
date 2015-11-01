@@ -5,7 +5,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     <body>
     <?php
     if (empty($_GET['suite'])) {
-    ?>
+        ?>
         <h1>Available PHPUnit Test Suites</h1>
         <ul>
         <?php
@@ -14,14 +14,15 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
             if (!is_a($testsSubNode, 'SiteCollection')) {
                 continue;
             }
-            
+
             print "<li><a href='?suite=$testsSubNode->Handle'>$testsSubNode->Handle</a> <form action='/phpunit/run?suite=$testsSubNode->Handle' method='POST' style='display:inline'><input type='submit' value='Run All Tests'></form></li>";
         }
         ?>
         </ul>
     <?php
+
     } elseif (count($testNodes = Emergence_FS::getAggregateChildren("phpunit-tests/$_GET[suite]"))) {
-    ?>
+        ?>
         <h1>Tests in suite <?=htmlspecialchars($_GET['suite'])?></h1>
         <form action="/phpunit/run?suite=<?=urlencode($_GET['suite'])?>"" method='POST'>
             <input type='submit' value='Run All Tests'>
@@ -44,6 +45,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
         ?>
         </ul>
     <?php
+
     } else {
         echo "Suite not found";
     }
