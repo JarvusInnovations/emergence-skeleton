@@ -30,5 +30,5 @@ Git::$repositories['emergence-skeleton'] = array(
         'sencha-workspace/EmergenceEditor',
         'sencha-workspace/EmergencePullTool',
         'sencha-workspace/ContentEditor'
-	)
+    )
 );

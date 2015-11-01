@@ -6,27 +6,27 @@
 
 ContactRequestHandler::$validators[] = array(
     'field' => 'Name'
-	,'validator' => 'string'
+    ,'validator' => 'string'
     ,'required' => true
 );
 
 
 ContactRequestHandler::$validators[] = array(
     'field' => 'Email'
-	,'validator' => 'email'
+    ,'validator' => 'email'
     ,'required' => true
 );
 
 
 ContactRequestHandler::$validators[] = array(
-	'field' => 'Phone'
-	,'validator' => 'phone'
+    'field' => 'Phone'
+    ,'validator' => 'phone'
     ,'required' => false
 );
 
 
 ContactRequestHandler::$validators[] = array(
-	'field' => 'Message'
-	,'validator' => 'string_multiline'
+    'field' => 'Message'
+    ,'validator' => 'string_multiline'
     ,'required' => true
 );

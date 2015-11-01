@@ -17,17 +17,17 @@ Site::$skipSessionPaths[] = 'thumbnail.php';
 
 // Custom routing called if a page isn't found in site-root
 /*Site::$onNotFound = function($message) {
-	switch($action = Site::$requestPath[0])
-	{
-		default:
-			if($Page = Page::getByHandle($action))
-			{
-				return Page::renderPage();
-			}
-			else
-			{
-				header('HTTP/1.0 404 Not Found');
-				die($message);
-			}
-	}
+    switch($action = Site::$requestPath[0])
+    {
+        default:
+            if($Page = Page::getByHandle($action))
+            {
+                return Page::renderPage();
+            }
+            else
+            {
+                header('HTTP/1.0 404 Not Found');
+                die($message);
+            }
+    }
 };*/
