@@ -63,7 +63,7 @@ class HandleBehavior extends RecordBehavior
             )
             ,$text
         );
-        
+
         // transliterate
         if ($options['transliterate']) {
             $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
@@ -97,7 +97,7 @@ class HandleBehavior extends RecordBehavior
             if ($options['alwaysSuffix'] || $incarnation > 1) {
                 $handle = sprintf($options['suffixFormat'], $text, $options['randomSuffix'] ? mt_rand($options['randomSuffixMin'], $options['randomSuffixMax']) : $incarnation);
             }
-            
+
             $where[$options['handleField']] = $handle;
         } while ($class::getByWhere($where));
 
@@ -106,18 +106,18 @@ class HandleBehavior extends RecordBehavior
 
     public static function generateRandomHandle($class, $length = 32, $options = array())
     {
-		// apply default options
-		$options = array_merge(array(
-			'handleField' => 'Handle'
-		), $options);
-	
-		do {
-			$handle = md5(mt_rand(0, mt_getrandmax()));
+        // apply default options
+        $options = array_merge(array(
+            'handleField' => 'Handle'
+        ), $options);
+
+        do {
+            $handle = md5(mt_rand(0, mt_getrandmax()));
 
             // ensure first character is a letter
             if (ctype_digit($handle[0])) {
                 if (preg_match('/\\pL/', $handle, $letterMatches, PREG_OFFSET_CAPTURE)) {
-                    $handle = substr($handle, $letterMatches[0][1]) . substr($handle, 0, $letterMatches[0][1]);
+                    $handle = substr($handle, $letterMatches[0][1]).substr($handle, 0, $letterMatches[0][1]);
                 } else {
                     $handle = '';
                 }
@@ -125,8 +125,8 @@ class HandleBehavior extends RecordBehavior
 
             // trim to desired length
             $handle = substr($handle, 0, $length);
-		} while (!$handle || $class::getByField($options['handleField'], $handle));
-		
-		return $handle;
-	}
+        } while (!$handle || $class::getByField($options['handleField'], $handle));
+
+        return $handle;
+    }
 }

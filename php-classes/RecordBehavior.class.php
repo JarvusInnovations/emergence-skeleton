@@ -2,7 +2,7 @@
 
 abstract class RecordBehavior
 {
-	// template functions
+    // template functions
 #	static public function onConfigure(string $recordClass) {}
 #	static public function onCreate(ActiveRecord $Record) {}
 #	static public function onValidate(ActiveRecord $Record) {}

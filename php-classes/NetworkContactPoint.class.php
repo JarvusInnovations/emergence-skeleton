@@ -3,8 +3,5 @@
 
 
  class NetworkContactPoint extends ContactPoint
-{
-
-
-
-}
+ {
+ }

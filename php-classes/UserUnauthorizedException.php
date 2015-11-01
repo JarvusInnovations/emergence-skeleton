@@ -2,5 +2,4 @@
 
 class UserUnauthorizedException extends Exception
 {
-    
 }

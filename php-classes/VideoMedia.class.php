@@ -2,7 +2,6 @@
 
 class VideoMedia extends Media
 {
-
     // configurables
     public static $ExtractFrameCommand = 'avconv -ss %2$u -i %1$s -an -vframes 1 -f mjpeg -'; // 1=video path, 2=position
     public static $ExtractFramePosition = 3;
@@ -27,7 +26,7 @@ class VideoMedia extends Media
                 'strict' => 'experimental'
             )
         ),
-        
+
         // from http://superuser.com/questions/556463/converting-video-to-webm-with-ffmpeg-avconv
         'webm-480p' => array(
             'enabled' => true,
@@ -41,73 +40,70 @@ class VideoMedia extends Media
             'audioCodec' => 'libvorbis'
         )
     );
-	
-	
-	// magic methods
-	static public function __classLoaded()
-	{
-		$className = get_called_class();
-		
-		Media::$mimeHandlers['video/x-flv'] = $className;
-    	Media::$mimeHandlers['video/mp4'] = $className;
-    	Media::$mimeHandlers['video/quicktime'] = $className;
-		
-		parent::__classLoaded();
 
-	}
-	
-		
-	function getValue($name)
-	{
-		switch($name)
-		{
-			case 'ThumbnailMIMEType':
-				return 'image/jpeg';
-				
-			case 'Extension':
 
-				switch($this->MIMEType)
-				{
-					case 'video/x-flv':
-						return 'flv';
-    					
-					case 'video/mp4':
-						return 'mp4';
-    					
-					case 'video/quicktime':
-						return 'mov';
-							
-					default:
-						throw new Exception('Unable to find video extension for mime-type: ' . $this->MIMEType);
-				}
-				
-			default:
-				return parent::getValue($name);
-		}
-	}
-	
-	
-	// public methods
-	public function getImage($sourceFile = null)
-	{
-		if (!isset($sourceFile)) {
-			$sourceFile = $this->FilesystemPath ? $this->FilesystemPath : $this->BlankPath;
-		}
+    // magic methods
+    public static function __classLoaded()
+    {
+        $className = get_called_class();
 
-		$cmd = sprintf(self::$ExtractFrameCommand, $sourceFile, min(self::$ExtractFramePosition, floor($this->Duration)));
+        Media::$mimeHandlers['video/x-flv'] = $className;
+        Media::$mimeHandlers['video/mp4'] = $className;
+        Media::$mimeHandlers['video/quicktime'] = $className;
 
-		if ($imageData = shell_exec($cmd)) {
-			return imagecreatefromstring($imageData);
-		} elseif($sourceFile != $this->BlankPath) {
-			return static::getImage($this->BlankPath);
-		}
+        parent::__classLoaded();
+    }
 
-		return null;
-	}
-	
-	// static methods
-	static public function analyzeFile($filename, $mediaInfo = array())
-	{
+
+    public function getValue($name)
+    {
+        switch ($name) {
+            case 'ThumbnailMIMEType':
+                return 'image/jpeg';
+
+            case 'Extension':
+
+                switch ($this->MIMEType) {
+                    case 'video/x-flv':
+                        return 'flv';
+
+                    case 'video/mp4':
+                        return 'mp4';
+
+                    case 'video/quicktime':
+                        return 'mov';
+
+                    default:
+                        throw new Exception('Unable to find video extension for mime-type: '.$this->MIMEType);
+                }
+
+            default:
+                return parent::getValue($name);
+        }
+    }
+
+
+    // public methods
+    public function getImage($sourceFile = null)
+    {
+        if (!isset($sourceFile)) {
+            $sourceFile = $this->FilesystemPath ? $this->FilesystemPath : $this->BlankPath;
+        }
+
+        $cmd = sprintf(self::$ExtractFrameCommand, $sourceFile, min(self::$ExtractFramePosition, floor($this->Duration)));
+
+        if ($imageData = shell_exec($cmd)) {
+            return imagecreatefromstring($imageData);
+        } elseif ($sourceFile != $this->BlankPath) {
+            return static::getImage($this->BlankPath);
+        }
+
+        return null;
+    }
+
+    // static methods
+    public static function analyzeFile($filename, $mediaInfo = array())
+    {
         // examine media with avprobe
         $output = shell_exec("avprobe -of json -show_streams -v quiet $filename");
 
@@ -119,7 +115,7 @@ class VideoMedia extends Media
         $videoStreams = array_filter($output['streams'], function($streamInfo) {
             return $streamInfo['codec_type'] == 'video';
         });
-        
+
         if (!count($videoStreams)) {
             throw new MediaTypeException('avprobe did not detect any video streams');
         }
@@ -127,13 +123,13 @@ class VideoMedia extends Media
         // convert and write interesting information to mediaInfo
         $mediaInfo['streams'] = $output['streams'];
         $mediaInfo['videoStream'] = array_shift($videoStreams);
-		
-		$mediaInfo['width'] = (int)$mediaInfo['videoStream']['width'];
-		$mediaInfo['height'] = (int)$mediaInfo['videoStream']['height'];
-		$mediaInfo['duration'] = (double)$mediaInfo['videoStream']['duration'];
 
-		return $mediaInfo;
-	}
+        $mediaInfo['width'] = (int)$mediaInfo['videoStream']['width'];
+        $mediaInfo['height'] = (int)$mediaInfo['videoStream']['height'];
+        $mediaInfo['duration'] = (double)$mediaInfo['videoStream']['duration'];
+
+        return $mediaInfo;
+    }
 
     public function writeFile($sourceFile)
     {
@@ -142,7 +138,7 @@ class VideoMedia extends Media
 
         // determine rotation metadata with exiftool
         $exifToolOutput = exec("exiftool -S -Rotation $this->FilesystemPath");
-        
+
         if (!$exifToolOutput || !preg_match('/Rotation\s*:\s*(?<rotation>\d+)/', $exifToolOutput, $matches)) {
             throw new MediaTypeException('Unable to examine video with exiftool, ensure libimage-exiftool-perl is installed on the host system');
         }
@@ -163,7 +159,8 @@ class VideoMedia extends Media
                 mkdir($outputDir, static::$newDirectoryPermissions, true);
             }
 
-            $tmpOutputPath = $outputDir . '/' . 'tmp-' . basename($outputPath);;
+            $tmpOutputPath = $outputDir.'/'.'tmp-'.basename($outputPath);
+            ;
 
 
             // build avconv command
@@ -189,7 +186,7 @@ class VideoMedia extends Media
             if (!empty($profile['audioOptions'])) {
                 static::_appendAvconvOptions($cmd, $profile['audioOptions']);
             }
-            
+
             // -- normalize smartphone rotation
             $cmd[] = '-metadata:s:v rotate="0"';
 
@@ -206,30 +203,29 @@ class VideoMedia extends Media
                 static::_appendAvconvOptions($cmd, $profile['outputOptions']);
             }
             $cmd[] = $tmpOutputPath;
-            
-            
+
+
             // move to final path after it finished
             $cmd[] = "&& mv $tmpOutputPath $outputPath";
-            
+
 
             // convert command to string and decorate for process control
-            $cmd = '(nohup ' . implode(' ', $cmd) . ') > /dev/null 2>/dev/null & echo $! &';
+            $cmd = '(nohup '.implode(' ', $cmd).') > /dev/null 2>/dev/null & echo $! &';
 
 
             // execute command and retrieve the spawned PID
             $pid = exec($cmd);
             // TODO: store PID somewhere in APCU cache so we can do something smarter when a video is requested before it's done encoding
         }
-        
     }
-    
+
     protected static function _appendAvconvOptions(array &$cmd, array $options)
     {
         foreach ($options AS $key => $value) {
             if (!is_int($key)) {
-                $cmd[] = '-' . $key;
+                $cmd[] = '-'.$key;
             }
-            
+
             if ($value) {
                 $cmd[] = $value;
             }
@@ -239,13 +235,13 @@ class VideoMedia extends Media
     public function getFilesystemPath($variant = 'original', $filename = null)
     {
         if (!$filename && array_key_exists($variant, static::$encodingProfiles)) {
-            $filename = $this->ID . '.' . static::$encodingProfiles[$variant]['extension'];
-            $variant = 'video-' . $variant;
+            $filename = $this->ID.'.'.static::$encodingProfiles[$variant]['extension'];
+            $variant = 'video-'.$variant;
         }
 
         return parent::getFilesystemPath($variant, $filename);
     }
-    
+
     public function getMIMEType($variant = 'original')
     {
         if (array_key_exists($variant, static::$encodingProfiles)) {
@@ -254,7 +250,7 @@ class VideoMedia extends Media
 
         return parent::getMIMEType($variant, $filename);
     }
-    
+
     public function isVariantAvailable($variant)
     {
         if (
@@ -264,7 +260,7 @@ class VideoMedia extends Media
         ) {
             return true;
         }
-        
+
         return parent::isVariantAvailable($variant);
     }
 }

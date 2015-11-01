@@ -37,7 +37,7 @@ class PHPGit_Command
     {
         $commandToRun = sprintf('cd %s && %s', escapeshellarg($this->dir), $this->commandString);
 
-        if($this->debug) {
+        if ($this->debug) {
             print $commandToRun."\n";
         }
 
@@ -45,16 +45,15 @@ class PHPGit_Command
         passthru($commandToRun, $returnVar);
         $output = ob_get_clean();
 
-        if($this->debug) {
+        if ($this->debug) {
             print $output."\n";
         }
 
-        if(0 !== $returnVar) {
+        if (0 !== $returnVar) {
             // Git 1.5.x returns 1 when running "git status"
-            if(1 === $returnVar && 0 === strncmp($this->commandString, 'git status', 10)) {
+            if (1 === $returnVar && 0 === strncmp($this->commandString, 'git status', 10)) {
                 // it's ok
-            }
-            else {
+            } else {
                 throw new GitRuntimeException(sprintf(
                     'Command %s failed with code %s: %s',
                     $commandToRun,
@@ -68,4 +67,6 @@ class PHPGit_Command
     }
 }
 
-class GitRuntimeException extends RuntimeException {}
+class GitRuntimeException extends RuntimeException
+{
+}

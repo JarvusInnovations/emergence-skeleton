@@ -92,14 +92,14 @@ class PHPGit_Repository
 
         return $repo;
     }
-    
+
     /**
      * Get the configuration for current 
      * @return PHPGit_Configuration
      */
     public function getConfiguration()
     {
-      return new PHPGit_Configuration($this);
+        return new PHPGit_Configuration($this);
     }
 
     /**
@@ -121,8 +121,8 @@ class PHPGit_Repository
     {
         $output = $this->git('branch');
 
-        foreach(explode("\n", $this->git('branch')) as $branchLine) {
-            if('*' === $branchLine{0}) {
+        foreach (explode("\n", $this->git('branch')) as $branchLine) {
+            if ('*' === $branchLine{0}) {
                 return substr($branchLine, 2);
             }
         }
@@ -160,7 +160,7 @@ class PHPGit_Repository
         $format = '"%H|%T|%an|%ae|%ad|%cn|%ce|%cd|%s"';
         $output = $this->git(sprintf('log -n %d --date=%s --format=format:%s', $nbCommits, $dateFormat, $format));
         $commits = array();
-        foreach(explode("\n", $output) as $line) {
+        foreach (explode("\n", $output) as $line) {
             $infos = explode('|', $line);
             $commits[] = array(
                 'id' => $infos[0],
@@ -187,7 +187,7 @@ class PHPGit_Repository
      */
     public function checkIsValidGitRepo()
     {
-        if(!file_exists($this->dir.'/.git/HEAD')) {
+        if (!file_exists($this->dir.'/.git/HEAD')) {
             throw new InvalidGitRepositoryDirectoryException($this->dir.' is not a valid Git repository');
         }
     }

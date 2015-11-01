@@ -3,43 +3,43 @@
 
 class EmailSubscriber extends ActiveRecord
 {
-	// support subclassing
-	static public $rootClass = __CLASS__;
-	static public $defaultClass = __CLASS__;
-	static public $subClasses = array(__CLASS__);
+    // support subclassing
+    public static $rootClass = __CLASS__;
+    public static $defaultClass = __CLASS__;
+    public static $subClasses = array(__CLASS__);
 
-	// ActiveRecord configuration
-	static public $tableName = 'email_subscribers';
-	static public $singularNoun = 'email_subscriber';
-	static public $pluralNoun = 'email subscribers';
+    // ActiveRecord configuration
+    public static $tableName = 'email_subscribers';
+    public static $singularNoun = 'email_subscriber';
+    public static $pluralNoun = 'email subscribers';
 
-	static public $fields = array(
-		'ContextClass' => null
-		,'ContextID' => null
-		,'Name' => array(
-			'type' => 'string'
-			,'notnull' => false
-		)
-		,'Email' => array(
-			'type' => 'string'
-			,'unique' => true
-			,'notnull' => true
-		)
-	);
-	
-	public function validate()
-	{
-		// call parent
-		parent::validate();
+    public static $fields = array(
+        'ContextClass' => null
+        ,'ContextID' => null
+        ,'Name' => array(
+            'type' => 'string'
+            ,'notnull' => false
+        )
+        ,'Email' => array(
+            'type' => 'string'
+            ,'unique' => true
+            ,'notnull' => true
+        )
+    );
 
-		$this->_validator->validate(array(
-			'field' => 'Email'
-			,'validator' => 'email'
-		));
-        
-        
+    public function validate()
+    {
+        // call parent
+        parent::validate();
 
-		// save results
-		return $this->finishValidation();
-	}
+        $this->_validator->validate(array(
+            'field' => 'Email'
+            ,'validator' => 'email'
+        ));
+
+
+
+        // save results
+        return $this->finishValidation();
+    }
 }

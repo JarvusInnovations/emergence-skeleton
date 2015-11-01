@@ -3,8 +3,5 @@
 
 
  class LinkContactPoint extends ContactPoint
-{
-
-
-
-}
+ {
+ }

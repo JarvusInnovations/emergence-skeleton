@@ -11,8 +11,8 @@ class MICS
     public static function __classLoaded()
     {
         static::$SiteName = Site::$title;
-        
-        Emergence\Logger::general_warning('Deprecated class loaded: ' . __CLASS__);
+
+        Emergence\Logger::general_warning('Deprecated class loaded: '.__CLASS__);
     }
 
     /*
@@ -23,7 +23,9 @@ class MICS
         printf("<h2>%s:</h2><pre>%s</pre>", $title, htmlspecialchars(var_export($value, true)));
 
         if ($backtrace) {
-            print('<hr><pre>');debug_print_backtrace();print('</pre>');
+            print('<hr><pre>');
+            debug_print_backtrace();
+            print('</pre>');
         }
 
         if ($exit) {
@@ -54,7 +56,6 @@ class MICS
 
     public static function useHTTPS()
     {
-
     }
 
     public static function externalRedirect($url, $get = false, $hash = false)
@@ -66,7 +67,7 @@ class MICS
     {
         Site::redirect($path, $get, $hash);
     }
-    
+
     public static function getQueryString()
     {
         return $_SERVER['QUERY_STRING'];

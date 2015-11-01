@@ -1,7 +1,7 @@
 <?php
 
-class EmergenceIO {
-
+class EmergenceIO
+{
     /*  function export
      *
      *  @params string  $path   Emergence Virtual Directory to Export, If empty will export entire site.
@@ -14,7 +14,7 @@ class EmergenceIO {
         set_time_limit(0);
 
         if (!is_array($path) && !empty($path)) {
-                $path = Site::splitPath($path);
+            $path = Site::splitPath($path);
         }
 
         if (empty($path)) {
@@ -22,13 +22,13 @@ class EmergenceIO {
                 'SELECT MAX(`ID`) as `RID`'
                 .' FROM `_e_files`'
                 //." WHERE `Status` = 'Normal'"
-                .' GROUP BY  `Handle`,`CollectionID`'
+.' GROUP BY  `Handle`,`CollectionID`'
             );
 
             foreach ($files as $file) {
                 $SiteFile = SiteFile::getByID($file['RID'])->getData();
                 if (strpos($SiteFile['FullPath'],'_parent') !== 0 && $SiteFile['Status'] != 'Deleted') {
-                    $SiteFiles[$SiteFile['FullPath']] = Site::$rootPath . '/data/' . $SiteFile['ID'];
+                    $SiteFiles[$SiteFile['FullPath']] = Site::$rootPath.'/data/'.$SiteFile['ID'];
                 }
             }
         } else {
@@ -42,7 +42,7 @@ class EmergenceIO {
 
             if ($zip->open($tmp) === TRUE) {
                 foreach ($SiteFiles as $virtualPath => $realPath) {
-                    $zip->addFromString ($virtualPath,file_get_contents($realPath));
+                    $zip->addFromString($virtualPath,file_get_contents($realPath));
                 }
             }
             $zip->close();
@@ -87,7 +87,7 @@ class EmergenceIO {
                 }
             break;
             default:
-                throw new Exception('MIME type ' . $type . ' unsupported.');
+                throw new Exception('MIME type '.$type.' unsupported.');
         }
     }
 }

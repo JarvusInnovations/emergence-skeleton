@@ -52,7 +52,6 @@ abstract class Token extends ActiveRecord
             default:
                 return parent::getValue($name);
         }
-
     }
 
     public function save($deep = true)

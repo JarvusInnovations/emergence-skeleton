@@ -11,55 +11,55 @@ class CSV
         fclose($tmp);
 
         return $output;
-	}
+    }
 
     public static function respond($records, $filename = null, $columns = '*')
     {
-		header('Content-Type: text/csv');
-		header('Content-Disposition: attachment' . ($filename ? '; filename="'.str_replace('"', '', $filename).'.csv"' : ''));
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment'.($filename ? '; filename="'.str_replace('"', '', $filename).'.csv"' : ''));
         static::writeToStream(fopen('php://output', 'w'), $records, $columns);
         exit();
     }
 
     public static function writeToStream($stream, $records, $columns = '*')
     {
-    	if (!is_array($records)) {
-			throw new Exception('fromRecords expects an array');
-		} elseif (empty($records)) {
-			return 'No data';
-		}
+        if (!is_array($records)) {
+            throw new Exception('fromRecords expects an array');
+        } elseif (empty($records)) {
+            return 'No data';
+        }
 
         if (is_string($columns) && $columns != '*') {
             $columns = explode(',', $columns);
         }
 
-		$firstRecord = $records[0];
+        $firstRecord = $records[0];
 
-		if (is_array($firstRecord)) {
-			$columnNames = array_keys($firstRecord);
+        if (is_array($firstRecord)) {
+            $columnNames = array_keys($firstRecord);
             $columnNames = array_combine($columnNames, $columnNames);
-		} else {
+        } else {
             $dynamicFields = $firstRecord->aggregateStackedConfig('dynamicFields');
             $fields = $firstRecord->aggregateStackedConfig('fields');
-            
+
             $columnNames = array_merge(array_keys($fields), array_keys($dynamicFields));
             $columnNames = array_combine($columnNames, $columnNames);
-            
+
             foreach ($columnNames AS &$columnName) {
                 $dynamicField = $dynamicFields[$columnName];
                 $field = $fields[$columnName];
-                
+
                 if ($dynamicField && !empty($dynamicField['label'])) {
                     $columnName = $dynamicField['label'];
                 } elseif ($field && !empty($field['label'])) {
                     $columnName = $field['label'];
                 }
             }
-		}
+        }
 
-		fputcsv($stream, static::getColumns($columnNames, $columns));
-		
-		foreach ($records AS $record) {
+        fputcsv($stream, static::getColumns($columnNames, $columns));
+
+        foreach ($records AS $record) {
             fputcsv(
                 $stream,
                 static::getColumns(
@@ -67,11 +67,11 @@ class CSV
                     $columns
                 )
             );
-		}
+        }
     }
 
-	public static function getColumns($array, $columns = null)
-	{
+    public static function getColumns($array, $columns = null)
+    {
         if (is_array($columns)) {
             $newArray = array();
             foreach ($columns AS $key) {
@@ -79,7 +79,7 @@ class CSV
             }
             $array = $newArray;
         }
-        
-		return $array;
-	}
+
+        return $array;
+    }
 }

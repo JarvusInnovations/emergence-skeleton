@@ -3,9 +3,9 @@
 class PeopleRequestHandler extends RecordsRequestHandler
 {
     // RecordRequestHandler configuration
-    static public $recordClass = 'Person';
+    public static $recordClass = 'Person';
 
-    static public function handleRecordsRequest($action = false)
+    public static function handleRecordsRequest($action = false)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
             case '*classes':
@@ -23,7 +23,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
         }
     }
 
-    static public function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
+    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
     {
         if ($_REQUEST['q'] != 'all') {
             $conditions[] = 'AccountLevel != "Disabled"';
@@ -32,14 +32,14 @@ class PeopleRequestHandler extends RecordsRequestHandler
         return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
 
-    static protected function onRecordSaved(ActiveRecord $Person, $requestData)
+    protected static function onRecordSaved(ActiveRecord $Person, $requestData)
     {
         if (isset($requestData['groupIDs'])) {
             Group::setPersonGroups($Person, $requestData['groupIDs']);
         }
     }
 
-    static public function getRecordByHandle($handle)
+    public static function getRecordByHandle($handle)
     {
         if (ctype_digit($handle) || is_int($handle)) {
             return Person::getByID($handle);

@@ -5,39 +5,39 @@ class JSON
     public static function getRequestData($subkey = false)
     {
         if (!$requestText = file_get_contents('php://input')) {
-			return false;
-		}
-		
-		$data = json_decode($requestText, true);
-		
-		return $subkey ? $data[$subkey] : $data;
-	}
-		
-	public static function respond($data, $exit = true)
-	{
-		if (extension_loaded('newrelic')) {
-			newrelic_disable_autorum();
-		}
-		
-		$text = json_encode($data);
-        
+            return false;
+        }
+
+        $data = json_decode($requestText, true);
+
+        return $subkey ? $data[$subkey] : $data;
+    }
+
+    public static function respond($data, $exit = true)
+    {
+        if (extension_loaded('newrelic')) {
+            newrelic_disable_autorum();
+        }
+
+        $text = json_encode($data);
+
         if ($text === false) {
             throw new Exception('Failed to encode json data, json_last_error='.json_last_error());
         }
-        
-    	header('Content-type: application/json', true);
-        print($text);
-		Site::finishRequest($exit);
-	}
-	
-	public static function translateAndRespond($data, $summary = null, $include = null)
-	{
-		static::respond(static::translateObjects($data, $summary, $include));
-	}
 
-	
-	public static function error($message, $statusCode = 200)
-	{
+        header('Content-type: application/json', true);
+        print($text);
+        Site::finishRequest($exit);
+    }
+
+    public static function translateAndRespond($data, $summary = null, $include = null)
+    {
+        static::respond(static::translateObjects($data, $summary, $include));
+    }
+
+
+    public static function error($message, $statusCode = 200)
+    {
         switch ($statusCode) {
             case 400:
                 header('HTTP/1.0 400 Bad Request');
@@ -59,50 +59,50 @@ class JSON
                 break;
         }
 
-		$args = func_get_args();
-		
-		self::respond(array(
-			'success' => false
-			,'message' => vsprintf($message, array_slice($args, 1))
-		));
-	}
-	
-	public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
-	{
-		if (is_object($input)) {
+        $args = func_get_args();
+
+        self::respond(array(
+            'success' => false
+            ,'message' => vsprintf($message, array_slice($args, 1))
+        ));
+    }
+
+    public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
+    {
+        if (is_object($input)) {
             if ($summary && method_exists($input, 'getSummary')) {
                 $input = $input->getSummary();
             } elseif (!empty($include) && method_exists($input, 'getDetails')) {
                 $includeThisLevel = array();
                 $includeLater = array();
-                
+
                 if (!empty($include)) {
                     if (is_string($include)) {
                         $include = explode(',', $include);
                     }
-                    
+
                     foreach ($include AS $value) {
                         if ($value == '*') {
                             $includeThisLevel = '*';
                             continue;
                         }
-        
+
                         if (strpos($value, '.') !== false) {
                             list($prefix, $rest) = explode('.', $value, 2);
-        
+
                             if ($prefix == '*') {
                                 $includeThisLevel = '*';
-                            } elseif($includeThisLevel != '*' &&!in_array($prefix, $includeThisLevel)) {
+                            } elseif ($includeThisLevel != '*' &&!in_array($prefix, $includeThisLevel)) {
                                 $includeThisLevel[] = $prefix;
                             }
-                            
+
                             $includeLater[$prefix][] = $rest;
                         } else {
                             if ($value[0] == '~') {
                                 $includeLater['*'] = $value;
                                 $value = substr($value, 1);
                             }
-                            
+
                             if ($includeThisLevel != '*') {
                                 $includeThisLevel[] = $value;
                             }
@@ -110,17 +110,17 @@ class JSON
                     }
                 }
 
-				$input = $input->getDetails($includeThisLevel, $stringsOnly);
-			} elseif (method_exists($input, 'getData')) {
-				$input = $input->getData();
-			}
-		}
-        
+                $input = $input->getDetails($includeThisLevel, $stringsOnly);
+            } elseif (method_exists($input, 'getData')) {
+                $input = $input->getData();
+            }
+        }
+
         if (is_array($input)) {
-			foreach ($input AS $key => &$item) {
+            foreach ($input AS $key => &$item) {
                 if (isset($includeLater)) {
                     $includeNext = array_key_exists('*', $includeLater) ? $includeLater['*'] : array();
-                    
+
                     if (array_key_exists($key, $includeLater)) {
                         $includeNext = array_merge($includeNext, $includeLater[$key]);
                     }
@@ -128,15 +128,15 @@ class JSON
                     $includeNext = $include;
                 }
 
-				$item = static::translateObjects($item, $summary, $includeNext);
-			}
-			
-			return $input;
-		} else {
-			return $input;
-		}
-	}
-	
+                $item = static::translateObjects($item, $summary, $includeNext);
+            }
+
+            return $input;
+        } else {
+            return $input;
+        }
+    }
+
 #	public static function mapArrayToRecords($array)
 #	{
 #		return array_map(create_function('$value', 'return array($value);'), $array);

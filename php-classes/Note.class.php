@@ -3,16 +3,13 @@
 
 
  class Note extends ActiveRecord
-{
+ {
+     // ActiveRecord configuration
+    public static $tableName = 'notes';
 
-	// ActiveRecord configuration
-	static $tableName = 'notes';
-	
-	static $fields = array(
-		'Body' => array(
-			'type' => 'clob'
-		)
-	);
-	
-
-}
+     public static $fields = array(
+        'Body' => array(
+            'type' => 'clob'
+        )
+    );
+ }

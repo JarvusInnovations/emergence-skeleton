@@ -3,19 +3,19 @@
 abstract class CMS_ContentItem extends VersionedRecord
 {
     // VersionedRecord configuration
-    static public $historyTable = 'history_content_item';
+    public static $historyTable = 'history_content_item';
 
     // ActiveRecord configuration
-    static public $tableName = 'content_item';
-    static public $singularNoun = 'content item';
-    static public $pluralNoun = 'content items';
-    
-    // required for shared-table subclassing support
-    static public $rootClass = __CLASS__;
-    static public $defaultClass = 'CMS_TextContent';
-    static public $subClasses = array('CMS_TextContent','CMS_RichTextContent','CMS_MediaContent','CMS_AlbumContent');
+    public static $tableName = 'content_item';
+    public static $singularNoun = 'content item';
+    public static $pluralNoun = 'content items';
 
-    static public $fields = array(
+    // required for shared-table subclassing support
+    public static $rootClass = __CLASS__;
+    public static $defaultClass = 'CMS_TextContent';
+    public static $subClasses = array('CMS_TextContent','CMS_RichTextContent','CMS_MediaContent','CMS_AlbumContent');
+
+    public static $fields = array(
         'Title' => array(
             'notnull' => false
             ,'blankisnull' => true
@@ -35,15 +35,15 @@ abstract class CMS_ContentItem extends VersionedRecord
             ,'default' => 'Published'
         )
         ,'Order' => array(
-        	'type' => 'integer'
-        	,'unsigned' => true
-        	,'notnull' => false
+            'type' => 'integer'
+            ,'unsigned' => true
+            ,'notnull' => false
         )
         ,'Data' => 'serialized'
     );
-    
-    
-    static public $relationships = array(
+
+
+    public static $relationships = array(
         'Author'    =>  array(
             'type'  =>  'one-one'
             ,'class' => 'Person'
@@ -53,30 +53,28 @@ abstract class CMS_ContentItem extends VersionedRecord
             ,'class' => 'CMS_Content'
         )
     );
-    
+
     public function validate($deep = true)
     {
         // call parent
         parent::validate($deep);
-        
+
         // save results
         return $this->finishValidation();
     }
-    
+
     public function save($deep = true)
     {
-    	// set author
-    	if(!$this->AuthorID)
-    	{
-    		$this->Author = $_SESSION['User'];
-    	}
-        
+        // set author
+        if (!$this->AuthorID) {
+            $this->Author = $_SESSION['User'];
+        }
+
         // call parent
         parent::save($deep);
     }
-    
-    
-        
-    abstract public function renderBody();
 
+
+
+    abstract public function renderBody();
 }

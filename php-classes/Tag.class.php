@@ -11,7 +11,7 @@ class Tag extends ActiveRecord
     public static $tableName = 'tags';
     public static $singularNoun = 'tag';
     public static $pluralNoun = 'tags';
-    static public $collectionRoute = '/tags';
+    public static $collectionRoute = '/tags';
 
     public static $fields = array(
         'Title' => array(
@@ -35,7 +35,7 @@ class Tag extends ActiveRecord
             ,'class' => 'TagItem'
         )
     );
-    
+
     public static $searchConditions = array(
         'Prefix' => array(
             'qualifiers' => array('prefix')
@@ -43,7 +43,7 @@ class Tag extends ActiveRecord
             ,'sql' => 'Handle LIKE "%%%s%%.%"'
         )
     );
-    
+
 
 
     // public methods
@@ -77,7 +77,7 @@ class Tag extends ActiveRecord
 
         if (is_string($tags)) {
             $tags = static::splitTags($tags);
-        } elseif(is_array($tags)) {
+        } elseif (is_array($tags)) {
             $newTags = array();
 
             foreach ($tags as $string) {
@@ -110,7 +110,7 @@ class Tag extends ActiveRecord
                     \Tag::$tableName,
                     DB::escape($prefix)
                 ));
-            }  catch (TableNotFoundException $e) {
+            } catch (TableNotFoundException $e) {
                 $prefixTags = array();
             }
         }
@@ -128,7 +128,8 @@ class Tag extends ActiveRecord
                         ,!empty($prefixTags) ? (' AND TagID IN ('.implode(',', $prefixTags).')') : ''
                     )
                 );
-            } catch (TableNotFoundException $e) { }
+            } catch (TableNotFoundException $e) {
+            }
         }
 
         return $assignedTags;
@@ -236,7 +237,8 @@ class Tag extends ActiveRecord
         return parent::save(true);
     }
 
-    public function destroy() {
+    public function destroy()
+    {
         // delete all TagItems
         DB::nonQuery('DELETE FROM `%s` WHERE TagID = %u', array(TagItem::$tableName, $this->ID));
 
@@ -307,7 +309,6 @@ class Tag extends ActiveRecord
 
     public function getItems($options = array())
     {
-
     }
 
     public function getItemsByClass($class, $options = array())
@@ -377,7 +378,7 @@ class Tag extends ActiveRecord
 
 
         if ($options['order']) {
-            $classQuery .= ' ORDER BY ' . join(',', $class::_mapFieldOrder($options['order']));
+            $classQuery .= ' ORDER BY '.join(',', $class::_mapFieldOrder($options['order']));
         }
 
         if ($options['limit']) {

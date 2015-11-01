@@ -1,5 +1,5 @@
 <?php
 class CMS_ContentItem_RequestHandler extends CRUDRequestHandler
 {
-	static public $recordClass = 'CMS_ContentItem';
+    public static $recordClass = 'CMS_ContentItem';
 }

@@ -3,34 +3,34 @@
 abstract class CMS_Content extends VersionedRecord
 {
     // VersionedRecord configuration
-    static public $historyTable = 'history_content';
+    public static $historyTable = 'history_content';
 
     // ActiveRecord configuration
-    static public $tableName = 'content';
-    static public $singularNoun = 'content';
-    static public $pluralNoun = 'contents';
-    
+    public static $tableName = 'content';
+    public static $singularNoun = 'content';
+    public static $pluralNoun = 'contents';
+
     // required for shared-table subclassing support
-    static public $rootClass = __CLASS__;
-    static public $defaultClass = __CLASS__;
-    static public $subClasses = array('CMS_Page','CMS_BlogPost');
-    
-    static public $searchConditions = array(
+    public static $rootClass = __CLASS__;
+    public static $defaultClass = __CLASS__;
+    public static $subClasses = array('CMS_Page','CMS_BlogPost');
+
+    public static $searchConditions = array(
         'Title' => array(
-    		'qualifiers' => array('any', 'title')
-    		,'points' => 2
-    		,'sql' => 'Title Like "%%%s%%"'
-    	)
-    	,'Handle' => array(
-    		'qualifiers' => array('any', 'handle')
-    		,'points' => 2
-    		,'sql' => 'Handle Like "%%%s%%"'
-    	)
+            'qualifiers' => array('any', 'title')
+            ,'points' => 2
+            ,'sql' => 'Title Like "%%%s%%"'
+        )
+        ,'Handle' => array(
+            'qualifiers' => array('any', 'handle')
+            ,'points' => 2
+            ,'sql' => 'Handle Like "%%%s%%"'
+        )
     );
 
-    static public $fields = array(
+    public static $fields = array(
         'ContextClass'
-		,'ContextID' => 'uint'
+        ,'ContextID' => 'uint'
         ,'Title'
         ,'Handle' => array(
             'unique' => true
@@ -50,141 +50,138 @@ abstract class CMS_Content extends VersionedRecord
             ,'index' => true
         )
         ,'Visibility' => array(
-        	'type' => 'enum'
-        	,'values' => array('Public','Private')
-        	,'default' => 'Public'
+            'type' => 'enum'
+            ,'values' => array('Public','Private')
+            ,'default' => 'Public'
         )
     );
-    
-    
-    static public $relationships = array(
-		'Context' => array(
-			'type' => 'context-parent'
-		)
-		,'GlobalHandle' => array(
-			'type' => 'handle'
-		)
-		,'Author' =>  array(
+
+
+    public static $relationships = array(
+        'Context' => array(
+            'type' => 'context-parent'
+        )
+        ,'GlobalHandle' => array(
+            'type' => 'handle'
+        )
+        ,'Author' =>  array(
             'type' =>  'one-one'
             ,'class' => 'Person'
         )
-		,'Items' => array(
-        	'type' => 'one-many'
-        	,'class' => 'CMS_ContentItem'
-        	,'foreign' => 'ContentID'
-        	,'conditions' => 'Status != "Deleted"'
-        	,'order' => array('Order','ID')
+        ,'Items' => array(
+            'type' => 'one-many'
+            ,'class' => 'CMS_ContentItem'
+            ,'foreign' => 'ContentID'
+            ,'conditions' => 'Status != "Deleted"'
+            ,'order' => array('Order','ID')
         )
         ,'Tags' => array(
-        	'type' => 'many-many'
-        	,'class' => 'Tag'
-        	,'linkClass' => 'TagItem'
-        	,'linkLocal' => 'ContextID'
-        	,'conditions' => array('Link.ContextClass = "CMS_Content"')
+            'type' => 'many-many'
+            ,'class' => 'Tag'
+            ,'linkClass' => 'TagItem'
+            ,'linkLocal' => 'ContextID'
+            ,'conditions' => array('Link.ContextClass = "CMS_Content"')
         )
-		,'Comments' => array(
-			'type' => 'context-children'
-			,'class' => 'Comment'
-			,'order' => array('ID' => 'DESC')
-		)
+        ,'Comments' => array(
+            'type' => 'context-children'
+            ,'class' => 'Comment'
+            ,'order' => array('ID' => 'DESC')
+        )
     );
 
-    
-    static public function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
+
+    public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
-		$options = array_merge(array(
-			'conditions' => array()
-			,'order' => array('Published' => 'DESC')
-		), $options);
-		
-		if(!$GLOBALS['Session']->Person)
-		{
-			$options['conditions']['Visibility'] = 'Public';
-		}
-		
-		$options['conditions']['Status'] = 'Published';
-		$options['conditions'][] = 'Published IS NULL OR Published <= CURRENT_TIMESTAMP';
-		
-		if(get_called_class() != __CLASS__)
-			$options['conditions']['Class'] = get_called_class();
-    
-	    return static::getAllByContextObject($Context, $options);
+        $options = array_merge(array(
+            'conditions' => array()
+            ,'order' => array('Published' => 'DESC')
+        ), $options);
+
+        if (!$GLOBALS['Session']->Person) {
+            $options['conditions']['Visibility'] = 'Public';
+        }
+
+        $options['conditions']['Status'] = 'Published';
+        $options['conditions'][] = 'Published IS NULL OR Published <= CURRENT_TIMESTAMP';
+
+        if (get_called_class() != __CLASS__) {
+            $options['conditions']['Class'] = get_called_class();
+        }
+
+        return static::getAllByContextObject($Context, $options);
     }
-   
-    static public function getAllPublishedByAuthor(Person $Author, $options = array())
+
+    public static function getAllPublishedByAuthor(Person $Author, $options = array())
     {
-		$options = array_merge(array(
-			'order' => array('Published' => 'DESC')
-		), $options);
-		
-		
-		$conditions = array(
-			'AuthorID' => $Author->ID
-			,'Status' => 'Published'
-			,'Published IS NULL OR Published <= CURRENT_TIMESTAMP'
-		);
-				
-		if(get_called_class() != __CLASS__)
-			$conditions['Class'] = get_called_class();
-    
-	    return static::getAllByWhere($conditions, $options);
+        $options = array_merge(array(
+            'order' => array('Published' => 'DESC')
+        ), $options);
+
+
+        $conditions = array(
+            'AuthorID' => $Author->ID
+            ,'Status' => 'Published'
+            ,'Published IS NULL OR Published <= CURRENT_TIMESTAMP'
+        );
+
+        if (get_called_class() != __CLASS__) {
+            $conditions['Class'] = get_called_class();
+        }
+
+        return static::getAllByWhere($conditions, $options);
     }
-    
+
     public function validate($deep = true)
     {
         // call parent
         parent::validate($deep);
-        
+
         $this->_validator->validate(array(
             'field' => 'Title'
             ,'errorMessage' => 'A title is required'
         ));
-        
-        
-		// implement handles
-		GlobalHandleBehavior::onValidate($this, $this->_validator);				
-        
+
+
+        // implement handles
+        GlobalHandleBehavior::onValidate($this, $this->_validator);
+
         // save results
         return $this->finishValidation();
     }
-    
+
     public function save($deep = true)
     {
-    	// set author
-    	if(!$this->AuthorID)
-    	{
-    		$this->Author = $_SESSION['User'];
-    	}
-        
-    	// set published
-    	if(!$this->Published && $this->Status == 'Published')
-    	{
-    		$this->Published = time();
-    	}
-        
-		// implement handles
-		GlobalHandleBehavior::onSave($this, $this->Title);				
-    
+        // set author
+        if (!$this->AuthorID) {
+            $this->Author = $_SESSION['User'];
+        }
+
+        // set published
+        if (!$this->Published && $this->Status == 'Published') {
+            $this->Published = time();
+        }
+
+        // implement handles
+        GlobalHandleBehavior::onSave($this, $this->Title);
+
         // call parent
         parent::save($deep);
     }
 
-	public function getData()
-	{
-		return array_merge(parent::getData(), array(
-			'items' => array_values(JSON::translateObjects($this->Items))
-			,'tags' => array_values(JSON::translateObjects($this->Tags))
-			,'Author' => $this->Author ? $this->Author->getData() : null
-		));
-	
-	}
-		    
-    
-    public function renderBody()
+    public function getData()
     {
-    	return join('', array_map(function($Item){
-    		return $Item->renderBody();
-    	}, $this->Items));
+        return array_merge(parent::getData(), array(
+            'items' => array_values(JSON::translateObjects($this->Items))
+            ,'tags' => array_values(JSON::translateObjects($this->Tags))
+            ,'Author' => $this->Author ? $this->Author->getData() : null
+        ));
     }
 
+
+    public function renderBody()
+    {
+        return join('', array_map(function($Item) {
+            return $Item->renderBody();
+        }, $this->Items));
+    }
 }

@@ -3,9 +3,5 @@
 
 
  class ForumDiscussion extends Discussion
-{
-
-
-
-
-}
+ {
+ }

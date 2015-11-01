@@ -3,9 +3,5 @@
 
 
  class PasswordAuthenticationFailedException extends Exception
-{
-
-
-
-
-}
+ {
+ }

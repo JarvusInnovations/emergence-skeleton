@@ -19,7 +19,7 @@ class Router
 
     public static function __classLoaded()
     {
-        Emergence\Logger::general_warning('Deprecated class loaded: ' . __CLASS__);
+        Emergence\Logger::general_warning('Deprecated class loaded: '.__CLASS__);
     }
 
     public static function getClassPath($className)
@@ -56,11 +56,11 @@ class Router
                 return RequestHandler::throwError('No route to record viewer');
             }
 
-            $url = '/' . $classPath . '/' . $Record->getHandle();
+            $url = '/'.$classPath.'/'.$Record->getHandle();
         }
 
         if ($path) {
-            $url .= '/' . ltrim($path, '/');
+            $url .= '/'.ltrim($path, '/');
         }
 
         if ($permanent) {

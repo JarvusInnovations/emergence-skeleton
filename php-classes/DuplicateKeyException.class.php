@@ -3,7 +3,5 @@
 
 
  class DuplicateKeyException extends Exception
-{
-
-
-}
+ {
+ }

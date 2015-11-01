@@ -3,9 +3,5 @@
 
 
  class PersonNotFoundException extends Exception
-{
-
-
-
-
-}
+ {
+ }

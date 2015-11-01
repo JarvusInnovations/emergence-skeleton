@@ -51,7 +51,7 @@ class PHPGit_Configuration
             }
 
             try {
-                $optionValue = $this->repository->git(sprintf('config --get ' . $configOption));
+                $optionValue = $this->repository->git(sprintf('config --get '.$configOption));
                 $this->configuration[$configOption] = $optionValue;
             } catch (GitRuntimeException $e) {
                 $optionValue = $fallback;
@@ -84,5 +84,4 @@ class PHPGit_Configuration
         $this->repository->git(sprintf('config --local --unset %s', $configOption));
         unset($this->configuration[$configOption]);
     }
-
 }

@@ -3,8 +3,5 @@
 
 
  class MediaTypeException extends Exception
-{
-
-
-
-}
+ {
+ }

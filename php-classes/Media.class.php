@@ -116,18 +116,16 @@ class Media extends ActiveRecord
         parent::__classLoaded();
 
         // load subclasses
-        foreach(static::$subClasses AS $subClass)
-        {
+        foreach (static::$subClasses AS $subClass) {
             Site::loadClass($subClass);
         }
     }
 
 
     // magic methods
-    function getValue($name)
+    public function getValue($name)
     {
-        switch($name)
-        {
+        switch ($name) {
             case 'Data':
             case 'SummaryData':
             case 'JsonTranslation':
@@ -149,12 +147,11 @@ class Media extends ActiveRecord
                 return $this->MIMEType;
 
             case 'Extension':
-                throw new MediaTypeException('Unable to find extension for mime-type: ' . $this->MIMEType);
+                throw new MediaTypeException('Unable to find extension for mime-type: '.$this->MIMEType);
 
             case 'WebPath':
 
-                if (!isset($this->_webPath))
-                {
+                if (!isset($this->_webPath)) {
                     $this->_webPath = sprintf(
                         static::$webPathFormat
                         , $this->ID
@@ -187,7 +184,7 @@ class Media extends ActiveRecord
             , $class
             , $width
             , $height
-            , ( isset($fillColor) ? 'x'.$fillColor : '' )
+            , (isset($fillColor) ? 'x'.$fillColor : '')
         );
     }
 
@@ -198,25 +195,23 @@ class Media extends ActiveRecord
             , $this->ID
             , $width
             , $height ?: $width
-            , ( is_string($fillColor) ? 'x'.$fillColor : '' )
-        ) . ($cropped ? '/cropped' : '');
+            , (is_string($fillColor) ? 'x'.$fillColor : '')
+        ).($cropped ? '/cropped' : '');
     }
 
     public function getImage($sourceFile = null)
     {
-        if (!isset($sourceFile))
-        {
+        if (!isset($sourceFile)) {
             $sourceFile = $this->FilesystemPath ? $this->FilesystemPath : $this->BlankPath;
         }
 
-        switch($this->MIMEType)
-        {
+        switch ($this->MIMEType) {
             case 'application/psd':
             case 'image/tiff':
 
                 //Converts PSD to PNG temporarily on the real file system.
                 $tempFile = tempnam('/tmp', 'media_convert');
-                exec("convert -density 100 " . $this->FilesystemPath . "[0] -flatten $tempFile.png");
+                exec("convert -density 100 ".$this->FilesystemPath."[0] -flatten $tempFile.png");
 
                 return imagecreatefrompng("$tempFile.png");
 
@@ -268,7 +263,6 @@ class Media extends ActiveRecord
 
                 return $image;
         }
-
     }
 
     public function getThumbnail($maxWidth, $maxHeight, $fillColor = false, $cropped = false)
@@ -276,8 +270,7 @@ class Media extends ActiveRecord
         // init thumbnail path
         $thumbFormat = sprintf('%ux%u', $maxWidth, $maxHeight);
 
-        if ($fillColor)
-        {
+        if ($fillColor) {
             $thumbFormat .= 'x'.strtoupper($fillColor);
         }
 
@@ -360,7 +353,7 @@ class Media extends ActiveRecord
 
                 // fill background
                 imagefill($image, 0, 0, $fillColor);
-            } elseif( ($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png' )) {
+            } elseif (($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png')) {
                 $trans_index = imagecolortransparent($srcImage);
 
                 // check if there is a specific transparent color
@@ -373,8 +366,7 @@ class Media extends ActiveRecord
                     // fill background
                     imagefill($image, 0, 0, $trans_index);
                     imagecolortransparent($image, $trans_index);
-
-                } elseif($this->MIMEType == 'image/png') {
+                } elseif ($this->MIMEType == 'image/png') {
                     imagealphablending($image, false);
                     $trans_color = imagecolorallocatealpha($image, 0, 0, 0, 127);
                     imagefill($image, 0, 0, $trans_color);
@@ -402,7 +394,7 @@ class Media extends ActiveRecord
                 imagecopyresampled(
                       $image
                     , $srcImage
-                    , round( ($thumbWidth - $scaledWidth) / 2 ), round( ($thumbHeight - $scaledHeight) / 2 )
+                    , round(($thumbWidth - $scaledWidth) / 2), round(($thumbHeight - $scaledHeight) / 2)
                     , 0, 0
                     , $scaledWidth, $scaledHeight
                     , $srcWidth, $srcHeight
@@ -461,8 +453,7 @@ class Media extends ActiveRecord
         }
 
         // sanity check
-        if(!is_uploaded_file($uploadedFile))
-        {
+        if (!is_uploaded_file($uploadedFile)) {
             throw new Exception('Supplied file is not a valid upload');
         }
 
@@ -474,21 +465,20 @@ class Media extends ActiveRecord
         try {
             // analyze file
             $mediaInfo = static::analyzeFile($file);
-    
+
             // create media object
             $Media = $mediaInfo['className']::create($fieldValues);
-    
+
             // init media
             $Media->initializeFromAnalysis($mediaInfo);
-    
+
             // save media
             $Media->save();
-    
+
             // write file
             $Media->writeFile($file);
-            
-            return $Media;
 
+            return $Media;
         } catch (Exception $e) {
             \Emergence\Logger::general_warning('Caught exception while processing media upload, aborting upload and returning null', array(
                 'exceptionClass' => get_class($e)
@@ -522,39 +512,34 @@ class Media extends ActiveRecord
         // DO NOT CALL FROM decendent's override, parent calls child
 
         // check file
-        if(!is_readable($filename))
-        {
+        if (!is_readable($filename)) {
             throw new Exception('Unable to read media file for analysis: "'.$filename.'"');
         }
 
         // get mime type
         $finfo = finfo_open(FILEINFO_MIME_TYPE, static::$magicPath);
 
-        if(!$finfo || !($mimeType = finfo_file($finfo, $filename)) )
-        {
+        if (!$finfo || !($mimeType = finfo_file($finfo, $filename))) {
             throw new Exception('Unable to load media file info');
         }
 
         finfo_close($finfo);
 
         // dig deeper if only generic mimetype returned
-        if($mimeType == 'application/octet-stream')
-        {
+        if ($mimeType == 'application/octet-stream') {
             $finfo = finfo_open(FILEINFO_NONE, static::$magicPath);
 
-            if(!$finfo || !($fileInfo = finfo_file($finfo, $filename)) )
-            {
+            if (!$finfo || !($fileInfo = finfo_file($finfo, $filename))) {
                 throw new Exception('Unable to load media file info');
             }
 
             finfo_close($finfo);
 
             // detect EPS
-            if(preg_match('/^DOS EPS/i', $fileInfo))
+            if (preg_match('/^DOS EPS/i', $fileInfo)) {
                 $mimeType = 'application/postscript';
-        }
-        elseif(array_key_exists($mimeType, static::$mimeRewrites))
-        {
+            }
+        } elseif (array_key_exists($mimeType, static::$mimeRewrites)) {
             $mimeType = static::$mimeRewrites[$mimeType];
         }
 
@@ -569,15 +554,12 @@ class Media extends ActiveRecord
         // determine handler
         $staticClass = get_called_class();
 
-        if(!isset(static::$mimeHandlers[$mediaInfo['mimeType']]) || $staticClass != 'Media')
-        {
-           // MICS::dump(static::$mimeHandlers, 'MIME Handlers');
+        if (!isset(static::$mimeHandlers[$mediaInfo['mimeType']]) || $staticClass != 'Media') {
+            // MICS::dump(static::$mimeHandlers, 'MIME Handlers');
            // throw new MediaTypeException('No class registered for mime type "' . $mediaInfo['mimeType'] . '"');
 
             $mediaInfo['className'] = $staticClass;
-        }
-        else
-        {
+        } else {
             $mediaInfo['className'] = static::$mimeHandlers[$mediaInfo['mimeType']];
 
             // call registered type's analyzer
@@ -591,12 +573,9 @@ class Media extends ActiveRecord
     {
         $path = array('site-root','img',sprintf(static::$defaultFilenameFormat, $contextClass));
 
-        if($node = Site::resolvePath($path))
-        {
+        if ($node = Site::resolvePath($path)) {
             return $node->RealPath;
-        }
-        else
-        {
+        } else {
             throw new Exception('Could not load '.implode('/',$path));
         }
     }
@@ -607,8 +586,7 @@ class Media extends ActiveRecord
         $sourcePath = static::getBlankPath($contextClass);
         $sourceInfo = @getimagesize($sourcePath);
 
-        if (!$sourceInfo)
-        {
+        if (!$sourceInfo) {
             throw new Exception("Unable to load blank image for context '$contextClass' from '$sourcePath'");
         }
 
@@ -616,9 +594,8 @@ class Media extends ActiveRecord
         $mimeType = image_type_to_mime_type($sourceInfo[2]);
 
         // determine type
-        if(!isset(static::$mimeHandlers[$mimeType]))
-        {
-            throw new MediaTypeException('No class registered for mime type "' . $mimeType . '"');
+        if (!isset(static::$mimeHandlers[$mimeType])) {
+            throw new MediaTypeException('No class registered for mime type "'.$mimeType.'"');
         }
 
         $className = static::$mimeHandlers[$mimeType];
@@ -631,7 +608,6 @@ class Media extends ActiveRecord
         $blankMedia->Height = $sourceInfo[1];
 
         return $blankMedia;
-
     }
 
     public static function getSupportedTypes()
@@ -645,18 +621,18 @@ class Media extends ActiveRecord
             return null;
         }
 
-        return Site::$rootPath . '/site-data/media/' . $variant . '/' . ($filename ?: $this->getFilename($variant));
+        return Site::$rootPath.'/site-data/media/'.$variant.'/'.($filename ?: $this->getFilename($variant));
     }
-    
+
     public function getFilename($variant = 'original')
     {
         if ($this->isPhantom) {
-            return 'default.' . $this->Extension;
+            return 'default.'.$this->Extension;
         }
-        
-        return $this->ID . '.' . $this->Extension;
+
+        return $this->ID.'.'.$this->Extension;
     }
-    
+
     public function getMIMEType($variant = 'original')
     {
         return $this->MIMEType;
@@ -670,7 +646,7 @@ class Media extends ActiveRecord
         if (!is_dir($targetDirectory)) {
             mkdir($targetDirectory, static::$newDirectoryPermissions, true);
         }
-        
+
         // move source file to target path
         if (!rename($sourceFile, $this->FilesystemPath)) {
             throw new \Exception('Failed to move source file to destination');
@@ -679,7 +655,7 @@ class Media extends ActiveRecord
         // set file permissions
         chmod($this->FilesystemPath, static::$newFilePermissions);
     }
-    
+
     public function isVariantAvailable($variant)
     {
         return false;
