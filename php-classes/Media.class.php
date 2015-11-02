@@ -463,10 +463,11 @@ class Media extends ActiveRecord
     public static function createFromFile($file, $fieldValues = array())
     {
         try {
-            // check if url
+            // handle url input
             if (filter_var($file, FILTER_VALIDATE_URL)) { 
-                copy($file, '/tmp/tmp-image.png');
-                $file = '/tmp/tmp-image.png';
+                $tempName = tempnam('/tmp', 'remote_media');
+                copy($file, $tempName);
+                $file = $tempName;
             }
             
             // analyze file
