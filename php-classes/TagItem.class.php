@@ -39,6 +39,12 @@ class TagItem extends ActiveRecord
     );
 
 
+
+    public function getTitle()
+    {
+        return sprintf('TagItem %s-%u + %s', $this->ContextClass, $this->ContextID, $this->Tag ? $this->Tag->getTitle() : '[tag not found]');
+    }
+
     public function validate($deep = true)
     {
         // call parent
