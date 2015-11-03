@@ -112,7 +112,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     {
         $className = static::$recordClass;
         $tableAlias = $className::getTableAlias();
-        $terms = preg_split('/\s+/', $query);
+        $terms = str_getcsv($query, ' ');
 
         $options = array_merge(array(
             'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault
