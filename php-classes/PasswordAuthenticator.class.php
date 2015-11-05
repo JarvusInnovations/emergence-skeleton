@@ -45,7 +45,7 @@ class PasswordAuthenticator extends Authenticator
             if ($this->_authenticatedPerson) {
                 
                 // set cookie for username
-                if (static::$rememberUsernameEnabled && isset($requestData['remember'])) {
+                if (static::$rememberUsernameEnabled && !empty($requestData['remember'])) {
                     setCookie(static::$rememberUsernameCookieName, $requestData['username'], time() + static::$rememberUsernameCookieDuration);
                     
                 // otherwise destroy if active
