@@ -5,7 +5,9 @@ class PasswordAuthenticator extends Authenticator
 {
     // configurable settings
     public static $requestContainer = '_LOGIN';
-
+    public static $enableRememberMe = true;
+    public static $rememberCookie = 'remember';
+    public static $rememberDuration = 31536000; // 1 year
 
     public function __construct(UserSession $Session)
     {
@@ -41,6 +43,16 @@ class PasswordAuthenticator extends Authenticator
             $this->_authenticatedPerson = $this->attemptAuthentication($requestData['username'], $requestData['password']);
 
             if ($this->_authenticatedPerson) {
+                
+                // set cookie for username
+                if (static::$enableRememberMe && isset($requestData['remember'])) {
+                    setCookie(static::$rememberCookie, $requestData['username'], time() + static::$rememberDuration);
+                    
+                // otherwise destroy if active
+                } elseif (static::$enableRememberMe) {
+                    setcookie(static::$rememberCookie, "", time() - 3600);
+                }
+                
                 // redirect if original request was GET
                 if ($requestData['returnMethod'] != 'POST' && $_SERVER['REQUEST_METHOD'] != 'GET') {
                     Site::redirect($_SERVER['REQUEST_URI']);
