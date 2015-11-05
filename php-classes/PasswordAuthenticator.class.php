@@ -6,7 +6,7 @@ class PasswordAuthenticator extends Authenticator
     // configurable settings
     public static $requestContainer = '_LOGIN';
     public static $enableRememberMe = true;
-    public static $rememberCookie = 'remember';
+    public static $rememberCookie = 'username';
     public static $rememberDuration = 31536000; // 1 year
 
     public function __construct(UserSession $Session)
