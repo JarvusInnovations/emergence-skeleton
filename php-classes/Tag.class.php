@@ -409,4 +409,11 @@ class Tag extends ActiveRecord
             return $Tag->Title;
         }, static::getAll());
     }
+
+    public static function filterTagsByPrefix(array $tags, $prefix)
+    {
+        return array_filter($tags, function($Tag) use ($prefix) {
+            return $Tag->HandlePrefix == $prefix;
+        });   
+    }
 }
