@@ -64,14 +64,18 @@ class EventBus
             }
 
             $eventPath = $contextPath.'/'.$key;
-            foreach (Emergence_FS::getAggregateChildren($eventPath) AS $filename => $node) {
+            $handlerNodes = Emergence_FS::getAggregateChildren($eventPath);
+            ksort($handlerNodes);
+            foreach ($handlerNodes AS $filename => $node) {
                 if ($node->Type == 'application/php') {
                     $handlers[$eventPath.'/'.$filename] = $node->ID;
                 }
             }
 
             $eventPath = $contextPath.'/~';
-            foreach (Emergence_FS::getAggregateChildren($eventPath) AS $filename => $node) {
+            $handlerNodes = Emergence_FS::getAggregateChildren($eventPath);
+            ksort($handlerNodes);
+            foreach ($handlerNodes AS $filename => $node) {
                 if ($node->Type == 'application/php') {
                     $handlers[$eventPath.'/'.$filename] = $node->ID;
                 }
