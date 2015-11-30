@@ -3,7 +3,7 @@
 class Session extends ActiveRecord
 {
     // Session configurables
-    public static $cookieName = 's';
+    public static $cookieName = null;
     public static $cookieDomain = null;
     public static $cookiePath = '/';
     public static $cookieSecure = false;
@@ -43,8 +43,13 @@ class Session extends ActiveRecord
     {
         parent::__classLoaded();
 
-        // auto-detect cookie domain
-        if (empty(static::$cookieDomain)) {
+        // generate cookie name
+        if (!static::$cookieName) {
+            static::$cookieName = 's_' . Site::getConfig('handle');
+        }
+
+        // auto-detect cookie domain by trimming leading www. from current hostname
+        if (!static::$cookieDomain) {
             static::$cookieDomain = preg_replace('/^www\.([^.]+\.[^.]+)$/i', '$1', $_SERVER['HTTP_HOST']);
         }
     }
