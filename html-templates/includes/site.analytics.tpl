@@ -12,9 +12,9 @@
 {if $.User}
 	var clicky_custom = {
 		session: {
-			username: '{$.User->Username}'
-			,email: '{$.User->Email}'
-			,full_name: '{$.User->FullName}'
+    		username: {$.User->Username|json_encode},
+			email: {$.User->Email|json_encode},
+			full_name: {$.User->FullName|json_encode}
 		}
 	};
 {/if}
