@@ -64,7 +64,6 @@ class ContactRequestHandler extends RequestHandler
                     Emergence\Mailer\Mailer::sendFromTemplate(static::$emailTo, 'staffNotice', array(
                         'Submission' => $Submission
                         ,'formatters' => static::$formatters
-                        ,'subject' => $_REQUEST['Subject']
                     ), array(
                         'Headers' => $headers
                     ));
