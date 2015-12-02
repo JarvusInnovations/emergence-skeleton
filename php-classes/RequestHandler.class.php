@@ -6,6 +6,7 @@ abstract class RequestHandler
     public static $responseMode = 'html';
     public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
     public static $beforeRespond;
+    public static $wkhtmltopdfPath = 'wkhtmltopdf';
 
 
     // static properties
@@ -136,7 +137,7 @@ abstract class RequestHandler
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
 
-        exec("/usr/local/bin/wkhtmltopdf \"$tmpPath.html\" \"$tmpPath.pdf\"");
+        exec(static::$wkhtmltopdfPath . " \"$tmpPath.html\" \"$tmpPath.pdf\"");
 
         if (!file_exists("$tmpPath.pdf")) {
             header('HTTP/1.0 501 Not Implemented');
