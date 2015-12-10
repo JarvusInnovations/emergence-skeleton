@@ -1897,7 +1897,7 @@ class ActiveRecord
             case 'clob':
             case 'string':
             {
-                if (!$fieldOptions['notnull'] && $fieldOptions['blankisnull'] && ($value === '' || $value === NULL)) {
+                if (!$fieldOptions['notnull'] && !empty($fieldOptions['blankisnull']) && ($value === '' || $value === NULL)) {
                     $value = null;
                     break;
                 }
@@ -2352,7 +2352,7 @@ class ActiveRecord
             if (is_string($field)) {
                 $fieldOptions = static::getFieldOptions($field);
 
-                if ($condition === null || ($condition == '' && $fieldOptions['blankisnull'])) {
+                if ($condition === null || ($condition == '' && !empty($fieldOptions['blankisnull']))) {
                     $condition = sprintf('`%s` IS NULL', static::_cn($field));
                 } elseif (is_array($condition)) {
                     if (is_array($condition['values'])) {
