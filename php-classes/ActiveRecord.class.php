@@ -1897,7 +1897,7 @@ class ActiveRecord
             case 'clob':
             case 'string':
             {
-                if (!$fieldOptions['notnull'] && !empty($fieldOptions['blankisnull']) && ($value === '' || $value === NULL)) {
+                if (empty($fieldOptions['notnull']) && !empty($fieldOptions['blankisnull']) && ($value === '' || $value === NULL)) {
                     $value = null;
                     break;
                 }
