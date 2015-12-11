@@ -25,3 +25,30 @@ Git::$repositories['emergence-skeleton'] = array(
         'sencha-workspace/ContentEditor'
     )
 );
+
+Git::$repositories['jarvus-apikit'] = array(
+    'remote' => 'https://github.com/JarvusInnovations/jarvus-apikit.git',
+    'originBranch' => 'master',
+    'workingBranch' => 'master',
+    'trees' => array(
+        'sencha-workspace/packages/jarvus-apikit' => '.'
+    )
+);
+
+Git::$repositories['emergence-apikit'] = array(
+    'remote' => 'https://github.com/JarvusInnovations/emergence-apikit.git',
+    'originBranch' => 'master',
+    'workingBranch' => 'master',
+    'trees' => array(
+        'sencha-workspace/packages/emergence-apikit' => '.'
+    )
+);
+
+Git::$repositories['jarvus-fileupload'] = array(
+    'remote' => 'https://github.com/JarvusInnovations/jarvus-fileupload.git',
+    'originBranch' => 'master',
+    'workingBranch' => 'master',
+    'trees' => array(
+        'sencha-workspace/packages/jarvus-fileupload' => '.'
+    )
+);
