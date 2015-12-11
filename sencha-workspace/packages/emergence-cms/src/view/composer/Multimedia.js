@@ -4,7 +4,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
     alias: 'emergence-cms-composer.multimedia',
     cls: 'multimedia-composer',
     requires: [
-        'Jarvus.ext.uploadbox.UploadBox',
+        'Jarvus.fileupload.UploadBox',
         'Emergence.cms.model.Media',
         'Ext.MessageBox'
     ],
