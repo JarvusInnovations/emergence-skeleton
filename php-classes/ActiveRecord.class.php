@@ -861,9 +861,16 @@ class ActiveRecord
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
             if ($options['type'] == 'one-one') {
-                if (isset($this->_relatedObjects[$relationship]) && $options['local'] != 'ID') {
+                if (isset($this->_relatedObjects[$relationship])) {
                     $this->_relatedObjects[$relationship]->save();
-                    $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->getValue($options['foreign']));
+
+                    if (!empty($options['link']) && is_array($options['link'])) {
+                        foreach ($options['link'] AS $linkLocal => $linkForeign) {
+                            $this->_setFieldValue(is_string($linkLocal) ? $linkLocal : $linkForeign, $this->_relatedObjects[$relationship]->getValue($linkForeign));
+                        }
+                    } elseif ($options['local'] != 'ID') {
+                        $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->getValue($options['foreign']));
+                    }
                 }
             } elseif ($options['type'] == 'one-many') {
                 if (isset($this->_relatedObjects[$relationship]) && $options['local'] != 'ID') {
@@ -1425,17 +1432,25 @@ class ActiveRecord
         }
 
         // apply defaults
+        $options['name'] = $relationship;
+
         if (empty($options['type'])) {
             $options['type'] = 'one-one';
         }
 
         if ($options['type'] == 'one-one') {
-            if (empty($options['local'])) {
-                $options['local'] = $relationship.'ID';
-            }
+            if (!empty($options['link'])) {
+                if (is_string($options['link'])) {
+                    $options['link'] = array($options['link']);
+                }
+            } else {
+                if (empty($options['local'])) {
+                    $options['local'] = $relationship.'ID';
+                }
 
-            if (empty($options['foreign'])) {
-                $options['foreign'] = 'ID';
+                if (empty($options['foreign'])) {
+                    $options['foreign'] = 'ID';
+                }
             }
 
             if (!isset($options['conditions'])) {
@@ -2042,11 +2057,30 @@ class ActiveRecord
             $rel = static::getStackedConfig('relationships', $relationship);
 
             if ($rel['type'] == 'one-one') {
-                if ($value = $this->_getFieldValue($rel['local'])) {
+                if (!empty($rel['link'])) {
+                    $conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'];
+
+                    if (is_callable($rel['link'])) {
+                        $conditions = array_merge($conditions, call_user_func($rel['link'], $this, $rel) ?: array());
+                    } else {
+                        foreach ($rel['link'] AS $linkLocal => $linkForeign) {
+                            $conditions[$linkForeign] = $this->_getFieldValue(is_string($linkLocal) ? $linkLocal : $linkForeign);
+                        }
+                    }
+
+                    if (count($conditions)) {
+                        $this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions, array(
+                            'order' => $rel['order']
+                        ));
+                    } else {
+                        $this->_relatedObjects[$relationship] = null;
+                    }
+                } elseif ($value = $this->_getFieldValue($rel['local'])) {
                     $conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel, $value) : $rel['conditions'];
 
                     if (!empty($conditions) || !empty($rel['order'])) {
                         $conditions[$rel['foreign']] = $value;
+
                         $this->_relatedObjects[$relationship] = $rel['class']::getByWhere($conditions, array(
                             'order' => $rel['order']
                         ));
@@ -2137,7 +2171,7 @@ class ActiveRecord
 
                 $conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'];
 
-                // TODO: support indexField, conditions, and order
+                // TODO: support order
                 $query = 'SELECT Related.* FROM `%s` Link JOIN `%s` Related ON (Related.`%s` = Link.%s) WHERE Link.`%s` = %u AND %s';
                 $params = array(
                     $rel['linkClass']::$tableName
