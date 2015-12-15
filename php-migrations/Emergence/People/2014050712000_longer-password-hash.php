@@ -17,7 +17,7 @@ if ('varchar(255)' != static::getColumnType('people', 'Password')) {
 
 if ('varchar(255)' != static::getColumnType('history_people', 'Password')) {
     print("Changing `Password` to VARCHAR(255) in table `history_people`\n");
-    DB::nonQuery('ALTER TABLE `history_people` CHANGE `Password` `Password` VARCHAR(255) NULL DEFAULT NULL');   
+    DB::nonQuery('ALTER TABLE `history_people` CHANGE `Password` `Password` VARCHAR(255) NULL DEFAULT NULL');
     $skipped = false;
 }
 

@@ -137,7 +137,7 @@ abstract class RequestHandler
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
 
-        exec(static::$wkhtmltopdfPath . " \"$tmpPath.html\" \"$tmpPath.pdf\"");
+        exec(static::$wkhtmltopdfPath." \"$tmpPath.html\" \"$tmpPath.pdf\"");
 
         if (!file_exists("$tmpPath.pdf")) {
             header('HTTP/1.0 501 Not Implemented');

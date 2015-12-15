@@ -414,6 +414,6 @@ class Tag extends ActiveRecord
     {
         return array_filter($tags, function($Tag) use ($prefix) {
             return $Tag->HandlePrefix == $prefix;
-        });   
+        });
     }
 }

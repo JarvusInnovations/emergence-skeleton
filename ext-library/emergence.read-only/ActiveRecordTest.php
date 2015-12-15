@@ -6,7 +6,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase
     {
         require('src/TestRecord.php');
     }
-    
+
     public function testFields()
     {
         $fields = TestRecord::getClassFields();

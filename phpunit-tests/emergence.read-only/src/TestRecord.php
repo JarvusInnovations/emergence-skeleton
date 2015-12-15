@@ -2,7 +2,7 @@
 
 class TestRecord extends ActiveRecord
 {
-    static public $fields = array(
+    public static $fields = array(
         'Field1',
         'Field2'
     );

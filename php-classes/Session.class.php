@@ -45,7 +45,7 @@ class Session extends ActiveRecord
 
         // generate cookie name
         if (!static::$cookieName) {
-            static::$cookieName = 's_' . Site::getConfig('handle');
+            static::$cookieName = 's_'.Site::getConfig('handle');
         }
 
         // auto-detect cookie domain by trimming leading www. from current hostname
