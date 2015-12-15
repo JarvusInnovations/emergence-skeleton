@@ -19,9 +19,9 @@
  */
 function Dwoo_Plugin_count_characters_compile(Dwoo_Compiler $compiler, $value, $count_spaces=false)
 {
-	if ($count_spaces==='false') {
-		return 'preg_match_all(\'#[^\s\pZ]#u\', '.$value.', $tmp)';
-	} else {
-		return 'mb_strlen('.$value.', $this->charset)';
-	}
+    if ($count_spaces==='false') {
+        return 'preg_match_all(\'#[^\s\pZ]#u\', '.$value.', $tmp)';
+    } else {
+        return 'mb_strlen('.$value.', $this->charset)';
+    }
 }

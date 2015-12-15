@@ -25,12 +25,12 @@
  */
 function Dwoo_Plugin_array_compile(Dwoo_Compiler $compiler, array $rest=array())
 {
-	$out = array();
-	foreach ($rest as $key => $value) {
-		if (!is_numeric($key) && !strstr($key, '$this->scope')) {
-			$key = "'".$key."'";
-		}
-		$out[] = $key.'=>'.$value;
-	}
-	return 'array('.implode(', ', $out).')';
+    $out = array();
+    foreach ($rest as $key => $value) {
+        if (!is_numeric($key) && !strstr($key, '$this->scope')) {
+            $key = "'".$key."'";
+        }
+        $out[] = $key.'=>'.$value;
+    }
+    return 'array('.implode(', ', $out).')';
 }

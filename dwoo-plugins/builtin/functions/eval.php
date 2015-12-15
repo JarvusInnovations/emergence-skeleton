@@ -26,17 +26,17 @@
  */
 function Dwoo_Plugin_eval(Dwoo_Core $dwoo, $var, $assign = null)
 {
-	if ($var == '') {
-		return;
-	}
+    if ($var == '') {
+        return;
+    }
 
-	$tpl = new Dwoo_Template_String($var);
-	$clone = clone $dwoo;
-	$out = $clone->get($tpl, $dwoo->readVar('_parent'));
+    $tpl = new Dwoo_Template_String($var);
+    $clone = clone $dwoo;
+    $out = $clone->get($tpl, $dwoo->readVar('_parent'));
 
-	if ($assign !== null) {
-		$dwoo->assignInScope($out, $assign);
-	} else {
-		return $out;
-	}
+    if ($assign !== null) {
+        $dwoo->assignInScope($out, $assign);
+    } else {
+        return $out;
+    }
 }

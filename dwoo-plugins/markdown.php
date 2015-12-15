@@ -2,7 +2,7 @@
 
 function Dwoo_Plugin_markdown(Dwoo_Core $dwoo, $text, $markdownClass = '\\Michelf\\MarkdownExtra', $autoLinkify = true, $useSmartyPants = true, $smartypantsClass = '\\Michelf\\SmartyPantsTypographer')
 {
-#    if($autoLinkify) {
+    #    if($autoLinkify) {
 #		// adapted from http://vanillaforums.org/discussion/15567/autolink-with-markdown
 #
 #		// via http://stackoverflow.com/questions/10002227/linkify-regex-function-php-daring-fireball-method and df
@@ -15,11 +15,11 @@ function Dwoo_Plugin_markdown(Dwoo_Core $dwoo, $text, $markdownClass = '\\Michel
 #    	);
 #	}
 
-	$text = $markdownClass::defaultTransform($text);
-	
-	if ($useSmartyPants) {
-		$text = $smartypantsClass::defaultTransform($text);
-	}
-	
-	return $text;
+    $text = $markdownClass::defaultTransform($text);
+
+    if ($useSmartyPants) {
+        $text = $smartypantsClass::defaultTransform($text);
+    }
+
+    return $text;
 }

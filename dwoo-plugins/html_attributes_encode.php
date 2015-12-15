@@ -13,7 +13,7 @@ function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = '
             continue;
         }
 
-        $attribute = ($prefix ?: '') . $key;
+        $attribute = ($prefix ?: '').$key;
 
         if ($value !== true) {
             if (!is_scalar($value)) {
@@ -24,7 +24,7 @@ function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = '
                 }
             }
 
-            $attribute .= '="' . htmlspecialchars($value). '"';
+            $attribute .= '="'.htmlspecialchars($value).'"';
         }
 
         $attributes[] = $attribute;

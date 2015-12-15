@@ -21,5 +21,5 @@
  */
 function Dwoo_Plugin_wordwrap_compile(Dwoo_Compiler $compiler, $value, $length=80, $break="\n", $cut=false)
 {
-	return 'wordwrap('.$value.','.$length.','.$break.','.$cut.')';
+    return 'wordwrap('.$value.','.$length.','.$break.','.$cut.')';
 }

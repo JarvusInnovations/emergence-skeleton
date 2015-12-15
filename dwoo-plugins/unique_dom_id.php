@@ -3,7 +3,7 @@
 class Dwoo_Plugin_unique_dom_id extends Dwoo_Block_Plugin
 {
     public function init()
-    { 
+    {
     }
 
     public function process()
@@ -40,7 +40,7 @@ class Dwoo_Plugin_unique_dom_id extends Dwoo_Block_Plugin
             $baseOutput = $output;
             $i = 2;
             while (in_array($output, $idTable)) {
-                $output = $baseOutput . $i++;
+                $output = $baseOutput.$i++;
             }
 
             // cache input -> output mapping
@@ -48,5 +48,5 @@ class Dwoo_Plugin_unique_dom_id extends Dwoo_Block_Plugin
         }
 
         return $idTable[$input];
-    } 
+    }
 }

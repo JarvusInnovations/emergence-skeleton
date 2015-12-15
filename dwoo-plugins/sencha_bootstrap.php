@@ -38,7 +38,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         if (is_string($packageRequirers)) {
             $packageRequirers = array($packageRequirers);
         }
-        
+
         foreach ($packageRequirers AS $packageRequirer) {
             if ($sourceNode = Site::resolvePath($packageRequirer)) {
                 $packages = array_merge($packages, Sencha::getRequiredPackagesForSourceFile($sourceNode->RealPath));
@@ -50,7 +50,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     if (!$frameworkVersion) {
         $frameworkVersion = Sencha::$frameworks[$framework]['defaultVersion'];
     }
-    
+
     $frameworkVersion = Sencha::normalizeFrameworkVersion($framework, $frameworkVersion);
     $frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
 
@@ -69,10 +69,10 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     foreach ($packages AS $packageName) {
         // check workspace and framework package dirs
         $packagePath = "sencha-workspace/packages/$packageName";
-        
+
         if (!Site::resolvePath($packagePath)) {
             $packagePath = "$frameworkPath/packages/$packageName";
-            
+
             if (!Site::resolvePath($packagePath)) {
                 throw new Exception("Source for package $packageName not found in workspace or framework");
             }
@@ -80,10 +80,10 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
 
         array_push($classPaths, "$packagePath/src", "$packagePath/overrides");
     }
-    
+
     // include classpaths from packages
     $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
-    
+
     // filter classpaths
     $classPaths = array_unique(array_filter($classPaths));
 
@@ -92,20 +92,20 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     foreach ($classPaths AS $classPath) {
         if (strpos($classPath, '${workspace.dir}/x/') === 0) {
             $classPath = substr($classPath, 19);
-            $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
+            $manifest[str_replace('/', '.', $classPath)] = '/app/x/'.$classPath;
 
-            $classPath = 'ext-library/' . $classPath;
+            $classPath = 'ext-library/'.$classPath;
         } elseif (strpos($classPath, 'ext-library/') === 0) {
             $classPath = substr($classPath, 12);
-            $manifest[str_replace('/', '.', $classPath)] = '/app/x/' . $classPath;
+            $manifest[str_replace('/', '.', $classPath)] = '/app/x/'.$classPath;
 
-            $classPath = 'ext-library/' . $classPath;
+            $classPath = 'ext-library/'.$classPath;
         } elseif (strpos($classPath, '${app.dir}/') === 0) {
-            $classPath = $appPath . substr($classPath, 10);
+            $classPath = $appPath.substr($classPath, 10);
         } elseif (strpos($classPath, '${ext.dir}/') === 0) {
-            $classPath = $frameworkPath . substr($classPath, 10);
+            $classPath = $frameworkPath.substr($classPath, 10);
         } elseif (strpos($classPath, '${touch.dir}/') === 0) {
-            $classPath = $frameworkPath . substr($classPath, 12);
+            $classPath = $frameworkPath.substr($classPath, 12);
         }
 
         Emergence_FS::cacheTree($classPath);
@@ -196,11 +196,11 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $autoLoadPaths[] = $webPath;
         }
     }
-    
-    
+
+
     // build loader overrides
     $loaderPatch = '';
-    
+
     if ($patchLoader) {
         $loaderPatch .= 'Ext.Loader.setConfig("disableCaching", false);';
 
@@ -210,16 +210,16 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
                     .'url = window.location.pathname + url;'
                     .'while (url.match(/\/\.\.\//)) url = url.replace(/\/[^\/]+\/\.\./g, "");'
                 .'}'
-    
+
                 .'if(!url.match(/\?_sha1=/)) {'
                     .'console.warn("Fingerprinted URL not found for %o, it will be loaded with a cache-buster", url);'
                     .'url += "?" + dcParam + "=" + now;'
                 .'}'
-    
+
                 .'return url;'
             .'}';
 
-        $loaderPatch .= 
+        $loaderPatch .=
             'function _overrideMethod(cls, method, override) {'
                 .'var parent = cls[method] || Ext.emptyFn;'
                 .'cls[method] = function() {'
@@ -231,7 +231,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
                     .'return override.apply(this, callArgs);'
                 .'};'
             .'}';
-        
+
 #        if (Sencha::isVersionNewer('5', $frameworkVersion)) {
         if ($framework == 'ext') {
             $loaderPatch .=
@@ -256,7 +256,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         '<script type="text/javascript">(function(){'
             .'var dcParam = Ext.Loader.getConfig("disableCachingParam")'
                 .',now = Ext.Date.now();'
-                
+
             .$loaderPatch
 
             .'Ext.Loader.addClassPathMappings('.json_encode($manifest).');'

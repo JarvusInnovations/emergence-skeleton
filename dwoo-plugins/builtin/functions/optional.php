@@ -19,5 +19,5 @@
  */
 function Dwoo_Plugin_optional_compile(Dwoo_Compiler $compiler, $value)
 {
-	return $value;
+    return $value;
 }
