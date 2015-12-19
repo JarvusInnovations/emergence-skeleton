@@ -13,16 +13,22 @@ class PostgresConnection extends AbstractSqlConnection
         $pdo = $pdo ?: [];
 
         if (is_array($pdo)) {
-            $dsn = 'pgsql:options=\'--client_encoding=UTF8\';dbname=' . $pdo['database'];
+            $pdoConfig = $pdo;
 
-            $dsn .= ';host=' . ($pdo['host'] ?: 'localhost');
-            $dsn .= ';port=' . ($pdo['port'] ?: 5432);
+            $dsn = 'pgsql:options=\'--client_encoding=UTF8\';dbname=' . $pdoConfig['database'];
 
-            if (!empty($pdo['application_name'])) {
-                $dsn .= ';application_name=' . $pdo['application_name'];
+            $dsn .= ';host=' . ($pdoConfig['host'] ?: 'localhost');
+            $dsn .= ';port=' . ($pdoConfig['port'] ?: 5432);
+
+            if (!empty($pdoConfig['application_name'])) {
+                $dsn .= ';application_name=' . $pdoConfig['application_name'];
             }
 
-            $pdo = new PDO($dsn, $pdo['username'], $pdo['password']);
+            $pdo = new PDO($dsn, $pdoConfig['username'], $pdoConfig['password']);
+
+            if (!empty($pdoConfig['search_path'])) {
+                $pdo->query('SET search_path = "'.implode('","', $pdoConfig['search_path']).'"')->closeCursor();
+            }
         }
 
         return parent::createInstance($pdo);
