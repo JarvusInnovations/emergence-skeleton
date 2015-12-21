@@ -302,7 +302,7 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
             $ExistingUser = User::getByField('Email', $this->Email);
 
             if ($ExistingUser && ($ExistingUser->ID != $this->ID)) {
-                $this->_validator->addError('Email', static::$existinEmailError);
+                $this->_validator->addError('Email', static::$existingEmailError);
             }
         }
 
