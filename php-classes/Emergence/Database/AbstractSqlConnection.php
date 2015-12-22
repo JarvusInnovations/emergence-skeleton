@@ -152,7 +152,7 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
             $statement->closeCursor();
         }
     }
-    
+
     public function select(array $options)
     {
         $query = 'SELECT';
@@ -162,7 +162,7 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
             if (is_array($options['columns'])) {
                 $select = [];
                 foreach ($options['columns'] AS $columnAlias => $columnValue) {
-                    $select[] = $columnValue . ( is_string($columnAlias) ? ' AS ' . $columnAlias : '' );
+                    $select[] = $columnValue . ( is_string($columnAlias) ? ' AS ' . $this->quoteIdentifier($columnAlias) : '' );
                 }
                 $select = implode(', ', $select);
             } else {
