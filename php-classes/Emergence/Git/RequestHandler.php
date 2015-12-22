@@ -2,6 +2,7 @@
 	
 namespace Emergence\Git;
 
+use Site;
 use Exception;
 
 class RequestHandler extends \RequestHandler
@@ -93,6 +94,9 @@ class RequestHandler extends \RequestHandler
 			return static::throwInvalidRequestError('Request must be POST');
 		}
 
+        // Disable diagnostics by default for this operation as a high volume of queries may be needed
+        Site::$debug = !empty($_GET['debug']);
+
 		try {
 			$layer = static::getRequestedLayer();
 		} catch (Exception $e) {
@@ -111,6 +115,9 @@ class RequestHandler extends \RequestHandler
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			return static::throwInvalidRequestError('Request must be POST');
 		}
+
+        // Disable diagnostics by default for this operation as a high volume of queries may be needed
+        Site::$debug = !empty($_GET['debug']);
 
 		try {
 			$layer = static::getRequestedLayer();
