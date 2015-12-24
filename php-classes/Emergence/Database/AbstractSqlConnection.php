@@ -153,9 +153,28 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
         }
     }
 
-    public function select(array $options)
+    protected function buildSelectQuery(array $options)
     {
         $query = 'SELECT';
+
+        // CTE's
+        if (!empty($options['with']) && is_array($options['with'])) {
+            $with = [];
+
+            foreach ($options['with'] AS $withAlias => $withBody) {
+                if (is_array($withBody)) {
+                    if (isset($withBody['params'])) {
+                        throw new \Exception('CTE query spec may not include params');
+                    }
+
+                    $withBody = $this->buildSelectQuery($withBody);
+                }
+
+                $with[] = $this->quoteIdentifier($withAlias) . ' AS (' . $withBody . ')';
+            }
+
+            $query = 'WITH ' . implode(', ', $with) . ' ' . $query;
+        }
 
         // columns
         if (!empty($options['columns'])) {
@@ -270,8 +289,15 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
             $query .= ' OFFSET ' . $options['offset'];
         }
 
+        return $query;
+    }
 
-        // params
+    public function select(array $options)
+    {
+        // prepare query
+        $query = $this->buildSelectQuery($options);
+
+        // prepare params
         if (!empty($options['params'])) {
             if (!is_array($options['params'])) {
                 $params = [$options['params']];
