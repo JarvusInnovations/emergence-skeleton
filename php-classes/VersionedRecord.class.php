@@ -145,7 +145,7 @@ abstract class VersionedRecord extends ActiveRecord
             $recordValues = $this->_prepareRecordValues();
 
             // maintain legacy behavior if trackModified is disabled and overwrite Creator
-            if (static::$trackModified) {
+            if (!static::$trackModified) {
                 $recordValues['Created'] = 'CURRENT_TIMESTAMP';
                 $recordValues['CreatorID'] = !empty($_SESSION) && !empty($_SESSION['User']) ? $_SESSION['User']->ID : null;
             }
