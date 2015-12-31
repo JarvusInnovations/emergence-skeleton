@@ -69,12 +69,12 @@ abstract class VersionedRecord extends ActiveRecord
 
     protected function _setFieldValue($field, $value)
     {
-        // ignore setting versioning fields
-        if (array_key_exists($field, self::$fields)) {
+        // prevent setting RevisionID
+        if ($field == 'RevisionID') {
             return false;
-        } else {
-            return parent::_setFieldValue($field, $value);
         }
+
+            return parent::_setFieldValue($field, $value);
     }
     /*
      * Implement specialized getters
