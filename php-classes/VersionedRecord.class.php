@@ -3,6 +3,8 @@
 abstract class VersionedRecord extends ActiveRecord
 {
     // configure ActiveRecord
+    public static $trackModified = false;
+
     public static $fields = array(
         'RevisionID' => array(
             'columnName' => 'RevisionID'
@@ -74,7 +76,7 @@ abstract class VersionedRecord extends ActiveRecord
             return false;
         }
 
-            return parent::_setFieldValue($field, $value);
+        return parent::_setFieldValue($field, $value);
     }
     /*
      * Implement specialized getters
@@ -142,8 +144,11 @@ abstract class VersionedRecord extends ActiveRecord
             // save a copy to history table
             $recordValues = $this->_prepareRecordValues();
 
-            $recordValues['Created'] = time();
-            $recordValues['CreatorID'] = !empty($_SESSION) && !empty($_SESSION['User']) ? $_SESSION['User']->ID : null;
+            // maintain legacy behavior if trackModified is disabled and overwrite Creator
+            if (static::$trackModified) {
+                $recordValues['Created'] = 'CURRENT_TIMESTAMP';
+                $recordValues['CreatorID'] = !empty($_SESSION) && !empty($_SESSION['User']) ? $_SESSION['User']->ID : null;
+            }
 
             $set = static::_mapValuesToSet($recordValues);
 
