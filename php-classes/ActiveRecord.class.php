@@ -1260,10 +1260,10 @@ class ActiveRecord
         }
 
         try {
-            return DB::oneValue('SELECT COUNT(*) FROM `%s` WHERE (%s)', array(
+            return intval(DB::oneValue('SELECT COUNT(*) FROM `%s` WHERE (%s)', array(
                 static::$tableName
                 ,$conditions ? join(') AND (', $conditions) : '1'
-            ));
+            )));
         } catch (TableNotFoundException $e) {
             return 0;
         }
