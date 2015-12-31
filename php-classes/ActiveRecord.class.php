@@ -179,11 +179,24 @@ class ActiveRecord
                     ,'notnull' => false
                 );
             }
+
             if (empty(static::$fields['ModifierID'])) {
                 static::$fields['ModifierID'] = array(
                     'type' => 'uint'
                     ,'notnull' => false
                 );
+            }
+
+            if (empty(static::$relationships['Modifier'])) {
+                static::$relationships['Modifier'] = array(
+                    'type' => 'one-one',
+                    'class' => 'Person',
+                    'local' => 'ModifierID'
+                );
+
+                if (!in_array('Modifier', static::$dynamicFields)) {
+                    static::$dynamicFields[] = 'Modifier';
+                }
             }
         }
     }
