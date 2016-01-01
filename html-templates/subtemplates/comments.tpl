@@ -15,7 +15,8 @@
                 <div class="author">{avatar $.User size=56}</div>
 
                 <div class="message">
-                    {textarea Message $.User->FullName $validationErrors.Message hint='You can use <a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown</a> for formatting.' required=true default=$Comment->Message}
+                    {capture assign=authorName}{personName $.User}{/capture}
+                    {textarea Message $authorName $validationErrors.Message hint='You can use <a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown</a> for formatting.' required=true default=$Comment->Message}
 
                     <div class="submit-area">
                         <input type="submit" class="submit" value="{tif $Comment ? Edit : Post} Comment">

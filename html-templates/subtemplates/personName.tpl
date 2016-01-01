@@ -1,0 +1,1 @@
+{template personName Person}{$Person->FullName|escape}{/template}

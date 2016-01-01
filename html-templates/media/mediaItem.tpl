@@ -5,7 +5,7 @@
 {block content}
 	{$Media = $data}
 
-	<p class="lead">Uploaded on {$Media->Created|date_format} {if $Media->Creator} by <a href="/people/{$Media->Creator->Handle}">{$Media->Creator->FullName}</a>{/if}</p>
+	<p class="lead">Uploaded on {$Media->Created|date_format} {if $Media->Creator} by {personLink $Media->Creator}{/if}</p>
 
 	<h3>Original Media</h3>
 	<p>

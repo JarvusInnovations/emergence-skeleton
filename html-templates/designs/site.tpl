@@ -47,7 +47,7 @@
 		
 		<section id="user-info">
 			{if $.User}
-				{avatar $.User size=10} <a href="/profile" id="current-user">{$.User->FullName}</a> - <a href="/logout">Logout</a>
+				{avatar $.User size=10} <a href="/profile" id="current-user">{personName $.User}</a> - <a href="/logout">Logout</a>
 			{else}
 				<form id="minilogin" action="/login" method="post">
 					<fieldset>

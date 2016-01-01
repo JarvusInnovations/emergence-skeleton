@@ -1,3 +1,5 @@
+{load_templates subtemplates/personName.tpl}
+
 {template avatar Person size=32 pixelRatio=2 urlOnly=false forceSquare=true}
     {$pixels = $size}
     {if $pixelRatio}
@@ -12,15 +14,15 @@
     {if $urlOnly}{strip}
         $src
     {/strip}{else}{strip}
-        <img alt="{$Person->FullName|escape}" src="{$src}" class="avatar" width="{$size}">
+        <img alt="{personName $Person}" src="{$src}" class="avatar" width="{$size}">
     {/strip}{/if}
 {/template}
 
 {template personLink Person photo=no photoSize=64 pixelRatio=2}{strip}
-    <a href="{$Person->getURL()}" title="{$Person->FullName|escape}">
+    <a href="{$Person->getURL()}" title="{personName $Person}">
         {if $photo}
             {avatar $Person size=$photoSize pixelRatio=$pixelRatio}
         {/if}
-        <span class="name">{$Person->FullName|escape}</span>
+        <span class="name">{personName $Person}</span>
     </a>
 {/strip}{/template}

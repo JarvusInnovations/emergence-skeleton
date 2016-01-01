@@ -1,13 +1,13 @@
 {extends "designs/site.tpl"}
 
-{block "title"}{$data->FullNamePossessive} Profile &mdash; {$dwoo.parent}{/block}
+{block "title"}{personName $data} &mdash; {$dwoo.parent}{/block}
 
 
 {block "content"}
 	{$Person = $data}
 
     <header class="page-header">
-        <h2 class="header-title">{$Person->FullName|escape}</h2>
+        <h2 class="header-title">{personName $Person}</h2>
     	{if $Person->Location}
 		    <h3 class="header-details"><a href="http://maps.google.com/?q={$Person->Location|escape:url}" target="_blank">{$Person->Location|escape}</a></h3>
 		{/if}
@@ -20,9 +20,9 @@
 	
 	<div id="photos">
 		{if $Person->PrimaryPhoto}
-			<a href="{$Person->PrimaryPhoto->WebPath}" id="display-photo-link"><img src="{$Person->PrimaryPhoto->getThumbnailRequest(200,200)}" alt="Profile Photo: {$Person->FullName|escape}" id="display-photo" /></a>
+			<a href="{$Person->PrimaryPhoto->WebPath}" id="display-photo-link"><img src="{$Person->PrimaryPhoto->getThumbnailRequest(200,200)}" alt="Profile Photo: {personName $Person}" id="display-photo" /></a>
 		{else}
-			<img src="/thumbnail/person/200x200" alt="Profile Photo: {$Person->FullName|escape}" id="profilePhoto" />
+			<img src="/thumbnail/person/200x200" alt="Profile Photo: {personName $Person}" id="profilePhoto" />
 		{/if}
 		<div id="photo-thumbs" class="clearfix">
 			{foreach item=Photo from=$Person->Photos}
@@ -49,7 +49,7 @@
 		<dl class="section">
 			{if $Person->Email}
 				<dt>Email</dt>
-				<dd><a href="mailto:{$Person->Email}" title="Email {$Person->FullName|escape}">{$Person->Email}</a></dd>
+				<dd><a href="mailto:{$Person->Email}" title="Email {personName $Person}">{$Person->Email}</a></dd>
 			{/if}
 			
 			{if $Person->Phone}
