@@ -6,9 +6,6 @@ use HandleBehavior;
 
 class Comment extends \VersionedRecord
 {
-    // VersionedRecord configuration
-    public static $historyTable = 'history_comments';
-
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;

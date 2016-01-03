@@ -105,7 +105,7 @@ abstract class VersionedRecord extends ActiveRecord
 
         $query = 'SELECT * FROM `%s` WHERE (%s)';
         $params = array(
-            static::$historyTable
+            static::getHistoryTableName()
             , count($options['conditions']) ? join(') AND (', static::_mapConditions($options['conditions'])) : 1
         );
 
@@ -155,7 +155,7 @@ abstract class VersionedRecord extends ActiveRecord
             DB::nonQuery(
                 'INSERT INTO `%s` SET %s'
                 , array(
-                    static::$historyTable
+                    static::getHistoryTableName()
                     , join(',', $set)
                 )
             );
@@ -170,5 +170,10 @@ abstract class VersionedRecord extends ActiveRecord
     public static function getStaticRootClass($boundingParentClass = __CLASS__)
     {
         return parent::getStaticRootClass($boundingParentClass);
+    }
+
+    public static function getHistoryTableName()
+    {
+        return static::$historyTable ?: 'history_' . static::$tableName;
     }
 }

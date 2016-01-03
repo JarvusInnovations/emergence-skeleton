@@ -4,9 +4,6 @@ namespace Emergence\CMS\Item;
 
 abstract class AbstractItem extends \VersionedRecord
 {
-    // VersionedRecord configuration
-    public static $historyTable = 'history_content_items';
-
     // ActiveRecord configuration
     public static $tableName = 'content_items';
     public static $singularNoun = 'content item';

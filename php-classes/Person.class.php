@@ -7,9 +7,6 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
     public static $defaultClass = __CLASS__;
     public static $subClasses = array(__CLASS__);
 
-    // VersionedRecord configuration
-    public static $historyTable = 'history_people';
-
     // ActiveRecord configuration
     public static $tableName = 'people';
     public static $singularNoun = 'person';

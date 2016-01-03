@@ -9,9 +9,6 @@ use JSON;
 
 abstract class AbstractContent extends \VersionedRecord
 {
-    // VersionedRecord configuration
-    public static $historyTable = 'history_content';
-
     // ActiveRecord configuration
     public static $tableName = 'content';
     public static $singularNoun = 'content';
