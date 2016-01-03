@@ -1931,7 +1931,7 @@ class ActiveRecord
                 }
 
                 // normalize encoding to ASCII
-                $value = @mb_convert_encoding($value, DB::$encoding, 'auto');
+                $value = @mb_convert_encoding($value, 'UTF-8', 'auto');
 
                 // remove any remaining non-printable characters
                 //$value = preg_replace('/[^[:print:][:space:]]/', '', $value);
