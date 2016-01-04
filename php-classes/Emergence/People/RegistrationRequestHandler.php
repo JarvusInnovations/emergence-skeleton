@@ -4,6 +4,7 @@ namespace Emergence\People;
 
 use PasswordToken;
 use Emergence\Mailer\Mailer;
+use Emergence\EventBus;
 
 class RegistrationRequestHandler extends \RequestHandler
 {
@@ -84,6 +85,12 @@ class RegistrationRequestHandler extends \RequestHandler
                 call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
             }
 
+            EventBus::fireEvent('beforeRegister', self::class, array(
+                'User' => $User,
+                'requestData' => $_REQUEST,
+                'additionalErrors' => &$additionalErrors
+            ));
+
             // validate
             if ($User->validate() && empty($additionalErrors)) {
                 // save store
@@ -102,6 +109,11 @@ class RegistrationRequestHandler extends \RequestHandler
                 if (is_callable(static::$onRegisterComplete)) {
                     call_user_func(static::$onRegisterComplete, $User, $_REQUEST);
                 }
+
+                EventBus::fireEvent('registerComplete', self::class, array(
+                    'User' => $User,
+                    'requestData' => $_REQUEST
+                ));
 
                 return static::respond('registerComplete', array(
                     'success' => true
