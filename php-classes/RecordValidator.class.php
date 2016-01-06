@@ -87,9 +87,17 @@ class RecordValidator
             }
         }
 
+
+        // get validator
+        if (is_string($options['validator'])) {
+            $validator = array('Validators', $options['validator']);
+        } else {
+            $validator = $options['validator'];
+        }
+
         // check validator
-        if (!is_callable('Validators::'.$options['validator'])) {
-            die("Invalid form validator: $options[validator]");
+        if (!is_callable($validator)) {
+            throw new Exception('Validator for field ' . $options['id'] . ' is not callable');
         }
 
 
@@ -121,7 +129,7 @@ class RecordValidator
 
 
         // call validator
-        $isValid = call_user_func(array('validators',$options['validator']), $value, $options);
+        $isValid = call_user_func($validator, $value, $options);
 
         if ($isValid == false) {
             if (!empty($options['errorMessage'])) {
