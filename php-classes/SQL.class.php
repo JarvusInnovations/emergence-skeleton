@@ -119,10 +119,9 @@ class SQL
 
 
         $createSQL = sprintf(
-            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=%s;"
-            , $historyVariant ? $recordClass::$historyTable : $recordClass::$tableName
+            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=utf8;"
+            , $historyVariant ? $recordClass::getHistoryTableName() : $recordClass::$tableName
             , join("\n\t,", $queryFields)
-            , DB::$charset
         );
 
         // append history table SQL
@@ -147,7 +146,7 @@ class SQL
     {
         // compile fields
         $rootClass = $recordClass::getStaticRootClass();
-        $existingFields = static::getExistingFields($historyVariant?$recordClass::$historyTable:$recordClass::$tableName);
+        $existingFields = static::getExistingFields($historyVariant?$recordClass::getHistoryTableName():$recordClass::$tableName);
     	foreach($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field)
     	{
             if(!in_array($field['columnName'],$existingFields))
@@ -216,7 +215,7 @@ class SQL
         }
         
         
-        $Output = 'ALTER TABLE `'.($historyVariant?$recordClass::$historyTable:$recordClass::$tableName)."`".PHP_EOL."\t".implode(",".PHP_EOL."\t",$queryFields).";";
+        $Output = 'ALTER TABLE `'.($historyVariant?$recordClass::getHistoryTableName():$recordClass::$tableName)."`".PHP_EOL."\t".implode(",".PHP_EOL."\t",$queryFields).";";
         
         if($historyVariant) {
             return $Output;
