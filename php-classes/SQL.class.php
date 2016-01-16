@@ -119,9 +119,10 @@ class SQL
 
 
         $createSQL = sprintf(
-            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=utf8;"
-            , $historyVariant ? $recordClass::getHistoryTableName() : $recordClass::$tableName
+            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=%s;"
+            , $historyVariant ? $recordClass::$historyTable : $recordClass::$tableName
             , join("\n\t,", $queryFields)
+            , DB::$charset
         );
 
         // append history table SQL
@@ -131,7 +132,7 @@ class SQL
 
         return $createSQL;
     }
-
+    
     static public function getExistingFields($table)
     {
         $columns = DB::allRecords(sprintf("SHOW COLUMNS FROM %s",$table));
@@ -142,35 +143,32 @@ class SQL
         return $output;
     }
     
-    static public function getAdds($recordClass, $historyVariant = false, $enforceOrder = true)
+    static public function getAlterTable($recordClass, $historyVariant = false, $enforceOrder = true)
     {
         // compile fields
-    	$rootClass = $recordClass::getStaticRootClass();
-        $existingFields = static::getExistingFields($recordClass::$tableName);
-	foreach($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field)
-	{
+        $rootClass = $recordClass::getStaticRootClass();
+        $existingFields = static::getExistingFields($historyVariant?$recordClass::$historyTable:$recordClass::$tableName);
+    	foreach($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field)
+    	{
             if(!in_array($field['columnName'],$existingFields))
             {
-                if($field['columnName'] == 'RevisionID')
-            	{
-    			continue;
-    		}
-    			
-    		// force notnull=false on non-rootclass fields
-    		if($rootClass && !$rootClass::fieldExists($fieldId))
-    		{
-    			$field['notnull'] = false;
-    		}
-    			
-    		// auto-prepend class type
-    		if($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses()))
-    		{
-    			array_unshift($field['values'], $rootClass);
-    		}
-    
-    		$fieldDef = '`'.$field['columnName'].'`';
-    		$fieldDef .= ' '.static::getSQLType($field);
-                
+                if($field['columnName'] == 'RevisionID') {
+        			continue;
+        		}
+        			
+        		// force notnull=false on non-rootclass fields
+        		if($rootClass && !$rootClass::fieldExists($fieldId)) {
+        			$field['notnull'] = false;
+        		}
+        			
+        		// auto-prepend class type
+        		if($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses())) {
+        			array_unshift($field['values'], $rootClass);
+        		}
+        
+        		$fieldDef = '`'.$field['columnName'].'`';
+        		$fieldDef .= ' '.static::getSQLType($field);
+                    
                 if (!empty($field['charset'])) {
                     $fieldDef .= " CHARACTER SET $field[charset]";
                 }
@@ -178,42 +176,60 @@ class SQL
                 if (!empty($field['collate'])) {
                     $fieldDef .= " COLLATE $field[collate]";
                 }
-    
-    		$fieldDef .= ' '. ($field['notnull'] ? 'NOT NULL' : 'NULL');
-    
-    		if($field['autoincrement'] && !$historyVariant)
-    			$fieldDef .= ' auto_increment';
-    		elseif( ($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP') )
-    			$fieldDef .= ' default CURRENT_TIMESTAMP';
-    		elseif(empty($field['notnull']) && ($field['default'] == null))
-    			$fieldDef .= ' default NULL';
-    		elseif(isset($field['default']))
-    		{
-    			if($field['type'] == 'boolean')
-    			{
-    				$fieldDef .= ' default ' . ($field['default'] ? 1 : 0);
-    			}
-    			else
-    			{
-    				$fieldDef .= ' default "'.DB::escape($field['default']).'"';
-    			}
-    		}
-                
-                
-                $fieldDef = 'ADD ' . $fieldDef;
+        
+        		$fieldDef .= ' '.($field['notnull']?'NOT NULL':'NULL');
+        
+        		if($field['autoincrement'] && !$historyVariant) {
+        			$fieldDef .= ' auto_increment';
+                }
+        		elseif( ($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP') ) {
+        			$fieldDef .= ' default CURRENT_TIMESTAMP';
+        		}
+        		elseif(empty($field['notnull']) && ($field['default'] == null)) {
+        			$fieldDef .= ' default NULL';
+                }
+        		elseif(isset($field['default'])) {
+        			if($field['type'] == 'boolean') {
+        				$fieldDef .= ' default '.($field['default']?1:0);
+        			}
+        			else {
+        				$fieldDef .= ' default "'.DB::escape($field['default']).'"';
+        			}
+        		}
+                    
+                    
+                $fieldDef = 'ADD '.$fieldDef;
                 if($lastColumn && $enforceOrder)
                 {
-                    $fieldDef .= ' AFTER `' . $lastColumn . '`';
+                    $fieldDef .= ' AFTER `'.$lastColumn.'`';
                 }
                 
                 $queryFields[] = $fieldDef;
-                
             }
-            
+                
             $lastColumn = $field['columnName'];
-            
-	}
-        return 'ALTER TABLE `'.$recordClass::$tableName.'` '.implode(", \n",$queryFields);
+                
+    	}
+        
+        if(!$queryFields) {
+            throw new Exception("Model already has all of it's fields.");
+        }
+        
+        
+        $Output = 'ALTER TABLE `'.($historyVariant?$recordClass::$historyTable:$recordClass::$tableName)."`".PHP_EOL."\t".implode(",".PHP_EOL."\t",$queryFields).";";
+        
+        if($historyVariant) {
+            return $Output;
+        }
+        
+        if (is_subclass_of($recordClass, 'VersionedRecord')) {
+            try {
+                $Output .= PHP_EOL.PHP_EOL.PHP_EOL.static::getAlterTable($recordClass, true, $enforceOrder);
+            }
+            catch(Exception $e) {} // if the history table throws an exception leave it alone just don't add the query
+        }
+        
+        return $Output;
     }
 
     public static function getSQLType($field)

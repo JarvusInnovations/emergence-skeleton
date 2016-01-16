@@ -28,6 +28,9 @@ class TableManagerRequestHandler extends RequestHandler
             {
                 return static::handleSQLRequest();
             }
+            
+            case 'alter-table':
+                return static::handleAlterTableRequest();
 
             case 'ext-model':
             {
@@ -122,6 +125,46 @@ class TableManagerRequestHandler extends RequestHandler
             'query' => SQL::getCreateTable($_REQUEST['class'])
             ,'class' => $_REQUEST['class']
         ));
+    }
+    
+    public static function handleAlterTableRequest()
+    {
+        if (empty($_REQUEST['class']) || !is_subclass_of($_REQUEST['class'], 'ActiveRecord')) {
+            return static::throwInvalidRequestError();
+        }
+
+        // handle execute
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_REQUEST['sql'])) {
+            $sql = preg_replace('/^--.*/m', '', $_REQUEST['sql']);
+
+            if (!$success = DB::getMysqli()->multi_query($sql)) {
+                $error = DB::getMysqli()->error;
+            }
+            return static::respond('sqlExecuted', array(
+                'query' => $_REQUEST['sql'],
+                'class' => $_REQUEST['class'],
+                'success' => $success,
+                'error' => isset($error) ? $error : null
+            ));
+        }
+        
+        try {
+            $query = SQL::getAlterTable($_REQUEST['class']);
+            return static::respond('altertable', array(
+                'success' => true,
+                'query' => $query,
+                'class' => $_REQUEST['class']
+            ));
+        }
+        catch(Exception $e) {
+            return static::respond('altertable', array(
+                'class' => $_REQUEST['class'],
+                'error' => $e->getMessage(),
+                'success' => false
+            ));
+        }
+
+        
     }
 
 
