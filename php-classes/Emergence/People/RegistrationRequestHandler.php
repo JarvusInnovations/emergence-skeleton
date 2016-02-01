@@ -69,20 +69,20 @@ class RegistrationRequestHandler extends \RequestHandler
             // save person fields
             $User->setFields(array_merge($filteredRequestFields, $overrideFields));
 
-            if (!empty($_REQUEST['Password'])) {
-                $User->setClearPassword($_REQUEST['Password']);
+            if (!empty($filteredRequestFields['Password'])) {
+                $User->setClearPassword($filteredRequestFields['Password']);
             }
 
             // additional checks
-            if (empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < $User::$minPasswordLength)) {
+            if (empty($filteredRequestFields['Password']) || (strlen($filteredRequestFields['Password']) < $User::$minPasswordLength)) {
                 $additionalErrors['Password'] = 'Password must be at least '.$User::$minPasswordLength.' characters long.';
-            } elseif (empty($_REQUEST['PasswordConfirm']) || ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm'])) {
+            } elseif (empty($filteredRequestFields['PasswordConfirm']) || ($filteredRequestFields['Password'] != $filteredRequestFields['PasswordConfirm'])) {
                 $additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
             }
 
             // configurable hook
             if (is_callable(static::$applyRegistrationData)) {
-                call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
+                call_user_func_array(static::$applyRegistrationData, array($User, $filteredRequestFields, &$additionalErrors));
             }
 
             EventBus::fireEvent('beforeRegister', self::class, array(
@@ -103,11 +103,12 @@ class RegistrationRequestHandler extends \RequestHandler
 
                 // send welcome email
                 Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', array(
-                    'User' => $User
+                    'User' => $User,
+                    'registrationData' => $filteredRequestFields
                 ));
 
                 if (is_callable(static::$onRegisterComplete)) {
-                    call_user_func(static::$onRegisterComplete, $User, $_REQUEST);
+                    call_user_func(static::$onRegisterComplete, $User, $filteredRequestFields);
                 }
 
                 EventBus::fireEvent('registerComplete', self::class, array(
