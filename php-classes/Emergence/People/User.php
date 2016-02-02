@@ -59,6 +59,8 @@ class User extends Person
         )
     );
 
+    public static $dynamicFields = [];
+
     public static function __classLoaded()
     {
         // merge User classes into valid Person classes, but not again when child classes are loaded
