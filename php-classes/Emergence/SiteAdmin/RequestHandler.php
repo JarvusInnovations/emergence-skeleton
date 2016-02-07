@@ -14,7 +14,7 @@ class RequestHandler extends \RequestHandler
             'scripts' => array_filter(
                 \Emergence_FS::getAggregateChildren('site-root/site-admin'),
                 function($script) {
-                    return $script->Handle != 'index.php';
+                    return $script->Handle != '_index.php';
                 }
             )
         ));
