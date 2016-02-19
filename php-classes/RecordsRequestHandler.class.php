@@ -188,7 +188,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 $conditions[] = '( ('.join(') OR (', $newConditions).') )';
             }
 
-            if (static::$browseOrder) {
+            if (static::$browseOrder && empty($options['order'])) {
                 $options['order'] = $className::mapFieldOrder(static::$browseOrder);
             }
         }
@@ -200,14 +200,14 @@ abstract class RecordsRequestHandler extends RequestHandler
                 ,'data' => $className::getAllByQuery(
                     'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
                     ,array(
-                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
+                        !empty($options['calcFoundRows']) ? 'SQL_CALC_FOUND_ROWS' : ''
                         ,join(',',$select)
                         ,$className::$tableName
                         ,$tableAlias
                         ,!empty($joins) ? implode(' ', $joins) : ''
                         ,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
                         ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-                        ,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
+                        ,count($options['order']) ? 'ORDER BY '.join(',', $className::mapFieldOrder($options['order'])) : ''
                         ,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
                     )
                 )
@@ -264,7 +264,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
         // handle query search
         if (!empty($_REQUEST['q']) && $className::$searchConditions) {
-            return static::handleQueryRequest($_REQUEST['q'], $conditions, array('limit' => $limit, 'offset' => $offset), $responseID, $responseData);
+            return static::handleQueryRequest($_REQUEST['q'], $conditions, $options, $responseID, $responseData);
         }
 
 
