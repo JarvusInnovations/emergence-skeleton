@@ -2549,5 +2549,47 @@ class ActiveRecord
         }
 
         return null;
+    },
+
+    /* 
+    *   Handles adding related fields to the query via $dynamicFields.
+    *   Accepts dot-separated string value of relationship (RelationshipName.RelationshipName) or an array of relationships to loop through
+    *   @params ActiveRecord Record
+    *   @params boolean Return only strings
+    *   @params array Options
+    */
+    public function getRelatedData($stringsOnly = false, $options = [])
+    {
+        
+        $relatedObject = null;
+        $value = null;
+        $relationships = $options['relationship'];
+        $Record = $this;
+        
+        if (is_string($relationships))
+            $relationships = explode('.', $relationships);
+            
+        $relatedObject = $Record->getValue(array_shift($relationships));
+        
+        while (is_object($relatedObject) && $relName = array_shift($relationships)) {
+            $relatedObject = $relatedObject->getValue($relName);
+        }            
+        
+        if ($relatedObject && is_object($relatedObject))
+            $value = $relatedObject->getValue($options['field']);
+        
+        if ($stringsOnly && !is_string($value)) {
+            if (is_array($value)) {
+                $strings = array();
+                foreach ($value AS $key => $attr) {
+                    $strings[] = is_string($key) ? "$key=$attr" : $attr;
+                }
+                $value = implode(',', $strings);
+            } else {
+                $value = (string)$value;
+            }
+        }
+        
+        return $value;
     }
 }
