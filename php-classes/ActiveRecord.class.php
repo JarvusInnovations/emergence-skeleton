@@ -822,7 +822,7 @@ class ActiveRecord
                         if (!empty($duplicateKeyConfig)) {
                             $keyFields = $duplicateKeyConfig['fields'];
                         } else {
-                            $keyFields = [];
+                            $keyFields = array();
                             foreach (static::getClassFields() AS $fieldName => $fieldConfig) {
                                 if (!empty($fieldConfig['primary'])) {
                                     $keyFields[] = $fieldName;
