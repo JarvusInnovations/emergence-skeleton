@@ -75,17 +75,6 @@ class TagItem extends ActiveRecord
         return $this->_isValid;
     }
 
-    public function save($deep = true)
-    {
-        global $Session;
-
-        if ($Session->Person) {
-            $this->Creator = $Session->Person;
-        }
-
-        return parent::save($deep);
-    }
-
     public function destroy()
     {
         DB::nonQuery('DELETE FROM `%s` WHERE `%s` = \'%s\' AND `%s` = %u AND `%s` = %u', array(
