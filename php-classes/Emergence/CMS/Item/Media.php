@@ -36,8 +36,10 @@ class Media extends AbstractItem
     public function save($deep = true)
     {
         if ($this->isFieldDirty('Data') && $this->Media) {
-            $this->Media->ContextClass = $this->Content->getRootClass();
-            $this->Media->ContextID = $this->ContentID;
+            if ($this->Content) {
+                $this->Media->ContextClass = $this->Content->getRootClass();
+                $this->Media->ContextID = $this->ContentID;
+            }
 
             if (array_key_exists('Caption', $this->Data)) {
                 $this->Media->Caption = $this->Data['Caption'];
