@@ -59,6 +59,11 @@ abstract class AbstractItem extends \VersionedRecord
         )
     );
 
+    public static $validators = array(
+        'Author' => 'require-relationship',
+        'Content' => 'require-relationship'
+    );
+
     public function validate($deep = true)
     {
         // call parent
