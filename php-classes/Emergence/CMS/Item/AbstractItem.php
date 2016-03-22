@@ -76,7 +76,7 @@ abstract class AbstractItem extends \VersionedRecord
     public function save($deep = true)
     {
         // set author
-        if (!$this->AuthorID) {
+        if (!$this->AuthorID && !empty($_SESSION) && !empty($_SESSION['User'])) {
             $this->Author = $_SESSION['User'];
         }
 
