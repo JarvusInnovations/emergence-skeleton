@@ -47,10 +47,7 @@ class Mapping extends \ActiveRecord
     );
 
     public static $indexes = array(
-        'Context' => array(
-            'type' => 'context-parent'
-        )
-        ,'Mapping' => array(
+        'Mapping' => array(
             'fields' => array('Connector', 'ExternalKey', 'ExternalIdentifier')
             ,'unique' => true
         )
