@@ -665,6 +665,12 @@ class Media extends ActiveRecord
 
     public function isVariantAvailable($variant)
     {
-        return false;
+        switch ($variant) {
+            case 'original':
+                return true;
+            
+            default:
+                return false;
+        }
     }
 }
