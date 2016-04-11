@@ -1253,6 +1253,73 @@ class ActiveRecord
         }
     }
 
+    public static function getAllBySearch($query, $options = [])
+    {
+        $tableAlias = static::getTableAlias();
+        $terms = str_getcsv($query, ' ');
+
+        $select = [$tableAlias.'.*'];
+        $joins = [];
+        $having = [];
+        $matchers = [];
+
+        foreach ($terms AS $term) {
+            $n = 0;
+            $qualifier = 'any';
+            $split = explode(':', $term, 2);
+
+            if (empty($term)) {
+                continue;
+            }
+
+            if (count($split) == 2) {
+                $qualifier = strtolower($split[0]);
+                $term = $split[1];
+            }
+
+            $sqlSearchConditions = static::getSqlSearchConditions($qualifier, $term);
+
+            if (count($sqlSearchConditions['conditions']) == 0 && !$sqlSearchConditions['qualifierFound']) {
+                throw new Exception('Unknown search qualifier: '.$qualifier);
+            }
+
+            $matchers = array_merge($matchers, $sqlSearchConditions['conditions']);
+
+            if ($sqlSearchConditions['joins']) {
+                $joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
+            }
+        }
+
+        if (empty($matchers)) {
+            throw new Exception('Query was empty');
+        }
+
+        // group by qualifier
+        $qualifierConditions = [];
+        foreach ($matchers AS $matcher) {
+            $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
+        }
+
+        // compile conditions
+        foreach ($qualifierConditions AS $newConditions) {
+            $conditions[] = '( ('.join(') OR (', $newConditions).') )';
+        }
+
+        return static::getAllByQuery(
+            'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s', [
+                'SQL_CALC_FOUND_ROWS',
+                join(',',$select),
+                static::$tableName,
+                $tableAlias,
+                !empty($joins) ? implode(' ', $joins) : '',
+                $conditions ? join(') AND (',static::mapConditions($conditions)) : '1',
+                count($having) ? 'HAVING ('.join(') AND (', $having).')' : '',
+                count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : '',
+                $options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
+            ]
+        );
+    }
+
     public static function getTableByQuery($keyField, $query, $params = array())
     {
         try {
