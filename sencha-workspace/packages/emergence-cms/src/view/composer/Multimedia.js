@@ -6,9 +6,9 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
     requires: [
         'Jarvus.fileupload.UploadBox',
         'Emergence.cms.model.Media',
-        'Ext.MessageBox'
+        'Ext.window.MessageBox'
     ],
-    
+
     config: {
         media: null
     },
@@ -22,7 +22,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
             tooltip: 'Add an audio, video, or photo file from your computer.'
         }
     },
-    
+
     previewTpl: [
         '<tpl for="Data">',
             '<a class="media-link" title="{Caption:htmlEncode}" href="/media/{MediaID}" target="_blank">',
@@ -57,7 +57,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
             captionField, uploadBox;
 
         me.callParent(arguments);
-        
+
         me.captionField = captionField = me.down('textfield');
         me.uploadBox = uploadBox = me.down('jarvus-uploadbox');
 
@@ -98,7 +98,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
         var me = this,
             captionField = me.captionField,
             supportedTypes = window.SiteEnvironment && window.SiteEnvironment.mediaSupportedTypes;
-        
+
         // check MIME type against supported types list if available
         if (supportedTypes && !Ext.Array.contains(supportedTypes, file.type)) {
             Ext.Msg.show({
@@ -110,10 +110,10 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
 
             return;
         }
-        
+
         // disable caption editing during upload because server will return a suggestion
         captionField.disable();
-        
+
         // upload to server
         uploadBox.upload(file, {
             url: '/media',
@@ -126,7 +126,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
 
                     captionField.setValue(media.get('Caption'));
                     captionField.enable();
-                    
+
                     me.firePreviewChange();
                 } else {
                     Ext.Msg.alert('Failed to upload media', response.data.message || 'The file you uploaded could not be processed. Please try a different file. Details have been logged for the system administrator.');
