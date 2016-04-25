@@ -45,12 +45,12 @@ class Tag extends ActiveRecord
             ,'sql' => 'Handle LIKE "%%%s%%.%"'
         ),
         'Title' => array(
-            'qualifiers' => ['any', 'Title'],
+            'qualifiers' => ['any', 'title'],
             'points' => 1,
             'sql' => 'Title LIKE "%%%1$s%%"'
         ),
         'Handle' => array(
-            'qualifiers' => ['any', 'Handle'],
+            'qualifiers' => ['any', 'handle'],
             'points' => 1,
             'sql' => 'Handle LIKE "%%%1$s%%"'
         )
