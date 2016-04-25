@@ -21,7 +21,22 @@ class TagsRequestHandler extends RecordsRequestHandler
             }
         }
     }
+    
+    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = NULL, $responseData = array())
+    {
+        if (!empty($_REQUEST['q']) && $_REQUEST['valuesqry'] == 'true') {
+            $handles = explode('|', $_REQUEST['q']);
+            $conditions = 'Handle IN ("'.join('","',DB::escape($handles)).'")';
+            
+            return static::respond('tags', array(
+                'success' => true
+                ,'data' => Tag::getAllByWhere($conditions)
+            ));
+        }
 
+        return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
+    }
+    
     public static function handleRecordRequest(ActiveRecord $Tag, $action = false)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
