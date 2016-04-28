@@ -30,20 +30,5 @@ foreach ($tableNames AS $tableName) {
 }
 
 
-// write config file to enable
-$configPath = 'php-config/VersionedRecord.config.d/track-modified.php';
-
-if (!Site::resolvePath($configPath)) {
-    printf("Writing VersionedRecord::\$trackModified = true to %s\n", $configPath);
-    SiteFile::createFromPath($configPath, <<<END_OF_FILE
-<?php
-
-// auto-written by {$migration[path]}
-VersionedRecord::\$trackModified = true;
-END_OF_FILE
-);
-}
-
-
 // done
 return static::STATUS_EXECUTED;
