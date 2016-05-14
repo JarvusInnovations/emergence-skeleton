@@ -116,7 +116,7 @@ abstract class AbstractContent extends \VersionedRecord
             return false;
         }
 
-        if ($this->Visibility != 'Public' && !$User->hasAccountLevel('User')) {
+        if ($this->Visibility != 'Public' && (!$User || !$User->hasAccountLevel('User'))) {
             return false;
         }
 
