@@ -1253,15 +1253,15 @@ class ActiveRecord
         }
     }
 
-    public static function getAllBySearch($query, $options = [])
+    public static function getAllBySearch($query, $options = array())
     {
         $tableAlias = static::getTableAlias();
         $terms = str_getcsv($query, ' ');
 
-        $select = [$tableAlias.'.*'];
-        $joins = [];
-        $having = [];
-        $matchers = [];
+        $select = array($tableAlias.'.*');
+        $joins = array();
+        $having = array();
+        $matchers = array();
 
         foreach ($terms AS $term) {
             $n = 0;
@@ -1295,7 +1295,7 @@ class ActiveRecord
         }
 
         // group by qualifier
-        $qualifierConditions = [];
+        $qualifierConditions = array();
         foreach ($matchers AS $matcher) {
             $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
         }
@@ -1306,9 +1306,9 @@ class ActiveRecord
         }
 
         return static::getAllByQuery(
-            'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s', [
+            'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s', array(
                 'SQL_CALC_FOUND_ROWS',
-                join(',',$select),
+                join(',', $select),
                 static::$tableName,
                 $tableAlias,
                 !empty($joins) ? implode(' ', $joins) : '',
@@ -1316,7 +1316,7 @@ class ActiveRecord
                 count($having) ? 'HAVING ('.join(') AND (', $having).')' : '',
                 count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : '',
                 $options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
-            ]
+            )
         );
     }
 
