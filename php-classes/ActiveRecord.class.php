@@ -1307,7 +1307,7 @@ class ActiveRecord
 
         return static::getAllByQuery(
             'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s', array(
-                'SQL_CALC_FOUND_ROWS',
+                !empty($options['calcFoundRows']) ? 'SQL_CALC_FOUND_ROWS' : '',
                 join(',', $select),
                 static::$tableName,
                 $tableAlias,
@@ -1315,7 +1315,7 @@ class ActiveRecord
                 $conditions ? join(') AND (',static::mapConditions($conditions)) : '1',
                 count($having) ? 'HAVING ('.join(') AND (', $having).')' : '',
                 count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : '',
-                $options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
+                $options['limit'] ? sprintf('LIMIT %u,%u', $options['offset'], $options['limit']) : ''
             )
         );
     }
