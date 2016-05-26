@@ -111,106 +111,18 @@ abstract class RecordsRequestHandler extends RequestHandler
     public static function handleQueryRequest($query, $conditions = array(), $options = array(), $responseID = null, $responseData = array(), $mode = 'AND')
     {
         $className = static::$recordClass;
-        $tableAlias = $className::getTableAlias();
-        $terms = str_getcsv($query, ' ');
 
-        $options = array_merge(array(
-            'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault
-            ,'offset' => !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false
-        ), $options);
-
-        $select = array($tableAlias.'.*');
-        $joins = array();
-        $having = array();
-        $matchers = array();
-
-        foreach ($terms AS $term) {
-            $n = 0;
-            $qualifier = 'any';
-            $split = explode(':', $term, 2);
-
-            if (empty($term)) {
-                continue;
-            }
-
-            if (count($split) == 2) {
-                $qualifier = strtolower($split[0]);
-                $term = $split[1];
-            }
-
-            if ($qualifier == 'mode' && $term=='or') {
-                $mode = 'OR';
-                continue;
-            }
-
-
-            $sqlSearchConditions = $className::getSqlSearchConditions($qualifier, $term);
-
-            if (count($sqlSearchConditions['conditions']) == 0 && !$sqlSearchConditions['qualifierFound']) {
-                return static::throwError('Unknown search qualifier: '.$qualifier);
-            }
-
-            $matchers = array_merge($matchers, $sqlSearchConditions['conditions']);
-
-            if ($sqlSearchConditions['joins']) {
-                $joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
-            }
-        }
-
-        if (empty($matchers)) {
-            return static::throwError('Query was empty');
-        }
-
-        if ($mode == 'OR') {
-            // OR mode, object can match any term and results are sorted by score
-
-            $select[] = join('+', array_map(function($c) {
-                return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
-            }, $matchers)).' AS searchScore';
-
-            $having[] = 'searchScore > 1';
-
-            if (empty($options['order'])) {
-                $options['order'] = array('searchScore DESC');
-            }
-        } else {
-            // AND mode, all terms must match 
-
-            // group by qualifier
-            $qualifierConditions = array();
-            foreach ($matchers AS $matcher) {
-                $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
-                //$conditions[] = $matcher['condition'];
-            }
-
-            // compile conditions
-            foreach ($qualifierConditions AS $newConditions) {
-                $conditions[] = '( ('.join(') OR (', $newConditions).') )';
-            }
-
-            if (static::$browseOrder) {
-                $options['order'] = $className::mapFieldOrder(static::$browseOrder);
-            }
+        if (static::$browseOrder) {
+            $options['order'] = $className::mapFieldOrder(static::$browseOrder);
         }
 
         return static::respond(
             isset($responseID) ? $responseID : static::getTemplateName($className::$pluralNoun)
             ,array_merge($responseData, array(
                 'success' => true
-                ,'data' => $className::getAllByQuery(
-                    'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
-                    ,array(
-                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
-                        ,join(',',$select)
-                        ,$className::$tableName
-                        ,$tableAlias
-                        ,!empty($joins) ? implode(' ', $joins) : ''
-                        ,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
-                        ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-                        ,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
-                        ,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
-                    )
-                )
+                ,'data' => $className::getAllBySearch($query, array_merge(array(
+                    'calcFoundRows' => static::$browseCalcFoundRows
+                ), $options))
                 ,'query' => $query
                 ,'conditions' => $conditions
                 ,'total' => DB::foundRows()
