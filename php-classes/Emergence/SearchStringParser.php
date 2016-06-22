@@ -10,7 +10,7 @@ class SearchStringParser
     // parser state
     protected $string;
     protected $cursorMax;
-    protected $terms = [];
+    protected $terms = array();
 
     // scanning state
     protected $qualifier = '';
@@ -144,10 +144,10 @@ class SearchStringParser
      protected function flushTerm()
      {
         if ($this->term || $this->qualifier) {
-            $this->terms[] = [
+            $this->terms[] = array(
                 'qualifier' => $this->qualifier ?: null,
                 'term' => $this->term ?: null
-            ];
+            );
 
             $this->qualifier = '';
             $this->term = '';
