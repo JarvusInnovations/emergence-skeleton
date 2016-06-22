@@ -112,7 +112,6 @@ abstract class RecordsRequestHandler extends RequestHandler
     {
         $className = static::$recordClass;
         $tableAlias = $className::getTableAlias();
-        $terms = str_getcsv($query, ' ');
 
         $options = array_merge(array(
             'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault
@@ -125,13 +124,13 @@ abstract class RecordsRequestHandler extends RequestHandler
         $matchers = array();
 
         $parsedQuery = \Emergence\SearchStringParser::parseString($query);
-        foreach ($parsedQuery AS $searchTerm) {
-            if ($searchTerm === null || !isset($searchTerm['term'])) {
+        foreach ($parsedQuery AS $queryPart) {
+            if ($queryPart === null || !isset($queryPart['term'])) {
                 continue;
             }
 
-            $term = $searchTerm['term'];
-            $qualifier = strtolower($searchTerm['qualifier']) ?: 'any';
+            $term = $queryPart['term'];
+            $qualifier = strtolower($queryPart['qualifier']) ?: 'any';
 
             if ($qualifier == 'mode' && $term=='or') {
                 $mode = 'OR';
