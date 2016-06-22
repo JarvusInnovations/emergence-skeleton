@@ -32,7 +32,8 @@ class SearchStringParser
 
     public static function parseString($string)
     {
-        return (new static($string))->parse();
+        $parser = new static($string);
+        return $parser->parse();
     }
 
     protected static function isQuote($character)
