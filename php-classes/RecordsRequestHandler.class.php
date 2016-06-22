@@ -124,25 +124,19 @@ abstract class RecordsRequestHandler extends RequestHandler
         $having = array();
         $matchers = array();
 
-        foreach ($terms AS $term) {
-            $n = 0;
-            $qualifier = 'any';
-            $split = explode(':', $term, 2);
-
-            if (empty($term)) {
+        $parsedQuery = \Emergence\SearchStringParser::parseString($query);
+        foreach ($parsedQuery AS $searchTerm) {
+            if ($searchTerm === null || !isset($searchTerm['term'])) {
                 continue;
             }
 
-            if (count($split) == 2) {
-                $qualifier = strtolower($split[0]);
-                $term = $split[1];
-            }
+            $term = $searchTerm['term'];
+            $qualifier = strtolower($searchTerm['qualifier']) ?: 'any';
 
             if ($qualifier == 'mode' && $term=='or') {
                 $mode = 'OR';
                 continue;
             }
-
 
             $sqlSearchConditions = $className::getSqlSearchConditions($qualifier, $term);
 
@@ -174,7 +168,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 $options['order'] = array('searchScore DESC');
             }
         } else {
-            // AND mode, all terms must match 
+            // AND mode, all terms must match
 
             // group by qualifier
             $qualifierConditions = array();
