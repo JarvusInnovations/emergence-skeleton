@@ -385,7 +385,7 @@ class ActiveRecord
     // public methods
     public function getTitle()
     {
-        return static::fieldExists('Title') ? $this->Title : "$this->Class #$this->ID";
+        return static::fieldExists('Title') && $this->Title ? $this->Title : "$this->Class #$this->ID";
     }
 
     public function getHandle()
@@ -814,9 +814,23 @@ class ActiveRecord
                         static::$updateOnDuplicateKey &&
                         preg_match('/Duplicate entry \'.*?\' for key \'([^\']+)\'/', $e->getMessage(), $errorMatches) &&
                         ($duplicateKeyName = $errorMatches[1]) &&
-                        ($duplicateKeyConfig = static::getStackedConfig('indexes', $duplicateKeyName))
+                        (
+                            ($duplicateKeyName == 'PRIMARY') ||
+                            ($duplicateKeyConfig = static::getStackedConfig('indexes', $duplicateKeyName))
+                        )
                     ) {
-                        $keyValues = array_intersect_key($recordValues, array_flip($duplicateKeyConfig['fields']));
+                        if (!empty($duplicateKeyConfig)) {
+                            $keyFields = $duplicateKeyConfig['fields'];
+                        } else {
+                            $keyFields = array();
+                            foreach (static::getClassFields() AS $fieldName => $fieldConfig) {
+                                if (!empty($fieldConfig['primary'])) {
+                                    $keyFields[] = $fieldName;
+                                }
+                            }
+                        }
+
+                        $keyValues = array_intersect_key($recordValues, array_flip($keyFields));
                         $deltaValues = array_diff_key($recordValues, array_flip(array('Created', 'CreatorID')));
 
                         DB::nonQuery(

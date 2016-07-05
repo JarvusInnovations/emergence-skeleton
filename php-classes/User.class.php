@@ -144,7 +144,7 @@ class User extends Person
     {
         if (static::fieldExists('Email')) {
             return static::getByWhere(array(
-                sprintf('"%s" IN (`%s`, `%s`)', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
+                sprintf('`%2$s` = "%1$s" OR `%3$s` = "%1$s"', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
             ));
         } else {
             return static::getByField('Username', $username);

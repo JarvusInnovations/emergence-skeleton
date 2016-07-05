@@ -3,7 +3,7 @@ Ext.define('Emergence.cms.view.EditorController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.emergence-cms-editor',
     requires: [
-        'Ext.MessageBox',
+        'Ext.window.MessageBox',
         'Emergence.cms.view.composer.Unknown'
     ],
 

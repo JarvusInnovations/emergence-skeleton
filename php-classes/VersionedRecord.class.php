@@ -3,7 +3,7 @@
 abstract class VersionedRecord extends ActiveRecord
 {
     // configure ActiveRecord
-    public static $trackModified = false;
+    public static $trackModified = true;
 
     public static $fields = array(
         'RevisionID' => array(

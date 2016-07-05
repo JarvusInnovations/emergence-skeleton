@@ -33,18 +33,11 @@ class HandleBehavior extends RecordBehavior
         }
     }
 
-    public static function getUniqueHandle($class, $text, $options = array())
+    public static function transformText($text, $options = array())
     {
         // apply default options
         $options = array_merge(array(
-            'handleField' => 'Handle'
-            ,'domainConstraints' => array()
-            ,'alwaysSuffix' => static::$alwaysSuffix
-            ,'randomSuffix' => false
-            ,'randomSuffixMin' => 100
-            ,'randomSuffixMax' => 999
-            ,'suffixFormat' => static::$suffixFormat
-            ,'transliterate' => static::$transliterate
+            'transliterate' => static::$transliterate
             ,'case' => 'lower' // 'lower' / 'upper' / null
         ), $options);
 
@@ -81,6 +74,25 @@ class HandleBehavior extends RecordBehavior
 
         // clean up any placeholder characters from ends
         $text = trim($text, '-_');
+
+        return $text;
+    }
+
+    public static function getUniqueHandle($class, $text, $options = array())
+    {
+        // apply default options
+        $options = array_merge(array(
+            'handleField' => 'Handle'
+            ,'domainConstraints' => array()
+            ,'alwaysSuffix' => static::$alwaysSuffix
+            ,'randomSuffix' => false
+            ,'randomSuffixMin' => 100
+            ,'randomSuffixMax' => 999
+            ,'suffixFormat' => static::$suffixFormat
+        ), $options);
+
+        // transform text to handle-friendly form
+        $text = static::transformText($text, $options);
 
         // restart with singular noun if nothing is left
         if (!$text) {

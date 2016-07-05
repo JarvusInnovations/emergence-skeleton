@@ -116,7 +116,7 @@ abstract class AbstractContent extends \VersionedRecord
             return false;
         }
 
-        if ($this->Visibility != 'Public' && !$User->hasAccountLevel('User')) {
+        if ($this->Visibility != 'Public' && (!$User || !$User->hasAccountLevel('User'))) {
             return false;
         }
 
@@ -183,7 +183,7 @@ abstract class AbstractContent extends \VersionedRecord
     public function save($deep = true)
     {
         // set author
-        if (!$this->AuthorID) {
+        if (!$this->AuthorID && !empty($_SESSION) && !empty($_SESSION['User'])) {
             $this->Author = $_SESSION['User'];
         }
 

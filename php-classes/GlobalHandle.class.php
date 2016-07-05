@@ -98,7 +98,7 @@ class GlobalHandle extends ActiveRecord
         }
 
         // update PK
-        if (!$this->ContextID && !$this->Context->isPhantom) {
+        if (!$this->ContextID && $this->Context && !$this->Context->isPhantom) {
             $this->ContextID = $this->Context->ID;
         }
 

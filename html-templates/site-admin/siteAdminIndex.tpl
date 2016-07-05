@@ -50,7 +50,7 @@
         <li><a class="button" href="/app/EmergencePullTool/production">Emergence Pull Tool</a></li>
         {foreach item=script from=$scripts}
             {$scriptName = $script->Handle|basename:'.php'}
-            <li><a class="button" href="{$scriptName}">{$scriptName}</a></li>
+            <li><a class="button" href="/site-admin/{$scriptName}">{$scriptName}</a></li>
         {/foreach}
     </ul>
 {/block}

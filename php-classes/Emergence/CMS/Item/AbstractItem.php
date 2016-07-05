@@ -59,6 +59,10 @@ abstract class AbstractItem extends \VersionedRecord
         )
     );
 
+    public static $validators = array(
+        'Content' => 'require-relationship'
+    );
+
     public function validate($deep = true)
     {
         // call parent
@@ -71,7 +75,7 @@ abstract class AbstractItem extends \VersionedRecord
     public function save($deep = true)
     {
         // set author
-        if (!$this->AuthorID) {
+        if (!$this->AuthorID && !empty($_SESSION) && !empty($_SESSION['User'])) {
             $this->Author = $_SESSION['User'];
         }
 

@@ -11,6 +11,7 @@ Site::$debug = true; // set to true for extended query logging
 
 // these resolved paths will skip initializing a user session
 Site::$skipSessionPaths[] = 'thumbnail.php';
+Site::$skipSessionPaths[] = 'min.php';
 
 // uncomment or set to an array of specific hostnames to enable CORS
 //Site::$permittedOrigins = '*';
