@@ -1,5 +1,5 @@
 <?php
-	
+
 namespace Emergence\Git;
 
 use Site;
@@ -17,13 +17,13 @@ class RequestHandler extends \RequestHandler
 		if (empty($_REQUEST['layer'])) {
 		    throw new Exception('Parameter "layer" required');
 		}
-		
+
 		$layerId = $_REQUEST['layer'];
-		
+
 		if(!$layer = Layer::getById($layerId)) {
 			throw new Exception('Requested layer "' . $layerId . '" is not defined');
 		}
-		
+
 		return $layer;
 	}
 
@@ -75,14 +75,30 @@ class RequestHandler extends \RequestHandler
 		}
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $keyTmpPath = tempnam(sys_get_temp_dir(), 'git-key');
+            unlink($keyTmpPath);
+            $keyStatus = exec($command = "ssh-keygen -q -t rsa -N '' -C '".Site::getConfig('primary_hostname')."' -f '$keyTmpPath'; echo $?");
+
+            if ($keyStatus != '0') {
+                throw new Exception("Failed to execute command: $command\nExit output: $keyStatus");
+            }
+
+            $publicKey = file_get_contents("$keyTmpPath.pub");
+            $privateKey = file_get_contents($keyTmpPath);
+
+            unlink("$keyTmpPath.pub");
+            unlink($keyTmpPath);
+
 			return static::respond('configureInit', [
-				'layer' => $layer
+				'layer' => $layer,
+                'publicKey' => $publicKey,
+                'privateKey' => $privateKey
 			]);
 		}
 
 		return static::respond('repositoryInitialized', [
 			'layer' => $layer,
-			'results' => $layer->initializeRepository($_POST['privateKey'])
+			'results' => $layer->initializeRepository($_POST['privateKey'], $_POST['publicKey'])
 		]);
 	}
 

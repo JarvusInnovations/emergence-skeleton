@@ -107,7 +107,7 @@ class Layer
 		if (is_string($key)) {
 			$treeOptions['vfsPath'] = $key;
 		}
-		
+
 		if (!$treeOptions['vfsPath']) {
 			$treeOptions['vfsPath'] = $treeOptions['path'] ?: $treeOptions['gitPath'];
 		}
@@ -144,7 +144,7 @@ class Layer
 		]));
 	}
 
-	public function initializeRepository($sshKey = null)
+	public function initializeRepository($privateKey = null, $publicKey = null)
 	{
 		// sanity checks
 		if (!$remote = $this->getConfig('remote')) {
@@ -163,11 +163,17 @@ class Layer
 			throw new \Exception("$repoPath already contains a .git repo directory");
 		}
 
-		// write key to file
-		if ($sshKey && ($sshKey = trim($sshKey))) {
-			$keyPath = "$repoPath.key";
-			file_put_contents($keyPath, $sshKey);
-			chmod($keyPath, 0600);
+		// write keys to file
+    	if ($privateKey && ($privateKey = trim($privateKey))) {
+			$privateKeyPath = "$repoPath.key";
+			file_put_contents($privateKeyPath, $privateKey);
+			chmod($privateKeyPath, 0600);
+		}
+
+    	if ($publicKey && ($publicKey = trim($publicKey))) {
+			$publicKeyPath = "$repoPath.pub";
+			file_put_contents($publicKeyPath, $publicKey);
+			chmod($publicKeyPath, 0600);
 		}
 
 		// write git wrapper to file
@@ -175,8 +181,8 @@ class Layer
 
 		$gitWrapper = '#!/bin/bash' . PHP_EOL;
         $gitWrapper .= 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no';
-		if (isset($keyPath)) {
-			$gitWrapper .= ' -i ' . escapeshellarg($keyPath);
+		if (isset($privateKeyPath)) {
+			$gitWrapper .= ' -i ' . escapeshellarg($privateKeyPath);
 		}
 		$gitWrapper .= ' $1 $2';
 
@@ -232,17 +238,17 @@ class Layer
     			if ($srcFileNode = Site::resolvePath($treeOptions['vfsPath'])) {
     			    if ($srcFileNode instanceof SiteFile) {
     			        $destDir = dirname($treeOptions['gitPath']);
-    	
+
     			        if ($destDir && !is_dir($destDir)) {
     			            mkdir($destDir, 0777, true);
     			        }
-    	
+
     			        copy($srcFileNode->RealPath, $treeOptions['gitPath']);
     					$result = ['analyzed' => 1, 'written' => 1];
     			    } else {
     			    	$result = Emergence_FS::exportTree($treeOptions['vfsPath'], $treeOptions['gitPath'], $treeOptions);
     			    }
-    
+
     				$result['success'] = true;
     			} else {
     				$result['success'] = false;
