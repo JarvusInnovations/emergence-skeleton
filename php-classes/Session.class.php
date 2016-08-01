@@ -28,6 +28,7 @@ class Session extends ActiveRecord
         )
         ,'LastRequest' => array(
             'type' => 'timestamp'
+            ,'default' => null
         )
         ,'LastIP' => array(
             'type' => 'integer'
