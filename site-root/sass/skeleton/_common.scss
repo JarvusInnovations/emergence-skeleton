@@ -17,7 +17,7 @@ body {
     margin: 0;
     padding: .5em 1em;
     text-align: center;
-    
+
     a {
         text-decoration: underline;
     }
@@ -55,6 +55,10 @@ body {
         @media #{$mq-wide} {
             width: 85%;
 
+            &.fluid-width {
+                width: auto;
+            }
+
             &.full-bleed {
                 padding: 0;
                 width: 100%;
@@ -81,7 +85,7 @@ body {
             @include box-sizing(border-box);
             float: left;
             width: 100%;
-            
+
             > .col-inner {
                 margin-right: $sidebar-size + 6;
             }
@@ -90,29 +94,29 @@ body {
         .sidebar-col {
             @include box-sizing(border-box);
             float: right;
-            margin-left: -1 * $sidebar-size; 
+            margin-left: -1 * $sidebar-size;
             width: $sidebar-size;
         }
     }
-    
+
     &.sidebar-28 {
         @media #{$mq-wide} {
             $sidebar-size: 28em;
-    
+
             .main-col {
                 @include box-sizing(border-box);
                 float: left;
                 width: 100%;
-                
+
                 > .col-inner {
                     margin-right: $sidebar-size + 1.5;
                 }
             }
-    
+
             .sidebar-col {
                 @include box-sizing(border-box);
                 float: right;
-                margin-left: -1 * $sidebar-size; 
+                margin-left: -1 * $sidebar-size;
                 width: $sidebar-size;
             }
         }
@@ -120,16 +124,16 @@ body {
 }
 
 .site-branding {
-    
+
     a {
         @include link-colors(inherit);
         text-decoration: none;
     }
-    
+
     img {
         vertical-align: middle;
     }
-    
+
     .text {
         display: inline-block;
     }
@@ -137,7 +141,7 @@ body {
     .site-logo + .text {
         padding-left: 1em;
     }
-    
+
     @media #{$mq-phone} {
         float: left;
         font-size: 1em;
@@ -148,17 +152,17 @@ body {
 
     &.has-slogan {
     	font-size: 1em;
-    	
+
     	.text {
         	vertical-align: -1em;
     	}
-    	
+
     	@media #{$mq-phone} {
     	    float: none;
     	    margin: 0;
         	padding: .75em 0 0;
         	overflow: hidden;
-        	
+
         	.text {
             	display: block;
             	margin-top: .25em;
@@ -169,7 +173,7 @@ body {
     	@media #{$mq-tablet} {
         	margin-top: 1em;
     	}
-    	
+
     	@media #{$mq-wide} {
         	margin: 0;
     	}
