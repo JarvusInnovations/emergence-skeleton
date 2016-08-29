@@ -1320,6 +1320,10 @@ class ActiveRecord
             if (!empty($condition['join'])) {
                 $joinConditions = $condition['join'];
 
+                if (empty($joinConditions['aliasName'])) {
+                    $joinConditions['aliasName'] = $joinConditions['className']::getTableAlias();
+                }
+
                 $sqlSearchConditions['joins'][] = 'JOIN `'.$joinConditions['className']::$tableName.'` '
                     .$joinConditions['aliasName']
                     .' ON ('
