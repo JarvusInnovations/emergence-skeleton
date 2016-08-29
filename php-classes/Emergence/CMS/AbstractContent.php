@@ -112,10 +112,17 @@ abstract class AbstractContent extends \VersionedRecord
     {
         $User = $User ?: $this->getUserFromEnvironment();
 
-        if ($this->Status != 'Published' && (!$User || !$User->hasAccountLevel('Staff'))) {
+        // author and staff can always read
+        if ($User && ($User->ID == $this->AuthorID || $User->hasAccountLevel('Staff'))) {
+            return true;
+        }
+
+        // only above exempted users can view non-published content
+        if ($this->Status != 'Published') {
             return false;
         }
 
+        // only logged-in users can view non-public content
         if ($this->Visibility != 'Public' && (!$User || !$User->hasAccountLevel('User'))) {
             return false;
         }
