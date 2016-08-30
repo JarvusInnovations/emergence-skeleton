@@ -27,7 +27,16 @@ class MinifiedRequestHandler extends RequestHandler
 
         // get sourceReport or cached code
         if (empty($_GET['_sha1']) || !($code = static::getSourceCode($minifier, $_GET['_sha1']))) {
-            $sourceReport = static::getSourceReport(static::getPath(), $root, $contentType);
+            try {
+                $sourceReport = static::getSourceReport(static::getPath(), $root, $contentType);
+            } catch (\Exception $e) {
+                if ($e->getCode() != self::ERROR_NOT_FOUND) {
+                    throw $e;
+                }
+
+                return static::throwNotFoundError('requested content not found');
+            }
+
             $hash = $sourceReport['hash'];
         } else {
             $hash = $_GET['_sha1'];
