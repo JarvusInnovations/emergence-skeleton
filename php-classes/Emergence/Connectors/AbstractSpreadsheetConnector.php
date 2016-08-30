@@ -10,6 +10,11 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 {
     public static $logRowColumnCount = 3;
 
+    public static $onBeforeValidateRecord;
+    public static $onValidateRecord;
+    public static $onBeforeSaveRecord;
+    public static $onSaveRecord;
+
     // protected methods
     protected static function _requireColumns($noun, SpreadsheetReader $spreadsheet, array $requiredColumns, array $columnsMap = null)
     {
