@@ -9,6 +9,7 @@ class SpreadsheetReader
     );
     protected $_fh;
     protected $_columnNames;
+    protected $_bomFound;
 
 
     public static function createFromFile($filename, $options = array())
@@ -60,6 +61,14 @@ class SpreadsheetReader
     {
         if (!$row = fgetcsv($this->_fh)) {
             return false;
+        }
+
+        if (!isset($this->_bomFound)) {
+            $this->_bomFound = count($row) && substr($row[0], 0, 3) == "\xEF\xBB\xBF";
+
+            if ($this->_bomFound) {
+                $row[0] = str_getcsv(substr($row[0], 3))[0];
+            }
         }
 
         if ($this->_options['autoTrim']) {
