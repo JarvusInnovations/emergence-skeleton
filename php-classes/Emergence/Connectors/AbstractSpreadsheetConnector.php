@@ -29,6 +29,8 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             throw new \Exception(
                 $noun.' spreadsheet is missing required column'.(count($missingColumns) != 1 ? 's' : '').': '
                 .join(',', $missingColumns)
+                .'. Found columns: '
+                .join(', ', $columns)
             );
         }
     }
