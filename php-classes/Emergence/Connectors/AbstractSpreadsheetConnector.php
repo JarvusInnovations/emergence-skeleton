@@ -116,6 +116,10 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             $results['created']++;
         } elseif ($logEntry['action'] == 'update') {
             $results['updated']++;
+
+            foreach (array_keys($logEntry['changes']) AS $changedField) {
+                $results['updated-fields'][$changedField]++;
+            }
         }
 
 
