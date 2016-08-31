@@ -32,6 +32,9 @@ class Person extends VersionedRecord implements IPerson
         ,'MiddleName' => array(
             'notnull' => false
         )
+        ,'PreferredName' => array(
+            'default' => null
+        )
         ,'Gender' => array(
             'type' => 'enum'
             ,'values' => array('Male','Female')
@@ -240,7 +243,7 @@ class Person extends VersionedRecord implements IPerson
     {
         return $this->getFullName();
     }
-    
+
     public function getFullName()
     {
         return $this->FirstName . ' ' . $this->LastName;
