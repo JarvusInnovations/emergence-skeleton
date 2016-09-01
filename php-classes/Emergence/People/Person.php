@@ -4,7 +4,8 @@ namespace Emergence\People;
 
 use DB;
 use VersionedRecord;
-use Group;
+use PhotoMedia;
+use Emergence\Comments\Comment;
 
 class Person extends VersionedRecord implements IPerson
 {
@@ -74,36 +75,30 @@ class Person extends VersionedRecord implements IPerson
     public static $relationships = array(
         'GroupMemberships' => array(
             'type' => 'one-many'
-            ,'class' => 'GroupMember'
+            ,'class' => Groups\GroupMember::class
             ,'indexField' => 'GroupID'
             ,'foreign' => 'PersonID'
         )
-        ,'Notes' => array(
-            'type' => 'context-children'
-            ,'class' => 'Note'
-            ,'contextClass' => 'Person'
-            ,'order' => array('ID' => 'DESC')
-        )
         ,'Groups' => array(
             'type' => 'many-many'
-            ,'class' => 'Group'
-            ,'linkClass' => 'GroupMember'
+            ,'class' => Groups\Group::class
+            ,'linkClass' => Groups\GroupMember::class
             ,'linkLocal' => 'PersonID'
             ,'linkForeign' => 'GroupID'
         )
         ,'PrimaryPhoto' => array(
             'type' => 'one-one'
-            ,'class' => 'PhotoMedia'
+            ,'class' => PhotoMedia::class
             ,'local' => 'PrimaryPhotoID'
         )
         ,'Photos' => array(
             'type' => 'context-children'
-            ,'class' => 'PhotoMedia'
+            ,'class' => PhotoMedia::class
             ,'contextClass' => __CLASS__
         )
         ,'Comments' => array(
             'type' => 'context-children'
-            ,'class' => 'Comment'
+            ,'class' => Comment::class
             ,'contextClass' => __CLASS__
             ,'order' => array('ID' => 'DESC')
         )
@@ -152,7 +147,7 @@ class Person extends VersionedRecord implements IPerson
             'qualifiers' => array('group')
             ,'points' => 1
             ,'join' => array(
-                'className' => 'GroupMember'
+                'className' => Groups\GroupMember::class
                 ,'aliasName' => 'GroupMember'
                 ,'localField' => 'ID'
                 ,'foreignField' => 'PersonID'
@@ -313,14 +308,14 @@ class Person extends VersionedRecord implements IPerson
 
     public static function getGroupConditions($handle, $matchedCondition)
     {
-        $group = Group::getByHandle($handle);
+        $group = Groups\Group::getByHandle($handle);
 
         if (!$group) {
             return false;
         }
 
         $containedGroups = DB::allRecords('SELECT ID FROM %s WHERE `Left` BETWEEN %u AND %u', array(
-            Group::$tableName
+            Groups\Group::$tableName
             ,$group->Left
             ,$group->Right
         ));
