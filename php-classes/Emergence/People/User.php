@@ -117,7 +117,7 @@ class User extends Person
 
         return parent::save($deep);
     }
-    
+
     public function getTitle()
     {
         return sprintf('%s (%s)', $this->Username, $this->AccountLevel);
@@ -198,7 +198,7 @@ class User extends Person
     {
         // apply default options
         $options = array_merge(
-            array('incrementerFormat' => '%s%u'),
+            array('suffixFormat' => '%s%u'),
             is_string(static::$usernameGenerator) || is_callable(static::$usernameGenerator) ? array('format' => static::$usernameGenerator) : static::$usernameGenerator,
             $options,
             array('handleField' => 'Username')
