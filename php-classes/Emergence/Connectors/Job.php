@@ -107,7 +107,16 @@ class Job extends ActiveRecord
         $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : array();
         $labelRenderers = is_array($options['labelRenderers']) ? $options['labelRenderers'] : array();
         $valueRenderers = is_array($options['valueRenderers']) ? $options['valueRenderers'] : array();
-        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function($logEntry) { return "{$logEntry[action]} ".$logEntry['record']->getTitle(); };
+        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function ($logEntry) {
+            $title = $logEntry['record']->getTitle();
+            $class = $logEntry['record']->Class;
+
+            if (strpos($title, $class) === false) {
+                $title = "$class \"$title\"";
+            }
+
+            return $logEntry['action'].' '.$title;
+        };
 
         $logEntry = array(
             'changes' => array()
