@@ -2,6 +2,9 @@
 
 namespace Emergence\Connectors;
 
+use Emergence\EventBus;
+
+
 abstract class AbstractConnector extends \RequestHandler implements IConnector
 {
     public static $title;
@@ -207,5 +210,10 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         return array(
             'reportTo' => !empty($requestData['reportTo']) ? $requestData['reportTo'] : null
         );
+    }
+
+    protected static function _fireEvent($name, array $payload)
+    {
+        return EventBus::fireEvent($name, __NAMESPACE__ . '\\' . static::getConnectorId(), $payload);
     }
 }
