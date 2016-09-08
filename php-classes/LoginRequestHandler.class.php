@@ -75,7 +75,7 @@ class LoginRequestHandler extends RequestHandler
         ));
     }
 
-    protected static function getReturnURL($returnURL = null)
+    public static function getReturnURL($returnURL = null)
     {
         if (static::$forceRedirect) {
             return static::$forceRedirect;
