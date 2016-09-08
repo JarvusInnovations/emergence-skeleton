@@ -1,6 +1,7 @@
 <?php
 
 use Emergence\People\Person;
+use Emergence\People\User;
 
 class UserSession extends Session
 {
@@ -63,7 +64,7 @@ class UserSession extends Session
     {
         $this->requireAuthentication();
 
-        if (!is_a($this->Person, Person::class) || !$this->Person->hasAccountLevel($accountLevel)) {
+        if (!is_a($this->Person, User::class) || !$this->Person->hasAccountLevel($accountLevel)) {
             ErrorHandler::handleInadaquateAccess($accountLevel);
             exit();
         }
