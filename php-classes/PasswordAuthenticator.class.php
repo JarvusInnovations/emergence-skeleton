@@ -25,7 +25,7 @@ class PasswordAuthenticator extends Authenticator
             return true;
         }
 
-        // resolve AuthRequest from PostContainer 
+        // resolve AuthRequest from PostContainer
         if (static::$requestContainer) {
             if (isset($_REQUEST[static::$requestContainer])) {
                 $requestData = &$_REQUEST[static::$requestContainer];
@@ -41,6 +41,12 @@ class PasswordAuthenticator extends Authenticator
             $this->_authenticatedPerson = $this->attemptAuthentication($requestData['username'], $requestData['password']);
 
             if ($this->_authenticatedPerson) {
+                Emergence\EventBus::fireEvent('personAuthenticate', 'Emergence/People', array(
+                    'Person' => $this->_authenticatedPerson,
+                    'requestData' => $requestData,
+                    'authenticatorClass' => get_called_class()
+                ));
+
                 // redirect if original request was GET
                 if ($requestData['returnMethod'] != 'POST' && $_SERVER['REQUEST_METHOD'] != 'GET') {
                     Site::redirect($_SERVER['REQUEST_URI']);
