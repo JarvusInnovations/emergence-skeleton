@@ -14,7 +14,7 @@ class Layer
 
     protected static $instances = [];
 
-	protected $id;
+    protected $id;
 	protected $config;
 	protected $gitWrapper;
 
@@ -121,6 +121,14 @@ class Layer
 	    if (is_string($treeOptions['exclude'])) {
 	        $treeOptions['exclude'] = array($treeOptions['exclude']);
 	    }
+
+        if (!empty($_REQUEST['minId']) && ctype_digit($_REQUEST['minId'])) {
+            $treeOptions['minId'] = $_REQUEST['minId'];
+        }
+
+        if (!empty($_REQUEST['maxId']) && ctype_digit($_REQUEST['maxId'])) {
+            $treeOptions['maxId'] = $_REQUEST['maxId'];
+        }
 
 		return $treeOptions;
 	}
