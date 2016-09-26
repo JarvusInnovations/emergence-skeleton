@@ -2,6 +2,11 @@
 
 namespace Emergence\People;
 
+use ActiveRecord;
+use Media;
+use MediaRequestHandler;
+
+
 class PeopleRequestHandler extends \RecordsRequestHandler
 {
     // RecordRequestHandler configuration
@@ -34,10 +39,10 @@ class PeopleRequestHandler extends \RecordsRequestHandler
         return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
 
-    protected static function onRecordSaved(\ActiveRecord $Person, $requestData)
+    protected static function onRecordSaved(ActiveRecord $Person, $requestData)
     {
         if (isset($requestData['groupIDs'])) {
-            \Emergence\People\Groups\Group::setPersonGroups($Person, $requestData['groupIDs']);
+            Groups\Group::setPersonGroups($Person, $requestData['groupIDs']);
         }
     }
 
@@ -48,5 +53,42 @@ class PeopleRequestHandler extends \RecordsRequestHandler
         } else {
             return User::getByUsername($handle);
         }
+    }
+
+    public static function handleRecordRequest(ActiveRecord $Person, $action = false)
+    {
+        switch ($action ?: $action = static::shiftPath()) {
+            case 'temporary-password':
+            case '*temporary-password':
+                return static::handleTemporaryPasswordRequest($Person);
+            case 'thumbnail':
+                return static::handleThumbnailRequest($Person);
+            default:
+                return parent::handleRecordRequest($Person, $action);
+        }
+    }
+
+    public static function handleTemporaryPasswordRequest(Person $Person)
+    {
+        $GLOBALS['Session']->requireAccountLevel('Administrator');
+
+        if (!$Person instanceof User) {
+            return static::throwInvalidRequestError('only a user can have a temporary password');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $Person->setTemporaryPassword();
+            $Person->save();
+        }
+
+        return static::respond('temporaryPassword', array(
+            'success' => true,
+            'temporaryPassword' => $Person->TemporaryPassword
+        ));
+    }
+
+    public static function handleThumbnailRequest(Person $Person)
+    {
+        return MediaRequestHandler::handleThumbnailRequest($Person->PrimaryPhoto ? $Person->PrimaryPhoto : Media::getBlank('person'));
     }
 }
