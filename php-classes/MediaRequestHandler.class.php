@@ -478,7 +478,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 
 
 
-    public static function handleThumbnailRequest()
+    public static function handleThumbnailRequest(Media $Media = null)
     {
         // send caching headers
         $expires = 60*60*24*365;
@@ -486,22 +486,23 @@ class MediaRequestHandler extends RecordsRequestHandler
         header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time()+$expires));
         header('Pragma: public');
 
+
         // thumbnails are immutable for a given URL, so no need to actually check anything if the browser wants to revalidate its cache
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
             header('HTTP/1.0 304 Not Modified');
             exit();
         }
 
-        // get context
-        if (!is_numeric(static::peekPath())) {
-            $contextClass = static::shiftPath();
-            $contextID = is_numeric(static::peekPath()) ? static::shiftPath() : false;
-            $mediaID = false;
-        } else {
-            $contextClass = false;
-            $contextID = false;
-            $mediaID = static::shiftPath();
+
+        // get media
+        if (!$Media) {
+            if (!$mediaID = static::shiftPath()) {
+                return static::throwError('Invalid request');
+            } elseif (!$Media = Media::getByID($mediaID)) {
+                return static::throwNotFoundError('Media not found');
+            }
         }
+
 
         // get format
         if (preg_match('/^(\d+)x(\d+)(x([0-9A-F]{6})?)?$/i', static::peekPath(), $matches)) {
@@ -522,25 +523,9 @@ class MediaRequestHandler extends RecordsRequestHandler
             $cropped = false;
         }
 
-        // load media
+
+        // fetch thumbnail
         try {
-            if ($mediaID) {
-                if (!$Media = Media::getByID($mediaID)) {
-                    return static::throwNotFoundError('Media not found');
-                }
-            } elseif ($contextClass && $contextID) {
-                if (!$Media = Media::getByContext($contextClass, $contextID)) {
-                    $Media = Media::getBlank($contextClass);
-                }
-            } elseif ($contextClass) {
-                if (!$Media = Media::getBlank($contextClass)) {
-                    return static::throwNotFoundError('Media not found');
-                }
-            } else {
-                return static::throwError('Invalid request');
-            }
-
-
             // get thumbnail
             $thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
         } catch (Exception $e) {
@@ -556,6 +541,7 @@ class MediaRequestHandler extends RecordsRequestHandler
                     ,'cropped' => $cropped
                 )
             ));
+
             return static::throwServerError('Thumbnail unavailable');
         }
 
@@ -613,23 +599,23 @@ class MediaRequestHandler extends RecordsRequestHandler
 #		{
 #			return static::handleMediaDeleteRequest();
 #		}
-#		
-#		
+#
+#
 #		// get media
 #		$media = JSON::translateRecords(Media::getAll(), true);
-#						
+#
 #		// get tag media assignments
 #		$media_tags = Tag::getAllItems('media');
-#				
+#
 #		// inject album assignments to photo records
 #		foreach($media_tags AS $media_id => $tags)
-#		{	
+#		{
 #			foreach($tags AS $tag)
 #			{
 #				$media[$media_id]['tags'][] = $tag['tag_id'];
 #			}
 #		}
-#		
+#
 #		return static::respond('media', array(
 #			'success' => true
 #			,'data' => array_values($media)
