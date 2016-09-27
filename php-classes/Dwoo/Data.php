@@ -1,34 +1,38 @@
 <?php
+/**
+ * Copyright (c) 2013-2016
+ *
+ * @category  Library
+ * @package   Dwoo
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @author    David Sanchez <david38sanchez@gmail.com>
+ * @copyright 2008-2013 Jordi Boggiano
+ * @copyright 2013-2016 David Sanchez
+ * @license   http://dwoo.org/LICENSE Modified BSD License
+ * @version   1.3.0
+ * @date      2016-09-23
+ * @link      http://dwoo.org/
+ */
+
+namespace Dwoo;
 
 /**
- * dwoo data object, use it for complex data assignments or if you want to easily pass it
+ * Dwoo data object, use it for complex data assignments or if you want to easily pass it
  * around multiple functions to avoid passing an array by reference.
- *
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from the use of this software.
- *
- * @author     Jordi Boggiano <j.boggiano@seld.be>
- * @author     David Sanchez <david38sanchez@gmail.com>
- * @copyright  2008-2013 Jordi Boggiano
- * @copyright  2013-2016 David Sanchez
- * @license    http://dwoo.org/LICENSE   Modified BSD License
- *
- * @link       http://dwoo.org/
- *
- * @version    1.2.3
- * @date       2016-10-15
  */
-class Dwoo_Data implements Dwoo_IDataProvider
+class Data implements IDataProvider
 {
     /**
-     * data array.
+     * Data array.
      *
      * @var array
      */
     protected $data = array();
 
     /**
-     * returns the data array.
+     * Returns the data array.
      *
      * @return array
      */
@@ -38,7 +42,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * clears a the entire data or only the given key.
+     * Clears a the entire data or only the given key.
      *
      * @param array|string $name clears only one value if you give a name, multiple values if
      *                           you give an array of names, or the entire data if left null
@@ -57,7 +61,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * overwrites the entire data with the given array.
+     * Overwrites the entire data with the given array.
      *
      * @param array $data the new data array to use
      */
@@ -70,7 +74,6 @@ class Dwoo_Data implements Dwoo_IDataProvider
      * merges the given array(s) with the current data with array_merge.
      *
      * @param array $data  the array to merge
-     * @param array $data2 $data3 ... other arrays to merge, optional, etc
      */
     public function mergeData(array $data)
     {
@@ -83,7 +86,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * assigns a value or an array of values to the data object.
+     * Assigns a value or an array of values to the data object.
      *
      * @param array|string $name an associative array of multiple (index=>value) or a string
      *                           that is the index to use, i.e. a value assigned to "foo" will be
@@ -103,7 +106,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * allows to assign variables using the object syntax.
+     * Allows to assign variables using the object syntax.
      *
      * @param string $name  the variable name
      * @param string $value the value to assign to it
@@ -114,7 +117,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * assigns a value by reference to the data object.
+     * Assigns a value by reference to the data object.
      *
      * @param string $name the index to use, i.e. a value assigned to "foo" will be
      *                     accessible in the template through {$foo}
@@ -126,7 +129,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * appends values or an array of values to the data object.
+     * Appends values or an array of values to the data object.
      *
      * @param array|string $name  an associative array of multiple (index=>value) or a string
      *                            that is the index to use, i.e. a value assigned to "foo" will be
@@ -164,7 +167,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * appends a value by reference to the data object.
+     * Appends a value by reference to the data object.
      *
      * @param string $name  the index to use, i.e. a value assigned to "foo" will be
      *                      accessible in the template through {$foo}
@@ -187,7 +190,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * returns true if the variable has been assigned already, false otherwise.
+     * Returns true if the variable has been assigned already, false otherwise.
      *
      * @param string $name the variable name
      *
@@ -199,7 +202,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * supports calls to isset($dwooData->var).
+     * Supports calls to isset($dwoo->var).
      *
      * @param string $name the variable name
      *
@@ -211,7 +214,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * unassigns/removes a variable.
+     * Unassigns/removes a variable.
      *
      * @param string $name the variable name
      */
@@ -221,7 +224,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * supports unsetting variables using the object syntax.
+     * Supports unsetting variables using the object syntax.
      *
      * @param string $name the variable name
      */
@@ -231,7 +234,7 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * returns a variable if it was assigned.
+     * Returns a variable if it was assigned.
      *
      * @param string $name the variable name
      *
@@ -243,20 +246,19 @@ class Dwoo_Data implements Dwoo_IDataProvider
     }
 
     /**
-     * allows to read variables using the object syntax.
+     * Allows to read variables using the object syntax.
      *
      * @param string $name the variable name
      *
      * @return mixed
-     *
-     * @throws Dwoo_Exception
+     * @throws Exception
      */
     public function __get($name)
     {
         if (isset($this->data[$name])) {
             return $this->data[$name];
         } else {
-            throw new Dwoo_Exception('Tried to read a value that was not assigned yet : "'.$name.'"');
+            throw new Exception('Tried to read a value that was not assigned yet : "' . $name . '"');
         }
     }
 }

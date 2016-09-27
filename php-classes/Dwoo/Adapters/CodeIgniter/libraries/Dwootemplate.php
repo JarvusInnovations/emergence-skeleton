@@ -1,4 +1,18 @@
 <?php
+/**
+ * Copyright (c) 2013-2016
+ *
+ * @category  Library
+ * @package   Dwoo\Adapters\CodeIgniter\libraries
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @author    David Sanchez <david38sanchez@gmail.com>
+ * @copyright 2008-2013 Jordi Boggiano
+ * @copyright 2013-2016 David Sanchez
+ * @license   http://dwoo.org/LICENSE Modified BSD License
+ * @version   1.3.0
+ * @date      2016-09-19
+ * @link      http://dwoo.org/
+ */
 
 if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
@@ -12,15 +26,14 @@ require 'dwoo/dwooAutoload.php';
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from the use of this software.
  *
+ * @author    Stefan Verstege <stefan.verstege@newmedia.nl>
+ * @copyright Copyright (c) 2008, Stefan Verstege
+ * @license   http://dwoo.org/LICENSE   Modified BSD License
  *
- * @author     Stefan Verstege <stefan.verstege@newmedia.nl>
- * @copyright  Copyright (c) 2008, Stefan Verstege
- * @license    http://dwoo.org/LICENSE   Modified BSD License
+ * @link http://www.newmedia.nl/
  *
- * @link       http://www.newmedia.nl/
- *
- * @version    1.1.0
- * @date       2009-07-18
+ * @version 1.1.0
+ * @date    2009-07-18
  *
  * @uses the dwoo package from http://dwoo.org
  */

@@ -1,4 +1,21 @@
 <?php
+/**
+ * Copyright (c) 2013-2016
+ *
+ * @category  Library
+ * @package   Dwoo\Adapters\ZendFramework
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @author    David Sanchez <david38sanchez@gmail.com>
+ * @copyright 2008-2013 Jordi Boggiano
+ * @copyright 2013-2016 David Sanchez
+ * @license   http://dwoo.org/LICENSE Modified BSD License
+ * @version   1.3.0
+ * @date      2016-09-19
+ * @link      http://dwoo.org/
+ */
+
+use Dwoo\Compiler;
+use Dwoo\IPluginProxy;
 
 /**
  * PluginProxy class for Zend View.
@@ -7,17 +24,17 @@
  * In no event will the authors be held liable for any damages arising from the
  * use of this software.
  *
- * @author	   Denis Arh <denis@arh.cc>
- * @author	   Jordi Boggiano <j.boggiano@seld.be>
- * @copyright  Copyright (c) 2008, Denis Arh, Jordi Boggiano
- * @license    http://dwoo.org/LICENSE   Modified BSD License
+ * @author    Denis Arh <denis@arh.cc>
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @copyright Copyright (c) 2008, Denis Arh, Jordi Boggiano
+ * @license   http://dwoo.org/LICENSE   Modified BSD License
  *
- * @link       http://dwoo.org/
+ * @link http://dwoo.org/
  *
- * @version    1.0.0
- * @date       2008-10-23
+ * @version 1.0.0
+ * @date    2008-10-23
  */
-class Dwoo_Adapters_ZendFramework_PluginProxy implements Dwoo_IPluginProxy
+class Dwoo_Adapters_ZendFramework_PluginProxy implements IPluginProxy
 {
     /**
      * reference to the zend view owning this proxy.
@@ -65,7 +82,7 @@ class Dwoo_Adapters_ZendFramework_PluginProxy implements Dwoo_IPluginProxy
      */
     public function getCode($name, $params)
     {
-        return '$this->getPluginProxy()->view->'.$name.'('.Dwoo_Compiler::implode_r($params).')';
+        return '$this->getPluginProxy()->view->'.$name.'('.Compiler::implode_r($params).')';
     }
 
     /**

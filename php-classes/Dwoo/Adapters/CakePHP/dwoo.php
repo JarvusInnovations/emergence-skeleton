@@ -1,4 +1,18 @@
 <?php
+/**
+ * Copyright (c) 2013-2016
+ *
+ * @category  Library
+ * @package   Dwoo\Adapters\CakePHP
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @author    David Sanchez <david38sanchez@gmail.com>
+ * @copyright 2008-2013 Jordi Boggiano
+ * @copyright 2013-2016 David Sanchez
+ * @license   http://dwoo.org/LICENSE Modified BSD License
+ * @version   1.3.0
+ * @date      2016-09-19
+ * @link      http://dwoo.org/
+ */
 
 App::import('vendor', 'dwoo', array('file' => 'dwoo/dwooAutoload.php'));
 
@@ -15,16 +29,16 @@ App::import('vendor', 'dwoo', array('file' => 'dwoo/dwooAutoload.php'));
  * More information can be found here:
  * {@link http://www.gnu.org/copyleft/lesser.html}
  *
- * @author     Mark John S. Buenconsejo <mjwork@simpleteq.com>
- * @author     Giangi <giangi@qwerg.com>
- * @author     Jordi Boggiano <j.boggiano@seld.be>
- * @copyright  Copyright (c) 2008, Jordi Boggiano
- * @license    http://www.gnu.org/copyleft/lesser.html  GNU Lesser General Public License
+ * @author    Mark John S. Buenconsejo <mjwork@simpleteq.com>
+ * @author    Giangi <giangi@qwerg.com>
+ * @author    Jordi Boggiano <j.boggiano@seld.be>
+ * @copyright Copyright (c) 2008, Jordi Boggiano
+ * @license   http://www.gnu.org/copyleft/lesser.html  GNU Lesser General Public License
  *
- * @link       http://dwoo.org/
+ * @link http://dwoo.org/
  *
- * @version    1.1.0
- * @date       2009-07-18
+ * @version 1.1.0
+ * @date    2009-07-18
  */
 class DwooView extends View
 {
