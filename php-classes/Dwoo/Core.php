@@ -1,9 +1,10 @@
 <?php
 
-define('DWOO_DIRECTORY', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
-
+if (!defined('DWOO_DIRECTORY')) {
+    define('DWOO_DIRECTORY', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
+}
 /**
- * main dwoo class, allows communication between the compiler, template and data classes
+ * main dwoo class, allows communication between the compiler, template and data classes.
  *
  * <pre>
  * requirements :
@@ -21,24 +22,27 @@ define('DWOO_DIRECTORY', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
  * In no event will the authors be held liable for any damages arising from the use of this software.
  *
  * @author     Jordi Boggiano <j.boggiano@seld.be>
- * @copyright  Copyright (c) 2008, Jordi Boggiano
+ * @author     David Sanchez <david38sanchez@gmail.com>
+ * @copyright  2008-2013 Jordi Boggiano
+ * @copyright  2013-2016 David Sanchez
  * @license    http://dwoo.org/LICENSE   Modified BSD License
+ *
  * @link       http://dwoo.org/
- * @version    1.1.0
- * @date       2009-07-18
- * @package    Dwoo
+ *
+ * @version    1.2.3
+ * @date       2016-10-15
  */
 class Dwoo_Core
 {
     /**
-     * current version number
+     * current version number.
      *
      * @var string
      */
-    const VERSION = '1.1.1';
+    const VERSION = '1.2.3';
 
     /**
-     * unique number of this dwoo release
+     * unique number of this dwoo release.
      *
      * this can be used by templates classes to check whether the compiled template
      * has been compiled before this release or not, so that old templates are
@@ -68,18 +72,19 @@ class Dwoo_Core
     /**#@-*/
 
     /**
-     * character set of the template, used by string manipulation plugins
+     * character set of the template, used by string manipulation plugins.
      *
      * it must be lowercase, but setCharset() will take care of that
      *
      * @see setCharset
      * @see getCharset
+     *
      * @var string
      */
     protected $charset = 'utf-8';
 
     /**
-     * global variables that are accessible through $dwoo.* in the templates
+     * global variables that are accessible through $dwoo.* in the templates.
      *
      * default values include:
      *
@@ -93,12 +98,13 @@ class Dwoo_Core
      * see their documentation for more details.
      *
      * @private
+     *
      * @var array
      */
     public $globals;
 
     /**
-     * directory where the compiled templates are stored
+     * directory where the compiled templates are stored.
      *
      * defaults to DWOO_COMPILEDIR (= dwoo_dir/compiled by default)
      *
@@ -107,7 +113,7 @@ class Dwoo_Core
     protected $compileDir;
 
     /**
-     * directory where the cached templates are stored
+     * directory where the cached templates are stored.
      *
      * defaults to DWOO_CACHEDIR (= dwoo_dir/cache by default)
      *
@@ -116,7 +122,7 @@ class Dwoo_Core
     protected $cacheDir;
 
     /**
-     * defines how long (in seconds) the cached files must remain valid
+     * defines how long (in seconds) the cached files must remain valid.
      *
      * can be overriden on a per-template basis
      *
@@ -129,80 +135,79 @@ class Dwoo_Core
     protected $cacheTime = 0;
 
     /**
-     * security policy object
+     * security policy object.
      *
      * @var Dwoo_Security_Policy
      */
     protected $securityPolicy = null;
 
     /**
-     * stores the custom plugins callbacks
+     * stores the custom plugins callbacks.
      *
      * @see addPlugin
      * @see removePlugin
+     *
      * @var array
      */
     protected $plugins = array();
 
     /**
-     * stores the filter callbacks
+     * stores the filter callbacks.
      *
      * @see addFilter
      * @see removeFilter
+     *
      * @var array
      */
     protected $filters = array();
 
     /**
      * stores the resource types and associated
-     * classes / compiler classes
+     * classes / compiler classes.
      *
      * @var array
      */
-    protected $resources = array
-    (
-        'file'      =>  array
-        (
-            'class'     =>  'Dwoo_Template_File',
-            'compiler'  =>  null
+    protected $resources = array(
+        'file' => array(
+            'class' => 'Dwoo_Template_File',
+            'compiler' => null,
         ),
-        'string'    =>  array
-        (
-            'class'     =>  'Dwoo_Template_String',
-            'compiler'  =>  null
-        )
+        'string' => array(
+            'class' => 'Dwoo_Template_String',
+            'compiler' => null,
+        ),
     );
 
     /**
-     * the dwoo loader object used to load plugins by this dwoo instance
+     * the dwoo loader object used to load plugins by this dwoo instance.
      *
      * @var Dwoo_ILoader
      */
     protected $loader = null;
 
     /**
-     * currently rendered template, set to null when not-rendering
+     * currently rendered template, set to null when not-rendering.
      *
      * @var Dwoo_ITemplate
      */
     protected $template = null;
 
     /**
-     * stores the instances of the class plugins during template runtime
+     * stores the instances of the class plugins during template runtime.
      *
      * @var array
      */
     protected $runtimePlugins;
 
     /**
-     * stores the returned values during template runtime
+     * stores the returned values during template runtime.
      *
      * @var array
      */
     protected $returnData;
 
     /**
-     * stores the data during template runtime
+     * stores the data during template runtime.
      *
      * @var array
      * @private
@@ -210,7 +215,7 @@ class Dwoo_Core
     public $data;
 
     /**
-     * stores the current scope during template runtime
+     * stores the current scope during template runtime.
      *
      * this should ideally not be accessed directly from outside template code
      *
@@ -220,45 +225,45 @@ class Dwoo_Core
     public $scope;
 
     /**
-     * stores the scope tree during template runtime
+     * stores the scope tree during template runtime.
      *
      * @var array
      */
     protected $scopeTree;
 
     /**
-     * stores the block plugins stack during template runtime
+     * stores the block plugins stack during template runtime.
      *
      * @var array
      */
     protected $stack;
 
     /**
-     * stores the current block plugin at the top of the stack during template runtime
+     * stores the current block plugin at the top of the stack during template runtime.
      *
      * @var Dwoo_Block_Plugin
      */
     protected $curBlock;
 
     /**
-     * stores the output buffer during template runtime
+     * stores the output buffer during template runtime.
      *
      * @var string
      */
     protected $buffer;
 
     /**
-     * stores plugin proxy
+     * stores plugin proxy.
      *
      * @var Dwoo_IPluginProxy
      */
     protected $pluginProxy;
 
     /**
-     * constructor, sets the cache and compile dir to the default values if not provided
+     * constructor, sets the cache and compile dir to the default values if not provided.
      *
      * @param string $compileDir path to the compiled directory, defaults to lib/compiled
-     * @param string $cacheDir path to the cache directory, defaults to lib/cache
+     * @param string $cacheDir   path to the cache directory, defaults to lib/cache
      */
     public function __construct($compileDir = null, $cacheDir = null)
     {
@@ -272,7 +277,7 @@ class Dwoo_Core
     }
 
     /**
-     * resets some runtime variables to allow a cloned object to be used to render sub-templates
+     * resets some runtime variables to allow a cloned object to be used to render sub-templates.
      */
     public function __clone()
     {
@@ -282,17 +287,21 @@ class Dwoo_Core
     }
 
     /**
-     * outputs the template instead of returning it, this is basically a shortcut for get(*, *, *, true)
+     * outputs the template instead of returning it, this is basically a shortcut for get(*, *, *, true).
      *
      * @see get
-     * @param mixed $tpl template, can either be a Dwoo_ITemplate object (i.e. Dwoo_Template_File), a valid path to a template, or
-     *                   a template as a string it is recommended to provide a Dwoo_ITemplate as it will probably make things faster,
-     *                   especially if you render a template multiple times
-     * @param mixed $data the data to use, can either be a Dwoo_IDataProvider object (i.e. Dwoo_Data) or an associative array. if you're
-     *                    rendering the template from cache, it can be left null
+     *
+     * @param mixed          $tpl      template, can either be a Dwoo_ITemplate object (i.e. Dwoo_Template_File), a valid path to a template, or
+     *                                 a template as a string it is recommended to provide a Dwoo_ITemplate as it will probably make things faster,
+     *                                 especially if you render a template multiple times
+     * @param mixed          $data     the data to use, can either be a Dwoo_IDataProvider object (i.e. Dwoo_Data) or an associative array. if you're
+     *                                 rendering the template from cache, it can be left null
      * @param Dwoo_ICompiler $compiler the compiler that must be used to compile the template, if left empty a default
-     *                                Dwoo_Compiler will be used.
+     *                                 Dwoo_Compiler will be used
+     *
      * @return string nothing or the template output if $output is true
+     *
+     * @deprecated 1.2.3. will be deleted in 1.3.0
      */
     public function output($tpl, $data = array(), Dwoo_ICompiler $compiler = null)
     {
@@ -300,23 +309,28 @@ class Dwoo_Core
     }
 
     /**
-     * returns the given template rendered using the provided data and optional compiler
+     * returns the given template rendered using the provided data and optional compiler.
      *
-     * @param mixed $tpl template, can either be a Dwoo_ITemplate object (i.e. Dwoo_Template_File), a valid path to a template, or
-     *                   a template as a string it is recommended to provide a Dwoo_ITemplate as it will probably make things faster,
-     *                   especially if you render a template multiple times
      * @param mixed $data the data to use, can either be a Dwoo_IDataProvider object (i.e. Dwoo_Data) or an associative array. if you're
      *                    rendering the template from cache, it can be left null
-     * @param Dwoo_ICompiler $compiler the compiler that must be used to compile the template, if left empty a default
-     *                                Dwoo_Compiler will be used.
-     * @param bool $output flag that defines whether the function returns the output of the template (false, default) or echoes it directly (true)
-     * @return string nothing or the template output if $output is false
+     *
+     * @return string|void or the template output if $output is false
+     *
+     * @throws Dwoo_Exception
+     *
+     * @param mixed          $_tpl      template, can either be a Dwoo_ITemplate object (i.e. Dwoo_Template_File), a valid path to a template, or
+     *                                  a template as a string it is recommended to provide a Dwoo_ITemplate as it will probably make things faster,
+     *                                  especially if you render a template multiple times
+     * @param Dwoo_ICompiler $_compiler the compiler that must be used to compile the template, if left empty a default
+     *                                  Dwoo_Compiler will be used
+     * @param bool           $_output   flag that defines whether the function returns the output of the template (false, default) or echoes it directly (true)
      */
     public function get($_tpl, $data = array(), $_compiler = null, $_output = false)
     {
         // a render call came from within a template, so we need a new dwoo instance in order to avoid breaking this one
         if ($this->template instanceof Dwoo_ITemplate) {
             $clone = clone $this;
+
             return $clone->get($_tpl, $data, $_compiler, $_output);
         }
 
@@ -361,13 +375,11 @@ class Dwoo_Core
                 ob_start();
                 include $file;
                 $this->template = null;
+
                 return ob_get_clean();
             }
         } else {
-            // no cache present
-            if ($doCache === true) {
-                $dynamicId = uniqid();
-            }
+            $dynamicId = uniqid();
 
             // render template
             $compiledTemplate = $_tpl->getCompiledTemplate($this, $_compiler);
@@ -382,7 +394,7 @@ class Dwoo_Core
 
             if ($doCache === true) {
                 $out = preg_replace('/(<%|%>|<\?php|<\?|\?>)/', '<?php /*'.$dynamicId.'*/ echo \'$1\'; ?>', $out);
-                if (!class_exists('Dwoo_plugin_dynamic', false)) {
+                if (!class_exists('Dwoo_plugin_dynamic')) {
                     $this->getLoader()->loadPlugin('dynamic');
                 }
                 $out = Dwoo_Plugin_dynamic::unescape($out, $dynamicId, $compiledTemplate);
@@ -411,6 +423,7 @@ class Dwoo_Core
                     include $file;
                     // exit render mode
                     $this->template = null;
+
                     return ob_get_clean();
                 }
             } else {
@@ -421,29 +434,31 @@ class Dwoo_Core
                 if ($_output === true) {
                     echo $out;
                 }
+
                 return $out;
             }
         }
+
+        return '';
     }
 
     /**
-     * re-initializes the globals array before each template run
+     * re-initializes the globals array before each template run.
      *
      * this method is only callede once when the Dwoo object is created
      */
     protected function initGlobals()
     {
-        $this->globals = array
-        (
-            'version'   =>  self::VERSION,
-            'ad'        =>  '<a href="http://dwoo.org/">Powered by Dwoo</a>',
-            'now'       =>  $_SERVER['REQUEST_TIME'],
-            'charset'   =>  $this->charset,
+        $this->globals = array(
+            'version' => self::VERSION,
+            'ad' => '<a href="http://dwoo.org/">Powered by Dwoo</a>',
+            'now' => $_SERVER['REQUEST_TIME'],
+            'charset' => $this->charset,
         );
     }
 
     /**
-     * re-initializes the runtime variables before each template run
+     * re-initializes the runtime variables before each template run.
      *
      * override this method to inject data in the globals array if needed, this
      * method is called before each template execution
@@ -453,7 +468,7 @@ class Dwoo_Core
     protected function initRuntimeVars(Dwoo_ITemplate $tpl)
     {
         $this->runtimePlugins = array();
-        $this->scope =& $this->data;
+        $this->scope = &$this->data;
         $this->scopeTree = array();
         $this->stack = array();
         $this->curBlock = null;
@@ -466,38 +481,46 @@ class Dwoo_Core
      */
 
     /**
-     * adds a custom plugin that is not in one of the plugin directories
+     * adds a custom plugin that is not in one of the plugin directories.
      *
-     * @param string $name the plugin name to be used in the templates
-     * @param callback $callback the plugin callback, either a function name,
-     *                           a class name or an array containing an object
-     *                           or class name and a method name
-     * @param bool $compilable if set to true, the plugin is assumed to be compilable
+     * @param string   $name       the plugin name to be used in the templates
+     * @param callback $callback   the plugin callback, either a function name,
+     *                             a class name or an array containing an object
+     *                             or class name and a method name
+     * @param bool     $compilable if set to true, the plugin is assumed to be compilable
+     *
+     * @throws Dwoo_Exception
      */
     public function addPlugin($name, $callback, $compilable = false)
     {
         $compilable = $compilable ? self::COMPILABLE_PLUGIN : 0;
         if (is_array($callback)) {
             if (is_subclass_of(is_object($callback[0]) ? get_class($callback[0]) : $callback[0], 'Dwoo_Block_Plugin')) {
-                $this->plugins[$name] = array('type'=>self::BLOCK_PLUGIN | $compilable, 'callback'=>$callback, 'class'=>(is_object($callback[0]) ? get_class($callback[0]) : $callback[0]));
+                $this->plugins[$name] = array('type' => self::BLOCK_PLUGIN | $compilable, 'callback' => $callback, 'class' => (is_object($callback[0]) ? get_class($callback[0]) : $callback[0]));
             } else {
-                $this->plugins[$name] = array('type'=>self::CLASS_PLUGIN | $compilable, 'callback'=>$callback, 'class'=>(is_object($callback[0]) ? get_class($callback[0]) : $callback[0]), 'function'=>$callback[1]);
+                $this->plugins[$name] = array('type' => self::CLASS_PLUGIN | $compilable, 'callback' => $callback, 'class' => (is_object($callback[0]) ? get_class($callback[0]) : $callback[0]), 'function' => $callback[1]);
             }
-        } elseif (class_exists($callback, false)) {
-            if (is_subclass_of($callback, 'Dwoo_Block_Plugin')) {
-                $this->plugins[$name] = array('type'=>self::BLOCK_PLUGIN | $compilable, 'callback'=>$callback, 'class'=>$callback);
+        } elseif (is_string($callback)) {
+            if (class_exists($callback)) {
+                if (is_subclass_of($callback, 'Dwoo_Block_Plugin')) {
+                    $this->plugins[$name] = array('type' => self::BLOCK_PLUGIN | $compilable, 'callback' => $callback, 'class' => $callback);
+                } else {
+                    $this->plugins[$name] = array('type' => self::CLASS_PLUGIN | $compilable, 'callback' => $callback, 'class' => $callback, 'function' => ($compilable ? 'compile' : 'process'));
+                }
+            } elseif (function_exists($callback)) {
+                $this->plugins[$name] = array('type' => self::FUNC_PLUGIN | $compilable, 'callback' => $callback);
             } else {
-                $this->plugins[$name] = array('type'=>self::CLASS_PLUGIN | $compilable, 'callback'=>$callback, 'class'=>$callback, 'function'=>($compilable ? 'compile' : 'process'));
+                throw new Dwoo_Exception('Callback could not be processed correctly, please check that the function/class you used exists');
             }
-        } elseif (function_exists($callback)) {
-            $this->plugins[$name] = array('type'=>self::FUNC_PLUGIN | $compilable, 'callback'=>$callback);
+        } elseif ($callback instanceof \Closure) {
+            $this->plugins[$name] = array('type' => self::FUNC_PLUGIN | $compilable, 'callback' => $callback);
         } else {
             throw new Dwoo_Exception('Callback could not be processed correctly, please check that the function/class you used exists');
         }
     }
 
     /**
-     * removes a custom plugin
+     * removes a custom plugin.
      *
      * @param string $name the plugin name
      */
@@ -509,17 +532,19 @@ class Dwoo_Core
     }
 
     /**
-     * adds a filter to this Dwoo instance, it will be used to filter the output of all the templates rendered by this instance
+     * adds a filter to this Dwoo instance, it will be used to filter the output of all the templates rendered by this instance.
      *
      * @param mixed $callback a callback or a filter name if it is autoloaded from a plugin directory
-     * @param bool $autoload if true, the first parameter must be a filter name from one of the plugin directories
+     * @param bool  $autoload if true, the first parameter must be a filter name from one of the plugin directories
+     *
+     * @throws Dwoo_Exception
      */
     public function addFilter($callback, $autoload = false)
     {
         if ($autoload) {
             $class = 'Dwoo_Filter_'.$callback;
 
-            if (!class_exists($class, false) && !function_exists($class)) {
+            if (!class_exists($class) && !function_exists($class)) {
                 try {
                     $this->getLoader()->loadPlugin($callback);
                 } catch (Dwoo_Exception $e) {
@@ -531,7 +556,7 @@ class Dwoo_Core
                 }
             }
 
-            if (class_exists($class, false)) {
+            if (class_exists($class)) {
                 $callback = array(new $class($this), 'process');
             } elseif (function_exists($class)) {
                 $callback = $class;
@@ -546,7 +571,7 @@ class Dwoo_Core
     }
 
     /**
-     * removes a filter
+     * removes a filter.
      *
      * @param mixed $callback callback or filter name if it was autoloaded
      */
@@ -556,9 +581,9 @@ class Dwoo_Core
             unset($this->filters[$index]);
         } elseif (($index = array_search($callback, $this->filters, true)) !== false) {
             unset($this->filters[$index]);
-        } else  {
-            $class = 'Dwoo_Filter_' . $callback;
-            foreach ($this->filters as $index=>$filter) {
+        } else {
+            $class = 'Dwoo_Filter_'.$callback;
+            foreach ($this->filters as $index => $filter) {
                 if (is_array($filter) && $filter[0] instanceof $class) {
                     unset($this->filters[$index]);
                     break;
@@ -568,11 +593,13 @@ class Dwoo_Core
     }
 
     /**
-     * adds a resource or overrides a default one
+     * adds a resource or overrides a default one.
      *
-     * @param string $name the resource name
-     * @param string $class the resource class (which must implement Dwoo_ITemplate)
+     * @param string   $name            the resource name
+     * @param string   $class           the resource class (which must implement Dwoo_ITemplate)
      * @param callback $compilerFactory the compiler factory callback, a function that must return a compiler instance used to compile this resource, if none is provided. by default it will produce a Dwoo_Compiler object
+     *
+     * @throws Dwoo_Exception
      */
     public function addResource($name, $class, $compilerFactory = null)
     {
@@ -589,19 +616,19 @@ class Dwoo_Core
             throw new Dwoo_Exception('Resource class must implement Dwoo_ITemplate');
         }
 
-        $this->resources[$name] = array('class'=>$class, 'compiler'=>$compilerFactory);
+        $this->resources[$name] = array('class' => $class, 'compiler' => $compilerFactory);
     }
 
     /**
-     * removes a custom resource
+     * removes a custom resource.
      *
      * @param string $name the resource name
      */
     public function removeResource($name)
     {
         unset($this->resources[$name]);
-        if ($name==='file') {
-            $this->resources['file'] = array('class'=>'Dwoo_Template_File', 'compiler'=>null);
+        if ($name === 'file') {
+            $this->resources['file'] = array('class' => 'Dwoo_Template_File', 'compiler' => null);
         }
     }
 
@@ -610,7 +637,7 @@ class Dwoo_Core
      */
 
     /**
-     * sets the loader object to use to load plugins
+     * sets the loader object to use to load plugins.
      *
      * @param Dwoo_ILoader $loader loader object
      */
@@ -620,9 +647,11 @@ class Dwoo_Core
     }
 
     /**
-     * returns the current loader object or a default one if none is currently found
+     * returns the current loader object or a default one if none is currently found.
      *
      * @param Dwoo_ILoader
+     *
+     * @return Dwoo_ILoader|Dwoo_Loader
      */
     public function getLoader()
     {
@@ -634,7 +663,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the custom plugins loaded
+     * returns the custom plugins loaded.
      *
      * used by the Dwoo_ITemplate classes to pass the custom plugins to their Dwoo_ICompiler instance
      *
@@ -646,7 +675,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the cache directory with a trailing DIRECTORY_SEPARATOR
+     * returns the cache directory with a trailing DIRECTORY_SEPARATOR.
      *
      * @return string
      */
@@ -660,9 +689,11 @@ class Dwoo_Core
     }
 
     /**
-     * sets the cache directory and automatically appends a DIRECTORY_SEPARATOR
+     * sets the cache directory and automatically appends a DIRECTORY_SEPARATOR.
      *
      * @param string $dir the cache directory
+     *
+     * @throws Dwoo_Exception
      */
     public function setCacheDir($dir)
     {
@@ -673,7 +704,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the compile directory with a trailing DIRECTORY_SEPARATOR
+     * returns the compile directory with a trailing DIRECTORY_SEPARATOR.
      *
      * @return string
      */
@@ -687,9 +718,11 @@ class Dwoo_Core
     }
 
     /**
-     * sets the compile directory and automatically appends a DIRECTORY_SEPARATOR
+     * sets the compile directory and automatically appends a DIRECTORY_SEPARATOR.
      *
      * @param string $dir the compile directory
+     *
+     * @throws Dwoo_Exception
      */
     public function setCompileDir($dir)
     {
@@ -700,7 +733,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the default cache time that is used with templates that do not have a cache time set
+     * returns the default cache time that is used with templates that do not have a cache time set.
      *
      * @return int the duration in seconds
      */
@@ -710,7 +743,7 @@ class Dwoo_Core
     }
 
     /**
-     * sets the default cache time to use with templates that do not have a cache time set
+     * sets the default cache time to use with templates that do not have a cache time set.
      *
      * @param int $seconds the duration in seconds
      */
@@ -720,7 +753,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the character set used by the string manipulation plugins
+     * returns the character set used by the string manipulation plugins.
      *
      * the charset is automatically lowercased
      *
@@ -732,7 +765,7 @@ class Dwoo_Core
     }
 
     /**
-     * sets the character set used by the string manipulation plugins
+     * sets the character set used by the string manipulation plugins.
      *
      * the charset will be automatically lowercased
      *
@@ -744,7 +777,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the current template being rendered, when applicable, or null
+     * returns the current template being rendered, when applicable, or null.
      *
      * @return Dwoo_ITemplate|null
      */
@@ -754,7 +787,7 @@ class Dwoo_Core
     }
 
     /**
-     * sets the current template being rendered
+     * sets the current template being rendered.
      *
      * @param Dwoo_ITemplate $tpl template object
      */
@@ -764,11 +797,11 @@ class Dwoo_Core
     }
 
     /**
-     * sets the default compiler factory function for the given resource name
+     * sets the default compiler factory function for the given resource name.
      *
      * a compiler factory must return a Dwoo_ICompiler object pre-configured to fit your needs
      *
-     * @param string $resourceName the resource name (i.e. file, string)
+     * @param string   $resourceName    the resource name (i.e. file, string)
      * @param callback $compilerFactory the compiler factory callback
      */
     public function setDefaultCompilerFactory($resourceName, $compilerFactory)
@@ -777,9 +810,10 @@ class Dwoo_Core
     }
 
     /**
-     * returns the default compiler factory function for the given resource name
+     * returns the default compiler factory function for the given resource name.
      *
      * @param string $resourceName the resource name
+     *
      * @return callback the compiler factory callback
      */
     public function getDefaultCompilerFactory($resourceName)
@@ -788,7 +822,7 @@ class Dwoo_Core
     }
 
     /**
-     * sets the security policy object to enforce some php security settings
+     * sets the security policy object to enforce some php security settings.
      *
      * use this if untrusted persons can modify templates
      *
@@ -800,7 +834,7 @@ class Dwoo_Core
     }
 
     /**
-     * returns the current security policy object or null by default
+     * returns the current security policy object or null by default.
      *
      * @return Dwoo_Security_Policy|null the security policy object if any
      */
@@ -811,20 +845,24 @@ class Dwoo_Core
 
     /**
      * sets the object that must be used as a plugin proxy when plugin can't be found
-     * by dwoo's loader
+     * by dwoo's loader.
      *
      * @param Dwoo_IPluginProxy $pluginProxy the proxy object
      */
-    public function setPluginProxy(Dwoo_IPluginProxy $pluginProxy) {
+    public function setPluginProxy(Dwoo_IPluginProxy $pluginProxy)
+    {
         $this->pluginProxy = $pluginProxy;
     }
 
     /**
-     * returns the current plugin proxy object or null by default
+     * returns the current plugin proxy object or null by default.
      *
      * @param Dwoo_IPluginProxy|null the proxy object if any
+     *
+     * @return Dwoo_IPluginProxy
      */
-    public function getPluginProxy() {
+    public function getPluginProxy()
+    {
         return $this->pluginProxy;
     }
 
@@ -833,9 +871,10 @@ class Dwoo_Core
      */
 
     /**
-     * [util function] checks whether the given template is cached or not
+     * [util function] checks whether the given template is cached or not.
      *
      * @param Dwoo_ITemplate $tpl the template object
+     *
      * @return bool
      */
     public function isCached(Dwoo_ITemplate $tpl)
@@ -844,37 +883,65 @@ class Dwoo_Core
     }
 
     /**
-     * [util function] clears the cached templates if they are older than the given time
+     * Clear templates inside the compiled directory.
      *
-     * @param int $olderThan minimum time (in seconds) required for a cached template to be cleared
-     * @return int the amount of templates cleared
+     * @return int
      */
-    public function clearCache($olderThan=-1)
+    public function clearCompiled()
     {
-        $cacheDirs = new RecursiveDirectoryIterator($this->getCacheDir());
-        $cache = new RecursiveIteratorIterator($cacheDirs);
-        $expired = time() - $olderThan;
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->getCompileDir()),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
         $count = 0;
-        foreach ($cache as $file) {
-            if ($cache->isDot() || $cache->isDir() || substr($file, -5) !== '.html') {
-                continue;
-            }
-            if ($cache->getCTime() < $expired) {
-                $count += unlink((string) $file) ? 1 : 0;
+        /** @var \SplFileInfo $file */
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $count += unlink($file->__toString()) ? 1 : 0;
             }
         }
+
         return $count;
     }
 
     /**
-     * [util function] fetches a template object of the given resource
+     * [util function] clears the cached templates if they are older than the given time.
      *
-     * @param string $resourceName the resource name (i.e. file, string)
-     * @param string $resourceId the resource identifier (i.e. file path)
-     * @param int $cacheTime the cache time setting for this resource
-     * @param string $cacheId the unique cache identifier
-     * @param string $compileId the unique compiler identifier
+     * @param int $olderThan minimum time (in seconds) required for a cached template to be cleared
+     *
+     * @return int the amount of templates cleared
+     */
+    public function clearCache($olderThan = -1)
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->getCacheDir()),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        $expired = time() - $olderThan;
+        $count = 0;
+        /** @var \SplFileInfo $file */
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getCTime() < $expired) {
+                $count += unlink((string) $file) ? 1 : 0;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * [util function] fetches a template object of the given resource.
+     *
+     * @param string         $resourceName   the resource name (i.e. file, string)
+     * @param string         $resourceId     the resource identifier (i.e. file path)
+     * @param int            $cacheTime      the cache time setting for this resource
+     * @param string         $cacheId        the unique cache identifier
+     * @param string         $compileId      the unique compiler identifier
+     * @param Dwoo_ITemplate $parentTemplate
+     *
      * @return Dwoo_ITemplate
+     *
+     * @throws Dwoo_Exception
      */
     public function templateFactory($resourceName, $resourceId, $cacheTime = null, $cacheId = null, $compileId = null, Dwoo_ITemplate $parentTemplate = null)
     {
@@ -887,14 +954,15 @@ class Dwoo_Core
     }
 
     /**
-     * [util function] checks if the input is an array or arrayaccess object, optionally it can also check if it's empty
+     * [util function] checks if the input is an array or arrayaccess object, optionally it can also check if it's empty.
      *
-     * @param mixed $value the variable to check
-     * @param bool $checkIsEmpty if true, the function will also check if the array|arrayaccess is empty,
-     *                              and return true only if it's not empty
+     * @param mixed $value        the variable to check
+     * @param bool  $checkIsEmpty if true, the function will also check if the array|arrayaccess is empty,
+     *                            and return true only if it's not empty
+     *
      * @return int|bool true if it's an array|arrayaccess (or the item count if $checkIsEmpty is true) or false if it's not an array|arrayaccess (or 0 if $checkIsEmpty is true)
      */
-    public function isArray($value, $checkIsEmpty=false)
+    public function isArray($value, $checkIsEmpty = false)
     {
         if (is_array($value) === true || $value instanceof ArrayAccess) {
             if ($checkIsEmpty === false) {
@@ -906,14 +974,15 @@ class Dwoo_Core
     }
 
     /**
-     * [util function] checks if the input is an array or a traversable object, optionally it can also check if it's empty
+     * [util function] checks if the input is an array or a traversable object, optionally it can also check if it's empty.
      *
-     * @param mixed $value the variable to check
-     * @param bool $checkIsEmpty if true, the function will also check if the array|traversable is empty,
-     *                              and return true only if it's not empty
+     * @param mixed $value        the variable to check
+     * @param bool  $checkIsEmpty if true, the function will also check if the array|traversable is empty,
+     *                            and return true only if it's not empty
+     *
      * @return int|bool true if it's an array|traversable (or the item count if $checkIsEmpty is true) or false if it's not an array|traversable (or 0 if $checkIsEmpty is true)
      */
-    public function isTraversable($value, $checkIsEmpty=false)
+    public function isTraversable($value, $checkIsEmpty = false)
     {
         if (is_array($value) === true) {
             if ($checkIsEmpty === false) {
@@ -928,12 +997,15 @@ class Dwoo_Core
                 return $this->count($value);
             }
         }
+
         return false;
     }
 
     /**
-     * [util function] counts an array or arrayaccess/traversable object
+     * [util function] counts an array or arrayaccess/traversable object.
+     *
      * @param mixed $value
+     *
      * @return int|bool the count for arrays and objects that implement countable, true for other objects that don't, and 0 for empty elements
      */
     public function count($value)
@@ -954,16 +1026,17 @@ class Dwoo_Core
                 return true;
             }
         }
+
         return 0;
     }
 
     /**
-     * [util function] triggers a dwoo error
+     * [util function] triggers a dwoo error.
      *
      * @param string $message the error message
-     * @param int $level the error level, one of the PHP's E_* constants
+     * @param int    $level   the error level, one of the PHP's E_* constants
      */
-    public function triggerError($message, $level=E_USER_NOTICE)
+    public function triggerError($message, $level = E_USER_NOTICE)
     {
         if (!($tplIdentifier = $this->template->getResourceIdentifier())) {
             $tplIdentifier = $this->template->getResourceName();
@@ -976,13 +1049,14 @@ class Dwoo_Core
      */
 
     /**
-     * [runtime function] adds a block to the block stack
+     * [runtime function] adds a block to the block stack.
      *
      * @param string $blockName the block name (without Dwoo_Plugin_ prefix)
-     * @param array $args the arguments to be passed to the block's init() function
+     * @param array  $args      the arguments to be passed to the block's init() function
+     *
      * @return Dwoo_Block_Plugin the newly created block
      */
-    public function addStack($blockName, array $args=array())
+    public function addStack($blockName, array $args = array())
     {
         if (isset($this->plugins[$blockName])) {
             $class = $this->plugins[$blockName]['class'];
@@ -1001,26 +1075,27 @@ class Dwoo_Core
         $block = new $class($this);
 
         $cnt = count($args);
-        if ($cnt===0) {
+        if ($cnt === 0) {
             $block->init();
-        } elseif ($cnt===1) {
+        } elseif ($cnt === 1) {
             $block->init($args[0]);
-        } elseif ($cnt===2) {
+        } elseif ($cnt === 2) {
             $block->init($args[0], $args[1]);
-        } elseif ($cnt===3) {
+        } elseif ($cnt === 3) {
             $block->init($args[0], $args[1], $args[2]);
-        } elseif ($cnt===4) {
+        } elseif ($cnt === 4) {
             $block->init($args[0], $args[1], $args[2], $args[3]);
         } else {
-            call_user_func_array(array($block,'init'), $args);
+            call_user_func_array(array($block, 'init'), $args);
         }
 
         $this->stack[] = $this->curBlock = $block;
+
         return $block;
     }
 
     /**
-     * [runtime function] removes the plugin at the top of the block stack
+     * [runtime function] removes the plugin at the top of the block stack.
      *
      * calls the block buffer() function, followed by a call to end()
      * and finally a call to process()
@@ -1033,15 +1108,15 @@ class Dwoo_Core
         ob_clean();
 
         $cnt = count($args);
-        if ($cnt===0) {
+        if ($cnt === 0) {
             $this->curBlock->end();
-        } elseif ($cnt===1) {
+        } elseif ($cnt === 1) {
             $this->curBlock->end($args[0]);
-        } elseif ($cnt===2) {
+        } elseif ($cnt === 2) {
             $this->curBlock->end($args[0], $args[1]);
-        } elseif ($cnt===3) {
+        } elseif ($cnt === 3) {
             $this->curBlock->end($args[0], $args[1], $args[2]);
-        } elseif ($cnt===4) {
+        } elseif ($cnt === 4) {
             $this->curBlock->end($args[0], $args[1], $args[2], $args[3]);
         } else {
             call_user_func_array(array($this->curBlock, 'end'), $args);
@@ -1053,7 +1128,7 @@ class Dwoo_Core
             $this->curBlock = end($this->stack);
             $this->curBlock->buffer($tmp->process());
         } else {
-            if($this->buffer !== '') {
+            if ($this->buffer !== '') {
                 echo $this->buffer;
                 $this->buffer = '';
             }
@@ -1065,25 +1140,28 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] returns the parent block of the given block
+     * [runtime function] returns the parent block of the given block.
      *
      * @param Dwoo_Block_Plugin $block
-     * @return Dwoo_Block_Plugin or false if the given block isn't in the stack
+     *
+     * @return Dwoo_Block_Plugin|false if the given block isn't in the stack
      */
     public function getParentBlock(Dwoo_Block_Plugin $block)
     {
         $index = array_search($block, $this->stack, true);
         if ($index !== false && $index > 0) {
-            return $this->stack[$index-1];
+            return $this->stack[$index - 1];
         }
+
         return false;
     }
 
     /**
-     * [runtime function] finds the closest block of the given type, starting at the top of the stack
+     * [runtime function] finds the closest block of the given type, starting at the top of the stack.
      *
      * @param string $type the type of plugin you want to find
-     * @return Dwoo_Block_Plugin or false if no plugin of such type is in the stack
+     *
+     * @return Dwoo_Block_Plugin|false if no plugin of such type is in the stack
      */
     public function findBlock($type)
     {
@@ -1099,17 +1177,20 @@ class Dwoo_Core
                 return $this->stack[$key];
             }
         }
+
         return false;
     }
 
     /**
-     * [runtime function] returns a Dwoo_Plugin of the given class
+     * [runtime function] returns a Dwoo_Plugin of the given class.
      *
      * this is so a single instance of every class plugin is created at each template run,
      * allowing class plugins to have "per-template-run" static variables
      *
      * @private
+     *
      * @param string $class the class name
+     *
      * @return mixed an object of the given class
      */
     public function getObjectPlugin($class)
@@ -1117,14 +1198,16 @@ class Dwoo_Core
         if (isset($this->runtimePlugins[$class])) {
             return $this->runtimePlugins[$class];
         }
+
         return $this->runtimePlugins[$class] = new $class($this);
     }
 
     /**
-     * [runtime function] calls the process() method of the given class-plugin name
+     * [runtime function] calls the process() method of the given class-plugin name.
      *
      * @param string $plugName the class plugin name (without Dwoo_Plugin_ prefix)
-     * @param array $params an array of parameters to send to the process() method
+     * @param array  $params   an array of parameters to send to the process() method
+     *
      * @return string the process() return value
      */
     public function classCall($plugName, array $params = array())
@@ -1134,15 +1217,15 @@ class Dwoo_Core
         $plugin = $this->getObjectPlugin($class);
 
         $cnt = count($params);
-        if ($cnt===0) {
+        if ($cnt === 0) {
             return $plugin->process();
-        } elseif ($cnt===1) {
+        } elseif ($cnt === 1) {
             return $plugin->process($params[0]);
-        } elseif ($cnt===2) {
+        } elseif ($cnt === 2) {
             return $plugin->process($params[0], $params[1]);
-        } elseif ($cnt===3) {
+        } elseif ($cnt === 3) {
             return $plugin->process($params[0], $params[1], $params[2]);
-        } elseif ($cnt===4) {
+        } elseif ($cnt === 4) {
             return $plugin->process($params[0], $params[1], $params[2], $params[3]);
         } else {
             return call_user_func_array(array($plugin, 'process'), $params);
@@ -1150,10 +1233,11 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] calls a php function
+     * [runtime function] calls a php function.
      *
      * @param string $callback the function to call
-     * @param array $params an array of parameters to send to the function
+     * @param array  $params   an array of parameters to send to the function
+     *
      * @return mixed the return value of the called function
      */
     public function arrayMap($callback, array $params)
@@ -1178,23 +1262,23 @@ class Dwoo_Core
 
                 if (is_string($callback) === false) {
                     while (($i = array_shift($keys)) !== null) {
-                        $out[] = call_user_func_array($callback, array(1=>$items[$i]) + $params);
+                        $out[] = call_user_func_array($callback, array(1 => $items[$i]) + $params);
                     }
-                } elseif ($cnt===1) {
+                } elseif ($cnt === 1) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($this, $items[$i]);
                     }
-                } elseif ($cnt===2) {
+                } elseif ($cnt === 2) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($this, $items[$i], $params[2]);
                     }
-                } elseif ($cnt===3) {
+                } elseif ($cnt === 3) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($this, $items[$i], $params[2], $params[3]);
                     }
                 } else {
                     while (($i = array_shift($keys)) !== null) {
-                        $out[] = call_user_func_array($callback, array(1=>$items[$i]) + $params);
+                        $out[] = call_user_func_array($callback, array(1 => $items[$i]) + $params);
                     }
                 }
             } else {
@@ -1205,19 +1289,19 @@ class Dwoo_Core
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = call_user_func_array($callback, array($items[$i]) + $params);
                     }
-                } elseif ($cnt===1) {
+                } elseif ($cnt === 1) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($items[$i]);
                     }
-                } elseif ($cnt===2) {
+                } elseif ($cnt === 2) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($items[$i], $params[1]);
                     }
-                } elseif ($cnt===3) {
+                } elseif ($cnt === 3) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($items[$i], $params[1], $params[2]);
                     }
-                } elseif ($cnt===4) {
+                } elseif ($cnt === 4) {
                     while (($i = array_shift($keys)) !== null) {
                         $out[] = $callback($items[$i], $params[1], $params[2], $params[3]);
                     }
@@ -1227,6 +1311,7 @@ class Dwoo_Core
                     }
                 }
             }
+
             return $out;
         } else {
             return $params[0];
@@ -1234,11 +1319,12 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] reads a variable into the given data array
+     * [runtime function] reads a variable into the given data array.
      *
-     * @param string $varstr the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
-     * @param mixed $data the data array or object to read from
-     * @param bool $safeRead if true, the function will check whether the index exists to prevent any notices from being output
+     * @param string $varstr   the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
+     * @param mixed  $data     the data array or object to read from
+     * @param bool   $safeRead if true, the function will check whether the index exists to prevent any notices from being output
+     *
      * @return mixed
      */
     public function readVarInto($varstr, $data, $safeRead = false)
@@ -1277,10 +1363,11 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] reads a variable into the parent scope
+     * [runtime function] reads a variable into the parent scope.
      *
-     * @param int $parentLevels the amount of parent levels to go from the current scope
-     * @param string $varstr the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
+     * @param int    $parentLevels the amount of parent levels to go from the current scope
+     * @param string $varstr       the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
+     *
      * @return mixed
      */
     public function readParentVar($parentLevels, $varstr = null)
@@ -1288,7 +1375,7 @@ class Dwoo_Core
         $tree = $this->scopeTree;
         $cur = $this->data;
 
-        while ($parentLevels--!==0) {
+        while ($parentLevels-- !== 0) {
             array_pop($tree);
         }
 
@@ -1300,7 +1387,7 @@ class Dwoo_Core
             }
         }
 
-        if ($varstr!==null) {
+        if ($varstr !== null) {
             return $this->readVarInto($varstr, $cur);
         } else {
             return $cur;
@@ -1308,23 +1395,23 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] reads a variable into the current scope
+     * [runtime function] reads a variable into the current scope.
      *
      * @param string $varstr the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
+     *
      * @return mixed
      */
     public function readVar($varstr)
     {
-        if (is_array($varstr)===true) {
+        if (is_array($varstr) === true) {
             $m = $varstr;
             unset($varstr);
         } else {
             if (strstr($varstr, '.') === false && strstr($varstr, '[') === false && strstr($varstr, '->') === false) {
                 if ($varstr === 'dwoo') {
                     return $this->globals;
-                } elseif ($varstr === '__' || $varstr === '_root' ) {
+                } elseif ($varstr === '__' || $varstr === '_root') {
                     return $this->data;
-                    $varstr = substr($varstr, 6);
                 } elseif ($varstr === '_' || $varstr === '_parent') {
                     $varstr = '.'.$varstr;
                     $tree = $this->scopeTree;
@@ -1451,19 +1538,20 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] assign the value to the given variable
+     * [runtime function] assign the value to the given variable.
      *
-     * @param mixed $value the value to assign
+     * @param mixed  $value the value to assign
      * @param string $scope the variable string, using dwoo variable syntax (i.e. "var.subvar[subsubvar]->property")
+     *
      * @return bool true if assigned correctly or false if a problem occured while parsing the var string
      */
     public function assignInScope($value, $scope)
     {
-        $tree =& $this->scopeTree;
-        $data =& $this->data;
+        $tree = &$this->scopeTree;
+        $data = &$this->data;
 
         if (!is_string($scope)) {
-            return $this->triggerError('Assignments must be done into strings, ('.gettype($scope).') '.var_export($scope, true).' given', E_USER_ERROR);
+            $this->triggerError('Assignments must be done into strings, ('.gettype($scope).') '.var_export($scope, true).' given', E_USER_ERROR);
         }
         if (strstr($scope, '.') === false && strstr($scope, '->') === false) {
             $this->scope[$scope] = $value;
@@ -1471,7 +1559,7 @@ class Dwoo_Core
             // TODO handle _root/_parent scopes ?
             preg_match_all('#(\[|->|\.)?([^.[\]-]+)\]?#i', $scope, $m);
 
-            $cur =& $this->scope;
+            $cur = &$this->scope;
             $last = array(array_pop($m[1]), array_pop($m[2]));
 
             while (list($k, $sep) = each($m[1])) {
@@ -1479,12 +1567,12 @@ class Dwoo_Core
                     if (is_array($cur) === false) {
                         $cur = array();
                     }
-                    $cur =& $cur[$m[2][$k]];
+                    $cur = &$cur[$m[2][$k]];
                 } elseif ($sep === '->') {
                     if (is_object($cur) === false) {
-                        $cur = new stdClass;
+                        $cur = new stdClass();
                     }
-                    $cur =& $cur->$m[2][$k];
+                    $cur = &$cur->$m[2][$k];
                 } else {
                     return false;
                 }
@@ -1497,7 +1585,7 @@ class Dwoo_Core
                 $cur[$last[1]] = $value;
             } elseif ($last[0] === '->') {
                 if (is_object($cur) === false) {
-                    $cur = new stdClass;
+                    $cur = new stdClass();
                 }
                 $cur->$last[1] = $value;
             } else {
@@ -1507,41 +1595,43 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] sets the scope to the given scope string or array
+     * [runtime function] sets the scope to the given scope string or array.
      *
-     * @param mixed $scope a string i.e. "level1.level2" or an array i.e. array("level1", "level2")
-     * @param bool $absolute if true, the scope is set from the top level scope and not from the current scope
+     * @param mixed $scope    a string i.e. "level1.level2" or an array i.e. array("level1", "level2")
+     * @param bool  $absolute if true, the scope is set from the top level scope and not from the current scope
+     *
      * @return array the current scope tree
      */
     public function setScope($scope, $absolute = false)
     {
         $old = $this->scopeTree;
 
-        if (is_string($scope)===true) {
+        if (is_string($scope) === true) {
             $scope = explode('.', $scope);
         }
 
-        if ($absolute===true) {
-            $this->scope =& $this->data;
+        if ($absolute === true) {
+            $this->scope = &$this->data;
             $this->scopeTree = array();
         }
 
         while (($bit = array_shift($scope)) !== null) {
             if ($bit === '_' || $bit === '_parent') {
                 array_pop($this->scopeTree);
-                $this->scope =& $this->data;
+                $this->scope = &$this->data;
                 $cnt = count($this->scopeTree);
-                for ($i=0;$i<$cnt;$i++)
-                    $this->scope =& $this->scope[$this->scopeTree[$i]];
+                for ($i = 0; $i < $cnt; ++$i) {
+                    $this->scope = &$this->scope[$this->scopeTree[$i]];
+                }
             } elseif ($bit === '__' || $bit === '_root') {
-                $this->scope =& $this->data;
+                $this->scope = &$this->data;
                 $this->scopeTree = array();
             } elseif (isset($this->scope[$bit])) {
-                if($this->scope instanceof ArrayAccess) {
+                if ($this->scope instanceof ArrayAccess) {
                     $tmp = $this->scope[$bit];
-                    $this->scope =& $tmp;
+                    $this->scope = &$tmp;
                 } else {
-                    $this->scope =& $this->scope[$bit];
+                    $this->scope = &$this->scope[$bit];
                 }
                 $this->scopeTree[] = $bit;
             } else {
@@ -1554,7 +1644,7 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] returns the entire data array
+     * [runtime function] returns the entire data array.
      *
      * @return array
      */
@@ -1564,10 +1654,10 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] sets a return value for the currently running template
+     * [runtime function] sets a return value for the currently running template.
      *
-     * @param string $name var name
-     * @param mixed $value var value
+     * @param string $name  var name
+     * @param mixed  $value var value
      */
     public function setReturnValue($name, $value)
     {
@@ -1575,7 +1665,7 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] retrieves the return values set by the template
+     * [runtime function] retrieves the return values set by the template.
      *
      * @return array
      */
@@ -1585,7 +1675,7 @@ class Dwoo_Core
     }
 
     /**
-     * [runtime function] returns a reference to the current scope
+     * [runtime function] returns a reference to the current scope.
      *
      * @return &mixed
      */
@@ -1597,15 +1687,20 @@ class Dwoo_Core
     /**
      * Redirects all calls to unexisting to plugin proxy.
      *
-     * @param string Method name
-     * @param array  List of arguments
+     * @param $method
+     * @param $args
+     *
      * @return mixed
+     *
+     * @throws Dwoo_Exception
      */
-    public function __call($method, $args) {
+    public function __call($method, $args)
+    {
         $proxy = $this->getPluginProxy();
         if (!$proxy) {
             throw new Dwoo_Exception('Call to undefined method '.__CLASS__.'::'.$method.'()');
         }
+
         return call_user_func_array($proxy->getCallback($method), $args);
     }
 }
