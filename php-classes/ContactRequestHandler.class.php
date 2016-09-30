@@ -6,13 +6,22 @@ class ContactRequestHandler extends RequestHandler
     public static $validators = array();
     public static $formatters = array();
     public static $excludeFields = array('path');
+    public static $accountLevelBrowse = 'Administrator';
+
+    public static $userResponseModes = array(
+        'application/json' => 'json',
+        'text/csv' => 'csv'
+    );
 
     public static function handleRequest()
     {
-
         // handle JSON requests
-        if (static::peekPath() == 'json') {
-            static::$responseMode = static::shiftPath();
+        switch (static::peekPath()) {
+            case 'json':
+                static::$responseMode = static::shiftPath();
+                break;
+            case 'submissions':
+                return static::handleSubmissionsRequest();
         }
 
         // route request
@@ -80,6 +89,15 @@ class ContactRequestHandler extends RequestHandler
         return static::respond('contact', array(
             'validationErrors' => isset($Validator) ? $Validator->getErrors() : array()
             ,'subform' => $subform
+        ));
+    }
+    
+    public static function handleSubmissionsRequest()
+    {
+        $GLOBALS['Session']->requireAccountLevel(static::$accountLevelBrowse);
+
+        return static::respond('submissions', array(
+            'data' => ContactSubmission::getAll(array('order' => array('ID' => 'DESC')))
         ));
     }
 }
