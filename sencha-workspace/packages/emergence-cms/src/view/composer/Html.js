@@ -11,7 +11,7 @@ Ext.define('Emergence.cms.view.composer.Html', {
         contentCls: 'content-html',
         contentItemClass: ['Emergence\\CMS\\Item\\RichText', 'Emergence\\CMS\\Item\\Text'],
         buttonCfg: {
-            text: 'Text',
+            text: 'Rich Text',
             glyph: 0xf0f6+'@FontAwesome', // fa-file-text-o
             cls: 'icon-w-20',
             tooltip: 'A block of text with rich formatting'

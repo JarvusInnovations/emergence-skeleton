@@ -26,7 +26,7 @@ Ext.define('Emergence.cms.view.Editor', {
 
     config: {
         contentRecord: null,
-        composers: ['markdown', 'multimedia', 'embed']
+        composers: ['html', 'markdown', 'multimedia', 'embed']
     },
 
     columnWidths: [1],

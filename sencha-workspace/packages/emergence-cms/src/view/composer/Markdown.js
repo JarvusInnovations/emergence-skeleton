@@ -10,7 +10,7 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
     inheritableStatics: {
         contentItemClass: 'Emergence\\CMS\\Item\\Markdown',
         buttonCfg: {
-            text: 'Text',
+            text: 'Markdown Text',
             glyph: 0xf0f6+'@FontAwesome', // fa-file-text-o
             cls: 'icon-w-20',
             tooltip: 'A block of text formatted with Markdown'
