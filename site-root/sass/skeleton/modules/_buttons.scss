@@ -11,54 +11,57 @@ $submit-color:      $link-color !default;
     $button-border-color: rgba($text-color, .2);
 
     @include contrasted($color);
-	border: none;
-	border-bottom: 1px solid $button-border-color;
-	
-	&:hover,
-	&:focus {
-		background-color: lighten($color, 7);
-		border-color: $button-border-color;
-	}
-	
-	&:active,
+    border: none;
+    border-bottom: 1px solid $button-border-color;
+    
+    &:hover,
+    &:focus {
+        background-color: lighten($color, 7);
+        border-color: $button-border-color;
+    }
+    
+    &:active,
     &.active {
         background-color: darken($color, 12);
         border-color: transparent;
         outline: none;
         @include transition(none);
-	}
+    }
 }
 
-// set up base class for all buttons
-.button {
-	@include button-colors($button-color);
-	@include border-radius(3px);
-	cursor: pointer;
+// set up base mixin for all buttons
+// mixin because we need to separate vendor-specific selectors from each other
+// (even though it dupes code)
+@mixin emergence-button {
+    @include button-colors($button-color);
+    @include border-radius(3px);
+    cursor: pointer;
     display: inline-block;
     font-family: $body-font;
     font-size: large;
     letter-spacing: 0;
-	line-height: $line-height;
-	margin-bottom: .25em;
-	padding: .125em .75em;
+    line-height: $line-height;
+    margin-bottom: .25em;
+    padding: .125em .75em;
     position: relative;
-	text-align: center;
-	@include transition(background-color 75ms ease-in-out);
-	white-space: nowrap;
-	width: auto;
-	
-	&[disabled],
-	&.disabled,
-	&:disabled {
-    	opacity: .3;
-    	pointer-events: none;
-	}
-	
-	&.destructive { @include button-colors($destructive-color); }
+    text-align: center;
+    text-decoration: none;
+    @include transition(background-color 75ms ease-in-out);
+    white-space: nowrap;
+    width: auto;
+    
+    &[disabled],
+    &.disabled,
+    &:disabled {
+        opacity: .3;
+        pointer-events: none;
+    }
+    
+    &.destructive { @include button-colors($destructive-color); }
 
-	&.primary,
-	&.submit,
-	&[type="submit"] { @include button-colors($link-color); }
+    &.primary,
+    &.submit,
+    &[type="submit"] { @include button-colors($link-color); }
 
     &.block {
         display: block;
@@ -88,20 +91,30 @@ $submit-color:      $link-color !default;
         vertical-align: .4em;
     }
 
-	@media #{$mq-phone} {
-		& + & {
-			margin-top: 1em;
-		}
-	}
+    @media #{$mq-phone} {
+        & + & {
+            margin-top: 1em;
+        }
+    }
 }
 
-// extend the class to elements that are buttons
+// include our mixin for anything with a .button class
+.button {
+    @include emergence-button;
+}
+
+// extend the class to other elements that are buttons
 button,
-a.button, // sometimes links need a little extra specificity
-// input[type="reset"],  // uncomment if you actually use one of these. otherwise, leave them out to reduce selector complexity
-// input[type="button"], // (these will get repeated for every custom button style)
-input[type="submit"],
+a.button,
+input[type="submit"] {
+    @extend .button;
+}
+
+// vendor nasties for file upload buttons (selector for Firefox unknown)
+::-ms-browse {
+    @include emergence-button;
+}
+
 ::-webkit-file-upload-button {
-	@extend .button;
-	text-decoration: none !important;
+    @include emergence-button;
 }
