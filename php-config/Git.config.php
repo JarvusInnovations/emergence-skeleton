@@ -51,27 +51,3 @@ Git::$repositories['chaki-emergence'] = [
     ]
 ];
 
-// used by gitlib, in skeleton-v2 because it requires PHP 5.5, but should be moved to skeleton once 5.3 is deprecated
-Git::$repositories['symfony-process'] = [
-    'remote' => 'https://github.com/symfony/Process.git',
-    'originBranch' => 'master',
-    'workingBranch' => 'master',
-    'trees' => [
-        'php-classes/Symfony/Component/Process' => [
-            'path' => '.',
-            'exclude' => [
-                '#(?<!\.php)$#', // exclude non-php files
-                '#^/Tests/#' // exclude tests
-            ]
-        ]
-    ]
-];
-
-Git::$repositories['gitlib'] = [
-    'remote' => 'https://github.com/gitonomy/gitlib.git',
-    'originBranch' => 'master',
-    'workingBranch' => 'master',
-    'trees' => [
-        'php-classes/Gitonomy/Git' => 'src/Gitonomy/Git'
-    ]
-];

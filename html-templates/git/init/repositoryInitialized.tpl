@@ -1,1 +1,0 @@
-<h1>Repository {$layer->getId()} initialized.</h1>
