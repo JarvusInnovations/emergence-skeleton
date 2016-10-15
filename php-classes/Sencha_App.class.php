@@ -165,7 +165,7 @@ class Sencha_App
 
     public function getRequiredPackages($deep = true)
     {
-        $packages = $this->getAppCfg('requires');
+        $packages = $this->getAppCfg('requires') ?: array();
 
         if ($themeName = $this->getBuildCfg('app.theme')) {
             $packages[] = $themeName;
