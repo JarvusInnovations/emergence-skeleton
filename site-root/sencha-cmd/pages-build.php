@@ -15,30 +15,46 @@
  * ````
  * 
  * TODO:
- * - For packages required by pages, all files within all packages' overrides folder should be automatically included in that page's build
+ * - Implement a workspace config option to enable/disable auto-requiring hotfix package
  *
  */
 
 $GLOBALS['Session']->requireAccountLevel('Developer');
 set_time_limit(0);
+Site::$debug = !empty($_REQUEST['debug']);
 
 if (empty($_GET['dumpWorkspace'])) {
     Benchmark::startLive();
 }
 
+
 // load build cfg
 $buildConfig = Sencha::loadProperties(Site::resolvePath('sencha-workspace/pages/.sencha/workspace/sencha.cfg')->RealPath);
-$framework = $buildConfig['pages.framework'];
-$frameworkVersion = Sencha::normalizeFrameworkVersion($framework, $buildConfig['pages.framework.version']);
-$cmdVersion = $buildConfig['workspace.cmd.version'];
+
+
+// load framework
+$framework = Jarvus\Sencha\Framework::get($buildConfig['pages.framework'], $buildConfig['pages.framework.version']);
 
 if (!$framework) {
-    die("app.framework not found in sencha.cfg");
+    throw new \Exception('Failed to load framework');
 }
+
+Benchmark::mark("loaded framework $framework");
+
+
+// load CMD
+$cmd = Jarvus\Sencha\Cmd::get($buildConfig['workspace.cmd.version']);
+
+if (!$cmd) {
+    throw new \Exception('Failed to load CMD');
+}
+
+Benchmark::mark("loaded cmd $cmd");
+
 
 // set paths
 $pagesPath = 'sencha-workspace/pages';
-$frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
+
 
 // get temporary directory and set paths
 $tmpPath = Emergence_FS::getTmpDir();
@@ -51,34 +67,45 @@ chdir($tmpPath);
 Benchmark::mark("chdir to: $tmpPath");
 
 
-// precache and write pages
+// get path to framework on disk
+$frameworkPhysicalPath = $framework->getPhysicalPath();
+Benchmark::mark("got physical path to framework: $frameworkPhysicalPath");
+
+
+// precache and write pages to disk
 $cachedFiles = Emergence_FS::cacheTree($pagesPath);
 Benchmark::mark("precached $cachedFiles files in $pagesPath");
 $exportResult = Emergence_FS::exportTree($pagesPath, '.');
 Benchmark::mark("exported $pagesPath to .: ".http_build_query($exportResult));
 
 
-// ... framework
-$cachedFiles = Emergence_FS::cacheTree($frameworkPath);
-Benchmark::mark("precached $cachedFiles files in $frameworkPath");
-
-$exportResult = Emergence_FS::exportTree($frameworkPath, $framework);
-Benchmark::mark("exported $frameworkPath to ./$framework: ".http_build_query($exportResult));
-
 // build command and scan for dependencies and pages
-$packages = array();
-$pageNames = array();
-$pageLoadCommands = array();
-$pageBuildCommands = array();
-$commonOverrides = array();
-$classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildConfig['workspace.classpath']) : array();
+$packages = [];
+$pageNames = [];
+$pageLoadCommands = [];
+$pageBuildCommands = [];
+$commonOverrides = [];
+$classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildConfig['workspace.classpath']) : [];
+
+
+// load hotfix package
+$hotfixPackage = Jarvus\Sencha\Package::get('jarvus-hotfixes', $framework);
+
+if ($hotfixPackage) {
+    $hotfixPackage->writeToDisk('packages/jarvus-hotfixes');
+    $packages[] = 'jarvus-hotfixes';
+    $commonOverrides[] = "include -recursive -file ./packages/jarvus-hotfixes/overrides";
+    $classPaths[] = './packages/jarvus-hotfixes/overrides';
+    Benchmark::mark("checked out package $hotfixPackage to packages/jarvus-hotfixes");
+}
+
 
 // analyze global package dependencies from Common.js
 $commonPackages = Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile('./src/Common.js'));
 $packages = array_merge($packages, $commonPackages);
 
 foreach ($commonPackages AS $package) {
-    foreach (array('src', 'overrides') AS $subPath) {
+    foreach (['src', 'overrides'] AS $subPath) {
         $packageSource = "sencha-workspace/packages/$package/$subPath";
         $packageDest = "./packages/$package/$subPath";
         Benchmark::mark("importing package: $package from $packageSource");
@@ -97,10 +124,11 @@ foreach ($commonPackages AS $package) {
     }
 }
 
+
 // assemble page-specific builds and dependencies
 foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
-    $pageOverrides = array();
+    $pageOverrides = [];
     $pagePackages = array_unique(Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile($page)));
 
     // merge into global packages list
@@ -108,7 +136,7 @@ foreach (glob('./src/page/*.js') AS $page) {
 
     // analyze packages, export, add to classPath, and register overrides per-page
     foreach ($pagePackages AS $package) {
-        foreach (array('src', 'overrides') AS $subPath) {
+        foreach (['src', 'overrides'] AS $subPath) {
             $packageSource = "sencha-workspace/packages/$package/$subPath";
             $packageDest = "./packages/$package/$subPath";
             Benchmark::mark("importing package: $package from $packageSource");
@@ -171,9 +199,8 @@ foreach ($classPaths AS &$classPath) {
 
 // prepare cmd
 $classPaths[] = 'src';
-$cmd = Sencha::buildCmd(
-    $cmdVersion
-    ,"-sdk ./$framework"
+$shellCommand = $cmd->buildShellCommand(
+    "-sdk $frameworkPhysicalPath"
     ,'compile'
         ,"-classpath=".implode(',', array_unique($classPaths))
 
@@ -213,7 +240,7 @@ $cmd = Sencha::buildCmd(
             ? 'and '.join(' and ', $pageBuildCommands)
             : ''
 );
-Benchmark::mark("running CMD: $cmd");
+Benchmark::mark("running CMD: $shellCommand");
 
 // optionally dump workspace and exit
 if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
@@ -227,7 +254,7 @@ if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] != 'afterBuild') {
 // execute CMD
 //  - optionally dump workspace and exit
 if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
-    exec($cmd);
+    exec($shellCommand);
 
     header('Content-Type: application/x-bzip-compressed-tar');
     header('Content-Disposition: attachment; filename="'.$appName.'.'.date('Y-m-d').'.tbz"');
@@ -235,7 +262,7 @@ if (!empty($_GET['dumpWorkspace']) && $_GET['dumpWorkspace'] == 'afterBuild') {
     exec("rm -R $tmpPath");
     exit();
 } else {
-    passthru("$cmd 2>&1", $cmdStatus);
+    passthru("$shellCommand 2>&1", $cmdStatus);
 }
 
 Benchmark::mark("CMD finished: exitCode=$cmdStatus");

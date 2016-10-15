@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths = array(), $packages = array(), $patchLoader = true, $framework = 'ext', $frameworkVersion = null, $packageRequirers = null)
+function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths = [], $packages = [], $patchLoader = true, $framework = 'ext', $frameworkVersion = null, $packageRequirers = null)
 {
     // retrieve app if available
     if (!$App) {
@@ -36,7 +36,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     // pull package requirements from source files
     if (!empty($packageRequirers)) {
         if (is_string($packageRequirers)) {
-            $packageRequirers = array($packageRequirers);
+            $packageRequirers = [$packageRequirers];
         }
 
         foreach ($packageRequirers AS $packageRequirer) {
@@ -55,8 +55,8 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     $frameworkPath = "sencha-workspace/$framework-$frameworkVersion";
 
     // initialize output state
-    $manifest = array();
-    $autoLoadPaths = array();
+    $manifest = [];
+    $autoLoadPaths = [];
 
     // set framework path if patching loader
     if ($patchLoader) {
@@ -88,7 +88,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     $classPaths = array_unique(array_filter($classPaths));
 
     // build list of all source trees, resolving CMD variables and children
-    $sources = array();
+    $sources = [];
     foreach ($classPaths AS $classPath) {
         if (strpos($classPath, '${workspace.dir}/x/') === 0) {
             $classPath = substr($classPath, 19);
@@ -109,7 +109,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
         }
 
         Emergence_FS::cacheTree($classPath);
-        $sources = array_merge($sources, Emergence_FS::getTreeFiles($classPath, false, array('Type' => 'application/javascript')));
+        $sources = array_merge($sources, Emergence_FS::getTreeFiles($classPath, false, ['Type' => 'application/javascript']));
     }
 
     // skip patching loader if manifest will be empty
