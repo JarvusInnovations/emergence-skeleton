@@ -5,7 +5,7 @@ Ext.define('Jarvus.ext.proxy.API', {
     requires: [
         'Jarvus.util.API'
     ],
-    
+
     /**
      * @cfg The API wrapper singleton that will process requests
      * @required
@@ -26,12 +26,12 @@ Ext.define('Jarvus.ext.proxy.API', {
 
         return doApiRequest.apply(me, requestArguments);
     },
-    
+
     doApiRequest: function(operation, callback, scope) {
         var me = this,
             writer = me.getWriter(),
             request = me.buildRequest(operation);
-            
+
         if (operation.allowWrite()) {
             request = writer.write(request);
         }
@@ -42,6 +42,10 @@ Ext.define('Jarvus.ext.proxy.API', {
             disableCaching: false,
             success: function(response) {
                 me.processResponse(true, operation, request, response, callback, scope);
+            },
+            failureStatusCodes: [404],
+            failure: function(response) {
+                me.processResponse(false, operation, request, response, callback, scope);
             }
         }));
 
