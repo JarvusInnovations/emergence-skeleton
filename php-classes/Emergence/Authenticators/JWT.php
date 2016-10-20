@@ -19,14 +19,6 @@ class JWT extends \PasswordAuthenticator
         parent::__construct($Session);
     }
     
-    public static function getRedirectUri()
-    {
-        $url = url_parse($_SERVER['REQUEST_URI']);
-        var_dump($url);
-        die();
-        return $_SERVER['REQUEST_URI'];    
-    }
-    
     public static function getUserByJWT($token, $key = null, $verify = true)
     {
         if (!$key) {
