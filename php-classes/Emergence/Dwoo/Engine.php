@@ -4,7 +4,7 @@ namespace Emergence\Dwoo;
 
 use Site;
 
-class Engine extends \Dwoo_Core
+class Engine extends \Dwoo\Core
 {
     // configurables
     public static $magicGlobals = array('Session');
@@ -56,7 +56,7 @@ class Engine extends \Dwoo_Core
     public static function compilerFactory()
     {
         if (!isset(static::$_instance_compiler)) {
-            static::$_instance_compiler = \Dwoo_Compiler::compilerFactory();
+            static::$_instance_compiler = \Dwoo\Compiler::compilerFactory();
         }
 
         return static::$_instance_compiler;
@@ -73,7 +73,7 @@ class Engine extends \Dwoo_Core
             $template = new Template($template);
         }
 
-        $dwoo->output($template, $data);
+        print($dwoo->get($template, $data));
         Site::finishRequest();
     }
 
@@ -101,7 +101,7 @@ class Engine extends \Dwoo_Core
         return static::$_instance_dwoo_loader;
     }
 
-    protected function initRuntimeVars(\Dwoo_ITemplate $tpl)
+    protected function initRuntimeVars(\Dwoo\ITemplate $tpl)
     {
         // call parent
         parent::initRuntimeVars($tpl);

@@ -3,9 +3,8 @@
 namespace Emergence\Dwoo;
 
 use Site;
-use Dwoo_Core;
 
-class Template extends \Dwoo_Template_String
+class Template extends \Dwoo\Template\Str
 {
     protected $path;
     protected $node;
@@ -49,7 +48,7 @@ class Template extends \Dwoo_Template_String
         return $this->node->SHA1;
     }
 
-    protected function getCompiledFilename(Dwoo_Core $dwoo)
+    protected function getCompiledFilename(\Dwoo\Core $dwoo)
     {
         if (!$this->compileId) {
             $this->compileId = $this->node->SHA1;
@@ -105,11 +104,11 @@ class Template extends \Dwoo_Template_String
         return $templateNode;
     }
 
-    public static function templateFactory(Dwoo_Core $dwoo, $resourceId, $cacheTime = null, $cacheId = null, $compileId = null, \Dwoo_ITemplate $parentTemplate = null)
+    public static function templateFactory(\Dwoo\Core $dwoo, $resourceId, $cacheTime = null, $cacheId = null, $compileId = null, \Dwoo\ITemplate $parentTemplate = null)
     {
         // return Dwoo_Template_File for absolute path
         if (substr($resourceId, 0, strlen(Site::$rootPath)) == Site::$rootPath) {
-            return new \Dwoo_Template_File($file, $cacheTime, $cacheId, $compileId, $includePath);
+            return new \Dwoo\Template\File($file, $cacheTime, $cacheId, $compileId, $includePath);
         }
 
         return new static($resourceId);

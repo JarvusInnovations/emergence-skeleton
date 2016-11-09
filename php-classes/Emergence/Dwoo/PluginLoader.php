@@ -2,35 +2,42 @@
 
 namespace Emergence\Dwoo;
 
-class PluginLoader implements \Dwoo_ILoader
+use Site;
+
+
+class PluginLoader implements \Dwoo\ILoader
 {
-    public static $searchPaths = array(
-        ''
-        ,'personal/'
-        ,'thirdparty/'
-        ,'builtin/'
-        ,'builtin/blocks/'
-        ,'builtin/filters/'
-        ,'builtin/functions/'
-        ,'builtin/processors/'
+    public static $namespaces = array(
+        'Dwoo\\Plugins\\Blocks',
+        'Dwoo\\Plugins\\Filters',
+        'Dwoo\\Plugins\\Functions',
+        'Dwoo\\Plugins\\Helpers',
+        'Dwoo\\Plugins\\Processors',
+        'Emergence\\Dwoo\\Plugins'
     );
 
-    public function loadPlugin($pluginName, $forceRehash = true)
+    public function loadPlugin($class, $forceRehash = true)
     {
-        if ($pluginName == 'array') {
-            $pluginName = 'helper.array';
-        }
+        // TODO: cache resolution in APC and create event-handler that scans $namespaces to clear
 
-        foreach (static::$searchPaths as $path) {
-            if ($pluginNode = \Site::resolvePath("dwoo-plugins/$path$pluginName.php")) {
-                break;
+        foreach (static::$namespaces as $namespace) {
+            // check for class-based plugin
+            //print("Looking for class $namespace\\$class or $namespace\\{$class}Compile<br>");
+            if (class_exists("$namespace\\$class") || class_exists("$namespace\\{$class}Compile")) {
+                return;
+            }
+
+            // check for function-based plugin
+            $pluginPath = 'php-classes/'.str_replace('\\', '/', "$namespace\\$class");
+            //print("Looking for function $pluginPath or {$pluginPath}Compile<br>");
+
+            if (($functionNode = Site::resolvePath("{$pluginPath}.php")) || ($functionNode = Site::resolvePath("{$pluginPath}Compile.php"))) {
+                //print("Loading {$functionNode->RealPath}<br>");
+                include_once($functionNode->RealPath);
+                return;
             }
         }
 
-        if ($pluginNode && file_exists($pluginNode->RealPath)) {
-            require($pluginNode->RealPath);
-        } else {
-            throw new \Dwoo_Exception('Plugin "'.$pluginName.'" can not be found in the Emergence VFS.');
-        }
+        throw new \Dwoo\Exception('Plugin "'.$class.'" could not be found in any registered plugin namespace', E_USER_NOTICE);
     }
 }
