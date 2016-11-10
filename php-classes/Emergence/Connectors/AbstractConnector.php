@@ -40,12 +40,12 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         }
     }
 
-    public static function handleConnectorRequest()
+    public static function handleConnectorRequest(array $responseData = array())
     {
-        return static::respond('connector', array(
-            'class' => get_called_class(),
-            'title' => static::getTitle()
-        ));
+        $responseData['class'] = get_called_class();
+        $responseData['title'] = static::getTitle();
+
+        return static::respond('connector', $responseData);
     }
 
     // TODO: this should be moved to SychronizeTrait
