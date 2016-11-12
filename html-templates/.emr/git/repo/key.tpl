@@ -14,13 +14,13 @@
         </h2>
     </div>
     <div class="clearfix"></div>
-    
+
     {assign $Repo->getPublicFingerprint() Fingerprint}
-    
+
     <div class="container">
-        
+
         <h3><i class="glyphicon glyphicon-lock"></i> Deploy Key Configuration</h3>
-    
+
         {if !$Repo->privateKeyExists()}
             <div class="alert alert-info" role="alert">You currently have no key configured. All Git remote functions will proceed without providing authentication credentials.</div>
         {else}
@@ -37,18 +37,18 @@
                 </div>
             </div>
         {/if}
-        
+
         <div class="container">
             <form method="post">
-            
+
                 {if $Repo->privateKeyExists()}
                 <h3><i class="glyphicon glyphicon-lock"></i> New Key</h3>
                 {/if}
-                
+
                 <div class="container">
-                
+
                     <p>Add the below generated public key to your git server before continuing, or paste your own key public/private key pair.</p>
-                
+
                     <div class="form-group">
                         <div class="col-sm-7 col-sm-offset-2">
                             <label>Private Key</label>
@@ -65,15 +65,15 @@
                             <button class="btn btn-default" id="js-commit"><i class="glyphicon glyphicon-save"></i> Set Key</button>
                         </div>
                     </div>
-    
+
                 </div>
             </form>
         </div>
-        
-    </div>
-    
 
-            
+    </div>
+
+
+
 {/block}
 
 {block "js-bottom"}

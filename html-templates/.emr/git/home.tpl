@@ -1,10 +1,10 @@
 {extends "design.tpl"}
 
-{block "content"}    
+{block "content"}
     <div class="page-header">
         <h2>Emergence Git Tool</h2>
     </div>
-    
+
     <table class="table">
         <tr>
         	<th>Repository ID</th>
@@ -12,7 +12,7 @@
     		<th>Upstream Branch</th>
     		<th>Status</th>
     	</tr>
-        
+
     	{foreach item=Repo from=$Repos}
     		<tr>
     			<td valign="top"><a href="/.emr/git/{$Repo->ID}">{$Repo->ID}</td>

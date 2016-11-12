@@ -223,7 +223,7 @@ class Repo
 					$data['Tracked'][] = $parsedLine;
 				}
 				else {
-					$data['Untracked'][] = $parsedLine;   
+					$data['Untracked'][] = $parsedLine;
 				}
 			}
 		}

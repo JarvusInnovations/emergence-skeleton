@@ -22,7 +22,7 @@
             <p>Run migration scripts. Occasionally a database structure change requires a migration script to properly apply a code update from the parent site.</p>
             <p><a class="btn btn-default" href="/.emr/tools/migrations" role="button">Migrations »</a></p>
         </div>
-        
+
         <div class="col-xs-6 col-lg-4">
             <h2><span class="glyphicon glyphicon-hdd" aria-hidden="true"></span> Table Manager</h2>
             <p>Generate database tables directly from Emergence ActiveRecord or VersionedRecord models. Allows you to preview the query before running it.</p>

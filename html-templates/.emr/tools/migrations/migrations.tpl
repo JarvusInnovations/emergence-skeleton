@@ -18,7 +18,7 @@
                     <th scope="col"></th>
                 </tr>
             </thead>
-            
+
             <tbody>
                 {foreach item=migration from=$data}
                     <tr>
@@ -36,7 +36,7 @@
                 {/foreach}
             </tbody>
         </table>
-    
+
         <form method="GET">
             <input type="hidden" name="refresh" value="1">
             <input type="submit" value="Refresh Inherited Migrations">
@@ -53,28 +53,28 @@
             'Ext.Date'
         ],
         singleton: true,
-        
+
         constructor: function() {
             Ext.onReady(this.onDocReady, this);
         },
-        
+
         onDocReady: function() {
             var me = this,
                 tableEl = Ext.get('adminMigrationsTable'),
                 forms = [];
-            
+
             tableEl.select('tbody tr').each(function(rowEl) {
                 var formEl = rowEl.down('form');
-                
+
                 if (!formEl) {
                     return; // skip rows that are already executed
                 }
-                
+
                 forms.push(formEl);
-                
+
                 formEl.on('submit', function(ev, t) {
                     ev.stopEvent();
-                    
+
                     formEl.down('input[type=submit]').set({ disabled: true });
 
                     Ext.Ajax.request({
@@ -91,7 +91,7 @@
                             formEl.up('tr').down('.migration-timestamp').update(Ext.Date.format(new Date(migrationData.executed*1000), 'Y-m-d H:i:s'));
 
                             formEl.destroy();
-                            
+
                             console.groupCollapsed('%s migration %s', migrationData.status, migrationData.key);
                             console.log(responseData.output);
                             console.table(responseData.log);

@@ -5,7 +5,7 @@
         <li><a href="/.emr/tools">Tools</a></li>
         <li class="active">Table Manager</li>
     </ol>
-    
+
     <div class="panel panel-default">
         <div class="panel-heading">Select Model</div>
         <form>

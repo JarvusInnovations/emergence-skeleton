@@ -12,17 +12,17 @@ document.emr = {
                 'selectAllButton': '#js-select-all',
                 'stageSelectedButton': '#js-stage-selected',
                 'commitButton': '#js-commit',
-                
+
                 'stageFileButtons': '.js-stage-file',
                 'resetFileButtons': '.js-reset-file',
                 'diffRemoteHeadButtons': '.js-diff-remote-head',
                 'diffLocalHeadButtons': '.js-diff-local-head',
                 'diffBehindHeadButtons': '.js-diff-behind-head',
-                
+
                 'activeTabFileCheckboxes': 'div.active div.emr-git-files input[type=checkbox]',
-                
+
                 'upperStatus': '#js-upper-status',
-                
+
                 'alertSuccessClass': 'alert-success',
                 'alertErrorClass': 'alert-danger'
             },
@@ -32,10 +32,10 @@ document.emr = {
             */
             bind: function() {
                 this.repo = $(this.selectors.repo).val();
-                
+
                 // dropdowns
                 $('.dropdown-toggle').dropdown();
-                
+
                 $(this.selectors.pullButton).on('click', this.pull.bind(this));
                 $(this.selectors.pushButton).on('click', this.push.bind(this));
                 $(this.selectors.cleanButton).on('click', this.clean.bind(this));
@@ -43,10 +43,10 @@ document.emr = {
                 $(this.selectors.toDiskButton).on('click', this.vfstodisk.bind(this));
                 $(this.selectors.fromDiskButton).on('click', this.disktovfs.bind(this));
                 $(this.selectors.commitButton).on('click', this.commit.bind(this));
-                
+
                 $(this.selectors.selectAllButton).on('click', this.selectAll.bind(this));
                 $(this.selectors.stageSelectedButton).on('click', this.stageSelected.bind(this));
-                
+
                 $(this.selectors.stageFileButtons).on('click', this.stageFile.bind(this));
                 $(this.selectors.resetFileButtons).on('click', this.resetFile.bind(this));
                 //$(this.selectors.diffRemoteHeadButtons).on('click', this.diffRemoteHead.bind(this));
@@ -128,7 +128,7 @@ document.emr = {
             },
             resetToRemoteHead: function(e) {
                 e.preventDefault();
-                
+
                 var prompt = 'Are you sure you want to reset the Git repository to the remote HEAD commit?<br>';
                 bootbox.confirm({
                     message: prompt,
@@ -170,7 +170,7 @@ document.emr = {
             },
             clean: function(e) {
                 e.preventDefault();
-                
+
                 var prompt = 'Are you sure you want to clean the Git repository?<br>'
                             + 'Any untracked files or directories will be permanently deleted.<br>';
                 bootbox.confirm({
@@ -296,19 +296,19 @@ document.emr = {
             },
             stageSelected: function(e) {
                 var checked = $(this.selectors.activeTabFileCheckboxes+':checked');
-                
+
                 var files = [];
-                
+
                 $.each(checked,function(index,checkbox){
                     files.push($(checkbox).val());
                 }.bind(this));
-                
+
                 if(!files.length) {
                     bootbox.alert('Please make a selection first.');
                 }
                 else {
                     var prompt = 'Are you sure you want to stage ' + files.length + ' selected path' + (files.length>1?'s':'') + '?<br>'
-                            
+
                     bootbox.confirm({
                         message: prompt,
                         title: 'Stage',
@@ -333,9 +333,9 @@ document.emr = {
                                     }.bind(this),
                                     error: function(data,status,xhr) {
                                         var domStatus = $(this.selectors.upperStatus);
-                                        
+
                                         var errors = '';
-                                        
+
                                         $.each(data.operations, function(index, item) {
                                             errors += item.output + '<br>';
                                         }.bind(this));
@@ -353,10 +353,10 @@ document.emr = {
             },
             stageFile: function(e) {
                 var path = $(e.toElement).closest('div.btn-group').attr('data-file');
-                
+
                 var prompt = 'Are you sure you want to stage this path?<br><br>'
                             + path;
-                            
+
                 bootbox.confirm({
                     message: prompt,
                     title: 'Stage',
@@ -381,9 +381,9 @@ document.emr = {
                                 }.bind(this),
                                 error: function(data,status,xhr) {
                                     var domStatus = $(this.selectors.upperStatus);
-                                    
+
                                     var errors = '';
-                                    
+
                                     $.each(data.operations, function(index, item) {
                                         errors += item.output + '<br>';
                                     }.bind(this));
@@ -400,10 +400,10 @@ document.emr = {
             },
             resetFile: function(e) {
                 var path = $(e.toElement).closest('div.btn-group').attr('data-file');
-                
+
                 var prompt = 'Are you sure you want to reset this path?<br><br>'
                             + path;
-                            
+
                 bootbox.confirm({
                     message: prompt,
                     title: 'Reset',
@@ -428,9 +428,9 @@ document.emr = {
                                 }.bind(this),
                                 error: function(data,status,xhr) {
                                     var domStatus = $(this.selectors.upperStatus);
-                                    
+
                                     var errors = '';
-                                    
+
                                     $.each(data.operations, function(index, item) {
                                         errors += item.output + '<br>';
                                     }.bind(this));
@@ -447,31 +447,31 @@ document.emr = {
             },
             diffRemoteHead: function(e) {
                 e.preventDefault();
-                
+
                 var path = $(e.toElement).closest('div.btn-group').attr('data-file');
             },
             diffLocalHead: function(e) {
                 e.preventDefault();
-                
+
                 var path = $(e.toElement).closest('div.btn-group').attr('data-file');
             },
             diffBehindHead: function(e) {
                 e.preventDefault();
-                
+
                 var path = $(e.toElement).closest('div.btn-group').attr('data-file');
-                
+
                 // get amount behind from
                 // <a data-behind="{$i}">
             },
             commit: function(e) {
                 e.preventDefault();
-                
+
                 var data = {
                     author: $('input[name=author]').val(),
                     subject: $('input[name=subject]').val(),
                     description: $('textarea[name=description]').val()
                 };
-                
+
                 var prompt = 'Are you sure you want to commit?<br>';
                 bootbox.confirm({
                     message: prompt,

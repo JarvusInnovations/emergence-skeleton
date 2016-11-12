@@ -8,15 +8,15 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link rel="icon" href="/img/emergence/favicon.ico">
-        
+
         <title>Emergence Developer Tools</title>
-        
+
         {* Bootstrap core CSS *}
         {cssmin "bootstrap3/bootstrap.css"}
         {cssmin "bootstrap3/bootstrap-theme.css"}
         {cssmin ".emr.css"}
     </head>
-    
+
     <body>
         {block "nav"}
         <nav class="navbar navbar-inverse navbar-fixed-top">

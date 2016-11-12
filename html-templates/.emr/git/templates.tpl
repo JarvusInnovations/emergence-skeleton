@@ -8,7 +8,7 @@
                         <label class="file{if $File.Staged} file-staged{/if}">
                             <input type="checkbox" name="Files[]" value="{$File.File|escape}">
                             <span class="code">{if ord($File.Code.0) != 32}{$File.Code.0}{else}&nbsp;{/if}{$File.Code.1}</span>
-                            <span class="path">{if $File.OriginalFile}{$File.OriginalFile} ->{/if}{$File.File}</span>    
+                            <span class="path">{if $File.OriginalFile}{$File.OriginalFile} ->{/if}{$File.File}</span>
                             <div class="btn-group text-right" data-file="{$File.File}">
                                 {*<button type="button" class="btn btn-xs navbar-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" alt="Diff a File">
                                     Diff

@@ -14,7 +14,7 @@
                 <span class="glyphicon glyphicon-lock"></span> Deploy Key
             </a>
         </h2>
-        
+
     </div>
 
     <input type="hidden" value="{$Repo->ID}" name="repo" id="js-repo">
@@ -30,35 +30,35 @@
             </div>
         </div>
     </div>
-    
-    
-    
+
+
+
     <div class="clearfix"></div>
-    
+
     <div class="container">
-    
+
         {if !$Repo->privateKeyExists()}
             <div class="alert alert-info" role="alert">You currently have no key configured. All Git remote functions will proceed without providing authentication credentials.</div>
         {/if}
-    
+
         <div class="alert hidden" role="alert" id="js-upper-status"></div>
-        
+
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">Remote</span>
                 <input type="text" class="form-control" disabled value="{$Repo->Remote}">
             </div>
         </div>
-        
+
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">Upstream Branch</span>
                 <input type="text" class="form-control" disabled value="{$Repo->UpstreamBranch}">
             </div>
         </div>
-        
+
         <hr>
-        
+
         <div class="row">
             <div class="col-lg-8"><h2>Local</h2></div>
             <div class="col-lg-4 text-right">
@@ -86,7 +86,7 @@
                     </div>
                 </div>
             </div>
-        
+
             <div class="col-lg-4 emr-git-diskio text-right">
                 <div class="btn-group">
                     <a class="btn btn-default disabled"><i class="glyphicon glyphicon-hdd"></i> Disk IO</a>
@@ -95,9 +95,9 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="clearfix"></div>
-    
+
         {if $Repo->isRepositoryInitialized()}
             <h3>Raw Status</h3>
 			<pre>{$Repo->Status}</pre>
@@ -110,8 +110,8 @@
             </div>
 		{/if}
     </div>
-    
-    
+
+
     {if $Repo->isRepositoryInitialized()}
         <div id="advancedStatus" class="container">
             <h2>Status</h2>
@@ -122,7 +122,7 @@
                 <li><a href="#status-tracked" data-toggle="tab">Tracked</a></li>
                 <li><a href="#status-untracked" data-toggle="tab">Untracked</a></li>
             </ul>
-            
+
             <div class="btn-group git-file-buttons">
                 <button type="button" class="btn btn-default" id="js-select-all" alt="Select All">
                     <span class="glyphicon glyphicon-check"></span> Select All
@@ -131,7 +131,7 @@
                     <span class="glyphicon glyphicon-save-file"></span> Stage Selected
                 </button>
             </div>
-            
+
             <div class="tab-content clearfix">
                 <div class="tab-pane active" id="status-everything">
                     {fileBlock $AdvancedStatus.Everything}
@@ -150,7 +150,7 @@
                 </div>
             </div>
         </div>
-        
+
         {if $AdvancedStatus.Staged}
         <div class="container">
             <h2>Commit</h2>
@@ -182,10 +182,10 @@
         </div>
         {/if}
     {/if}
-    
-    
-    
-            
+
+
+
+
 {/block}
 
 {block "js-bottom"}

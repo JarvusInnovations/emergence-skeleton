@@ -25,7 +25,7 @@
                     </ul>
                     <input type="submit" class="btn btn-default" value="Precache selected collections">
                 </fieldset>
-                
+
             </form>
         </div>
     </div>

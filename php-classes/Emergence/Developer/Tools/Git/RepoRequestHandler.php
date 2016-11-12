@@ -196,7 +196,7 @@ class RepoRequestHandler extends \RequestHandler
 
 	public static function handleStatusRequest() {
 		static::respond('repo/status', [
-			'AdvancedStatus' =>   static::$_currentRepo->AdvancedStatus  
+			'AdvancedStatus' =>   static::$_currentRepo->AdvancedStatus
 		]);
 	}
 
@@ -212,7 +212,7 @@ class RepoRequestHandler extends \RequestHandler
 		Site::$debug = !empty($_GET['debug']);
 
 
-		/* 
+		/*
          *  This needs better error handling. Currently errors coming from php raw copy exit as server 500 because Site::$debug == false to disable caching.
          *  Instead errors should be caught and should bubble up to the JSON output.
          */
@@ -577,7 +577,7 @@ class RepoRequestHandler extends \RequestHandler
 		}
 
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$repo->setKeys($_POST['privateKey'], $_POST['publicKey']);   
+			$repo->setKeys($_POST['privateKey'], $_POST['publicKey']);
 		}
 
 		$keyTmpPath = tempnam(sys_get_temp_dir(), 'git-key');
