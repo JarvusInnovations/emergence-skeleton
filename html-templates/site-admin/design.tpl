@@ -14,7 +14,7 @@
         {* Bootstrap core CSS *}
         {cssmin "bootstrap3/bootstrap.css"}
         {cssmin "bootstrap3/bootstrap-theme.css"}
-        {cssmin ".emr.css"}
+        {cssmin "site-admin.css"}
     </head>
 
     <body>
@@ -23,14 +23,14 @@
             <div class="container">
                 <div class="navbar-header">
                     <a href="#" class="navbar-left emr-logo"><img src="/img/emergence/logo.png"></a>
-                    <a class="navbar-brand" href="/.emr/">Emergence Developer Tools</a>
+                    <a class="navbar-brand" href="/site-admin/">Emergence Site Administrator</a>
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li{if $Page==""} class="active"{/if}><a href="/.emr/">Site Status</a></li>
+                        <li{if $Page==""} class="active"{/if}><a href="/site-admin/">Site Status</a></li>
                         <li><a href="/develop">Code Editor</a></li>
-                        <li{if $Page=='git'} class="active"{/if}><a href="/.emr/git">Git</a></li>
-                        <li{if $Page=='tools'} class="active"{/if}><a href="/.emr/tools">Tools</a></li>
+                        <li{if $Page=='git'} class="active"{/if}><a href="/site-admin/git">Git</a></li>
+                        <li{if $Page=='tools'} class="active"{/if}><a href="/site-admin/tools">Tools</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#">Load Average</a></li>

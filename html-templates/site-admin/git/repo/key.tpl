@@ -3,8 +3,8 @@
 
 {block "content"}
     <ol class="breadcrumb">
-        <li><a href="/.emr/git">Git</a></li>
-        <li><a href="/.emr/git/{$Repo->ID}">{$Repo->ID}</a></li>
+        <li><a href="/site-admin/git">Git</a></li>
+        <li><a href="/site-admin/git/{$Repo->ID}">{$Repo->ID}</a></li>
         <li class="active">Deploy Key</li>
     </ol>
 
@@ -74,9 +74,4 @@
 
 
 
-{/block}
-
-{block "js-bottom"}
-    {$dwoo.parent}
-    {*jsmin ".emr/git/key.js"*}
 {/block}

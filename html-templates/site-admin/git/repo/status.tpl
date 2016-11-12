@@ -1,16 +1,16 @@
 {extends "design.tpl"}
 
 {block "content"}
-    {load_templates ".emr/git/templates.tpl"}
+    {load_templates "site-admin/git/templates.tpl"}
     <ol class="breadcrumb">
-        <li><a href="/.emr/git">Git</a></li>
+        <li><a href="/site-admin/git">Git</a></li>
         <li class="active">{$Repo->ID}<a href="#"></a></li>
     </ol>
 
     <div class="navbar-form navbar-left">
         <h2>
             {$Repo->ID}
-            <a href="/.emr/git/{$Repo->ID}/key" class="btn btn-default">
+            <a href="/site-admin/git/{$Repo->ID}/key" class="btn btn-default">
                 <span class="glyphicon glyphicon-lock"></span> Deploy Key
             </a>
         </h2>
@@ -104,7 +104,7 @@
 		{else}
 			<div class="text-center">
                 <h3>Repository not initialized</h3>
-                <form method="GET" action="/.emr/git/{$Repo->ID}/init" >
+                <form method="GET" action="/site-admin/git/{$Repo->ID}/init" >
         			<input type="submit" value="Click here to Initialize" class="btn btn-default">
     			</form>
             </div>
@@ -190,5 +190,5 @@
 
 {block "js-bottom"}
     {$dwoo.parent}
-    {jsmin ".emr/git/repo.js"}
+    {jsmin "site-admin/git.js"}
 {/block}

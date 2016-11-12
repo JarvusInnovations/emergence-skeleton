@@ -15,7 +15,7 @@
 
     	{foreach item=Repo from=$Repos}
     		<tr>
-    			<td valign="top"><a href="/.emr/git/{$Repo->ID}">{$Repo->ID}</td>
+    			<td valign="top"><a href="/site-admin/git/{$Repo->ID}">{$Repo->ID}</td>
     			<td valign="top">{$Repo->WorkingBranch}</td>
     			<td valign="top">{$Repo->UpstreamBranch}</td>
     			<td valign="top">

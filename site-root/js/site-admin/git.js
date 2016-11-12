@@ -1,4 +1,4 @@
-document.emr = {
+document.emergenceSiteAdmin = {
     git: {
         repo: {
             selectors: {
@@ -523,5 +523,5 @@ function nl2br (str, is_xhtml) {
 }
 
 $(document).ready(function() {
-    document.emr.git.repo.bind();
+    document.emergenceSiteAdmin.git.repo.bind();
 })

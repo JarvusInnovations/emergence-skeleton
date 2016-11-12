@@ -3,7 +3,7 @@
 
 {block content}
     <ol class="breadcrumb">
-        <li><a href="/.emr/tools">Tools</a></li>
+        <li><a href="/site-admin/tools">Tools</a></li>
         <li class="active">Clear Templates Cache</li>
     </ol>
     {if $success}

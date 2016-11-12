@@ -439,7 +439,7 @@ class RepoRequestHandler extends \RequestHandler
 
         $repo->initializeRepository();
 
-        Site::redirect('/.emr/git/'.$repo->ID);
+        Site::redirect('/site-admin/git/'.$repo->ID);
     }
 
     public static function handleStageRequest()

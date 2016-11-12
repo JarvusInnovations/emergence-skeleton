@@ -2,8 +2,8 @@
 
 {block "content"}
     <ol class="breadcrumb">
-        <li><a href="/.emr/tools">Tools</a></li>
-        <li><a href="/.emr/tools/table-manager">Table Manager</a></li>
+        <li><a href="/site-admin/tools">Tools</a></li>
+        <li><a href="/site-admin/tools/table-manager">Table Manager</a></li>
         <li class="active">Ext Modal</li>
     </ol>
     <div class="panel panel-default">
