@@ -5,113 +5,110 @@ use Site,Emergence_FS;
 
 class RequestHandler extends \RequestHandler
 {
-	public static function handleRequest()
-	{
-		$GLOBALS['Session']->requireAccountLevel('Developer');
+    public static function handleRequest()
+    {
+        $GLOBALS['Session']->requireAccountLevel('Developer');
 
-		switch($action ? $action : $action = static::shiftPath())
-		{
-			case 'clear-apc-cache':
-				return static::handleAPCClearRequest();
+        switch ($action ? $action : $action = static::shiftPath()) {
+            case 'clear-apc-cache':
+                return static::handleAPCClearRequest();
 
-			case 'precache':
-				return static::handlePrecacheRequest();
+            case 'precache':
+                return static::handlePrecacheRequest();
 
-			case 'migrations':
-				return \Emergence\Migrations\MigrationsRequestHandler::handleRequest();
+            case 'migrations':
+                return \Emergence\Migrations\MigrationsRequestHandler::handleRequest();
 
-			case 'table-manager':
-				return \TableManagerRequestHandler::handleRequest();
+            case 'table-manager':
+                return \TableManagerRequestHandler::handleRequest();
 
-			case 'clear-template-cache':
-				return static::handleTemplatesClearRequest();
+            case 'clear-template-cache':
+                return static::handleTemplatesClearRequest();
 
-			default:
-				return static::respond('home');
-		}
-	}
+            default:
+                return static::respond('home');
+        }
+    }
 
-	public static function respond($responseID, $responseData = [], $responseMode = false)
-	{
-		\Emergence\Developer\Tools\RequestHandler::respond($responseID, array_merge($responseData,[
+    public static function respond($responseID, $responseData = [], $responseMode = false)
+    {
+        \Emergence\Developer\Tools\RequestHandler::respond($responseID, array_merge($responseData,[
 
-		]),$responseMode);
-	}
+        ]),$responseMode);
+    }
 
-	public static function handleAPCClearRequest()
-	{
-		$data = [];
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if ($_REQUEST['target'] != 'System') {
-				apc_clear_cache('user');
-				$data['userClear'] = true;
-			}
+    public static function handleAPCClearRequest()
+    {
+        $data = [];
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($_REQUEST['target'] != 'System') {
+                apc_clear_cache('user');
+                $data['userClear'] = true;
+            }
 
-			if ($_REQUEST['target'] != 'User') {
-				apc_clear_cache();
-				$data['systemClear'] = true;
-			}
+            if ($_REQUEST['target'] != 'User') {
+                apc_clear_cache();
+                $data['systemClear'] = true;
+            }
 
-			$data['clear'] = true;
-		}
+            $data['clear'] = true;
+        }
 
-		static::respond('apc-clear', $data);
-	}
+        static::respond('apc-clear', $data);
+    }
 
-	public static function handlePrecacheRequest()
-	{
+    public static function handlePrecacheRequest()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            Site::$autoPull = true;
+            Site::$debug = true;
 
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			Site::$autoPull = true;
-			Site::$debug = true;
+            set_time_limit(0);
 
-			set_time_limit(0);
+            $trees = [
+                'dwoo-plugins'
+                ,'event-handlers'
+                ,'ext-library'
+                ,'html-templates'
+                ,'js-library'
+                ,'php-classes'
+                ,'php-config'
+                ,'phpunit-tests'
+                ,'php-migrations'
+                ,'site-root'
+                ,'sencha-workspace/.sencha'
+                ,'sencha-workspace/microloaders'
+                ,'sencha-workspace/pages'
+                ,'sencha-workspace/packages'
+                ,'sencha-workspace/EmergenceEditor'
+                ,'sencha-workspace/EmergencePullTool'
+                ,'sencha-workspace/ContentEditor'
+            ];
 
-			$trees = array(
-				'dwoo-plugins'
-				,'event-handlers'
-				,'ext-library'
-				,'html-templates'
-				,'js-library'
-				,'php-classes'
-				,'php-config'
-				,'phpunit-tests'
-				,'php-migrations'
-				,'site-root'
-				,'sencha-workspace/.sencha'
-				,'sencha-workspace/microloaders'
-				,'sencha-workspace/pages'
-				,'sencha-workspace/packages'
-				,'sencha-workspace/EmergenceEditor'
-				,'sencha-workspace/EmergencePullTool'
-				,'sencha-workspace/ContentEditor'
-			);
+            $message = "";
+            foreach ($_POST['collections'] AS $collection) {
+                $filesCached = Emergence_FS::cacheTree($collection, true);
+                $message .= sprintf('Precached %03u files in %s'.PHP_EOL, $filesCached, $collection);
+            }
+        }
 
-			$message = "";
-			foreach ($_POST['collections'] AS $collection) {
-				$filesCached = Emergence_FS::cacheTree($collection, true);
-				$message .= sprintf('Precached %03u files in %s'.PHP_EOL, $filesCached, $collection);
-			}
-		}
+        static::respond('precache', [
+            'message' => $message
+        ]);
+    }
 
-		static::respond('precache', array(
-			'message' => $message
-		));
-	}
+    public static function handleTemplatesClearRequest()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $templateDir = \Emergence\Dwoo\Engine::$pathCompile.'/'.Site::getConfig('handle');
 
-	public static function handleTemplatesClearRequest()
-	{
+            exec("find $templateDir -name \"*.d*.php\" -type f -delete");
 
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$templateDir = \Emergence\Dwoo\Engine::$pathCompile.'/'.Site::getConfig('handle');
+            $success = true;
+        }
 
-			exec("find $templateDir -name \"*.d*.php\" -type f -delete");
-
-			$success = true;
-		}
-
-		static::respond('templates-clear', [
-			'success' => $success
-		]);
-	}
+        static::respond('templates-clear', [
+            'success' => $success
+        ]);
+    }
 }
