@@ -27,17 +27,15 @@ class EmailSubscriber extends ActiveRecord
         )
     );
 
-    public function validate()
+    public function validate($deep = true)
     {
         // call parent
-        parent::validate();
+        parent::validate($deep);
 
         $this->_validator->validate(array(
             'field' => 'Email'
             ,'validator' => 'email'
         ));
-
-
 
         // save results
         return $this->finishValidation();
