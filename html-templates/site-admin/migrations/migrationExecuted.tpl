@@ -1,10 +1,11 @@
 {extends migration.tpl}
 
-{block title}Executed {$dwoo.parent}{/block}
+{block title}Executed: {$dwoo.parent}{/block}
 
 {block breadcrumbs}
-    {$crumbTrail = array($migration.key => "$.task.baseUrl/$migration.key", Results => false)}
-    {$dwoo.parent}
+    <li><a href="/site-admin/migrations">Migrations</a></li>
+    <li><a href="/site-admin/migrations/{$migration.key}">{$migration.key}</a></li>
+    <li class="active">Results</li>
 {/block}
 
 {block content}

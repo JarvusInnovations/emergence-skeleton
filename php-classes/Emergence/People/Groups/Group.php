@@ -49,7 +49,6 @@ class Group extends ActiveRecord
         )
         ,'Founded' => array(
             'type' => 'timestamp'
-            ,'default' => null
         )
         ,'About' => array(
             'type' => 'clob'

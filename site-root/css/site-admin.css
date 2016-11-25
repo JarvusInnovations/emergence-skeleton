@@ -4,6 +4,10 @@
     margin-right: 10px;
 }
 
+.breadcrumb:empty {
+    display: none;
+}
+
 .notfound {
      background-image: url('/img/emergence/logo.png');
      background-size: 300px; 

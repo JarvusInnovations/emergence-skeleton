@@ -1,11 +1,12 @@
 <?php
 
-namespace Emergence\Migrations;
+namespace Emergence\SiteAdmin;
 
 use DB;
 use Site;
 use Emergence_FS;
 use TableNotFoundException;
+
 
 class MigrationsRequestHandler extends \RequestHandler
 {
@@ -35,42 +36,8 @@ class MigrationsRequestHandler extends \RequestHandler
 
     public static function handleBrowseRequest()
     {
-        // get all migration status records from table
-        try {
-            $migrationRecords = DB::table('Key', 'SELECT * FROM _e_migrations');
-        } catch (TableNotFoundException $e) {
-            $migrationRecords = [];
-        }
-
-        $migrations = [];
-
-        Emergence_FS::cacheTree('php-migrations');
-
-        // append sequence to each node
-        foreach (Emergence_FS::getTreeFiles('php-migrations') AS $migrationPath => $migrationNodeData) {
-            $migrationKey = preg_replace('#^php-migrations/(.*)\.php$#i', '$1', $migrationPath);
-            $migrationRecord = array_key_exists($migrationKey, $migrationRecords) ? $migrationRecords[$migrationKey] : null;
-
-            $migrations[$migrationKey] = [
-                'key' => $migrationKey,
-                'path' => 'php-migrations/'.$migrationKey.'.php',
-                'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
-                'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
-                'sha1' => $migrationNodeData['SHA1'],
-                'sequence' => preg_match('#(\d+)_[^/]+$#', $migrationKey, $matches) ? (int)$matches[1] : 0
-            ];
-        }
-
-        // sort migrations by sequence
-        uasort($migrations, function($a, $b) {
-            if ($a['sequence'] == $b['sequence']) {
-                return 0;
-            }
-            return ($a['sequence'] < $b['sequence']) ? -1 : 1;
-        });
-
         return static::respond('migrations',[
-            'migrations' => $migrations
+            'migrations' => static::getMigrations()
         ]);
     }
 
@@ -156,6 +123,50 @@ class MigrationsRequestHandler extends \RequestHandler
         return static::respond('migration', [
             'migration' => $migration
         ]);
+    }
+
+    public static function getMigrations()
+    {
+        static $migrations = null;
+
+        if ($migrations) {
+            return $migrations;
+        }
+
+        Emergence_FS::cacheTree('php-migrations');
+
+        // get all migration status records from table
+        try {
+            $migrationRecords = DB::table('Key', 'SELECT * FROM _e_migrations');
+        } catch (TableNotFoundException $e) {
+            $migrationRecords = [];
+        }
+
+        // append sequence to each node
+        $migrations = [];
+        foreach (Emergence_FS::getTreeFiles('php-migrations') AS $migrationPath => $migrationNodeData) {
+            $migrationKey = preg_replace('#^php-migrations/(.*)\.php$#i', '$1', $migrationPath);
+            $migrationRecord = array_key_exists($migrationKey, $migrationRecords) ? $migrationRecords[$migrationKey] : null;
+
+            $migrations[$migrationKey] = [
+                'key' => $migrationKey,
+                'path' => 'php-migrations/'.$migrationKey.'.php',
+                'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
+                'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
+                'sha1' => $migrationNodeData['SHA1'],
+                'sequence' => preg_match('#(\d+)_[^/]+$#', $migrationKey, $matches) ? (int)$matches[1] : 0
+            ];
+        }
+
+        // sort migrations by sequence
+        uasort($migrations, function($a, $b) {
+            if ($a['sequence'] == $b['sequence']) {
+                return 0;
+            }
+            return ($a['sequence'] < $b['sequence']) ? -1 : 1;
+        });
+
+        return $migrations;
     }
 
     protected static function createMigrationsTable()

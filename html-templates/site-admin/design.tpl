@@ -28,16 +28,21 @@
                         <a class="navbar-brand" href="/site-admin/">Emergence Site Administrator</a>
                     </div>
                     <div id="navbar" class="collapse navbar-collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="{tif $activeSection == dashboard ? active}"><a href="/site-admin/">Dashboard</a></li>
-                            <li class="{tif $activeSection == tasks ? active}"><a href="/site-admin/tasks">Tasks</a></li>
 
-                            {if $.User->hasAccountLevel(Developer)}
-                                <li class="{tif $activeSection == sources ? active}"><a href="/site-admin/sources">Sources</a></li>
-                                <li class="{tif $activeSection == logs ? active}"><a href="/site-admin/logs">Logs</a></li>
-                                <li><a href="/develop">Code Editor</a></li>
-                            {/if}
+                        <ul class="nav navbar-nav">
+                            {foreach item=item key=key from=Emergence\SiteAdmin\Navigation::getItems()}
+                                <li class="{tif $activeSection == $key ? active}">
+                                    <a href="{$item.url|escape}">
+                                        {$item.label|escape}
+
+                                        {if $item.badge}
+                                            <span class="badge">{$item.badge|number_format}</span>
+                                        {/if}
+                                    </a>
+                                </li>
+                            {/foreach}
                         </ul>
+{*
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="#">Load Average</a></li>
                             {$CPULoad = sys_getloadavg()}
@@ -45,37 +50,27 @@
                             <li class="active {if $CPULoad.0>1}load-yellow{else if $CPULoad.0>4}load-red{else}load-green{/if}"><a href="#">{$CPULoad.1}<sub>5</sub></a></li>
                             <li class="active {if $CPULoad.0>1}load-yellow{else if $CPULoad.0>4}load-red{else}load-green{/if}"><a href="#">{$CPULoad.2}<sub>15</sub></a></li>
                         </ul>
+*}
                     </div>
                 </div>
             </nav>
         {/block}
 
         <div class="container main-content">
-            {block breadcrumbs}
-                {if $.task}
-                    <ol class="breadcrumb">
+            {strip}
+            <ol class="breadcrumb">
+                {block breadcrumbs}
+                    {if $.task}
                         <li><a href="/site-admin/tasks">Tasks</a></li>
-
-                        {capture assign=taskTitleHtml}<span class="glyphicon glyphicon-{$.task.icon}" aria-hidden="true"></span> {$.task.title|escape}{/capture}
-
-                        {if $crumbTrail}
-                            <li><a href="{$.task.baseUrl}">{$taskTitleHtml}</a></li>
-
-                            {foreach item=url key=label from=$crumbTrail}
-                                {if !$url}
-                                    <li>{$label|escape}</li>
-                                {elseif $.foreach.default.last}
-                                    <li class="active">{$label|escape}</li>
-                                {else}
-                                    <li><a href="{$url|escape}">{$label|escape}</a></li>
-                                {/if}
-                            {/foreach}
-                        {else}
-                            <li class="active">{$taskTitleHtml}</li>
-                        {/if}
-                    </ol>
-                {/if}
-            {/block}
+                        <li class="active">
+                            <span class="glyphicon glyphicon-{$.task.icon}" aria-hidden="true"></span>
+                            &nbsp;
+                            {$.task.title|escape}
+                        </li>
+                    {/if}
+                {/block}
+            </ol>
+            {/strip}
 
             {block content}{/block}
         </div>

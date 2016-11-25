@@ -188,7 +188,7 @@
 
 {/block}
 
-{block js-bottom}
+{block "js-bottom"}
     {$dwoo.parent}
     {jsmin "site-admin/git.js"}
 {/block}
