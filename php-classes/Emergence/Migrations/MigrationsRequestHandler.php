@@ -15,16 +15,18 @@ class MigrationsRequestHandler extends \RequestHandler
     const STATUS_FAILED = 'failed';
     const STATUS_EXECUTED = 'executed';
 
-    public static $userResponseModes = array(
-        'application/json' => 'json'
-        ,'text/csv' => 'csv'
-    );
+    public static $userResponseModes = [
+        'application/json' => 'json',
+        'text/csv' => 'csv'
+    ];
 
     public static function handleRequest()
     {
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
-        if (count(array_filter($migrationKey = static::getPath()))) {
+        if (static::peekPath() == 'refresh') {
+            return static::handleRefreshRequest();
+        } elseif (count(array_filter($migrationKey = static::getPath()))) {
             return static::handleMigrationRequest(implode('/', $migrationKey));
         }
 
@@ -37,25 +39,26 @@ class MigrationsRequestHandler extends \RequestHandler
         try {
             $migrationRecords = DB::table('Key', 'SELECT * FROM _e_migrations');
         } catch (TableNotFoundException $e) {
-            $migrationRecords = array();
+            $migrationRecords = [];
         }
 
-        Emergence_FS::cacheTree('php-migrations', !empty($_GET['refresh']));
-        $migrations = array();
+        $migrations = [];
+
+        Emergence_FS::cacheTree('php-migrations');
 
         // append sequence to each node
         foreach (Emergence_FS::getTreeFiles('php-migrations') AS $migrationPath => $migrationNodeData) {
             $migrationKey = preg_replace('#^php-migrations/(.*)\.php$#i', '$1', $migrationPath);
             $migrationRecord = array_key_exists($migrationKey, $migrationRecords) ? $migrationRecords[$migrationKey] : null;
 
-            $migrations[$migrationKey] = array(
-                'key' => $migrationKey
-                ,'path' => 'php-migrations/'.$migrationKey.'.php'
-                ,'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW
-                ,'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null
-                ,'sha1' => $migrationNodeData['SHA1']
-                ,'sequence' => preg_match('#(\d+)_[^/]+$#', $migrationKey, $matches) ? (int)$matches[1] : 0
-            );
+            $migrations[$migrationKey] = [
+                'key' => $migrationKey,
+                'path' => 'php-migrations/'.$migrationKey.'.php',
+                'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
+                'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
+                'sha1' => $migrationNodeData['SHA1'],
+                'sequence' => preg_match('#(\d+)_[^/]+$#', $migrationKey, $matches) ? (int)$matches[1] : 0
+            ];
         }
 
         // sort migrations by sequence
@@ -66,9 +69,26 @@ class MigrationsRequestHandler extends \RequestHandler
             return ($a['sequence'] < $b['sequence']) ? -1 : 1;
         });
 
-        return static::respond('migrations', array(
-            'data' => $migrations
-        ));
+        return static::respond('migrations',[
+            'migrations' => $migrations
+        ]);
+    }
+
+    public static function handleRefreshRequest()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to query the parent site for new migration scripts and pull any that are found?'
+            ]);
+        }
+
+        Site::$autoPull = true;
+        $precached = Emergence_FS::cacheTree('php-migrations', true);
+
+        return static::respond('message', [
+            'title' => 'Migrations precached from parent site',
+            'message' => "$precached new migrations have been pulled from the parent site"
+        ]);
     }
 
     public static function handleMigrationRequest($migrationKey)
@@ -86,13 +106,13 @@ class MigrationsRequestHandler extends \RequestHandler
             $migrationRecord = null;
         }
 
-        $migration = array(
-            'key' => $migrationKey
-            ,'path' => $migrationPath
-            ,'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW
-            ,'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null
-            ,'sha1' => $migrationNode->SHA1
-        );
+        $migration = [
+            'key' => $migrationKey,
+            'path' => $migrationPath,
+            'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
+            'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
+            'sha1' => $migrationNode->SHA1
+        ];
 
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -116,7 +136,7 @@ class MigrationsRequestHandler extends \RequestHandler
             $migrationStatus = include($migrationNode->RealPath);
             $output = ob_get_clean();
 
-            if (!in_array($migrationStatus, array(static::STATUS_SKIPPED, static::STATUS_EXECUTED))) {
+            if (!in_array($migrationStatus, [static::STATUS_SKIPPED, static::STATUS_EXECUTED])) {
                 $migrationStatus = static::STATUS_FAILED;
             }
 
@@ -124,18 +144,18 @@ class MigrationsRequestHandler extends \RequestHandler
             $migration['status'] = $migrationStatus;
             $log = array_slice(\Debug::$log, $debugLogStartIndex);
 
-            DB::nonQuery('UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"', array($migration['executed'], $migration['status'], $migrationKey));
+            DB::nonQuery('UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"', [$migration['executed'], $migration['status'], $migrationKey]);
 
-            return static::respond('migrationExecuted', array(
-                'data' => $migration
-                ,'log' => $log
-                ,'output' => $output
-            ));
+            return static::respond('migrationExecuted', [
+                'migration' => $migration,
+                'log' => $log,
+                'output' => $output
+            ]);
         }
 
-        return static::respond('migration', array(
-            'data' => $migration
-        ));
+        return static::respond('migration', [
+            'migration' => $migration
+        ]);
     }
 
     protected static function createMigrationsTable()
@@ -165,26 +185,26 @@ class MigrationsRequestHandler extends \RequestHandler
 
     protected static function columnExists($tableName, $columnName)
     {
-        return (boolean)DB::oneRecord('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+        return (boolean)DB::oneRecord('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
     protected static function getColumn($tableName, $columnName)
     {
-        return DB::oneRecord('SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+        return DB::oneRecord('SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
     protected static function getColumnType($tableName, $columnName)
     {
-        return DB::oneValue('SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+        return DB::oneValue('SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
     protected static function getColumnKey($tableName, $columnName)
     {
-        return DB::oneValue('SELECT COLUMN_KEY FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+        return DB::oneValue('SELECT COLUMN_KEY FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
     protected static function getColumnIsNullable($tableName, $columnName)
     {
-        return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape(array($tableName, $columnName)));
+        return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 }
