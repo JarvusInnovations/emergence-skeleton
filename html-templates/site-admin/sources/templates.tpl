@@ -1,3 +1,12 @@
+{template sourceStatusCls source}{strip}
+    {$status = $source->getStatus()}
+    {if $status == 'uninitialized'}
+        default
+    {elseif $status == 'clean'}
+        success
+    {/if}
+{/strip}{/template}
+
 {template fileBlock Files}
     <div class="emr-git-files">
         <form method="POST">

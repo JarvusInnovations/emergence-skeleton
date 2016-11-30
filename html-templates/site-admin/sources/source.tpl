@@ -1,11 +1,99 @@
 {extends "design.tpl"}
 
+{block title}{$source->getId()} &mdash; {$dwoo.parent}{/block}
+
+{block nav}
+    {$activeSection = 'sources'}
+    {$dwoo.parent}
+{/block}
+
+{block breadcrumbs}
+    <li><a href="/site-admin/sources">Sources</a></li>
+    <li class="active"><a href="/site-admin/sources/{$source->getId()}">{$source->getId()}</a></li>
+{/block}
+
 {block "content"}
-    {load_templates "site-admin/git/templates.tpl"}
-    <ol class="breadcrumb">
-        <li><a href="/site-admin/git">Git</a></li>
-        <li class="active">{$Repo->ID}<a href="#"></a></li>
-    </ol>
+    {load_templates "templates.tpl"}
+
+    <div class="page-header">
+        <div class="btn-toolbar pull-right">
+            <div class="btn-group">
+                {if !$source->isInitialized()}
+                    <a href="/site-admin/sources/{$source->getId()}/initialize" class='btn btn-primary'>
+                        <i class="glyphicon glyphicon-play-circle"></i>
+                        Initialize Repository
+                    </a>
+                {/if}
+            </div>
+        </div>
+
+        <h1>{$source->getId()}</h1>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h2 class="panel-title">Repository Configuration</h2></div>
+
+        <dl class="panel-body dl-horizontal">
+            <dt>status</dt>
+            <dd><span class="label label-{sourceStatusCls $source}">{$source->getStatus()}</span></dd>
+
+            <dt>working branch</dt>
+            <dd>{$source->getWorkingBranch()}</dd>
+
+            <dt>upstream branch</dt>
+            <dd>{$source->getUpstreamBranch()}</dd>
+
+            <dt>remote</dt>
+            <dd>{$source->getRemoteUrl()}</dd>
+
+            {if $source->getRemoteProtocol() == 'ssh'}
+                <dt>ssh deploy key</dt>
+                <dd>
+                    {$deployKey = $source->getDeployKey()}
+                    {if $deployKey}
+                        {$deployKey->getFingerprint()}
+                    {/if}
+                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">Manage Deploy Key</a></dd>
+            {/if}
+
+            {$trees = $source->getTrees()}
+            <dt>mappings</dt>
+            <dd>
+                <details>
+                    <summary>{$trees|count|number_format} mapping{tif count($trees) != 1 ? s}</summary>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Repository Path</th>
+                                <th>Site Path</th>
+                                <th>Local Only</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach item=tree from=$trees}
+                                <tr>
+                                    <td>{$tree.gitPath|escape}</td>
+                                    <td>{$tree.vfsPath|escape}</td>
+                                    <td>{tif $tree.localOnly ? 'yes' : 'no'}</td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </details>
+            </dd>
+        </dl>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Repository Status: <span class="label label-{sourceStatusCls $source}">{$source->getStatus()}</span>
+            </h2>
+        </div>
+
+        <div class="panel-body">{dump $source}</div>
+    </div>
 
     <div class="navbar-form navbar-left">
         <h2>

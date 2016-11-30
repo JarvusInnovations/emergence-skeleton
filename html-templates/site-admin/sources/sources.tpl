@@ -11,26 +11,30 @@
     </div>
 
     <table class="table">
-        <tr>
-        	<th>Repository ID</th>
-    		<th>Working Branch</th>
-    		<th>Upstream Branch</th>
-    		<th>Status</th>
-    	</tr>
+        <thead>
+            <tr>
+            	<th>Repository ID</th>
+        		<th>Working Branch</th>
+        		<th>Upstream Branch</th>
+        		<th>Status</th>
+        	</tr>
+        </thead>
 
-    	{foreach item=Repo from=$Repos}
-    		<tr>
-    			<td valign="top"><a href="/site-admin/git/{$Repo->ID}">{$Repo->ID}</td>
-    			<td valign="top">{$Repo->WorkingBranch}</td>
-    			<td valign="top">{$Repo->UpstreamBranch}</td>
-    			<td valign="top">
-    				{if $Repo->isRepositoryInitialized()}
-    					<pre>{$Repo->Status}</pre>
-                    {else}
-                        <pre>Not Initialized</pre>
-    				{/if}
-    			</td>
-    		</tr>
-    	{/foreach}
+        <tbody>
+        	{foreach item=source key=id from=$sources}
+        		<tr>
+        			<td valign="top"><a href="/site-admin/sources/{$id|escape:url}">{$id|escape}</td>
+        			<td valign="top">{$source->getWorkingBranch()}</td>
+        			<td valign="top">{$source->getUpstreamBranch()}</td>
+        			<td valign="top">
+        				{if $source->getRepository()}
+        					<pre>{$source->getRepository()->getStatus()}</pre>
+                        {else}
+                            <em>Not Initialized</em>
+        				{/if}
+        			</td>
+        		</tr>
+        	{/foreach}
+        </tbody>
     </table>
 {/block}
