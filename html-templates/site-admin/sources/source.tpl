@@ -59,46 +59,36 @@
         <h1>{$source->getId()}</h1>
     </div>
 
+
+    {template fileStatus file group}
+        {strip}
+            {$status = tif($group == staged ? $file.indexStatus : $file.workTreeStatus)}
+            <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' ? modified} {tif $status == 'D' ? deleted}">
+                <label>
+                    <input type="checkbox" name="paths[]" value="{$file.path|escape}">
+                    &nbsp;
+                    <span class="status">{$status|default:'&nbsp;'}</span>
+                    &emsp;
+                    <span class="path">{$file.path|escape}</span>
+                    {if $file.renamedPath}
+                        &emsp;&rarr;&emsp;
+                        <span class="renamed-path">{$file.renamedPath|escape}</span>
+                    {/if}
+                </label>
+            </li>
+        {/strip}
+    {/template}
+
     {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStaged=yes))}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="btn-group btn-group-xs pull-right">
-                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sync with VFS <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    {*<li><button class="btn btn-default">Update <strong>working tree</strong> <small>from VFS</small></button></li>
-                    <li><button class="btn btn-default">Sync <strong>to</strong> VFS</button></li>*}
-                    <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>working tree</strong> <div class="small">from VFS</div></a></li>
-                    <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>VFS</strong> <div class="small">from working tree</div></a></li>
-                </ul>
+
+    {if $workTreeStatus.staged}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Staged Commit</h2>
             </div>
-            <h2 class="panel-title">Working Tree Status</h2>
-        </div>
-
-        <div class="panel-body checkbox">
-            {template fileStatus file group}
-                {strip}
-                    {$status = tif($group == staged ? $file.indexStatus : $file.workTreeStatus)}
-                    <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' ? modified} {tif $status == 'D' ? deleted}">
-                        <label>
-                            <input type="checkbox" name="paths[]" value="{$file.path|escape}">
-                            &nbsp;
-                            <span class="status">{$status|default:'&nbsp;'}</span>
-                            &emsp;
-                            <span class="path">{$file.path|escape}</span>
-                            {if $file.renamedPath}
-                                &emsp;&rarr;&emsp;
-                                <span class="renamed-path">{$file.renamedPath|escape}</span>
-                            {/if}
-                        </label>
-                    </li>
-                {/strip}
-            {/template}
-
-            {if $workTreeStatus.staged}
-                <h3>Staged</h3>
-                <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/unstage">
+    
+            <div class="panel-body">
+                <form class="checkbox" method="POST" action="/site-admin/sources/{$source->getId()|escape}/unstage">
                     <ul class="list-unstyled worktree-status worktree-staged">
                         {foreach item=file from=$workTreeStatus.staged}
                             {fileStatus $file group=staged}
@@ -117,7 +107,8 @@
                     </div>
                 </form>
 
-                <h4>Commit Staged Changes</h4>
+                <hr>
+
                 <form class="form-horizontal">
                     <div class="form-group">
                         <label for="inputCommitAuthor" class="col-sm-2 control-label">Author</label>
@@ -143,8 +134,27 @@
                         </div>
                     </div>
                 </form>
-            {/if}
+            </div>
+        </div>
+    {/if}
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="btn-group btn-group-xs pull-right">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sync with VFS <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    {*<li><button class="btn btn-default">Update <strong>working tree</strong> <small>from VFS</small></button></li>
+                    <li><button class="btn btn-default">Sync <strong>to</strong> VFS</button></li>*}
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>working tree</strong> <div class="small">from VFS</div></a></li>
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>VFS</strong> <div class="small">from working tree</div></a></li>
+                </ul>
+            </div>
+            <h2 class="panel-title">Working Tree Status</h2>
+        </div>
+
+        <div class="panel-body checkbox">
             {if $workTreeStatus.unstaged}
                 <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/stage">
                     <h3>Unstaged</h3>
@@ -165,10 +175,7 @@
                         </button>
                     </div>
                 </form>
-
-            {/if}
-
-            {if !$workTreeStatus.staged && !$workTreeStatus.unstaged}
+            {else}
                 <div class="alert alert-success">The working tree is clean</div>
             {/if}
         </div>
