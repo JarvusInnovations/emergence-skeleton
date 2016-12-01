@@ -49,11 +49,26 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleInitializeRequest($source);
             case 'deploy-key':
                 return static::handleDeployKeyRequest($source);
+            case 'pull':
+                return static::handlePullRequest($source);
+            case 'push':
+                return static::handlePushRequest($source);
+            case 'sync-from-vfs':
+                return static::handleSyncFromVfsRequest($source);
+            case 'sync-to-vfs':
+                return static::handleSyncToVfsRequest($source);
+            case 'stage':
+                return static::handleStageRequest($source);
+            case 'unstage':
+                return static::handleUnstageRequest($source);
+            case '':
+            case false:
+                return static::respond('source', [
+                    'source' => $source
+                ]);
+            default:
+                return static::throwNotFoundError();
         }
-
-        return static::respond('source', [
-            'source' => $source
-        ]);
     }
 
     public static function handleInitializeRequest(Source $source)
@@ -97,11 +112,7 @@ class SourcesRequestHandler extends \RequestHandler
             $deployKey = new KeyPair($_POST['privateKey'], $_POST['publicKey']);
             $source->setDeployKey($deployKey);
 
-            return static::respond('message', [
-                'message' => 'Deploy key saved',
-                'returnURL' => '/site-admin/sources/' . $source->getId(),
-                'returnLabel' => 'Return to ' . $source->getId()
-            ]);
+            return static::respondStatusMessage($source, 'Deploy key saved');
         }
 
         if (!empty($_GET['source']) && $_GET['source'] == 'generated') {
@@ -113,6 +124,99 @@ class SourcesRequestHandler extends \RequestHandler
         return static::respond('deployKey', [
             'source' => $source,
             'deployKey' => $deployKey
+        ]);
+    }
+
+    public static function handlePullRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to pull all forward commits from the upstream branch?'
+            ]);
+        }
+
+        $result = $source->pull();
+
+        return static::respondStatusMessage($source, $result ? "Updated local branch from commit $result[from] to upstream commit $result[to]" : 'Local branch already up-to-date');
+    }
+
+    public static function handlePushRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to push all forward commits to the upstream branch?'
+            ]);
+        }
+
+        $result = $source->push();
+
+        return static::respondStatusMessage($source, $result ? "Updated remote branch from commit $result[from] to local commit $result[to]" : 'Remote branch already up-to-date');
+    }
+
+    public static function handleSyncFromVfsRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => "Are you sure you want to update the working tree on disk to the current state of the VFS?\n\nAny changes in the working tree that are not committed **may be lost permanently**!"
+            ]);
+        }
+
+        return static::respond('syncedFromVfs', [
+            'source' => $source,
+            'results' => $source->syncFromVfs()
+        ]);
+    }
+
+    public static function handleSyncToVfsRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to update the VFS from the current contents of the working tree?'
+            ]);
+        }
+
+        $result = $source->syncToVfs();
+\Debug::dumpVar($result);
+        return static::respondStatusMessage($source, $result ? "Updated remote branch from commit $result[from] to local commit $result[to]" : 'Remote branch already up-to-date');
+    }
+    
+    public static function handleStageRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::throwInvalidRequestError('only POST accepted');
+        }
+
+        if (empty($_POST['paths'])) {
+            return static::throwInvalidRequestError('no paths provided');
+        }
+
+        $result = $source->stage($_POST['paths']);
+
+        return static::respondStatusMessage($source, "Staged $result change" . ($result == 1 ? '' : 's'));
+    }
+    
+    public static function handleUnstageRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::throwInvalidRequestError('only POST accepted');
+        }
+
+        if (empty($_POST['paths'])) {
+            return static::throwInvalidRequestError('no paths provided');
+        }
+
+        $result = $source->unstage($_POST['paths']);
+
+        return static::respondStatusMessage($source, "Untaged $result change" . ($result == 1 ? '' : 's'));
+    }
+
+
+    protected static function respondStatusMessage(Source $source, $message)
+    {
+        return static::respond('message', [
+            'message' => $message,
+            'returnURL' => '/site-admin/sources/' . $source->getId(),
+            'returnLabel' => 'Return to ' . $source->getId()
         ]);
     }
 }

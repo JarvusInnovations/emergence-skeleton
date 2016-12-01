@@ -12,6 +12,35 @@
     <li class="active"><a href="/site-admin/sources/{$source->getId()}">{$source->getId()}</a></li>
 {/block}
 
+{block css}
+    {$dwoo.parent}
+    <style>
+        .worktree-status {
+            font-family: monospace;
+        }
+        .worktree-file label {
+            display: block;
+        }
+        .worktree-file.added {
+            background-color: #dbffdb;
+        }
+        .worktree-file.modified {
+            background-color: #fff3b2;
+        }
+        .worktree-file.deleted {
+            background-color: #ffdddd;
+        }
+        .worktree-file.untracked {
+            background-color: #dddddd;
+        }
+    </style>
+{/block}
+
+{block "js-bottom"}
+    {$dwoo.parent}
+    {jsmin "site-admin/source.js"}
+{/block}
+
 {block "content"}
     {load_templates "templates.tpl"}
 
@@ -30,8 +59,176 @@
         <h1>{$source->getId()}</h1>
     </div>
 
+    {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStaged=yes))}
     <div class="panel panel-default">
-        <div class="panel-heading"><h2 class="panel-title">Repository Configuration</h2></div>
+        <div class="panel-heading">
+            <div class="btn-group btn-group-xs pull-right">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sync with VFS <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    {*<li><button class="btn btn-default">Update <strong>working tree</strong> <small>from VFS</small></button></li>
+                    <li><button class="btn btn-default">Sync <strong>to</strong> VFS</button></li>*}
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>working tree</strong> <div class="small">from VFS</div></a></li>
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>VFS</strong> <div class="small">from working tree</div></a></li>
+                </ul>
+            </div>
+            <h2 class="panel-title">Working Tree Status</h2>
+        </div>
+
+        <div class="panel-body checkbox">
+            {template fileStatus file group}
+                {strip}
+                    {$status = tif($group == staged ? $file.indexStatus : $file.workTreeStatus)}
+                    <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' ? modified} {tif $status == 'D' ? deleted}">
+                        <label>
+                            <input type="checkbox" name="paths[]" value="{$file.path|escape}">
+                            &nbsp;
+                            <span class="status">{$status|default:'&nbsp;'}</span>
+                            &emsp;
+                            <span class="path">{$file.path|escape}</span>
+                            {if $file.renamedPath}
+                                &emsp;&rarr;&emsp;
+                                <span class="renamed-path">{$file.renamedPath|escape}</span>
+                            {/if}
+                        </label>
+                    </li>
+                {/strip}
+            {/template}
+
+            {if $workTreeStatus.staged}
+                <h3>Staged</h3>
+                <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/unstage">
+                    <ul class="list-unstyled worktree-status worktree-staged">
+                        {foreach item=file from=$workTreeStatus.staged}
+                            {fileStatus $file group=staged}
+                        {/foreach}
+                    </ul>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-minus"></span> Untage Selected
+                        </button>
+                        <button type="button" class="btn btn-default worktree-select-all">
+                            <span class="glyphicon glyphicon-check"></span> Select All
+                        </button>
+                        <button type="button" class="btn btn-default worktree-select-none">
+                            <span class="glyphicon glyphicon-unchecked"></span> Select None
+                        </button>
+                    </div>
+                </form>
+
+                <h4>Commit Staged Changes</h4>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="inputCommitAuthor" class="col-sm-2 control-label">Author</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="inputCommitAuthor" readonly value="{$.User->EmailRecipient|escape}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCommitSubject" class="col-sm-2 control-label">Subject</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="inputCommitSubject" placeholder="Update &hellip;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCommitExtended" class="col-sm-2 control-label">Extended Description</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="inputCommitExtended" placeholder="Add an optional extended description&hellip;"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary">Commit</button>
+                        </div>
+                    </div>
+                </form>
+            {/if}
+
+            {if $workTreeStatus.unstaged}
+                <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/stage">
+                    <h3>Unstaged</h3>
+                    <ul class="list-unstyled worktree-status worktree-unstaged">
+                        {foreach item=file from=$workTreeStatus.unstaged}
+                            {fileStatus $file group=unstaged}
+                        {/foreach}
+                    </ul>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-plus"></span> Stage Selected
+                        </button>
+                        <button type="button" class="btn btn-default worktree-select-all">
+                            <span class="glyphicon glyphicon-check"></span> Select All
+                        </button>
+                        <button type="button" class="btn btn-default worktree-select-none">
+                            <span class="glyphicon glyphicon-unchecked"></span> Select None
+                        </button>
+                    </div>
+                </form>
+
+            {/if}
+
+            {if !$workTreeStatus.staged && !$workTreeStatus.unstaged}
+                <div class="alert alert-success">The working tree is clean</div>
+            {/if}
+        </div>
+    </div>
+
+    {$upstreamDiff = $source->getUpstreamDiff()}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <small class="pull-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
+            <h2 class="panel-title">Branch Status</h2>
+        </div>
+
+        <table class="table panel-body">
+            <thead>
+                <tr>
+                    <th width="50%">
+                        <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
+                            {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
+                            {if $upstreamDiff.ahead && !$upstreamDiff.behind}
+                                <button type="submit" class="btn btn-default btn-xs pull-right">Push</button>
+                            {/if}
+                        </form>
+                    </th>
+                    <th width="50%">
+                        <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
+                            {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
+                            {if $upstreamDiff.behind && !$upstreamDiff.ahead}
+                                <button type="submit" class="btn btn-default btn-xs pull-right">Pull (fast fwd)</button>
+                            {/if}
+                        </form>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach item=commit from=$upstreamDiff.commits}
+                    <tr>
+                        {if $commit.position == behind}
+                            <td width="50%"></td>
+                        {/if}
+                        <td width="50%">
+                            {$commit.subject|escape}
+                            <div class="small">
+                                by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
+                                on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
+                            </div>
+                        </td>
+                        {if $commit.position == ahead}
+                            <td width="50%"></td>
+                        {/if}
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <small class="pull-right">{$source->getRemoteUrl()|escape}</small>
+            <h2 class="panel-title">Repository Configuration</h2>
+        </div>
 
         <dl class="panel-body dl-horizontal">
             <dt>status</dt>
@@ -51,9 +248,12 @@
                 <dd>
                     {$deployKey = $source->getDeployKey()}
                     {if $deployKey}
-                        {$deployKey->getFingerprint()}
+                        Fingerprint: {$deployKey->getFingerprint()}
+                    {else}
+                        <em>None configured</em>
                     {/if}
-                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">Manage Deploy Key</a></dd>
+                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">Manage Deploy Key</a>
+                </dd>
             {/if}
 
             {$trees = $source->getTrees()}
@@ -84,199 +284,4 @@
             </dd>
         </dl>
     </div>
-
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2 class="panel-title">
-                Repository Status: <span class="label label-{sourceStatusCls $source}">{$source->getStatus()}</span>
-            </h2>
-        </div>
-
-        <div class="panel-body">{dump $source}</div>
-    </div>
-
-    <div class="navbar-form navbar-left">
-        <h2>
-            {$Repo->ID}
-            <a href="/site-admin/git/{$Repo->ID}/key" class="btn btn-default">
-                <span class="glyphicon glyphicon-lock"></span> Deploy Key
-            </a>
-        </h2>
-
-    </div>
-
-    <input type="hidden" value="{$Repo->ID}" name="repo" id="js-repo">
-
-    <div class="navbar-form navbar-right emr-git-remoteio">
-        <div class="btn-toolbar" role="toolbar">
-            <div class="btn-group">
-                <a class="btn btn-default navbar-btn disabled"><i class="glyphicon glyphicon-transfer"></i> Remote IO</a>
-
-                <input type="submit" id="js-pull" value="Pull (FF)" class="btn btn-default navbar-btn">
-                <input type="submit" id="js-push" value="Push (FF)" class="btn btn-default navbar-btn">
-
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="clearfix"></div>
-
-    <div class="container">
-
-        {if !$Repo->privateKeyExists()}
-            <div class="alert alert-info" role="alert">You currently have no key configured. All Git remote functions will proceed without providing authentication credentials.</div>
-        {/if}
-
-        <div class="alert hidden" role="alert" id="js-upper-status"></div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">Remote</span>
-                <input type="text" class="form-control" disabled value="{$Repo->Remote}">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">Upstream Branch</span>
-                <input type="text" class="form-control" disabled value="{$Repo->UpstreamBranch}">
-            </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-            <div class="col-lg-8"><h2>Local</h2></div>
-            <div class="col-lg-4 text-right">
-                <button type="button" class="btn btn-default" id="js-clean" alt="Clean Repository">
-                    <span class="glyphicon glyphicon-erase"></span> Clean
-                </button>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" alt="Reset Repository">
-                        <span class="glyphicon glyphicon-fire"></span> Reset
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="#" id="js-reset-remote-head">Remote HEAD</a></li>
-                        <li><a href="#">Local HEAD</a></li>
-                        {*<li role="separator" class="divider"></li>
-                        <li><a href="#">One commit before Local HEAD</a></li>*}
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">Working Branch</span>
-                        <input type="text" class="form-control" disabled value="{$Repo->WorkingBranch}">
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 emr-git-diskio text-right">
-                <div class="btn-group">
-                    <a class="btn btn-default disabled"><i class="glyphicon glyphicon-hdd"></i> Disk IO</a>
-                    <input type="submit" id="js-to-disk" value="VFS &rarr; Disk" class="btn btn-default">
-                    <input type="submit" id="js-from-disk" value="Disk &rarr; VFS" class="btn btn-default">
-                </div>
-            </div>
-        </div>
-
-        <div class="clearfix"></div>
-
-        {if $Repo->isRepositoryInitialized()}
-            <h3>Raw Status</h3>
-			<pre>{$Repo->Status}</pre>
-		{else}
-			<div class="text-center">
-                <h3>Repository not initialized</h3>
-                <form method="GET" action="/site-admin/git/{$Repo->ID}/init" >
-        			<input type="submit" value="Click here to Initialize" class="btn btn-default">
-    			</form>
-            </div>
-		{/if}
-    </div>
-
-
-    {if $Repo->isRepositoryInitialized()}
-        <div id="advancedStatus" class="container">
-            <h2>Status</h2>
-            <ul class="nav nav-pills">
-                <li class="active"><a  href="#status-everything" data-toggle="tab">Everything</a></li>
-                <li><a href="#status-staged" data-toggle="tab">Staged</a></li>
-                <li><a href="#status-unstaged" data-toggle="tab">Unstaged</a></li>
-                <li><a href="#status-tracked" data-toggle="tab">Tracked</a></li>
-                <li><a href="#status-untracked" data-toggle="tab">Untracked</a></li>
-            </ul>
-
-            <div class="btn-group git-file-buttons">
-                <button type="button" class="btn btn-default" id="js-select-all" alt="Select All">
-                    <span class="glyphicon glyphicon-check"></span> Select All
-                </button>
-                <button type="button" class="btn btn-default" id="js-stage-selected" alt="Select All">
-                    <span class="glyphicon glyphicon-save-file"></span> Stage Selected
-                </button>
-            </div>
-
-            <div class="tab-content clearfix">
-                <div class="tab-pane active" id="status-everything">
-                    {fileBlock $AdvancedStatus.Everything}
-                </div>
-                <div class="tab-pane" id="status-staged">
-                    {fileBlock $AdvancedStatus.Staged}
-                </div>
-                <div class="tab-pane" id="status-unstaged">
-                    {fileBlock $AdvancedStatus.Unstaged}
-                </div>
-                <div class="tab-pane" id="status-tracked">
-                    {fileBlock $AdvancedStatus.Tracked}
-                </div>
-                <div class="tab-pane" id="status-untracked">
-                    {fileBlock $AdvancedStatus.Untracked}
-                </div>
-            </div>
-        </div>
-
-        {if $AdvancedStatus.Staged}
-        <div class="container">
-            <h2>Commit</h2>
-            <div class="container">
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">Author</span>
-                        <input type="text" name="author" class="form-control" disabled value="{$.User->FirstName} {$.User->LastName} <{$.User->Email}>">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">Subject</span>
-                        <input type="text" name="subject" class="form-control" placeholder="Title">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">Description</span>
-                        <textarea name="description" class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="form-group text-right">
-                    <div class="btn-group">
-                        <button class="btn btn-default" id="js-commit"><i class="glyphicon glyphicon-save"></i> Commit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {/if}
-    {/if}
-
-
-
-
-{/block}
-
-{block "js-bottom"}
-    {$dwoo.parent}
-    {jsmin "site-admin/git.js"}
 {/block}

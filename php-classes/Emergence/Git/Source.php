@@ -3,6 +3,9 @@
 namespace Emergence\Git;
 
 use Site;
+use SiteFile;
+use Emergence_FS;
+
 use Gitonomy\Git\Admin AS GitAdmin;
 use Gitonomy\Git\Repository;
 use Gitonomy\Git\Exception\ProcessException AS GitProcessException;
@@ -112,7 +115,16 @@ class Source
     {
         if (!isset($this->repository)) {
             $gitDir = $this->getRepositoryPath();
-            $this->repository = is_dir($gitDir) ? new Repository($gitDir) : false;
+
+            if (is_dir($gitDir)) {
+                $this->repository = new Repository($gitDir, [
+                    'environment_variables' => [
+                        'GIT_SSH' => $this->getSshWrapperPath()
+                    ]
+                ]);
+            } else {
+                $this->repository = false;
+            }
         }
 
         return $this->repository;
@@ -125,7 +137,7 @@ class Source
         }
 
         $privateKeyPath = $this->getPrivateKeyPath();
-    	$publicKeyPath = $this->getPublicKeyPath();
+        $publicKeyPath = $this->getPublicKeyPath();
 
         if (is_readable($privateKeyPath) && is_readable($publicKeyPath)) {
             $this->deployKey = KeyPair::load($privateKeyPath, $publicKeyPath);
@@ -149,7 +161,7 @@ class Source
 
     public function getSshWrapperPath($create = true)
     {
-        if ($this->getRemoteProtocol() != 'ssh' || !($privateKeyPath = $this->getPrivateKeyPath())) {
+        if (!$privateKeyPath = $this->getPrivateKeyPath()) {
             return null;
         }
 
@@ -238,15 +250,215 @@ class Source
         ]);
 
         // add remote
-        $this->repository->run('remote', ['add', 'origin', $this->getRemoteUrl()]);
+        $this->getRepository()->run('remote', ['add', 'origin', $this->getRemoteUrl()]);
 
         // fetch upstream branch and checkout
         $upstreamBranch = $this->getUpstreamBranch();
 
-        $this->repository->run('fetch', ['origin', $upstreamBranch]);
-        $this->repository->run('checkout', ['-b', $this->getWorkingBranch(), "origin/$upstreamBranch"]);
+        $this->getRepository()->run('fetch', ['origin', $upstreamBranch]);
+        $this->getRepository()->run('checkout', ['-b', $this->getWorkingBranch(), "origin/$upstreamBranch"]);
 
         return true;
+    }
+
+    public function pull()
+    {
+        $output = trim($this->getRepository()->run('merge', ['--ff-only', '--no-stat', '@{upstream}']));
+        $output = explode(PHP_EOL, $output);
+
+        if ($output[0] == 'Already up-to-date.') {
+            return false;
+        }
+
+        list ($status, $commits) = explode(' ', $output[0]);
+
+        if ($status != 'Updating') {
+            throw new \Exception('Unexpected merge status output: ' . $status);
+        }
+
+        list ($from, $to) = explode('..', $commits);
+
+        return ['from' => $from, 'to' => $to];
+    }
+
+    public function push()
+    {
+        $output = trim($this->getRepository()->run('push', ['--porcelain', 'origin', 'HEAD']));
+        $output = explode(PHP_EOL, $output);
+
+        list ($symbol, $refs, $status) = explode("\t", $output[1]);
+
+        if ($status == '[up to date]') {
+            return false;
+        }
+
+        list ($from, $to) = explode('..', $status);
+
+        return ['from' => $from, 'to' => $to];
+    }
+
+    public function getUpstreamDiff(array $options = [])
+    {
+        $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
+        $output = $this->getRepository()->run('rev-list', ['--left-right', "--format=%an\t%ae\t%at\t%s", 'HEAD...HEAD@{upstream}']);
+        $output = explode(PHP_EOL, trim($output));
+
+        $commits = [];
+        $ahead = 0;
+        $behind = 0;
+
+        while (($header = array_shift($output)) && ($details = array_shift($output))) {
+            // parse header
+            list ($objectType, $hash) = explode(' ', $header);
+
+            if ($objectType != 'commit') {
+                throw new \Exception('unexpected object type in rev-list output: ' . $objectType);
+            }
+
+            $position = $hash[0] == '<' ? 'ahead' : 'behind';
+            $hash = substr($hash, 1);
+            ${$position}++;
+
+            // parse details
+            list ($authorName, $authorEmail, $timestamp, $subject) = explode("\t", $details);
+
+            $commit = [
+                'hash' => $hash,
+                'position' => $position,
+                'authorName' => $authorName,
+                'authorEmail' => $authorEmail,
+                'timestamp' => $timestamp,
+                'subject' => $subject
+            ];
+
+            if (!empty($options['groupByPosition'])) {
+                $commits[$position][] = $commit;
+            } else {
+                $commits[] = $commit;
+            }
+        }
+
+        return [
+            'commits' => $commits,
+            'ahead' => $ahead,
+            'behind' => $behind
+        ];
+    }
+
+    public function getWorkTreeStatus(array $options = [])
+    {
+        $output = $this->getRepository()->run('status', ['--porcelain', '-uall', '--ignored']);
+        $output = array_filter(explode(PHP_EOL, $output));
+
+        $files = [];
+
+        foreach ($output AS $line) {
+            if ($line[0] == '#') {
+                continue; // skip comment lines
+            }
+
+            if (!preg_match('/^(?<indexStatus>[ MADRCU?!])(?<workTreeStatus>[ MADRCU?!]) (?<path>\S+)( -> (?<renamePath>\S+))?$/', $line, $matches)) {
+                throw new \Exception('Could not parse git status output line: ' . $line);
+            }
+
+            $file = [
+                'path' => $matches['path'],
+                'renamedPath' => $matches['renamePath'] ?: null,
+                'indexStatus' => $matches['indexStatus'] == ' ' ? null : $matches['indexStatus'],
+                'workTreeStatus' => $matches['workTreeStatus'] == ' ' ? null : $matches['workTreeStatus']
+            ];
+
+            $file['tracked'] = $file['indexStatus'] != '?' && $file['workTreeStatus'] != '?';
+            $file['ignored'] = $file['indexStatus'] == '!' && $file['workTreeStatus'] == '!';
+            $file['staged'] = $file['tracked'] && !$file['ignored'] && (bool)$file['indexStatus'];
+            $file['unstaged'] = !$file['ignored'] && (bool)$file['workTreeStatus'];
+
+            if (!empty($options['groupByStaged'])) {
+                if ($file['staged']) {
+                    $files['staged'][$matches['path']] = $file;
+                }
+
+                if ($file['unstaged']) {
+                    $files['unstaged'][$matches['path']] = $file;
+                }
+            } else {
+                $files[$matches['path']] = $file;
+            }
+            
+        }
+
+        return $files;
+    }
+
+    public function syncFromVfs()
+    {
+        $results = [];
+        $exportOptions = [
+            'localOnly' => true
+        ];
+
+        if ($this->getConfig('localOnly') === false) {
+            $exportOptions['localOnly'] = false;
+        }
+
+        chdir($this->getRepositoryPath());
+
+        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+            $treeOptions = array_merge(
+                $exportOptions,
+                static::getTreeOptions($treeKey, $treeValue),
+                [
+                    'dataPath' => false
+                ]
+            );
+
+            $result = [];
+
+            try {
+                if ($srcFileNode = Site::resolvePath($treeOptions['vfsPath'])) {
+                    if ($srcFileNode instanceof SiteFile) {
+                        $destDir = dirname($treeOptions['gitPath']);
+
+                        if ($destDir && !is_dir($destDir)) {
+                            mkdir($destDir, 0777, true);
+                        }
+
+                        copy($srcFileNode->RealPath, $treeOptions['gitPath']);
+                        $result = ['filesAnalyzed' => 1, 'filesWritten' => 1];
+                    } else {
+                        $result = Emergence_FS::exportTree($treeOptions['vfsPath'], $treeOptions['gitPath'], $treeOptions);
+                    }
+
+                    $result['success'] = true;
+                } else {
+                    $result['success'] = false;
+                }
+            } catch (Exception $e) {
+                $result['success'] = false;
+                $result['error'] = $e->getMessage();
+            }
+
+            $results[$treeOptions['vfsPath']] = $result;
+        }
+
+        return $results;
+    }
+
+    public function syncToVfs()
+    {
+        die('sync to vfs');
+    }
+
+    public function stage(array $paths)
+    {
+        $this->getRepository()->run('add', $paths);
+        return count($paths);
+    }
+
+    public function unstage(array $paths)
+    {
+        $this->getRepository()->run('reset', array_merge(['HEAD'], $paths));
+        return count($paths);
     }
 
 
