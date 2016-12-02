@@ -111,6 +111,11 @@ class Source
         return $this->getRepositoryPath() . '.pub';
     }
 
+    public function getDraftCommitMessagePath()
+    {
+        return $this->getRepositoryPath() . '/.git/COMMIT_MSG';
+    }
+
     public function getRepository()
     {
         if (!isset($this->repository)) {
@@ -459,6 +464,18 @@ class Source
     {
         $this->getRepository()->run('reset', array_merge(['HEAD'], $paths));
         return count($paths);
+    }
+
+    public function getDraftCommitMessage()
+    {
+        $path = $this->getDraftCommitMessagePath();
+
+        return file_exists($path) ? file_get_contents($path) : null;
+    }
+
+    public function setDraftCommitMessage($message)
+    {
+        file_put_contents($this->getDraftCommitMessagePath(), $message);
     }
 
 

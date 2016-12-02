@@ -61,6 +61,8 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleStageRequest($source);
             case 'unstage':
                 return static::handleUnstageRequest($source);
+            case 'commit':
+                return static::handleCommitRequest($source);
             case '':
             case false:
                 return static::respond('source', [
@@ -208,6 +210,32 @@ class SourcesRequestHandler extends \RequestHandler
         $result = $source->unstage($_POST['paths']);
 
         return static::respondStatusMessage($source, "Untaged $result change" . ($result == 1 ? '' : 's'));
+    }
+    
+    public static function handleCommitRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::throwInvalidRequestError('only POST accepted');
+        }
+
+        $message = !empty($_POST['subject']) ? $_POST['subject'] : '';
+
+        if (!empty($_POST['extended'])) {
+            $message .= PHP_EOL . PHP_EOL . $_POST['extended'];
+        }
+
+        if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'save-draft') {
+            $source->setDraftCommitMessage($message);
+            return static::respondStatusMessage($source, 'Draft commit message saved');
+        }
+
+        if (empty($_POST['subject'])) {
+            return static::throwInvalidRequestError('commit message required');
+        }
+
+        $hash = $source->commit($message);
+
+        return static::respondStatusMessage($source, "Created commit $hash");
     }
 
 

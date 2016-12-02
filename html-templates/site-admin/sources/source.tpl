@@ -109,28 +109,33 @@
 
                 <hr>
 
-                <form class="form-horizontal">
+                <form class="form-horizontal" method="POST" action="/site-admin/sources/{$source->getId()|escape}/commit">
                     <div class="form-group">
                         <label for="inputCommitAuthor" class="col-sm-2 control-label">Author</label>
                         <div class="col-sm-10">
-                            <input class="form-control" id="inputCommitAuthor" readonly value="{$.User->EmailRecipient|escape}">
+                            <input class="form-control" id="inputCommitAuthor" name="author" value="{$.User->FullName|escape} <{$.User->Email|escape}>">
                         </div>
                     </div>
+
+                    {$draftCommitMessage = explode("\n\n", $source->getDraftCommitMessage(), 2)}
                     <div class="form-group">
                         <label for="inputCommitSubject" class="col-sm-2 control-label">Subject</label>
                         <div class="col-sm-10">
-                            <input class="form-control" id="inputCommitSubject" placeholder="Update &hellip;">
+                            <input class="form-control" id="inputCommitSubject" name="subject" placeholder="Update &hellip;" value="{$draftCommitMessage[0]|escape}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCommitExtended" class="col-sm-2 control-label">Extended Description</label>
                         <div class="col-sm-10">
-                            <textarea class="form-control" rows="3" id="inputCommitExtended" placeholder="Add an optional extended description&hellip;"></textarea>
+                            <textarea class="form-control" rows="3" id="inputCommitExtended" name="extended" placeholder="Add an optional extended description&hellip;">{$draftCommitMessage[1]|escape}</textarea>
                         </div>
                     </div>
+
+
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <button type="submit" class="btn btn-primary">Commit</button>
+                            <button type="submit" class="btn btn-default" name="action" value="save-draft">Save Message Draft</button>
                         </div>
                     </div>
                 </form>
