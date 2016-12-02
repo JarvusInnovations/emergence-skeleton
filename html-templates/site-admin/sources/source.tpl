@@ -151,14 +151,13 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="btn-group btn-group-xs pull-right">
-                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sync git working tree with emergence VFS <span class="caret"></span>
-                </button>
+                <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/unstaged">Diff</a>
+                <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/clean">Clean</a>
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sync <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                     <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>git working tree</strong> <div class="small">from emergence VFS</div></a></li>
                     <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>emergence VFS</strong> <div class="small">from git working tree</div></a></li>
                 </ul>
-                <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/unstaged">Diff</a>
             </div>
             <h2 class="panel-title">Git Working Tree</h2>
         </div>
@@ -185,7 +184,7 @@
                     </div>
                 </form>
             {else}
-                <div class="alert alert-success">The working tree is clean</div>
+                <div class="alert alert-success"><strong>The working tree is clean.</strong> If you've made changes in the emergence VFS, <a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">update the git working tree from emergence VFS</a>.</div>
             {/if}
         </div>
     </div>

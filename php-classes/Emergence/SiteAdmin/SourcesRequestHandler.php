@@ -65,6 +65,8 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleCommitRequest($source);
             case 'diff':
                 return static::handleDiffRequest($source);
+            case 'clean':
+                return static::handleCleanRequest($source);
             case '':
             case false:
                 return static::respond('source', [
@@ -271,6 +273,19 @@ class SourcesRequestHandler extends \RequestHandler
             'diff' => $result,
             'error' => $error
         ]);
+    }
+
+    public static function handleCleanRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to completely clean the git working tree back to the state of the last commit? Any changes made directly to the git working tree **may be lost permanently**!'
+            ]);
+        }
+
+        $result = $source->clean();
+
+        return static::respondStatusMessage($source, 'Cleaned git working tree');
     }
 
 

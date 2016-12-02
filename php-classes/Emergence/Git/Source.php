@@ -537,6 +537,12 @@ class Source
         return $this->getRepository()->run('diff', $diffArgs);
     }
 
+    public function clean()
+    {
+        $this->getRepository()->run('reset', ['--hard']);
+        $this->getRepository()->run('clean', ['-df']);
+    }
+
 
     protected function getTreeOptions($key, $value)
 	{
