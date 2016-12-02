@@ -60,10 +60,11 @@
     </div>
 
 
-    {template fileStatus file group}
+    {template fileStatus file group source}
         {strip}
             {$status = tif($group == staged ? $file.indexStatus : $file.workTreeStatus)}
             <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' ? modified} {tif $status == 'D' ? deleted}">
+                <a class="pull-right" href="/site-admin/sources/{$source->getId()}/diff/{$group}/{$file.path|escape}">diff</a>
                 <label>
                     <input type="checkbox" name="paths[]" value="{$file.path|escape}">
                     &nbsp;
@@ -81,17 +82,22 @@
 
     {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStaged=yes))}
 
-    {if $workTreeStatus.staged}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h2 class="panel-title">Staged Commit</h2>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="btn-group btn-group-xs pull-right">
+                <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/staged">Diff</a>
             </div>
+            <h2 class="panel-title">Staged Commit</h2>
+        </div>
     
-            <div class="panel-body">
+        <div class="panel-body">
+            {if !$workTreeStatus.staged}
+                <div class="alert alert-info" role="alert">Stage some changes from the git working tree below to start building a commit</div>
+            {else}
                 <form class="checkbox" method="POST" action="/site-admin/sources/{$source->getId()|escape}/unstage">
                     <ul class="list-unstyled worktree-status worktree-staged">
                         {foreach item=file from=$workTreeStatus.staged}
-                            {fileStatus $file group=staged}
+                            {fileStatus $file group=staged source=$source}
                         {/foreach}
                     </ul>
                     <div class="btn-group">
@@ -131,7 +137,6 @@
                         </div>
                     </div>
 
-
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <button type="submit" class="btn btn-primary">Commit</button>
@@ -139,9 +144,9 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            {/if}
         </div>
-    {/if}
+    </div>
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -153,8 +158,9 @@
                     <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>git working tree</strong> <div class="small">from emergence VFS</div></a></li>
                     <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>emergence VFS</strong> <div class="small">from git working tree</div></a></li>
                 </ul>
+                <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/unstaged">Diff</a>
             </div>
-            <h2 class="panel-title">Git Working Tree Status</h2>
+            <h2 class="panel-title">Git Working Tree</h2>
         </div>
 
         <div class="panel-body checkbox">
@@ -163,7 +169,7 @@
                     <h3>Unstaged</h3>
                     <ul class="list-unstyled worktree-status worktree-unstaged">
                         {foreach item=file from=$workTreeStatus.unstaged}
-                            {fileStatus $file group=unstaged}
+                            {fileStatus $file group=unstaged source=$source}
                         {/foreach}
                     </ul>
                     <div class="btn-group">
