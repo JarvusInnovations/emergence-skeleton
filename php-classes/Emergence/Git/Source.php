@@ -507,6 +507,36 @@ class Source
         return true;
     }
 
+    public function getDiff(array $options = [])
+    {
+        // apply options
+        if (empty($options['path'])) {
+            $options['path'] = '.';
+        } elseif (is_array($options['path'])) {
+            $options['path'] = implode(' ', $options['path']);
+        }
+
+        if (empty($options['group'])) {
+            $options['group'] = 'unstaged';
+        } elseif ($options['group'] != 'staged' && $options['group'] != 'unstaged') {
+            throw new \Exception('group must be staged or unstaged');
+        }
+
+
+        // build diff args
+        $diffArgs = [];
+
+        if ($options['group'] == 'staged') {
+            $diffArgs[] = '--cached';
+        }
+
+        $diffArgs[] = '--';
+        $diffArgs[] = $options['path'];
+
+        // execute and return raw diff output
+        return $this->getRepository()->run('diff', $diffArgs);
+    }
+
 
     protected function getTreeOptions($key, $value)
 	{

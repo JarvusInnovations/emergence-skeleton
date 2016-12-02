@@ -63,6 +63,8 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleUnstageRequest($source);
             case 'commit':
                 return static::handleCommitRequest($source);
+            case 'diff':
+                return static::handleDiffRequest($source);
             case '':
             case false:
                 return static::respond('source', [
@@ -244,6 +246,31 @@ class SourcesRequestHandler extends \RequestHandler
         $hash = $source->commit($message, $author);
 
         return static::respondStatusMessage($source, "Created commit");
+    }
+
+    public static function handleDiffRequest(Source $source)
+    {
+        $group = static::shiftPath();
+        $path = implode('/', static::getPath()) ?: '.';
+
+        try {
+            $result = $source->getDiff([
+                'group' => $group,
+                'path' => $path
+            ]);
+            $error = false;
+        } catch (\Exception $e) {
+            $result = null;
+            $error = $e->getMessage();
+        }
+
+        return static::respond('diff', [
+            'source' => $source,
+            'path' => $path,
+            'group' => $group,
+            'diff' => $result,
+            'error' => $error
+        ]);
     }
 
 
