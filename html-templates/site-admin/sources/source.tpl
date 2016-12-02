@@ -67,7 +67,7 @@
             <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' ? modified} {tif $status == 'D' ? deleted}">
                 <a class="pull-right" href="/site-admin/sources/{$source->getId()}/diff/{$group}/{$file.path|escape}">diff</a>
                 <label>
-                    <input type="checkbox" name="paths[]" value="{$file.path|escape}">
+                    <input type="checkbox" name="paths[]" value="{$file.path|escape}" {tif $group == unstaged ? checked}>
                     &nbsp;
                     <span class="status">{$status|default:'&nbsp;'}</span>
                     &emsp;
