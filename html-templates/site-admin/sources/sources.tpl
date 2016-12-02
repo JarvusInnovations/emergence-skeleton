@@ -6,6 +6,8 @@
 {/block}
 
 {block "content"}
+    {load_templates "templates.tpl"}
+
     <div class="page-header">
         <h1>Site Sources</h1>
     </div>
@@ -22,17 +24,12 @@
 
         <tbody>
         	{foreach item=source key=id from=$sources}
+                {$status = $source->getStatus()}
         		<tr>
         			<td valign="top"><a href="/site-admin/sources/{$id|escape:url}">{$id|escape}</td>
         			<td valign="top">{$source->getWorkingBranch()}</td>
         			<td valign="top">{$source->getUpstreamBranch()}</td>
-        			<td valign="top">
-        				{if $source->getRepository()}
-        					<pre>{$source->getRepository()->getStatus()}</pre>
-                        {else}
-                            <em>Not Initialized</em>
-        				{/if}
-        			</td>
+        			<td valign="top"><span class="label label-{sourceStatusCls $status}">{$status}</span></td>
         		</tr>
         	{/foreach}
         </tbody>

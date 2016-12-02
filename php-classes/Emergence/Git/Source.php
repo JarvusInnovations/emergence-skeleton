@@ -85,7 +85,16 @@ class Source
             return 'uninitialized';
         }
 
-        // TODO: dirty?
+        $workTreeStatus = $this->getWorkTreeStatus(['groupByStatus' => true]);
+
+        if (!empty($workTreeStatus['unstaged'])) {
+            return 'dirty';
+        }
+
+        if (!empty($workTreeStatus['staged'])) {
+            return 'commit-staged';
+        }
+
         // TODO: out-of-sync?
 
         return 'clean';
@@ -393,13 +402,17 @@ class Source
             $file['staged'] = $file['tracked'] && !$file['ignored'] && (bool)$file['indexStatus'];
             $file['unstaged'] = !$file['ignored'] && (bool)$file['workTreeStatus'];
 
-            if (!empty($options['groupByStaged'])) {
+            if (!empty($options['groupByStatus'])) {
                 if ($file['staged']) {
                     $files['staged'][$matches['path']] = $file;
                 }
 
                 if ($file['unstaged']) {
                     $files['unstaged'][$matches['path']] = $file;
+                }
+
+                if ($file['ignored']) {
+                    $files['ignored'][$matches['path']] = $file;
                 }
             } else {
                 $files[$matches['path']] = $file;

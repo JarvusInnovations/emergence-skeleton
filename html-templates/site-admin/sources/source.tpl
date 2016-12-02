@@ -43,6 +43,7 @@
 
 {block "content"}
     {load_templates "templates.tpl"}
+    {$status = $source->getStatus()}
 
     <div class="page-header">
         <div class="btn-toolbar pull-right">
@@ -80,7 +81,7 @@
         {/strip}
     {/template}
 
-    {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStaged=yes))}
+    {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStatus=yes))}
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -251,7 +252,7 @@
 
         <dl class="panel-body dl-horizontal">
             <dt>status</dt>
-            <dd><span class="label label-{sourceStatusCls $source}">{$source->getStatus()}</span></dd>
+            <dd><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
 
             <dt>working branch</dt>
             <dd>{$source->getWorkingBranch()}</dd>
