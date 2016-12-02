@@ -314,8 +314,13 @@ class Source
 
     public function getUpstreamDiff(array $options = [])
     {
-        $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
-        $output = $this->getRepository()->run('rev-list', ['--left-right', "--format=%an\t%ae\t%at\t%s", 'HEAD...HEAD@{upstream}']);
+        try {
+            $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
+            $output = $this->getRepository()->run('rev-list', ['--left-right', "--format=%an\t%ae\t%at\t%s", 'HEAD...HEAD@{upstream}']);
+        } catch (GitProcessException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
         $output = explode(PHP_EOL, trim($output));
 
         $commits = [];

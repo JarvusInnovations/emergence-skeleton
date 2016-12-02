@@ -147,16 +147,14 @@
         <div class="panel-heading">
             <div class="btn-group btn-group-xs pull-right">
                 <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sync with VFS <span class="caret"></span>
+                    Sync git working tree with emergence VFS <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    {*<li><button class="btn btn-default">Update <strong>working tree</strong> <small>from VFS</small></button></li>
-                    <li><button class="btn btn-default">Sync <strong>to</strong> VFS</button></li>*}
-                    <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>working tree</strong> <div class="small">from VFS</div></a></li>
-                    <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>VFS</strong> <div class="small">from working tree</div></a></li>
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>git working tree</strong> <div class="small">from emergence VFS</div></a></li>
+                    <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>emergence VFS</strong> <div class="small">from git working tree</div></a></li>
                 </ul>
             </div>
-            <h2 class="panel-title">Working Tree Status</h2>
+            <h2 class="panel-title">Git Working Tree Status</h2>
         </div>
 
         <div class="panel-body checkbox">
@@ -187,53 +185,57 @@
     </div>
 
     {$upstreamDiff = $source->getUpstreamDiff()}
-    <div class="panel panel-default">
+    <div class="panel panel-{tif $upstreamDiff.error ? danger : default}">
         <div class="panel-heading">
             <small class="pull-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
             <h2 class="panel-title">Branch Status</h2>
         </div>
-
-        <table class="table panel-body">
-            <thead>
-                <tr>
-                    <th width="50%">
-                        <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
-                            {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
-                            {if $upstreamDiff.ahead && !$upstreamDiff.behind}
-                                <button type="submit" class="btn btn-default btn-xs pull-right">Push</button>
-                            {/if}
-                        </form>
-                    </th>
-                    <th width="50%">
-                        <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
-                            {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
-                            {if $upstreamDiff.behind && !$upstreamDiff.ahead}
-                                <button type="submit" class="btn btn-default btn-xs pull-right">Pull (fast fwd)</button>
-                            {/if}
-                        </form>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {foreach item=commit from=$upstreamDiff.commits}
+    
+        {if $upstreamDiff.error}
+            <pre class="panel-body" role="alert">{$upstreamDiff.error|escape}</pre>
+        {else}
+            <table class="table panel-body">
+                <thead>
                     <tr>
-                        {if $commit.position == behind}
-                            <td width="50%"></td>
-                        {/if}
-                        <td width="50%">
-                            {$commit.subject|escape}
-                            <div class="small">
-                                by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
-                                on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
-                            </div>
-                        </td>
-                        {if $commit.position == ahead}
-                            <td width="50%"></td>
-                        {/if}
+                        <th width="50%">
+                            <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
+                                {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
+                                {if $upstreamDiff.ahead && !$upstreamDiff.behind}
+                                    <button type="submit" class="btn btn-default btn-xs">Push</button>
+                                {/if}
+                            </form>
+                        </th>
+                        <th width="50%">
+                            <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
+                                {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
+                                {if $upstreamDiff.behind && !$upstreamDiff.ahead}
+                                    <button type="submit" class="btn btn-default btn-xs">Pull (fast fwd)</button>
+                                {/if}
+                            </form>
+                        </th>
                     </tr>
-                {/foreach}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {foreach item=commit from=$upstreamDiff.commits}
+                        <tr>
+                            {if $commit.position == behind}
+                                <td width="50%"></td>
+                            {/if}
+                            <td width="50%">
+                                <small class="label label-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
+                                <div class="small">
+                                    by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
+                                    on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
+                                </div>
+                            </td>
+                            {if $commit.position == ahead}
+                                <td width="50%"></td>
+                            {/if}
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        {/if}
     </div>
 
     <div class="panel panel-default">
