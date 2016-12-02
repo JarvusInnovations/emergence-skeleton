@@ -233,9 +233,17 @@ class SourcesRequestHandler extends \RequestHandler
             return static::throwInvalidRequestError('commit message required');
         }
 
-        $hash = $source->commit($message);
+        if (!empty($_POST['author'])) {
+            $author = $_POST['author'];
+        } elseif (!empty($GLOBALS['Session']) && ($User = $GLOBALS['Session']->Person)) {
+            $author = "$User->FullName <$User->Email>";
+        } else {
+            $author = null;
+        }
 
-        return static::respondStatusMessage($source, "Created commit $hash");
+        $hash = $source->commit($message, $author);
+
+        return static::respondStatusMessage($source, "Created commit");
     }
 
 

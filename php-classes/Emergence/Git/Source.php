@@ -116,6 +116,20 @@ class Source
         return $this->getRepositoryPath() . '/.git/COMMIT_MSG';
     }
 
+    public function getGitEnvironment()
+    {
+        $env = [
+            'GIT_SSH' => $this->getSshWrapperPath()
+        ];
+
+        if (!empty($GLOBALS['Session']) && ($User = $GLOBALS['Session']->Person)) {
+            $env['GIT_AUTHOR_NAME'] = $env['GIT_COMMITTER_NAME'] = $User->FullName;
+            $env['GIT_AUTHOR_EMAIL'] = $env['GIT_COMMITTER_EMAIL'] = $User->Email;
+        }
+
+        return $env;
+    }
+
     public function getRepository()
     {
         if (!isset($this->repository)) {
@@ -123,9 +137,7 @@ class Source
 
             if (is_dir($gitDir)) {
                 $this->repository = new Repository($gitDir, [
-                    'environment_variables' => [
-                        'GIT_SSH' => $this->getSshWrapperPath()
-                    ]
+                    'environment_variables' => $this->getGitEnvironment()
                 ]);
             } else {
                 $this->repository = false;
@@ -249,9 +261,7 @@ class Source
 
         // create new repo
         $this->repository = GitAdmin::init($this->getRepositoryPath(), false, [
-            'environment_variables' => [
-                'GIT_SSH' => $this->getSshWrapperPath()
-            ]
+            'environment_variables' => $this->getGitEnvironment()
         ]);
 
         // add remote
@@ -476,6 +486,20 @@ class Source
     public function setDraftCommitMessage($message)
     {
         file_put_contents($this->getDraftCommitMessagePath(), $message);
+    }
+
+    public function commit($message, $author = null)
+    {
+        $args = ['--quiet', '--message='.$message];
+
+        if ($author) {
+            $args[] = '--author='.$author;
+        }
+
+        $this->getRepository()->run('commit', $args);
+        $this->setDraftCommitMessage('');
+
+        return true;
     }
 
 
