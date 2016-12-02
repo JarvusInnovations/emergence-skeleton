@@ -204,6 +204,11 @@ class Source
         return $wrapperPath;
     }
 
+    public function getCloneUrl()
+    {
+        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . Site::getConfig('primary_hostname') . '/site-admin/sources/' . $this->getId() . '.git';
+    }
+
     /**
      * Return active or configured remote URL
      */

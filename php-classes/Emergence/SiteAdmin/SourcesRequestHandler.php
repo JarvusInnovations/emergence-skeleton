@@ -4,6 +4,7 @@ namespace Emergence\SiteAdmin;
 
 use Emergence\Git\Source;
 use Emergence\SSH\KeyPair;
+use Emergence\Git\HttpBackend AS GitHttpBackend;
 
 
 class SourcesRequestHandler extends \RequestHandler
@@ -14,7 +15,7 @@ class SourcesRequestHandler extends \RequestHandler
 
     public static function handleRequest()
     {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
+        // git http backend handles its own authentication
 
         if ($sourceId = static::shiftPath()) {
             if (substr($sourceId, -4) == '.git') {
@@ -32,6 +33,8 @@ class SourcesRequestHandler extends \RequestHandler
             return static::handleSourceRequest(Source::getById($sourceId));
         }
 
+        $GLOBALS['Session']->requireAccountLevel('Developer');
+
         return static::respond('sources', [
             'sources' => Source::getAll()
         ]);
@@ -39,11 +42,13 @@ class SourcesRequestHandler extends \RequestHandler
 
     public static function handleSourceGitRequest(Source $source)
     {
-        \Debug::dumpVar($source, false, 'handleSourceGitRequest');
+        return GitHttpBackend::handleRepositoryRequest($source->getRepository());
     }
 
     public static function handleSourceRequest(Source $source)
     {
+        $GLOBALS['Session']->requireAccountLevel('Developer');
+
         switch ($action = static::shiftPath()) {
             case 'initialize':
                 return static::handleInitializeRequest($source);

@@ -246,13 +246,16 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <small class="pull-right">{$source->getRemoteUrl()|escape}</small>
+            <small class="pull-right"><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></small>
             <h2 class="panel-title">Repository Configuration</h2>
         </div>
 
         <dl class="panel-body dl-horizontal">
             <dt>status</dt>
             <dd><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
+
+            <dt>clone url</dt>
+            <dd><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></dd>
 
             <dt>working branch</dt>
             <dd>{$source->getWorkingBranch()}</dd>
