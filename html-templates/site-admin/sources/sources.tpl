@@ -26,10 +26,10 @@
         	{foreach item=source key=id from=$sources}
                 {$status = $source->getStatus()}
         		<tr>
-        			<td valign="top"><a href="/site-admin/sources/{$id|escape:url}">{$id|escape}</td>
-        			<td valign="top">{$source->getWorkingBranch()}</td>
-        			<td valign="top">{$source->getUpstreamBranch()}</td>
-        			<td valign="top"><span class="label label-{sourceStatusCls $status}">{$status}</span></td>
+        			<td><a href="/site-admin/sources/{$id|escape:url}">{$id|escape}</a></td>
+        			<td>{$source->getWorkingBranch()|escape}</td>
+        			<td>{$source->getUpstreamBranch()|escape}</td>
+        			<td><span class="label label-{sourceStatusCls $status}">{$status}</span></td>
         		</tr>
         	{/foreach}
         </tbody>
