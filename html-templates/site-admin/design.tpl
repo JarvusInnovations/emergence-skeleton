@@ -8,7 +8,7 @@
             <link rel="icon" href="/img/emergence/favicon.ico">
         {/block}
 
-        <title>{block title}Emergence Site Administrator{/block}</title>
+        <title>{block title}{Site::getConfig(handle)}{/block}</title>
 
         {block css}
             {cssmin "bootstrap3/bootstrap.css+bootstrap3/bootstrap-theme.css+site-admin.css"}
