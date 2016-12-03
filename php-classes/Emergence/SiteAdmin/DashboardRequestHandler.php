@@ -36,6 +36,30 @@ class DashboardRequestHandler extends \RequestHandler
         return static::respond('dashboard', [
             'metrics' => [
                 [
+                    'label' => 'Site Handle',
+                    'value' => Site::getConfig('handle')
+                ],
+                [
+                    'label' => 'Site Label',
+                    'value' => Site::getConfig('label')
+                ],
+                [
+                    'label' => 'Primary Hostname',
+                    'value' => Site::getConfig('primary_hostname')
+                ],
+                [
+                    'label' => 'Secondary Hostnames',
+                    'value' => implode(', ', Site::getConfig('hostnames'))
+                ],
+                [
+                    'label' => 'Parent Hostname',
+                    'value' => Site::getConfig('parent_hostname')
+                ],
+                [
+                    'label' => 'Parent Key',
+                    'value' => Site::getConfig('parent_key')
+                ],
+                [
                     'label' => 'People',
                     'value' => Person::getCount(),
                     'link' => '/people'
