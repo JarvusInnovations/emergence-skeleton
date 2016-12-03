@@ -7,6 +7,10 @@
         info
     {elseif $status == 'dirty'}
         warning
+    {elseif $status == 'behind'}
+        info
+    {elseif $status == 'ahead'}
+        success
     {else}
         default
     {/if}

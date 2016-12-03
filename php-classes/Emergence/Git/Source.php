@@ -95,6 +95,16 @@ class Source
             return 'commit-staged';
         }
 
+        $upstreamDiff = $this->getUpstreamDiff();
+
+        if ($upstreamDiff['behind']) {
+            return 'behind';
+        }
+
+        if ($upstreamDiff['ahead']) {
+            return 'ahead';
+        }
+
         // TODO: out-of-sync?
 
         return 'clean';
