@@ -37,6 +37,7 @@ class TasksRequestHandler extends RequestHandler
         $rootCollection = 'site-tasks';
         $prefixLength = strlen($rootCollection) + 1;
 
+        Emergence_FS::cacheTree($rootCollection);
         $taskNodes = Emergence_FS::getTreeFiles($rootCollection);
 
         foreach ($taskNodes AS $taskNodePath => $taskNode) {
