@@ -174,13 +174,13 @@ class Source
 
     public function setDeployKey(KeyPair $keyPair)
     {
-		$privateKeyPath = $this->getPrivateKeyPath();
-		file_put_contents($privateKeyPath, $keyPair->getPrivateKey() . PHP_EOL);
-		chmod($privateKeyPath, 0600);
+        $privateKeyPath = $this->getPrivateKeyPath();
+        file_put_contents($privateKeyPath, $keyPair->getPrivateKey() . PHP_EOL);
+        chmod($privateKeyPath, 0600);
 
-		$publicKeyPath = $this->getPublicKeyPath();
-		file_put_contents($publicKeyPath, $keyPair->getPublicKey() . PHP_EOL);
-		chmod($publicKeyPath, 0600);
+        $publicKeyPath = $this->getPublicKeyPath();
+        file_put_contents($publicKeyPath, $keyPair->getPublicKey() . PHP_EOL);
+        chmod($publicKeyPath, 0600);
 
         $this->deployKey = $keyPair;
     }
@@ -219,7 +219,7 @@ class Source
                 return trim($repository->run('config', ['--get', 'remote.origin.url']));
             }
         } catch (GitProcessException $e) {
-            // fall through to returning configured remote 
+            // fall through to returning configured remote
         }
 
         return $this->getConfig('remote');
@@ -237,9 +237,9 @@ class Source
         if (!$this->trees) {
             $this->trees = [];
 
-        	foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
-    			$this->trees[] = $this->getTreeOptions($treeKey, $treeValue);
-        	}
+            foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+                $this->trees[] = $this->getTreeOptions($treeKey, $treeValue);
+            }
         }
 
         return $this->trees;
@@ -422,7 +422,7 @@ class Source
             } else {
                 $files[$matches['path']] = $file;
             }
-            
+
         }
 
         return $files;
@@ -563,14 +563,14 @@ class Source
 
 
     protected function getTreeOptions($key, $value)
-	{
-		if (is_string($value)) {
-			$treeOptions = [
-				'gitPath' => $value
-			];
-		} else {
-			$treeOptions = $value;
-		}
+    {
+        if (is_string($value)) {
+            $treeOptions = [
+                'gitPath' => $value
+            ];
+        } else {
+            $treeOptions = $value;
+        }
 
         $treeOptions['dataPath'] = false;
 
@@ -578,23 +578,23 @@ class Source
             $treeOptions['localOnly'] = $this->getConfig('localOnly') === null ? true : $this->getConfig('localOnly');
         }
 
-		if (is_string($key)) {
-			$treeOptions['vfsPath'] = $key;
-		}
+        if (is_string($key)) {
+            $treeOptions['vfsPath'] = $key;
+        }
 
-		if (!$treeOptions['vfsPath']) {
-			$treeOptions['vfsPath'] = $treeOptions['path'] ?: $treeOptions['gitPath'];
-		}
+        if (!$treeOptions['vfsPath']) {
+            $treeOptions['vfsPath'] = $treeOptions['path'] ?: $treeOptions['gitPath'];
+        }
 
-		if (!$treeOptions['gitPath']) {
-			$treeOptions['gitPath'] = $treeOptions['path'] ?: $treeOptions['vfsPath'];
-		}
+        if (!$treeOptions['gitPath']) {
+            $treeOptions['gitPath'] = $treeOptions['path'] ?: $treeOptions['vfsPath'];
+        }
 
-		unset($treeOptions['path']);
+        unset($treeOptions['path']);
 
-	    if (is_string($treeOptions['exclude'])) {
-	        $treeOptions['exclude'] = array($treeOptions['exclude']);
-	    }
+        if (is_string($treeOptions['exclude'])) {
+            $treeOptions['exclude'] = array($treeOptions['exclude']);
+        }
 
         if (!empty($_REQUEST['minId']) && ctype_digit($_REQUEST['minId'])) {
             $treeOptions['minId'] = $_REQUEST['minId'];
@@ -604,6 +604,6 @@ class Source
             $treeOptions['maxId'] = $_REQUEST['maxId'];
         }
 
-		return $treeOptions;
-	}
+        return $treeOptions;
+    }
 }

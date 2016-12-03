@@ -15,10 +15,10 @@ class SourceRepository extends \Gitonomy\Git\Repository
 
     public static function __classLoaded()
     {
-		// copy config from legacy class if not defined locally
-		if (empty(static::$repositories) && class_exists('Git')) {
-			static::$repositories = \Git::$repositories;
-		}
+        // copy config from legacy class if not defined locally
+        if (empty(static::$repositories) && class_exists('Git')) {
+            static::$repositories = \Git::$repositories;
+        }
 
         // instantiate repositories
         foreach (static::$repositories AS $id => &$repository) {
