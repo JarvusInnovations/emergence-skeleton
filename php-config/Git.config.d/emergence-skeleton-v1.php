@@ -16,6 +16,7 @@ Git::$repositories['emergence-skeleton-v1'] = [
         'phpunit-tests',
         'sencha-build',
         'sencha-workspace',
-        'site-root'
+        'site-root',
+        'site-tasks'
     ]
 ];
