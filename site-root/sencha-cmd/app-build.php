@@ -221,7 +221,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
             $exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
             Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
         } catch (Exception $e) {
-            Benchmark::mark("failed to export $archivePath, continueing");
+            Benchmark::mark("failed to export $archivePath, continuing");
         }
     }
 

@@ -1,3 +1,3 @@
 <?php
 
-Emergence\Migrations\MigrationsRequestHandler::handleRequest();
+Emergence\SiteAdmin\MigrationsRequestHandler::handleRequest();

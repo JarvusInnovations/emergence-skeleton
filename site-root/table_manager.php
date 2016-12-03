@@ -1,3 +1,3 @@
 <?php
 
-Site::redirect('/site-admin/table-manager');
+Site::redirect('/site-admin/tasks/database/generate-table-sql');
