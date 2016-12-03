@@ -66,6 +66,10 @@ class DashboardRequestHandler extends \RequestHandler
                 [
                     'label' => 'Available Swap',
                     'value' => $availableSwap ? ByteSize::format($availableSwap) : null
+                ],
+                [
+                    'label' => 'Load Average',
+                    'value' => implode(' ', array_map(function ($n) { return number_format($n, 2); }, sys_getloadavg()))
                 ]
             ]
         ]);
