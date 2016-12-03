@@ -186,9 +186,10 @@ class SourcesRequestHandler extends \RequestHandler
             ]);
         }
 
-        $result = $source->syncToVfs();
-\Debug::dumpVar($result);
-        return static::respondStatusMessage($source, $result ? "Updated remote branch from commit $result[from] to local commit $result[to]" : 'Remote branch already up-to-date');
+        return static::respond('syncedToVfs', [
+            'source' => $source,
+            'results' => $source->syncToVfs()
+        ]);
     }
     
     public static function handleStageRequest(Source $source)

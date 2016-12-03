@@ -484,7 +484,48 @@ class Source
 
     public function syncToVfs()
     {
-        die('sync to vfs');
+        $results = [];
+
+        chdir($this->getRepositoryPath());
+
+        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+            $treeOptions = array_merge(
+                static::getTreeOptions($treeKey, $treeValue),
+                [
+                    'dataPath' => false
+                ]
+            );
+
+            $treeOptions['exclude'][] = '#(^|/)\\.git(/|$)#';
+
+            $result = [];
+
+            try {
+                if (is_file($treeOptions['gitPath'])) {
+                    $sha1 = sha1_file($treeOptions['gitPath']);
+                    $existingNode = Site::resolvePath($treeOptions['vfsPath']);
+                    $result['filesAnalyzed'] = 1;
+
+                    if (!$existingNode || $existingNode->SHA1 != $sha1) {
+                        $fileRecord = SiteFile::createFromPath($treeOptions['vfsPath'], null, $existingNode ? $existingNode->ID : null);
+                        SiteFile::saveRecordData($fileRecord, fopen($treeOptions['gitPath'], 'r'), $sha1);
+                        $result['filesUpdated'] = 1;
+                    } else {
+                        $result['filesUpdated'] = 0;
+                    }
+                } else {
+                    $result = Emergence_FS::importTree($treeOptions['gitPath'], $treeOptions['vfsPath'], $treeOptions);
+                }
+                $result['success'] = true;
+            } catch (Exception $e) {
+                $result['success'] = false;
+                $result['error'] = $e->getMessage();
+            }
+
+            $results[$treeOptions['vfsPath']] = $result;
+        }
+
+        return $results;
     }
 
     public function stage(array $paths)
