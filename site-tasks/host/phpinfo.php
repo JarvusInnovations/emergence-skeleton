@@ -5,7 +5,7 @@ return [
     'description' => 'Show the output of [`phpinfo()`](http://php.net/phpinfo)',
     'icon' => 'search',
     'requireAccountLevel' => 'Developer',
-    'handler' => function ($taskConfig) {
+    'handler' => function () {
         ob_start();
         phpinfo();
         $html = ob_get_contents();

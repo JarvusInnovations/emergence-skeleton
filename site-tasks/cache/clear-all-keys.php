@@ -6,7 +6,7 @@ return [
     'warning' => 'This operation could render the site unresponsive if executed during high load',
     'icon' => 'refresh',
     'requireAccountLevel' => 'Administrator',
-    'handler' => function ($taskConfig) {
+    'handler' => function () {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $keysDeleted = Cache::deleteByPattern('/.*/');
 

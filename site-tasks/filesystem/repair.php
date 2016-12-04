@@ -6,7 +6,7 @@ return [
     'warning' => 'This operation could render the site unresponsive if executed during high load',
     'icon' => 'wrench',
     'requireAccountLevel' => 'Developer',
-    'handler' => function ($taskConfig) {
+    'handler' => function () {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             set_time_limit(0);
 

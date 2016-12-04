@@ -23,8 +23,8 @@ return [
             }
         }
         
-        return static::respond('precache', array(
+        return static::respond('precache', [
             'message' => $message
-        ));
+        ]);
     }
 ];

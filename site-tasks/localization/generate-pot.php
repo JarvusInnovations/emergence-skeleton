@@ -5,7 +5,7 @@ return [
     'description' => 'Generate a `.pot` ("Portable Object Template") file with `xgettext` as a starting point for translations by scanning all PHP and Dwoo source files',
     'icon' => 'list-alt',
     'requireAccountLevel' => 'Administrator',
-    'handler' => function ($taskConfig) {
+    'handler' => function () {
 
         // utility methods
         $extractStrings = function ($pattern, $contents, $fileVirtualPath, &$strings) {
