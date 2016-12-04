@@ -82,6 +82,7 @@ class TasksRequestHandler extends RequestHandler
         $taskConfig = include($taskNode->RealPath);
         $taskConfig = array_merge(static::$taskDefaults, $taskConfig);
         $taskConfig['path'] = $taskPath;
+        $taskConfig['pathStack'] = $pathStack;
         $taskConfig['baseUrl'] = '/site-admin/tasks/'.$taskPath;
 
         if (!empty($taskConfig['requireAccountLevel']) && (empty($GLOBALS['Session']) || !$GLOBALS['Session']->hasAccountLevel($taskConfig['requireAccountLevel']))) {

@@ -5,20 +5,40 @@ return [
     'description' => 'Browse and selective clear application cache entries',
     'icon' => 'pencil',
     'requireAccountLevel' => 'Developer',
-    'handler' => function () {
+    'handler' => function ($taskConfig) {
+
+        $getEntryData = function ($entry, $includeValue = false) {
+            return [
+                'hits' => $entry['num_hits'],
+                'size' => $entry['mem_size'],
+                'accessTime' => $entry['access_time'],
+                'createTime' => $entry['creation_time'],
+                'modifyTime' => $entry['mtime'],
+                'value' => $includeValue ? $entry['value'] : null
+            ];
+        };
+
+        if ($key = array_shift($taskConfig['pathStack'])) {
+            $key = urldecode($key);
+            $entry = Cache::getIterator('/^'.preg_quote($key, '/').'$/')->current();
+
+            if (!$entry) {
+                return static::throwNotFoundError('cache entry not found');
+            }
+
+            return static::respond('entry', [
+                'entryKey' => $key,
+                'entry' => $getEntryData($entry, true)
+            ]);
+        }
+
+
         $prefixLength = strlen(Cache::getKeyPrefix());
         $entries = [];
 
         foreach (Cache::getIterator('/.*/') AS $key => $entry) {
             $key = substr($key, $prefixLength);
-            $entries[$key] = [
-                'key' => $key,
-                'hits' => $entry['num_hits'],
-                'size' => $entry['mem_size'],
-                'accessTime' => $entry['access_time'],
-                'createTime' => $entry['creation_time'],
-                'modifyTime' => $entry['mtime']
-            ];
+            $entries[$key] = $getEntryData($entry);
         }
 
         uasort($entries, function ($a, $b) {
@@ -29,7 +49,7 @@ return [
             return $a['hits'] > $b['hits'] ? -1 : 1;
         });
 
-        return static::respond('manage', [
+        return static::respond('entries', [
             'entries' => $entries
         ]);
     }
