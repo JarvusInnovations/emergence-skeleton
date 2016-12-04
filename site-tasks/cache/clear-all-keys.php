@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Clear all cache keys',
+    'title' => 'Clear all application cache keys',
     'description' => 'Clear all in-memory cache keys for the current site',
     'warning' => 'This operation could render the site unresponsive if executed during high load',
     'icon' => 'refresh',
