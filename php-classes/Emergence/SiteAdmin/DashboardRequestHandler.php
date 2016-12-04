@@ -14,6 +14,9 @@ class DashboardRequestHandler extends \RequestHandler
     {
         $GLOBALS['Session']->requireAccountLevel('Administrator');
 
+        // get apc memory info
+        $apcInfo = apcu_sma_info(true);
+
         // get available memory
         $availableMemory = null;
         $availableSwap = null;
@@ -80,19 +83,27 @@ class DashboardRequestHandler extends \RequestHandler
                     'link' => '/people?q=accountlevel:Developer'
                 ],
                 [
-                    'label' => 'Available Storage',
-                    'value' => ByteSize::format(exec('df --output=avail ' . escapeshellarg(Site::$rootPath)))
+                    'label' => 'Used App Cache',
+                    'value' => ByteSize::format($apcInfo['seg_size'] - $apcInfo['avail_mem'])
                 ],
                 [
-                    'label' => 'Available Memory',
+                    'label' => 'Available App Cache',
+                    'value' => ByteSize::format($apcInfo['avail_mem'])
+                ],
+                [
+                    'label' => 'Available Host Storage',
+                    'value' => ByteSize::format(exec('df -B1 --output=avail ' . escapeshellarg(Site::$rootPath)))
+                ],
+                [
+                    'label' => 'Available Host Memory',
                     'value' => $availableMemory ? ByteSize::format($availableMemory) : null
                 ],
                 [
-                    'label' => 'Available Swap',
+                    'label' => 'Available Host Swap',
                     'value' => $availableSwap ? ByteSize::format($availableSwap) : null
                 ],
                 [
-                    'label' => 'Load Average',
+                    'label' => 'Host Load Average',
                     'value' => implode(' ', array_map(function ($n) { return number_format($n, 2); }, sys_getloadavg()))
                 ]
             ]
