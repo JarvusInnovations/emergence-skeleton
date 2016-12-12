@@ -540,7 +540,7 @@ class Source
 
     public function stage(array $paths)
     {
-        $this->getRepository()->run('add', $paths);
+        $this->getRepository()->run('add', array_merge(['--all'], $paths));
         return count($paths);
     }
 
