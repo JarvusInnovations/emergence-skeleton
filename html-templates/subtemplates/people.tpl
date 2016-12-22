@@ -19,10 +19,14 @@
 {/template}
 
 {template personLink Person photo=no photoSize=64 pixelRatio=2}{strip}
-    <a href="{$Person->getURL()}" title="{personName $Person}">
-        {if $photo}
-            {avatar $Person size=$photoSize pixelRatio=$pixelRatio}
-        {/if}
-        <span class="name">{personName $Person}</span>
-    </a>
+    {if $Person}
+        <a href="{$Person->getURL()}" title="{personName $Person}">
+            {if $photo}
+                {avatar $Person size=$photoSize pixelRatio=$pixelRatio}
+            {/if}
+            <span class="name">{personName $Person}</span>
+        </a>
+    {else}
+        <em class="anonymous">Anonymous</em>
+    {/if}
 {/strip}{/template}
