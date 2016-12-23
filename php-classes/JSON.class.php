@@ -25,7 +25,7 @@ class JSON
             throw new Exception('Failed to encode json data, json_last_error='.json_last_error());
         }
 
-        header('Content-type: application/json', true);
+    	header('Content-type: application/json; charset=utf-8');
         print($text);
         Site::finishRequest($exit);
     }

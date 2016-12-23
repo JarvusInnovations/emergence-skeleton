@@ -150,7 +150,7 @@ abstract class RequestHandler
 
     public static function respondXml($responseID, $responseData = array())
     {
-        header('Content-Type: text/xml');
+        header('Content-Type: text/xml; charset=utf-8');
         return Emergence\Dwoo\Engine::respond($responseID, $responseData);
     }
 
