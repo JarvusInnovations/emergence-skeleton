@@ -66,7 +66,7 @@ return [
 
         rewind($pot);
 
-        header('Content-Type: text/plain');
+        header('Content-Type: text/plain; charset=utf-8');
         header('Content-Disposition: attachment; filename="'.Site::getConfig('handle').'.pot"');
         fpassthru($pot);
     }

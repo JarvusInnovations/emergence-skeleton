@@ -28,10 +28,10 @@ class LogsRequestHandler extends \RequestHandler
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
         $path = array_filter(static::getPath());
-        
+
         if (count($path)) {
             $path = implode('/', $path);
-    
+
             if (empty(static::$files[$path])) {
                 return static::throwNotFoundError('log not found');
             }
@@ -54,7 +54,7 @@ class LogsRequestHandler extends \RequestHandler
 
         if (!empty($_GET['download']) && $_GET['download'] == 'raw') {
             header('Content-Length: ' . $file['size']);
-            header('Content-Type: text/plain');
+            header('Content-Type: text/plain; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . addslashes(basename($path)) . '"');
             readfile($file['realPath']);
             exit();

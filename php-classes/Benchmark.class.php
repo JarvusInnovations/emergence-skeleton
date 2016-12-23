@@ -10,7 +10,7 @@ class Benchmark
     public static function startLive()
     {
         header('X-Accel-Buffering: no');
-        header('Content-Type: text/plain');
+        header('Content-Type: text/plain; charset=utf-8');
         ob_end_flush();
 
         static::$livePrint = true;

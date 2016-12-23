@@ -71,7 +71,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 $logPath = $Job->getLogPath().'.bz2';
 
                 if (file_exists($logPath)) {
-                    header('Content-Type: application/json');
+                    header('Content-Type: application/json; charset=utf-8');
                     header(sprintf('Content-Disposition: attachment; filename="%s-%u.json"', $Job->Connector, $Job->ID));
                     passthru("bzcat $logPath");
                     exit();

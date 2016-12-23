@@ -15,7 +15,7 @@ class CSV
 
     public static function respond($records, $filename = null, $columns = '*')
     {
-        header('Content-Type: text/csv');
+        header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment'.($filename ? '; filename="'.str_replace('"', '', $filename).'.csv"' : ''));
         static::writeToStream(fopen('php://output', 'w'), $records, $columns);
         exit();

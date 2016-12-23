@@ -25,7 +25,7 @@ class JSON
             throw new Exception('Failed to encode json data, json_last_error='.json_last_error());
         }
 
-        header('Content-type: application/json', true);
+        header('Content-type: application/json; charset=utf-8');
         print($text);
         Site::finishRequest($exit);
     }
@@ -141,22 +141,22 @@ class JSON
 #	{
 #		return array_map(create_function('$value', 'return array($value);'), $array);
 #	}
-#	
+#
 #	static public function indent($json)
 #    {
-# 
+#
 #		$result	   = '';
 #		$pos	   = 0;
 #		$strLen	   = strlen($json);
 #		$indentStr = "\t";
 #		$newLine   = "\n";
-#	 
+#
 #		for($i = 0; $i <= $strLen; $i++) {
-#			
+#
 #			// Grab the next character in the string
 #			$char = substr($json, $i, 1);
-#			
-#			// If this character is the end of an element, 
+#
+#			// If this character is the end of an element,
 #			// output a new line and indent the next line
 #			if($char == '}' || $char == ']') {
 #				$result .= $newLine;
@@ -165,11 +165,11 @@ class JSON
 #					$result .= $indentStr;
 #				}
 #			}
-#			
+#
 #			// Add the character to the result string
 #			$result .= $char;
-#	 
-#			// If the last character was the beginning of an element, 
+#
+#			// If the last character was the beginning of an element,
 #			// output a new line and indent the next line
 #			if ($char == ',' || $char == '{' || $char == '[') {
 #				$result .= $newLine;
@@ -181,7 +181,7 @@ class JSON
 #				}
 #			}
 #		}
-#	 
+#
 #		return $result;
 #	}
 }
