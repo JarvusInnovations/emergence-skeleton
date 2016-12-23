@@ -75,7 +75,7 @@ class RegistrationRequestHandler extends RequestHandler
             // additional checks
             if (empty($filteredRequestFields['Password']) || (strlen($filteredRequestFields['Password']) < $User::$minPasswordLength)) {
                 $additionalErrors['Password'] = 'Password must be at least '.$User::$minPasswordLength.' characters long.';
-            } elseif (empty($filteredRequestFields['PasswordConfirm']) || ($filteredRequestFields['Password'] != $filteredRequestFields['PasswordConfirm'])) {
+            } elseif (empty($_REQUEST['PasswordConfirm']) || ($filteredRequestFields['Password'] != $_REQUEST['PasswordConfirm'])) {
                 $additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
             }
 
@@ -84,7 +84,7 @@ class RegistrationRequestHandler extends RequestHandler
                 call_user_func_array(static::$applyRegistrationData, array($User, $filteredRequestFields, &$additionalErrors));
             }
 
-            EventBus::fireEvent('beforeRegister', self::class, array(
+            Emergence\EventBus::fireEvent('beforeRegister', self::class, array(
                 'User' => $User,
                 'requestData' => $_REQUEST,
                 'additionalErrors' => &$additionalErrors
@@ -110,7 +110,7 @@ class RegistrationRequestHandler extends RequestHandler
                     call_user_func(static::$onRegisterComplete, $User, $filteredRequestFields);
                 }
 
-                EventBus::fireEvent('registerComplete', self::class, array(
+                Emergence\EventBus::fireEvent('registerComplete', self::class, array(
                     'User' => $User,
                     'requestData' => $_REQUEST
                 ));
