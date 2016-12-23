@@ -11,7 +11,7 @@
 
     <section class="page-section">
         <ul>
-        {foreach item=Item from=$Tag->Items}
+        {foreach item=Item from=$Tag->getReadableItems()}
             <li>{contextLink $Item->Context}</li>
         {/foreach}
         </ul>

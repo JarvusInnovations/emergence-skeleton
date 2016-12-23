@@ -424,4 +424,23 @@ class Tag extends ActiveRecord
             return $Tag->HandlePrefix == $prefix;
         });
     }
+
+    public function getReadableItems()
+    {
+        $items = array();
+
+        foreach ($this->Items AS $item) {
+            try {
+                if (!$item->Context) {
+                    continue;
+                }
+
+                $items[] = $item;
+            } catch (UserUnauthorizedException $e) {
+                continue;
+            }
+        }
+
+        return $items;
+    }
 }
