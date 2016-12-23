@@ -43,10 +43,18 @@ class Tag extends ActiveRecord
             'qualifiers' => array('prefix')
             ,'points' => 2
             ,'sql' => 'Handle LIKE "%%%s%%.%"'
+        ),
+        'Title' => array(
+            'qualifiers' => ['any', 'title'],
+            'points' => 1,
+            'sql' => 'Title LIKE "%%%1$s%%"'
+        ),
+        'Handle' => array(
+            'qualifiers' => ['any', 'handle'],
+            'points' => 1,
+            'sql' => 'Handle LIKE "%%%1$s%%"'
         )
     );
-
-
 
     // public methods
     public static function assignTags($contextClass, $contextID, $tags, $autoCreate = true)

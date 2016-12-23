@@ -7,7 +7,6 @@ class TagsRequestHandler extends RecordsRequestHandler
     public static $accountLevelBrowse = false;
     public static $accountLevelAssign = 'User';
 
-
     public static function handleRecordsRequest($action = false)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
@@ -22,30 +21,22 @@ class TagsRequestHandler extends RecordsRequestHandler
             }
         }
     }
-
-
+    
     public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = NULL, $responseData = array())
     {
-        $conditions = array();
-
-        if (!empty($_REQUEST['q'])) {
-            if ($_REQUEST['valuesqry'] == 'true') {
-                $handles = explode('|', $_REQUEST['q']);
-                $conditions = 'Handle IN ("'.join('","',DB::escape($handles)).'")';
-            } elseif (ctype_digit($_REQUEST['q'])) {
-                $conditions[] = 'ID = '.$_REQUEST['q'];
-            } else {
-                $conditions[] = sprintf('Title LIKE "%%%1$s%%" OR Handle LIKE "%%%1$s%%"', DB::escape($_REQUEST['q']));
-            }
+        if (!empty($_REQUEST['q']) && $_REQUEST['valuesqry'] == 'true') {
+            $handles = explode('|', $_REQUEST['q']);
+            $conditions = 'Handle IN ("'.join('","',DB::escape($handles)).'")';
+            
+            return static::respond('tags', array(
+                'success' => true
+                ,'data' => Tag::getAllByWhere($conditions)
+            ));
         }
 
-        return static::respond('tags', array(
-            'success' => true
-            ,'data' => Tag::getAllByWhere($conditions)
-        ));
+        return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
-
-
+    
     public static function handleRecordRequest(ActiveRecord $Tag, $action = false)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
@@ -71,14 +62,12 @@ class TagsRequestHandler extends RecordsRequestHandler
             $conditions['ContextClass'] = $_REQUEST['Class'];
         }
 
-
         return static::respond('tagItems', array(
             'success' => true
             ,'data' => TagItem::getAllByWhere($conditions)
         ));
     }
-
-
+    
     public static function handleMultiAssignRequest()
     {
         if (static::$accountLevelAssign) {
@@ -107,7 +96,6 @@ class TagsRequestHandler extends RecordsRequestHandler
                 $results[] = $TagItem;
             }
         }
-
 
         return static::respond($className::$pluralNoun.'Saved', array(
             'success' => true
