@@ -3,7 +3,7 @@
 {load_templates "subtemplates/forms.tpl"}
 
 {template commentForm Context url=no Comment=no}
-    {if $.Session->Person}
+    {if $.User}
         {if $Comment}
             {$url = cat($Comment->getURL() '/edit')}
         {elseif !$url}
@@ -33,9 +33,11 @@
     <section class="comments-list">
     {foreach item=Comment from=$comments}
         <article class="comment" id="comment-{$Comment->ID}">
-            <div class="author">
-                <a href="{$Comment->Creator->getURL()}">{avatar $Comment->Creator size=56}</a>
-            </div>
+            {if $Comment->Creator}
+                <div class="author">
+                    <a href="{$Comment->Creator->getURL()}">{avatar $Comment->Creator size=56}</a>
+                </div>
+            {/if}
             <div class="message">
                 <header>
                     {personLink $Comment->Creator}
