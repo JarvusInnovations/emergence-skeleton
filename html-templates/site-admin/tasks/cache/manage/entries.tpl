@@ -26,9 +26,10 @@
                         <td><time datetime="{html_time $entry.accessTime}">{fuzzy_time $entry.accessTime}</time></td>
                         <td><time datetime="{html_time $entry.createTime}">{fuzzy_time $entry.createTime}</time></td>
                         <td><time datetime="{html_time $entry.modifyTime}">{fuzzy_time $entry.modifyTime}</time></td>
-                        <td>
+                        <td width="70">
                             <div class="btn-group btn-group-xs" role="group">
                                 <a href="{$.task.baseUrl}/{$key|escape:url}" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
+                                <a href="{$.task.baseUrl}/{$key|escape:url}/delete" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                             </div>
                         </td>
                     </tr>

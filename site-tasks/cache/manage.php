@@ -26,6 +26,19 @@ return [
                 return static::throwNotFoundError('cache entry not found');
             }
 
+            if (array_shift($taskConfig['pathStack']) == 'delete') {
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    Cache::delete($key);
+                    return static::respond('message', [
+                        'message' => "Cleared cache key `$key`"
+                    ]);
+                }
+
+                return static::respond('confirm', [
+                    'question' => "Are you sure you want to delete the cache key `$key`?"
+                ]);
+            }
+
             return static::respond('entry', [
                 'entryKey' => $key,
                 'entry' => $getEntryData($entry, true)
