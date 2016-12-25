@@ -133,11 +133,11 @@ abstract class AbstractContent extends \VersionedRecord
     public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
     {
         $options = array_merge(array(
-            'conditions' => array()
-            ,'order' => array('Published' => 'DESC')
+            'conditions' => array(),
+            'order' => array('Published' => 'DESC')
         ), $options);
 
-        if (!$GLOBALS['Session']->Person) {
+        if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
             $options['conditions']['Visibility'] = 'Public';
         }
 
@@ -154,20 +154,23 @@ abstract class AbstractContent extends \VersionedRecord
     public static function getAllPublishedByAuthor(IPerson $Author, $options = array())
     {
         $options = array_merge(array(
+            'conditions' => array(),
             'order' => array('Published' => 'DESC')
         ), $options);
 
-        $conditions = array(
-            'AuthorID' => $Author->ID
-            ,'Status' => 'Published'
-            ,'Published IS NULL OR Published <= CURRENT_TIMESTAMP'
-        );
-
-        if (get_called_class() != __CLASS__) {
-            $conditions['Class'] = get_called_class();
+        if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
+            $options['conditions']['Visibility'] = 'Public';
         }
 
-        return static::getAllByWhere($conditions, $options);
+        $options['conditions']['AuthorID'] = $Author->ID;
+        $options['conditions']['Status'] = 'Published';
+        $options['conditions'][] = 'Published IS NULL OR Published <= CURRENT_TIMESTAMP';
+
+        if (get_called_class() != __CLASS__) {
+            $options['conditions']['Class'] = get_called_class();
+        }
+
+        return static::getAllByWhere($options['conditions'], $options);
     }
 
     public function validate($deep = true)
