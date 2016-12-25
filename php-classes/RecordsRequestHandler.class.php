@@ -200,7 +200,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                         ,!empty($joins) ? implode(' ', $joins) : ''
                         ,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
                         ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-                        ,count($options['order']) ? 'ORDER BY '.join(',', $className::mapFieldOrder($options['order'])) : ''
+                        ,!empty($options['order']) ? 'ORDER BY '.join(',', $className::mapFieldOrder($options['order'])) : ''
                         ,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
                     )
                 )
