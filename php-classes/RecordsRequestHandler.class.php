@@ -182,7 +182,7 @@ abstract class RecordsRequestHandler extends RequestHandler
             }
 
             if (static::$browseOrder && empty($options['order'])) {
-                $options['order'] = $className::mapFieldOrder(static::$browseOrder);
+                $options['order'] = static::$browseOrder;
             }
         }
 
