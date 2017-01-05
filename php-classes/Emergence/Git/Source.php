@@ -300,6 +300,11 @@ class Source
         return true;
     }
 
+    public function fetch()
+    {
+        return $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
+    }
+
     public function pull()
     {
         $output = trim($this->getRepository()->run('merge', ['--ff-only', '--no-stat', '@{upstream}']));
@@ -339,7 +344,7 @@ class Source
     public function getUpstreamDiff(array $options = [])
     {
         try {
-            $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
+            $this->fetch();
             $output = $this->getRepository()->run('rev-list', ['--left-right', "--format=%an\t%ae\t%at\t%s", 'HEAD...HEAD@{upstream}']);
         } catch (GitProcessException $e) {
             return ['error' => $e->getMessage()];
