@@ -1290,14 +1290,23 @@ class ActiveRecord
         return $record ? new $className($record) : null;
     }
 
-    public static function instantiateRecords($records)
+    public static function instantiateRecords($records, $skipUnauthorized = true)
     {
         foreach ($records AS &$record) {
             $className = static::_getRecordClass($record);
-            $record = new $className($record);
+
+            try {
+                $record = new $className($record);
+            } catch (UserUnauthorizedException $e) {
+                if ($skipUnauthorized) {
+                    $record = null;
+                } else {
+                    throw $e;
+                }
+            }
         }
 
-        return $records;
+        return array_filter($records);
     }
 
     public static function getSqlSearchConditions($qualifier, $term)
