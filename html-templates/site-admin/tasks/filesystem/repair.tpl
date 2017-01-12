@@ -25,6 +25,13 @@
 
             <div class="checkbox">
                 <label>
+                    <input type="checkbox" name="ops[]" value="merge-ghost-collections" {refill field=ops checked=merge-ghost-collections default=merge-ghost-collections}>
+                    Merge ghost collections
+                </label>
+            </div>
+
+            <div class="checkbox">
+                <label>
                     <input type="checkbox" name="ops[]" value="renest" {refill field=ops checked=renest default=renest}>
                     Renest collections
                 </label>

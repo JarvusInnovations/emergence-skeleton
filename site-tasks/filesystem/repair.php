@@ -48,6 +48,37 @@ return [
                 $messages[] = "Erased $erasedCollections orphaned collections and $erasedFiles orphaned files";
             }
 
+            if (in_array('merge-ghost-collections', $ops)) {
+                // find live collections that have a deleted collection at the same layer+parent+handle
+                $duplicates = DB::allRecords(
+                    'SELECT c1.ID AS current,
+                            c2.ID AS deleted
+                       FROM _e_file_collections c1
+                       JOIN _e_file_collections c2
+                         ON c1.Site = c2.Site
+                            AND c1.ParentID = c2.ParentID
+                            AND c1.Handle = c2.Handle
+                            AND c1.Status = "Normal"
+                            AND c2.Status = "Deleted"
+                    '
+                );
+
+                $messages[] = sprintf('Found %u ghost collections', count($duplicates));
+
+                // merge all collections and files into the not deleted collection and erase the deleted collection
+                foreach ($duplicates AS $duplicate) {
+                    DB::nonQuery('UPDATE _e_files SET CollectionID = %u WHERE CollectionID = %u', [$duplicate['current'], $duplicate['deleted']]);
+                    $movedFiles = DB::affectedRows();
+
+                    DB::nonQuery('UPDATE _e_file_collections SET ParentID = %u WHERE ParentID = %u', [$duplicate['current'], $duplicate['deleted']]);
+                    $movedCollections = DB::affectedRows();
+
+                    DB::nonQuery('DELETE FROM _e_file_collections WHERE ID = %u', $duplicate['deleted']);
+
+                    $messages[] = "Merged $movedFiles files and $movedCollections collections out of ghost collection";
+                }
+            }
+
             if (in_array('renest', $ops)) {
                 // renest all collections
                 $renestedCount = NestingBehavior::repairTable('_e_file_collections', 'PosLeft', 'PosRight');
