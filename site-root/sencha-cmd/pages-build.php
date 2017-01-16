@@ -88,40 +88,19 @@ $commonOverrides = [];
 $classPaths = !empty($buildConfig['workspace.classpath']) ? explode(',', $buildConfig['workspace.classpath']) : [];
 
 
-// load hotfix package
-$hotfixPackage = Jarvus\Sencha\Package::get('jarvus-hotfixes', $framework);
+// analyze global package dependencies from Common.js
+$packages = Jarvus\Sencha\Package::aggregatePackageDependencies(Sencha::getRequiredPackagesForSourceFile('./src/Common.js'), $framework);
 
-if ($hotfixPackage) {
-    $hotfixPackage->writeToDisk('packages/jarvus-hotfixes');
-    $packages[] = 'jarvus-hotfixes';
-    $commonOverrides[] = "include -recursive -file ./packages/jarvus-hotfixes/overrides";
-    $classPaths[] = './packages/jarvus-hotfixes/overrides';
-    Benchmark::mark("checked out package $hotfixPackage to packages/jarvus-hotfixes");
+
+// add jarvus-hotfixes package
+if ($hotfixesPackage = Jarvus\Sencha\Package::get('jarvus-hotfixes', $framework)) {
+    $packages['jarvus-hotfixes'] = $hotfixesPackage;
 }
 
 
-// analyze global package dependencies from Common.js
-$commonPackages = Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile('./src/Common.js'));
-$packages = array_merge($packages, $commonPackages);
-
-foreach ($commonPackages AS $package) {
-    foreach (['src', 'overrides'] AS $subPath) {
-        $packageSource = "sencha-workspace/packages/$package/$subPath";
-        $packageDest = "./packages/$package/$subPath";
-        Benchmark::mark("importing package: $package from $packageSource");
-
-        $cachedFiles = Emergence_FS::cacheTree($packageSource);
-        Benchmark::mark("precached $cachedFiles files in $packageSource");
-
-        $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-        Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-
-        $classPaths[] = "./packages/$package/$subPath";
-
-        if ($subPath == 'overrides') {
-            $commonOverrides[] = "include -recursive -file packages/$package/$subPath";
-        }
-    }
+// add all packages so far to common overrides
+foreach ($packages AS $packageName => $package) {
+    $commonOverrides[] = "include -recursive -file packages/$package/overrides";
 }
 
 
@@ -129,30 +108,16 @@ foreach ($commonPackages AS $package) {
 foreach (glob('./src/page/*.js') AS $page) {
     $pageNames[] = $pageName = basename($page, '.js');
     $pageOverrides = [];
-    $pagePackages = array_unique(Sencha::crawlRequiredPackages(Sencha::getRequiredPackagesForSourceFile($page)));
+    $pagePackages = Jarvus\Sencha\Package::aggregatePackageDependencies(Sencha::getRequiredPackagesForSourceFile($page), $framework);
+
 
     // merge into global packages list
     $packages = array_merge($packages, $pagePackages);
 
-    // analyze packages, export, add to classPath, and register overrides per-page
+
+    // register overrides per-page
     foreach ($pagePackages AS $package) {
-        foreach (['src', 'overrides'] AS $subPath) {
-            $packageSource = "sencha-workspace/packages/$package/$subPath";
-            $packageDest = "./packages/$package/$subPath";
-            Benchmark::mark("importing package: $package from $packageSource");
-
-            $cachedFiles = Emergence_FS::cacheTree($packageSource);
-            Benchmark::mark("precached $cachedFiles files in $packageSource");
-
-            $exportResult = Emergence_FS::exportTree($packageSource, $packageDest);
-            Benchmark::mark("exported $packageSource to $packageDest: ".http_build_query($exportResult));
-
-            $classPaths[] = "./packages/$package/$subPath";
-
-            if ($subPath == 'overrides') {
-                $pageOverrides[] = "include -recursive -file packages/$package/$subPath";
-            }
-        }
+        $pageOverrides[] = "include -recursive -file packages/$package/overrides";
     }
 
     $pageLoadCommands[] =
@@ -164,8 +129,20 @@ foreach (glob('./src/page/*.js') AS $page) {
 }
 
 
-// eliminate duplicate packages between pages
-$packages = array_unique($packages);
+// write all packages to disk and add to classpath
+foreach ($packages AS $packageName => $package) {
+    $packageTmpPath = "packages/$packageName";
+
+    if ($package instanceof \Chaki\Package) {
+        $package->updateRepo();
+    }
+
+    $package->writeToDisk($packageTmpPath);
+    Benchmark::mark("wrote package $package to $packageTmpPath");
+
+    $classPaths[] = "$packageTmpPath/src";
+    $classPaths[] = "$packageTmpPath/overrides";
+}
 
 
 // write any libraries from classpath
