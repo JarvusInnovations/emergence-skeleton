@@ -283,6 +283,10 @@ class Source
             throw new \Exception('repository already initialized');
         }
 
+        // get configured branches before beginning initialization -- they won't return consistent results mid-initialization
+        $upstreamBranch = $this->getUpstreamBranch();
+        $workingBranch = $this->getWorkingBranch();
+
         // create new repo
         $this->repository = GitAdmin::init($this->getRepositoryPath(), false, [
             'environment_variables' => $this->getGitEnvironment()
@@ -292,10 +296,8 @@ class Source
         $this->getRepository()->run('remote', ['add', 'origin', $this->getRemoteUrl()]);
 
         // fetch upstream branch and checkout
-        $upstreamBranch = $this->getUpstreamBranch();
-
         $this->getRepository()->run('fetch', ['origin', $upstreamBranch]);
-        $this->getRepository()->run('checkout', ['-b', $this->getWorkingBranch(), "origin/$upstreamBranch"]);
+        $this->getRepository()->run('checkout', ['-b', $workingBranch, "origin/$upstreamBranch"]);
 
         return true;
     }
