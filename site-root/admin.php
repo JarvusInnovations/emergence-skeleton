@@ -1,3 +1,3 @@
 <?php
 
-Site::redirect('/site-admin/index');
+Site::redirect('/site-admin');
