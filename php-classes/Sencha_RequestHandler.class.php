@@ -95,16 +95,17 @@ class Sencha_RequestHandler extends RequestHandler
             $version = Sencha::$frameworks[$framework]['defaultVersion'];
         }
 
-        $version = Sencha::normalizeFrameworkVersion($framework, $version);
-
+        // Create shared cached framework path
+        $framework = Jarvus\Sencha\Framework::get($framework, $version);
         $filePath = static::getPath();
-        array_unshift($filePath, 'sencha-workspace', "$framework-$version");
+        array_unshift($filePath, Jarvus\Sencha\Framework::$sharedCacheDirectory."/$framework");
+        $path = join('/', $filePath);
 
-        if ($fileNode = Site::resolvePath($filePath)) {
-            $fileNode->outputAsResponse();
-        } else {
-            return static::throwNotFoundError('Framework asset not found');
-        }
+        header('Content-Type: application/javascript');
+        header('Cache-Control: max-age=3600, must-revalidate');
+        header('Pragma: public');
+        readfile($path);
+        exit();
     }
 
     public static function handlePagesRequest()
