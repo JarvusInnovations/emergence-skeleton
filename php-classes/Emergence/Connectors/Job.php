@@ -5,10 +5,12 @@ namespace Emergence\Connectors;
 use ActiveRecord;
 use HandleBehavior;
 use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
+use Emergence\Logger;
 
-class Job extends ActiveRecord
+class Job extends ActiveRecord implements LoggerInterface
 {
-    public $log;
+    public $logEntries;
 
     // ActiveRecord configuration
     public static $tableName = 'connector_jobs';
@@ -83,25 +85,6 @@ class Job extends ActiveRecord
         return $className::getTitle();
     }
 
-    public function log($message, $level = null)
-    {
-        if (is_string($message)) {
-            $entry = array(
-                'message' => $message
-            );
-        } else {
-            $entry = $message;
-        }
-
-        if ($level !== null) {
-            $entry['level'] = $level;
-        } elseif (!array_key_exists('level', $entry)) {
-            $entry['level'] = LogLevel::INFO;
-        }
-
-        return $this->log[] = $entry;
-    }
-
     public function logRecordDelta(ActiveRecord $Record, $options = array())
     {
         $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : array();
@@ -160,23 +143,36 @@ class Job extends ActiveRecord
 
         $logEntry['message'] = call_user_func($messageRenderer, $logEntry);
 
-        return $this->log[] = $logEntry;
+        return $this->log(
+            $logEntry['level'],
+            $logEntry['message'],
+            [
+                'changes' => $changes,
+                'record' => $Record
+            ]
+        );
     }
 
     public function logInvalidRecord(\ActiveRecord $Record)
     {
-        return $this->log(array(
-            'message' => 'Invalid '.get_class($Record).' record: '.$Record->getTitle()
-            ,'validationErrors' => $Record->validationErrors
-        ), LogLevel::WARNING);
+        return $this->log(
+            LogLevel::WARNING,
+            'Invalid '.get_class($Record).' record: '.$Record->getTitle(),
+            [
+                'validationErrors' => $Record->validationErrors
+            ]
+        );
     }
 
     public function logException(\Exception $e)
     {
-        return $this->log(array(
-            'message' => get_class($e).': '.$e->getMessage()
-            ,'exception' => $e
-        ), LogLevel::ERROR);
+        return $this->log(
+            LogLevel::ERROR,
+            'Exception:: '.get_class($e).': '.$e->getMessage(),
+            [
+                'exception' => $e
+            ]
+        );
     }
 
     public function getLogPath()
@@ -184,16 +180,83 @@ class Job extends ActiveRecord
         return $this->isPhantom ? null : \Site::$rootPath.'/site-data/connector-jobs/'.$this->ID.'.json';
     }
 
-    public function writeLog()
+    public function writeLog($logEntry, $compress = false)
     {
         $logPath = $this->getLogPath();
-        $logDirectory = dirname($logPath);
 
+        if (!$logPath) { // record is phantom
+            return;
+        }
+
+        $logDirectory = dirname($logPath);
         if (!is_dir($logDirectory)) {
             mkdir($logDirectory, 0777, true);
         }
 
-        file_put_contents($logPath, json_encode($this->log));
-        exec("bzip2 $logPath");
+        file_put_contents($logPath, json_encode($logEntry), FILE_APPEND | LOCK_EX);
+        if ($compress === true) {
+            exec("bzip2 $logPath");
+        }
+    }
+
+    public function log($level, $message, array $context = [])
+    {
+        $entry = [
+            'message' => $message,
+            'context' => $context,
+            'level' => $level
+        ];
+
+        $this->logEntries[] = $entry;
+        $this->writeLog($entry);
+    }
+
+    /**
+    *  Logger Interface Methods
+    */
+
+    /**
+    * @param string $message
+    * @param array $context
+    * @return null
+    */
+    public function emergency($message, array $context = array())
+    {
+        return $this->log(LogLevel::EMERGENCY, $message, $context);
+    }
+
+    public function alert($message, array $context = array())
+    {
+        return $this->log(LogLevel::ÅLERT, $message, $context);
+    }
+
+    public function critical($message, array $context = array())
+    {
+        return $this->log(LogLevel::CRITICAL, $message, $context);
+    }
+
+    public function error($message, array $context = array())
+    {
+        return $this->log(LogLevel::ERROR, $message, $context);
+    }
+
+    public function warning($message, array $context = array())
+    {
+        return $this->log(LogLevel::WARNING, $message, $context);
+    }
+
+    public function notice($message, array $context = array())
+    {
+        return $this->log(LogLevel::NOTICE, $message, $context);
+    }
+
+    public function info($message, array $context = array())
+    {
+        return $this->log(LogLevel::INFO, $message, $context);
+    }
+
+    public function debug($message, array $context = array())
+    {
+        return $this->log(LogLevel::DEBUG, $message, $context);
     }
 }
