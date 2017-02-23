@@ -14,17 +14,11 @@ class SyncResult
     protected $message = '';
     protected $context = [];
 
-    public function __construct($status, array $options = [])
+    public function __construct($status, $message, array $context = [])
     {
         $this->status = $status;
-
-        if (isset($options['message'])) {
-            $this->message = $options['message'];
-        }
-
-        if (isset($options['context'])) {
-            $this->context = $options['context'];
-        }
+        $this->message = $message;
+        $this->context = $context;
     }
 
     public function __toString()
