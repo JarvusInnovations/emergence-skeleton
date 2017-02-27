@@ -34,6 +34,14 @@ trait IdentityConsumerTrait
         return true;
     }
 
+    public static function getSAMLNameId(IPerson $Person)
+    {
+        return [
+            'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            'Value' => $Person->Username.'@'.SAML2::$issuer
+        ];
+    }
+
     public static function handleRequest($action = null)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
