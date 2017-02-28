@@ -648,6 +648,8 @@ class Source
             $treeOptions['gitPath'] = $treeOptions['path'] ?: $treeOptions['vfsPath'];
         }
 
+        $treeOptions['gitPath'] = ltrim($treeOptions['gitPath'], '/') ?: '.';
+
         unset($treeOptions['path']);
 
         if (is_string($treeOptions['exclude'])) {
