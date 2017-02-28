@@ -115,6 +115,16 @@ class Logger extends \Psr\Log\AbstractLogger
         return $lines;
     }
 
+    public static function interpolate($message, array $context = [])
+    {
+        $replace = [];
+        foreach ($context as $key => $value) {
+            $replace['{' . $key . '}'] = (string)$value;
+        }
+
+        return strtr($message, $replace);
+    }
+
     // permit log messages for the default logger instance to be called statically by prefixing them with general_
     public static function __callStatic($name, $arguments)
     {
