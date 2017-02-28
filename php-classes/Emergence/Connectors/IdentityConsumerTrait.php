@@ -36,6 +36,10 @@ trait IdentityConsumerTrait
 
     public static function getSAMLNameId(IPerson $Person)
     {
+        if (!$Person->Username) {
+            throw new \Exception('Person does not have a username');
+        }
+
         return [
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
             'Value' => $Person->Username.'@'.SAML2::$issuer
