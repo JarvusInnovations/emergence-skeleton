@@ -31,9 +31,14 @@ class SyncResult
         return $this->status;
     }
 
-    public function getMessage()
+    public function getMessage($interpolate = true)
     {
-        return static::interpolate($this->message, $this->context);
+        return $interpolate ? $this->getInterpolatedMessage() : $this->message;
+    }
+
+    public function getInterpolatedMessage()
+    {
+        return \Emergence\Logger::interpolate($this->message, $this->context);
     }
 
     public function getContext($key = null)
@@ -43,16 +48,6 @@ class SyncResult
         } else {
             return $this->context;
         }
-    }
-
-    public static function interpolate($message, array $context = [])
-    {
-        $replace = [];
-        foreach ($context as $key => $value) {
-            $replace['{' . $key . '}'] = (string)$value;
-        }
-
-        return strtr($message, $replace);
     }
 
 }

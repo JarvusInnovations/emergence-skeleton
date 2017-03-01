@@ -17,7 +17,12 @@ class SyncException extends \Exception
 
     public function getMessage($interpolate = true)
     {
-        return $interpolate ? static::interpolate($this->message, $this->context) : $this->message;
+        return $interpolate ? $this->getInterpolatedMessage() : $this->message;
+    }
+
+    public function getInterpolatedMessage()
+    {
+        return \Emergence\Logger::interpolate($this->message, $this->context);
     }
 
     public function getContext($key = null)
@@ -27,15 +32,5 @@ class SyncException extends \Exception
         }
 
         return $this->context;
-    }
-
-    public static function interpolate($message, array $context = [])
-    {
-        $replace = [];
-        foreach ($context as $key => $value) {
-            $replace['{' . $key . '}'] = (string)$value;
-        }
-
-        return strtr($message, $replace);
     }
 }
