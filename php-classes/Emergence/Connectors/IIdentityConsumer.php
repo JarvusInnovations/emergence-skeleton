@@ -15,4 +15,5 @@ interface IIdentityConsumer
 #    public static function userShouldAutoProvision(IPerson $Person);
     public static function beforeAuthenticate(IPerson $Person);
 #    public static function pushUser(IPerson $Person);
+    public static function getSAMLNameId(IPerson $Person);
 }
