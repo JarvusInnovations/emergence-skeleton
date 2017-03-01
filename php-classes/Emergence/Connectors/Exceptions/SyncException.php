@@ -15,9 +15,9 @@ class SyncException extends \Exception
         return parent::__construct($message);
     }
 
-    public function getMessage($interpolate = true)
+    public function getMessage()
     {
-        return $interpolate ? $this->getInterpolatedMessage() : $this->message;
+        return $this->message;
     }
 
     public function getInterpolatedMessage()
