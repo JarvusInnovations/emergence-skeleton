@@ -215,6 +215,5 @@ class Job extends ActiveRecord implements LoggerInterface
         ];
 
         $this->logEntries[] = $entry;
-        $this->writeLog($entry);
     }
 }
