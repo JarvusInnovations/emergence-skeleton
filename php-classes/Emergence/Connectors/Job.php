@@ -160,9 +160,11 @@ class Job extends ActiveRecord implements LoggerInterface
     {
         return $this->log(
             LogLevel::WARNING,
-            'Invalid '.get_class($Record).' record: '.$Record->getTitle(),
+            'Invalid {recordClass} record: {recordTitle}',
             [
-                'validationErrors' => $Record->validationErrors
+                'validationErrors' => $Record->validationErrors,
+                'recordClass' => get_class($Record),
+                'recordTitle' => $Record->getTitle()
             ]
         );
     }
@@ -171,9 +173,11 @@ class Job extends ActiveRecord implements LoggerInterface
     {
         return $this->log(
             LogLevel::ERROR,
-            'Exception:: '.get_class($e).': '.$e->getMessage(),
+            'Exception({exceptionClass}): {exceptionMessage}',
             [
-                'exception' => $e
+                'exception' => $e,
+                'exceptionClass' => get_class($e),
+                'exceptionMessage' => $e->getMessage()
             ]
         );
     }
