@@ -214,8 +214,14 @@ class MigrationsRequestHandler extends \RequestHandler
         return DB::oneValue('SELECT COLUMN_KEY FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
+    protected static function getColumnDefault($tableName, $columnName)
+    {
+        return DB::oneValue('SELECT COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
+    }
+
     protected static function getColumnIsNullable($tableName, $columnName)
     {
         return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
+
 }
