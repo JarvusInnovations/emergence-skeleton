@@ -63,12 +63,15 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 
         $summaryColumns = array_slice($nonEmptyColumns, 0, static::$logRowColumnCount, true);
 
-        return $Job->log(sprintf(
-            'Analyzing %s row #%03u: %s',
-            $noun,
-            $rowNumber,
-            http_build_query($summaryColumns).(count($nonEmptyColumns) > count($summaryColumns) ? '&...' : '')
-        ), LogLevel::DEBUG);
+        $Job->log(
+            LogLevel::DEBUG,
+            'Analyzing {noun} row #{rowNumber}: {rowSummary}',
+            [
+                'noun' => $noun,
+                'rowNumber' => $rowNumber,
+                'rowSummary' => http_build_query($summaryColumns).(count($nonEmptyColumns) > count($summaryColumns) ? '&...' : '')
+            ]
+        );
     }
 
     protected static function _validateRecord(Job $Job, ActiveRecord $Record, array &$results)
