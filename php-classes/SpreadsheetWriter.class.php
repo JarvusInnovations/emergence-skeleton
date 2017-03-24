@@ -37,8 +37,8 @@ class SpreadsheetWriter
 
     public function writeRows($rows)
     {
-        foreach ($rows AS $row) {
-            $this->writeRow($row);
+        for ($i = 0; $i < count($rows); $i++) {
+            $this->writeRow($rows[$i]);
         }
     }
 
