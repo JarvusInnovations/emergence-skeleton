@@ -146,7 +146,7 @@ class Job extends ActiveRecord implements LoggerInterface
 
         $logEntry['message'] = call_user_func($messageRenderer, $logEntry);
 
-        return $this->log(
+        $this->log(
             $logEntry['level'],
             $logEntry['message'],
             [
@@ -154,6 +154,8 @@ class Job extends ActiveRecord implements LoggerInterface
                 'record' => $Record
             ]
         );
+
+        return $logEntry;
     }
 
     public function logInvalidRecord(\ActiveRecord $Record)
@@ -215,5 +217,7 @@ class Job extends ActiveRecord implements LoggerInterface
         ];
 
         $this->logEntries[] = $entry;
+
+        return $entry;
     }
 }
