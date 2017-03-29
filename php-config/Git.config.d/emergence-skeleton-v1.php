@@ -21,4 +21,22 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
             'site-tasks'
         ]
     ];
+
+    Git::$repositories['symfony-yaml'] = [
+        'remote' => 'https://github.com/symfony/Yaml.git'
+        ,'originBranch' => 'master'
+        ,'workingBranch' => 'master'
+        ,'trees' => [
+            'php-classes/Symfony/Component/Yaml' => [
+                'path' => '.'
+                ,'exclude' => [
+                    '#\\.gitignore$#'
+                    ,'#^/Tests#'
+                    ,'#\\.md$#'
+                    ,'#composer\\.json#'
+                    ,'#phpunit\\.xml\\.dist#'
+                ]
+            ]
+        ]
+    ];
 }
