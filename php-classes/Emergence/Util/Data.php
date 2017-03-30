@@ -89,7 +89,7 @@ class Data
             throw new Exception('Could not determine extension for node with unhandled MIME type');
         } elseif ($extension == 'json') {
             $parser = 'json';
-        } elseif ($extension == 'yml') {
+        } elseif ($extension == 'yml' || $extension == 'yaml') {
             $parser = 'yaml';
         } else {
             throw new Exception('Unable to parse node, format unhandlable');
