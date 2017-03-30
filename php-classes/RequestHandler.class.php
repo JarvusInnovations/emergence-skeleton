@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\Yaml\Yaml;
+
+
 abstract class RequestHandler
 {
     // configurables
@@ -80,6 +83,9 @@ abstract class RequestHandler
             case 'json':
                 return static::respondJson($responseID, $responseData);
 
+            case 'yaml':
+                return static::respondYaml($responseID, $responseData);
+
             case 'csv':
                 return static::respondCsv($responseID, $responseData);
 
@@ -106,6 +112,15 @@ abstract class RequestHandler
     public static function respondJson($responseID, $responseData = array())
     {
         return JSON::translateAndRespond($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
+    }
+
+    public static function respondYaml($responseID, $responseData = array())
+    {
+        header('Content-type: application/x-yaml; charset=utf-8');
+
+        $responseData = JSON::translateObjects($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
+        print(Yaml::dump($responseData, 10, 2, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE));
+        exit();
     }
 
     public static function respondCsv($responseID, $responseData = array())
