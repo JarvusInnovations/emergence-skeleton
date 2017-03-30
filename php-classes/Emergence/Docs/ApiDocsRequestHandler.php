@@ -16,12 +16,19 @@ class ApiDocsRequestHandler extends \RequestHandler
 
     public static function handleRequest()
     {
+        $schemes = ['http'];
+
+        if (Site::getConfig('ssl')) {
+            array_unshift($schemes, 'https');
+        }
+
         $openApiData = DataUtil::mergeFileTree('api-docs', [
-            'host' => Site::getConfig('primary_hostname')
+            'host' => Site::getConfig('primary_hostname'),
+            'schemes' => $schemes
         ]);
 
         $openApiData = OpenAPIWriter::sort($openApiData);
 
-        return static::respond('docs', $openApiData);
+        return static::respond('openAPI', $openApiData);
     }
 }
