@@ -6,6 +6,7 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
         'originBranch' => 'master',
         'workingBranch' => 'master',
         'trees' => [
+            'api-docs',
             'dwoo-plugins',
             'event-handlers',
             'ext-library',
