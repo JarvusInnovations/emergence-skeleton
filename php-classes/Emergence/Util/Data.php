@@ -116,7 +116,7 @@ class Data
 
         $data = $base;
         foreach ($docsTree AS $path => $node) {
-            $pathStack = array_slice($node->getFullPath(), 1);
+            $pathStack = array_slice($node->getFullPath(null, false), 1);
             $dataRoot = &$data;
 
             if ($pathStack[0] == 'paths') {
