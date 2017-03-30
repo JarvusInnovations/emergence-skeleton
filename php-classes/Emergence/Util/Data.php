@@ -2,6 +2,12 @@
 
 namespace Emergence\Util;
 
+use Exception;
+use SiteFile;
+use Emergence_FS;
+use Symfony\Component\Yaml\Yaml;
+
+
 /**
  * TODO: use this in Sencha_App
  */
@@ -71,5 +77,69 @@ class Data
         }
 
         return $output;
+    }
+
+    public static function readNode(SiteFile $source)
+    {
+        if ($source->Type == 'application/json') {
+            $parser = 'json';
+        } elseif ($source->Type == 'application/x-yaml') {
+            $parser = 'yaml';
+        } elseif (!$extension = pathinfo($source->Handle, PATHINFO_EXTENSION)) {
+            throw new Exception('Could not determine extension for node with unhandled MIME type');
+        } elseif ($extension == 'json') {
+            $parser = 'json';
+        } elseif ($extension == 'yml') {
+            $parser = 'yaml';
+        } else {
+            throw new Exception('Unable to parse node, format unhandlable');
+        }
+
+        $contents = file_get_contents($source->RealPath);
+
+        if ($parser == 'yaml') {
+            return Yaml::parse($contents);
+        }
+
+        return json_decode($contents, true);
+    }
+
+    public static function parse($string)
+    {
+        return Yaml::parse($string);
+    }
+
+    public static function mergeFileTree($root, array $base = [])
+    {
+        $docsTree = Emergence_FS::findFiles('\.(yml|json)$', true, $root);
+
+        $data = $base;
+        foreach ($docsTree AS $path => $node) {
+            $pathStack = array_slice($node->getFullPath(), 1);
+            $dataRoot = &$data;
+
+            if ($pathStack[0] == 'paths') {
+                $pathStackLast = array_pop($pathStack);
+
+                if ($pathStackLast[0] != '_') {
+                    $pathStack[] = pathinfo($pathStackLast, PATHINFO_FILENAME);
+                }
+
+                $dataRoot = &$dataRoot[array_shift($pathStack)]['/'.implode('/', $pathStack)];
+            } else {
+                while (count($pathStack) > 1) {
+                    $dataRoot = &$dataRoot[array_shift($pathStack)];
+                }
+
+                if ($pathStack[0][0] != '_') {
+                    $dataRoot = &$dataRoot[pathinfo($pathStack[0], PATHINFO_FILENAME)];
+                }
+            }
+
+            $nodeData = static::readNode($node);
+            $dataRoot = $dataRoot ? array_replace_recursive($dataRoot, $nodeData) : $nodeData;
+        }
+
+        return $data;
     }
 }

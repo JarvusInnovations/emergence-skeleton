@@ -2,26 +2,11 @@
 
 namespace Emergence\OpenAPI;
 
-use SiteFile;
-use Symfony\Component\Yaml\Yaml;
+use Exception;
 
 
 class Reader
 {
-    public static function read($source)
-    {
-        if ($source instanceof SiteFile) {
-            $source = $source->RealPath;
-        }
-
-        return static::parse(file_get_contents($source));
-    }
-
-    public static function parse($string)
-    {
-        return Yaml::parse($string);
-    }
-
     public static function dereferenceNode(array $node, array $document)
     {
         if (empty($node['$ref'])) {
