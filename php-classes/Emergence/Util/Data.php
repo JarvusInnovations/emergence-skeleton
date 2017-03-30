@@ -111,7 +111,7 @@ class Data
 
     public static function mergeFileTree($root, array $base = [])
     {
-        $docsTree = Emergence_FS::findFiles('\.(yml|json)$', true, $root);
+        $docsTree = Emergence_FS::findFiles('\.(ya?ml|json)$', true, $root);
 
         $data = $base;
         foreach ($docsTree AS $path => $node) {
