@@ -3,12 +3,15 @@
 namespace Emergence\OpenAPI;
 
 use Exception;
+use ActiveRecord;
+use VersionedRecord;
 use Emergence\Util\Data AS DataUtil;
 
 
 class Reader
 {
     public static $pathObjectProperties = [
+        'x-recordsRequestHandler',
         'get',
         'put',
         'post',
@@ -20,6 +23,7 @@ class Reader
     ];
 
     public static $schemaObjectProperties = [
+        'x-activeRecord',
         '$ref',
         'properties',
         'description',
@@ -31,6 +35,8 @@ class Reader
     {
         $data = DataUtil::mergeFileTree($root, $base);
 
+
+        // collapse and normalize paths
         $data['paths'] = static::findObjects(
             $data['paths'],
             [__CLASS__, 'isPathObject'],
@@ -39,6 +45,10 @@ class Reader
             }
         );
 
+        $data['paths'] = array_map([__CLASS__, 'normalizePathObject'], $data['paths']);
+
+
+        // collapse and normalize definitions
         $data['definitions'] = static::findObjects(
             $data['definitions'],
             [__CLASS__, 'isSchemaObject'],
@@ -46,6 +56,9 @@ class Reader
                 return implode('\\', $keys);
             }
         );
+
+        $data['definitions'] = array_map([__CLASS__, 'normalizeSchemaObject'], $data['definitions']);
+
 
         return $data;
     }
@@ -71,7 +84,7 @@ class Reader
         return $results;
     }
 
-    public static function isPathObject(array $object)
+    protected static function isPathObject(array $object)
     {
         foreach (static::$pathObjectProperties AS $key) {
             if (array_key_exists($key, $object)) {
@@ -82,7 +95,7 @@ class Reader
         return false;
     }
 
-    public static function isSchemaObject(array $object)
+    protected static function isSchemaObject(array $object)
     {
         foreach (static::$schemaObjectProperties AS $key) {
             if (array_key_exists($key, $object)) {
@@ -91,6 +104,124 @@ class Reader
         }
 
         return false;
+    }
+
+    protected static function normalizePathObject(array $object)
+    {
+        // TODO: generate path and sub-path spec if x-recordsRequestHandler is set
+        return $object;
+    }
+
+    protected static function normalizeSchemaObject(array $object)
+    {
+        if (!empty($object['x-activeRecord'])) {
+            if (!class_exists($object['x-activeRecord']) || !is_a($object['x-activeRecord'], ActiveRecord::class, true)) {
+                throw new Exception('x-activeRecord value does not match an available ActiveRecord class: ' . $object['x-activeRecord']);
+            }
+
+            $required = [];
+
+            foreach ($object['x-activeRecord']::aggregateStackedConfig('fields') AS $fieldName => $fieldConfig) {
+                if ($fieldName == 'RevisionID' && is_a($object['x-activeRecord'], VersionedRecord::class, true)) {
+                    continue;
+                }
+
+                if ($fieldConfig['notnull'] && !isset($fieldConfig['default']) && !$fieldConfig['autoincrement']) {
+                    $required[] = $fieldName;
+                }
+
+                $propertyDefaults = [
+                    'title' => $fieldConfig['label']
+                ];
+
+                if (!empty($fieldConfig['description'])) {
+                    $propertyDefaults['description'] = $fieldConfig['description'];
+                }
+
+                if (isset($fieldConfig['default'])) {
+                    $propertyDefaults['default'] = $fieldConfig['default'];
+                }
+
+                switch ($fieldConfig['type']) {
+                    case 'int':
+                    case 'uint':
+                    case 'integer':
+                    case 'tinyint':
+                    case 'smallint':
+                    case 'mediumint':
+                    case 'year':
+                        $propertyDefaults['type'] = 'number';
+                        break;
+
+                    case 'bigint':
+                        $propertyDefaults['type'] = 'number';
+                        $propertyDefaults['format'] = 'int64';
+                        break;
+
+                    case 'float':
+                    case 'decimal':
+                        $propertyDefaults['type'] = 'number';
+                        $propertyDefaults['format'] = 'float';
+                        break;
+
+                    case 'double':
+                        $propertyDefaults['type'] = 'number';
+                        $propertyDefaults['format'] = 'double';
+                        break;
+
+                    case 'enum':
+                        $propertyDefaults['enum'] = $fieldConfig['values'];
+                        // fall through to string type
+                    case 'set':
+                    case 'string':
+                    case 'clob':
+                    case 'serialized':
+                    case 'json':
+                    case 'list':
+                        $propertyDefaults['type'] = 'string';
+                        break;
+
+                    case 'password':
+                        $propertyDefaults['type'] = 'string';
+                        $propertyDefaults['format'] = 'password';
+                        break;
+
+                    case 'blob':
+                        $propertyDefaults['type'] = 'string';
+                        $propertyDefaults['format'] = 'binary';
+                        break;
+
+                    case 'boolean':
+                        $propertyDefaults['type'] = 'boolean';
+                        break;
+
+                    case 'timestamp':
+                        $propertyDefaults['type'] = 'string';
+                        $propertyDefaults['format'] = 'date-time';
+
+                        if ($propertyDefaults['default'] == 'CURRENT_TIMESTAMP') {
+                            unset($propertyDefaults['default']);
+
+                            $description = 'Defaults to current timestamp.';
+                            $propertyDefaults['description'] = !empty($propertyDefaults['description']) ? $propertyDefaults['description'] . "\n\n" . $description : $description;
+                        }
+                        break;
+
+                    case 'date':
+                        $propertyDefaults['type'] = 'string';
+                        $propertyDefaults['format'] = 'date';
+                        break;
+                }
+
+                $object['properties'][$fieldName] = isset($object['properties'][$fieldName]) ? array_merge($propertyDefaults, $object['properties'][$fieldName]) : $propertyDefaults;
+            }
+
+            if (count($required)) {
+                $object['required'] = isset($object['required']) ? array_unique(array_merge($object['required'], $required)) : $required;
+            }
+        }
+
+        return $object;
     }
 
     public static function dereferenceNode(array $node, array $document)
