@@ -3,10 +3,96 @@
 namespace Emergence\OpenAPI;
 
 use Exception;
+use Emergence\Util\Data AS DataUtil;
 
 
 class Reader
 {
+    public static $pathObjectProperties = [
+        'get',
+        'put',
+        'post',
+        'delete',
+        'options',
+        'head',
+        'patch',
+        'parameters'
+    ];
+
+    public static $schemaObjectProperties = [
+        '$ref',
+        'properties',
+        'description',
+        'type'
+    ];
+
+
+    public static function readTree(array $base = [], $root = 'api-docs')
+    {
+        $data = DataUtil::mergeFileTree($root, $base);
+
+        $data['paths'] = static::findObjects(
+            $data['paths'],
+            [__CLASS__, 'isPathObject'],
+            function (array $keys) {
+                return '/' . implode('/', $keys);
+            }
+        );
+
+        $data['definitions'] = static::findObjects(
+            $data['definitions'],
+            [__CLASS__, 'isSchemaObject'],
+            function (array $keys) {
+                return implode('\\', $keys);
+            }
+        );
+
+        return $data;
+    }
+
+    protected static function findObjects(array $array, $sniffer, $keyMaker, array $previousKeys = [])
+    {
+        $results = [];
+
+        foreach ($array AS $key => $value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
+            $keys = array_merge($previousKeys, [$key]);
+
+            if (call_user_func($sniffer, $value)) {
+                $results[call_user_func($keyMaker, $keys)] = $value;
+            } else {
+                $results = array_merge($results, static::findObjects($value, $sniffer, $keyMaker, $keys));
+            }
+        }
+
+        return $results;
+    }
+
+    public static function isPathObject(array $object)
+    {
+        foreach (static::$pathObjectProperties AS $key) {
+            if (array_key_exists($key, $object)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function isSchemaObject(array $object)
+    {
+        foreach (static::$schemaObjectProperties AS $key) {
+            if (array_key_exists($key, $object)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function dereferenceNode(array $node, array $document)
     {
         if (empty($node['$ref'])) {

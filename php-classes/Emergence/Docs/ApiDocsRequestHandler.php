@@ -3,8 +3,8 @@
 namespace Emergence\Docs;
 
 use Site;
+use Emergence\OpenAPI\Reader AS OpenAPIReader;
 use Emergence\OpenAPI\Writer AS OpenAPIWriter;
-use Emergence\Util\Data AS DataUtil;
 
 
 class ApiDocsRequestHandler extends \RequestHandler
@@ -22,7 +22,7 @@ class ApiDocsRequestHandler extends \RequestHandler
             array_unshift($schemes, 'https');
         }
 
-        $openApiData = DataUtil::mergeFileTree('api-docs', [
+        $openApiData = OpenAPIReader::readTree([
             'host' => Site::getConfig('primary_hostname'),
             'schemes' => $schemes
         ]);

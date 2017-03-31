@@ -119,22 +119,12 @@ class Data
             $pathStack = array_slice($node->getFullPath(null, false), 1);
             $dataRoot = &$data;
 
-            if ($pathStack[0] == 'paths') {
-                $pathStackLast = array_pop($pathStack);
+            while (count($pathStack) > 1) {
+                $dataRoot = &$dataRoot[array_shift($pathStack)];
+            }
 
-                if ($pathStackLast[0] != '_') {
-                    $pathStack[] = pathinfo($pathStackLast, PATHINFO_FILENAME);
-                }
-
-                $dataRoot = &$dataRoot[array_shift($pathStack)]['/'.implode('/', $pathStack)];
-            } else {
-                while (count($pathStack) > 1) {
-                    $dataRoot = &$dataRoot[array_shift($pathStack)];
-                }
-
-                if ($pathStack[0][0] != '_') {
-                    $dataRoot = &$dataRoot[pathinfo($pathStack[0], PATHINFO_FILENAME)];
-                }
+            if ($pathStack[0][0] != '_') {
+                $dataRoot = &$dataRoot[pathinfo($pathStack[0], PATHINFO_FILENAME)];
             }
 
             $nodeData = static::readNode($node);
