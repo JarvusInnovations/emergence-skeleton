@@ -70,7 +70,7 @@
 {template loginField}{field name=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
 {template passwordField}{field name=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
 
-template date inputName label='' error='' hint='' required=false autofocus=false attribs='' default=null class=null fieldClass=null max=null min=null}
+{template date inputName label='' error='' hint='' required=false autofocus=false attribs='' default=null class=null fieldClass=null max=null min=null}
     {capture assign=html}
         <input type="date"
             class="field-control date-field {$class}"
