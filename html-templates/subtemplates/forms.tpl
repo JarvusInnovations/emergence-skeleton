@@ -69,3 +69,35 @@
 
 {template loginField}{field name=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
 {template passwordField}{field name=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
+
+template date inputName label='' error='' hint='' required=false autofocus=false attribs='' default=null class=null fieldClass=null max=null min=null}
+    {capture assign=html}
+        <input type="date"
+            class="field-control date-field {$class}"
+            name="{$inputName|escape}"
+            {if $autofocus}autofocus{/if}
+            {if $required}required aria-required="true"{/if}
+            {if $max}max="{$max|escape}"{/if}
+            {if $min}min="{$min|escape}"{/if}
+            {$attribs}
+            value="{refill field=$inputName default=$default}">
+    {/capture}
+
+    {labeledField html=$html type=$type label=$label error=$error hint=$hint required=$required class=$fieldClass}
+{/template}
+
+{template fileUpload inputName label='' error='' hint='' required=false autofocus=false attribs='' default=null defaultID=null class=null fieldClass=null height=null width=null previewLink=false previewImage=false}
+    {capture assign=html}
+        {if $default}
+            <input type="hidden" name="{$inputName}ID" value="{$defaultID}">
+            {if $previewImage}
+                <img src="{$default->getThumbnailRequest($width, $height)}">
+            {elseif $previewLink}
+                <a href="{$default->getURL()}">{$default->Caption}.{$default->Extension}</a>
+            {/if}
+        {/if}
+        <input class="field-control file-upload {$class}" type="file" name="{$inputName}">
+    {/capture}
+    
+    {labeledField html=$html type=$type label=$label error=$error hint=$hint required=$required class=$fieldClass}
+{/template}}
