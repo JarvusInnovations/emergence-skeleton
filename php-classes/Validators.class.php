@@ -56,10 +56,15 @@ class Validators
             && (($options['max'] === false) || ($number <= $options['max']));
     }
 
-    public static function email($email)
+    public static function email($email, $options = [])
     {
+        $options = array_merge([
+            'domain' => null
+        ], $options);
+
         return !empty($email)
-            && preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/', $email);
+            && preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/', $email)
+            && (empty($options['domain']) || preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@'.$options['domain'].'$/', $email));
     }
 
     public static function URL($url, $options = array())
