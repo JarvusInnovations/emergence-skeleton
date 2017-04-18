@@ -2,6 +2,11 @@
 
 {block "title"}{$info.title|escape} &mdash; {$dwoo.parent}{/block}
 
+{block "branding"}{/block}
+{block "header-bottom"}{/block}
+{block "footer-top"}{/block}
+{block "footer"}{/block}
+
 {block "content"}
     <?php
         // we need to keep a reference to the top-level document for resolving JSONSchema refs
@@ -56,6 +61,7 @@
     <div class="split-view">
         <div class="nav-view">
             <ul class="docs-toc">
+                <li><a href="/">&larr; {Site::getConfig(label)}</a></li>
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#keys">API Keys</a></li>
                 {if count($paths)}
@@ -93,7 +99,11 @@
             <header class="page-header" id="overview">
                 <h2 class="header-title"><a href="#overview">{$info.title|escape}</a></h2>
                 <div class="header-buttons">
-                    Download OpenAPI specification: <a class="button" href="?format=json">JSON</a> <a class="button" href="?format=yaml">YAML</a>
+                    <span class="button-group">
+                        <label class="muted">Download OpenAPI specification:&nbsp;</label>
+                        <a class="button small" href="?format=json">JSON</a>
+                        <a class="button small" href="?format=yaml">YAML</a>
+                    </span>
                 </div>
             </header>
 
