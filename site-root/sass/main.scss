@@ -5,5 +5,6 @@
 
 @import 'skeleton/common';          // set styles for common elements such as layout, typography, etc.
 
+@import 'site/common';              // for site-specific overrides or additions that are common across your site
 @import 'site/modules';             // put your site-specific style rules and overrides (other than variables) in here
                                     // variables should go in 'site/variables' above
