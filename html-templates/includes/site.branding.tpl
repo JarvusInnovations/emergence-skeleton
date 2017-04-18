@@ -1,4 +1,4 @@
-<div class="site-branding title-jumbo">
+<div class="site-branding">
     <a href="/">
         {if Site::resolvePath('site-root/img/logo.png')}
             <img class="site-logo" src="{versioned_url 'img/logo.png'}" height=80 alt="">

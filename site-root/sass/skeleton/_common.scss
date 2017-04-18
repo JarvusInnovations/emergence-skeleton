@@ -8,7 +8,7 @@ body {
     background: $page-bg-color;
     @include box-shadow(0 0 1.5em black);
     color: $text-color;
-    font: normal normal 300 #{$font-size}/#{$line-height} $body-font;
+    font: normal normal #{$font-weight} #{$font-size}/#{$line-height} $body-font;
     text-rendering: optimizeLegibility;
 }
 
@@ -123,8 +123,22 @@ body {
     }
 }
 
-.site-branding {
+.split-view {
+    @include display-flex;
 
+    > .nav-view {
+        background-color: lighten($page-bg-color, 10);
+        padding: 1.5em 0;
+        width: 320px;
+    }
+
+    > .detail-view {
+        @include flex(1);
+        padding: 1.5em 3em;
+    }
+}
+
+.site-branding {
     a {
         @include link-colors(inherit);
         text-decoration: none;
@@ -136,6 +150,7 @@ body {
 
     .text {
         display: inline-block;
+        margin: 0 0 1em;
     }
 
     .site-logo + .text {
@@ -145,13 +160,12 @@ body {
     @media #{$mq-phone} {
         float: left;
         font-size: 1em;
-        font-weight: lighter;
         line-height: inherit;
         margin: 2.5em 0 0;
     }
 
     &.has-slogan {
-    	font-size: 1em;
+        font-size: 1em;
 
     	.text {
         	vertical-align: -1em;
@@ -274,6 +288,12 @@ body {
         height: 1.5em;
         padding: .25em .75em;
         vertical-align: top;
+    }
+
+    .user-link {
+        img {
+            vertical-align: -.25em;
+        }
     }
 }
 

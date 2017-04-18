@@ -110,8 +110,7 @@ h3.header-title,
     font-family: $heading-font;
     font-weight: 300;
     line-height: 1;
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
+    margin: 1em 0;
 
     img {
         margin: 0;
@@ -119,12 +118,13 @@ h3.header-title,
 }
 
 .title-jumbo {
-    font-size: 3em;
+    font-size: 2em;
     margin-bottom: 0.50em;
+    margin-top: -.5em;
 
     @media #{$mq-phone} {
-        font-size: 2em;
-        margin-bottom: .75em;
+        font-size: 1em;
+        margin: 2em 0 .75em;
     }
 }
 
@@ -192,7 +192,7 @@ h6,
 }
 
 p {
-    margin: 0 0 1.5em;
+    margin: 0 0 $em-spacer;
 
     a {
         text-decoration: underline;
@@ -213,13 +213,13 @@ p {
 
 blockquote {
     border-left: 1px solid rgba($text-color, .2);
-    margin: 1em;
+    margin: 1em 0;
     padding: 0 1em;
 }
 
 ol {
     list-style: decimal;
-    margin: 1em 0;
+    margin: $em-spacer 0;
     padding-left: 1.125em;
     
     &.plain,
@@ -234,6 +234,45 @@ ol {
 ul {
     @extend ol;
     list-style: square;
+}
+
+// dl {}
+
+.dli {
+    margin: $em-spacer 0;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+    margin: 0;
+}
+
+dl.align-right {
+    @media #{$mq-tablet} {
+        display: table;
+        
+        .dli {
+            display: table-row;
+        }
+        
+        dt, dd {
+            display: table-cell;
+            padding: ($em-spacer/2) 0;
+        }
+        
+        dt {
+            padding-right: ($em-spacer/2);
+            text-align: right;
+            white-space: nowrap;
+            
+            &.wrap {
+                white-space: normal;
+            }
+        }
+    }
 }
 
 .lead {
@@ -279,7 +318,7 @@ a {
 }
 
 .well {
-    background: #f8f8f8;
+    background: rgba(mix($text-color, $page-bg-color), .08);
     border: none;
     border-radius: 3px;
     box-shadow: 0 .125em .375em rgba(black, .2);

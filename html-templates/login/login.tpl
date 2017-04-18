@@ -37,7 +37,7 @@
             {passwordField}
             
             <div class="submit-area">
-                <input type="submit" value="Log In">
+                <button type="submit">Log In</button>
                 {if RegistrationRequestHandler::$enableRegistration}
                     <span class="submit-text">or <a href="/register{tif $.request.return || $.server.SCRIPT_NAME != '/login' ? cat('?return=', escape(default($.request.return, $.server.REQUEST_URI), url))}">Register</a></span>
                 {/if}

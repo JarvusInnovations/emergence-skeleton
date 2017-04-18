@@ -2,7 +2,7 @@
 $contrasted-lightness-threshold: 60%;
 
 // default button colors
-$button-color:      mix($page-bg-color, $text-color) !default;
+$button-color:      #cfe5ed !default;
 $destructive-color: $danger-color !default;
 $submit-color:      $link-color !default;
 
@@ -117,4 +117,37 @@ input[type="submit"] {
 
 ::-webkit-file-upload-button {
     @include emergence-button;
+}
+
+.button-group {
+    display: inline-block;
+    margin-top: .5em;
+
+    > label {
+        float: left;
+        margin-right: .5em;
+    }
+
+    > .button {
+        border-left: 1px solid rgba(black, .1);
+        border-radius: 0;
+        float: left;
+        margin: 0 !important;
+
+        &:first-of-type {
+            border-bottom-left-radius: 5px;
+            border-left: 0;
+            border-top-left-radius: 5px;
+        }
+
+
+        &:last-of-type {
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+    }
+
+    + .button-group {
+        margin-left: .5em;
+    }
 }

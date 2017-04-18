@@ -17,7 +17,7 @@
 		<fieldset class="shrink">
 		    {field inputName='username' label='Email or Username' required=true attribs='autofocus'}
             <div class="submit-area">
-                <input type="submit" class="button submit" value="Reset Password">
+                <button type="submit" class="submit">Reset Password</button>
             </div>
 		</fieldset>
 	</form>

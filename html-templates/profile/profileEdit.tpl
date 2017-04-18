@@ -37,7 +37,7 @@
                             {field inputName="Username" label="Username" default=$User->Username}
 
                             {capture assign=accountLevelHtml}
-                                <select name="AccountLevel">
+                                <select class="field-control" name="AccountLevel">
                                     {foreach item=level from=Emergence\People\User::getFieldOptions(AccountLevel, values)}
                                         <option {refill field=AccountLevel default=$User->AccountLevel selected=$level}>{$level}</option>
                                     {/foreach}
@@ -46,7 +46,7 @@
                             {labeledField html=$accountLevelHtml type=select label='Account Level'}
 
                             {capture assign=classHtml}
-                                <select name="Class">
+                                <select class="field-control" name="Class">
                                     {foreach item=class from=Emergence\People\User::getFieldOptions(Class, values)}
                                         <option {refill field=Class default=$User->Class selected=$class}>{$class}</option>
                                     {/foreach}
@@ -55,43 +55,43 @@
                             {labeledField html=$classHtml type=select label='Person subclass'}
 
                             <div class="submit-area">
-                                <input type="submit" class="submit" value="Save Profile">
+                                <button type="submit" class="submit">Save Profile</button>
                             </div>
                         </fieldset>
                     {/if}
 
                     <fieldset class="stretch">
-                        <h2 class="legend title-2">Profile Details</h2>
+                        <h2 class="legend title-3">Profile Details</h2>
 
                         {field inputName="Location" label="Location" default=$User->Location}
                         {textarea inputName="About" label="About Me" default=$User->About hint="Use <a href='http://daringfireball.net/projects/markdown'>Markdown</a> to give your text some style"}
 
                         <div class="submit-area">
-                            <input type="submit" class="submit" value="Save Profile">
+                            <button type="submit" class="submit">Save Profile</button>
                         </div>
                     </fieldset>
 
                     <fieldset class="stretch">
-                        <h2 class="legend title-2">Contact Information</h2>
+                        <h2 class="legend title-3">Contact Information</h2>
 
                         {field inputName="Email" label="Email" type="email" default=$User->Email}
                         {field inputName="Phone" label="Phone" type="tel"   default=$User->Phone}
 
                         <div class="submit-area">
-                            <input type="submit" class="submit" value="Save Profile">
+                            <button type="submit" class="submit">Save Profile</button>
                         </div>
                     </fieldset>
                 </form>
 
                 <form action="/profile/password?{refill_query}" method="POST">
                     <fieldset class="stretch">
-                        <h2 class="legend title-2">Change Password</h2>
+                        <h2 class="legend title-3">Change Password</h2>
                         {field inputName="OldPassword" label="Old Password" type="password"}
                         {field inputName="Password" label="New Password" type="password"}
                         {field inputName="PasswordConfirm" label="New Password (Confirm)" type="password"}
 
                         <div class="submit-area">
-                            <input type="submit" class="submit" value="Change Password">
+                            <button type="submit" class="submit">Change Password</button>
                         </div>
                     </fieldset>
                 </form>
@@ -106,7 +106,7 @@
 
                 <form class="profile-photo-form" action="/profile/uploadPhoto?{refill_query}" method="POST" enctype="multipart/form-data">
                     <fieldset class="stretch">
-                        <h2 class="title-2">Profile Photo</h2>
+                        <h2 class="title-3">Profile Photo</h2>
 
                         <div class="current-photo">
                             {avatar $User size=200}
@@ -140,7 +140,7 @@
 
                         <div class="photo-upload field">
                             <input class="field-control" type="file" name="photoFile" id="photoFile">
-                            <input class="field-control submit" type="submit" value="Upload New Photo">
+                            <button type="submit" class="submit">Upload New Photo</button>
                         </div>
                     </fieldset>
                 </form>
