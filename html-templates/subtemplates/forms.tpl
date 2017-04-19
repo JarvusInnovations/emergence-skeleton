@@ -21,51 +21,51 @@
     </label>
 {/template}
 
-{template field name label='' error='' type=text placeholder='' hint='' required=false autofocus=false attribs='' default=null class=null fieldClass=null}
+{template field inputName label='' error='' type=text placeholder='' hint='' required=false autofocus=false attribs='' default=null class=null fieldClass=null}
     {capture assign=html}
         <input type="{$type}"
             class="field-control {$class}"
-            name="{$name|escape}"
+            name="{$inputName|escape}"
             {if $placeholder}placeholder="{$placeholder|escape}"{/if}
             {if $autofocus}autofocus{/if}
             {if $required}required aria-required="true"{/if}
             {$attribs}
-            value="{refill field=$name default=$default}">
+            value="{refill field=$inputName default=$default}">
     {/capture}
 
     {labeledField html=$html type=$type label=$label error=$error hint=$hint required=$required class=$fieldClass}
 {/template}
 
-{template checkbox name value label='' error='' hint='' attribs='' default=null class=null unsetValue=null}
+{template checkbox inputName value label='' error='' hint='' attribs='' default=null class=null unsetValue=null}
     {capture assign=html}
         <input type="checkbox"
             class="field-control {$class}"
-            name="{$name|escape}"
+            name="{$inputName|escape}"
             value="{$value|escape}"
             {$attribs}
-            {refill field=$name default=$default checked=$value}>
+            {refill field=$inputName default=$default checked=$value}>
     {/capture}
 
     {if $unsetValue !== null}
-        <input type="hidden" name="{$name|escape}" value="{$unsetValue|escape}">
+        <input type="hidden" name="{$inputName|escape}" value="{$unsetValue|escape}">
     {/if}
 
     {labeledField html=$html type=checkbox label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template textarea name label='' error='' placeholder='' hint='' required=false attribs='' default=null}
+{template textarea inputName label='' error='' placeholder='' hint='' required=false attribs='' default=null}
     {capture assign=html}
         <textarea
             class="field-control"
-            name="{$name|escape}"
+            name="{$inputName|escape}"
             {if $placeholder}placeholder="{$placeholder|escape}"{/if}
             {if $required}required aria-required="true"{/if}
             {$attribs}
-        >{refill field=$name default=$default}</textarea>
+        >{refill field=$inputName default=$default}</textarea>
     {/capture}
 
     {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template loginField}{field name=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
-{template passwordField}{field name=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
+{template loginField}{field inputName=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
+{template passwordField}{field inputName=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
