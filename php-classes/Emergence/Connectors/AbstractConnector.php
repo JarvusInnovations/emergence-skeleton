@@ -3,6 +3,9 @@
 namespace Emergence\Connectors;
 
 use Emergence\EventBus;
+use Emergence\Logger;
+
+use Psr\Log\LoggerInterface;
 
 
 abstract class AbstractConnector extends \RequestHandler implements IConnector
@@ -215,5 +218,10 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
     protected static function _fireEvent($name, array $payload)
     {
         return EventBus::fireEvent($name, __NAMESPACE__ . '\\' . static::getConnectorId(), $payload);
+    }
+
+    protected static function getLogger(LoggerInterface $logger = null)
+    {
+        return $logger ?: Logger::getLogger();
     }
 }
