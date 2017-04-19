@@ -48,7 +48,7 @@ trait IdentityConsumerTrait
 
     public static function handleRequest($action = null)
     {
-        switch ($action ? $action : $action = static::shiftPath()) {
+        switch ($action ?: $action = static::shiftPath()) {
             case 'login':
                 $GLOBALS['Session']->requireAuthentication();
 
