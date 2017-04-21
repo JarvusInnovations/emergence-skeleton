@@ -6,7 +6,6 @@ if (Site::getConfig('handle') == 'skeleton-v2') {
         'originBranch' => 'master',
         'workingBranch' => 'master',
         'trees' => [
-            'event-handlers',
             'html-templates',
             'php-classes',
             'php-config',
