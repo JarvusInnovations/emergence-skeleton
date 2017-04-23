@@ -44,7 +44,8 @@ class PHPMailer extends AbstractMailer
 
         $headers .= 'MIME-Version: 1.0'.PHP_EOL;
         $headers .= 'Content-Type: text/html; charset=utf-8'.PHP_EOL;
+        $headers .= 'Content-Transfer-Encoding: base64'.PHP_EOL;
 
-        return @mail($to, $subject, $body, $headers, $sendmailParams);
+        return @mail($to, $subject, chunk_split(base64_encode($body)), $headers, $sendmailParams);
     }
 }
