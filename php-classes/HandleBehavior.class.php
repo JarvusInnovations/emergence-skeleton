@@ -103,6 +103,7 @@ class HandleBehavior extends RecordBehavior
         $where = $options['domainConstraints'];
         $incarnation = 0;
         $handle = $text;
+        $recordExists = false;
         do {
             $incarnation++;
 
@@ -111,7 +112,12 @@ class HandleBehavior extends RecordBehavior
             }
 
             $where[$options['handleField']] = $handle;
-        } while ($class::getByWhere($where));
+            try {
+                $recordExists = $class::getByWhere($where);
+            } catch (UserUnauthorizedException $e) {
+                $recordExists = true;
+            }
+        } while ($recordExists);
 
         return $handle;
     }
