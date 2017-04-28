@@ -1290,14 +1290,23 @@ class ActiveRecord
         return $record ? new $className($record) : null;
     }
 
-    public static function instantiateRecords($records)
+    public static function instantiateRecords($records, $skipUnauthorized = true)
     {
         foreach ($records AS &$record) {
             $className = static::_getRecordClass($record);
-            $record = new $className($record);
+
+            try {
+                $record = new $className($record);
+            } catch (UserUnauthorizedException $e) {
+                if ($skipUnauthorized) {
+                    $record = null;
+                } else {
+                    throw $e;
+                }
+            }
         }
 
-        return $records;
+        return array_filter($records);
     }
 
     public static function getSqlSearchConditions($qualifier, $term)
@@ -1319,6 +1328,10 @@ class ActiveRecord
 
             if (!empty($condition['join'])) {
                 $joinConditions = $condition['join'];
+
+                if (empty($joinConditions['aliasName'])) {
+                    $joinConditions['aliasName'] = $joinConditions['className']::getTableAlias();
+                }
 
                 $sqlSearchConditions['joins'][] = 'JOIN `'.$joinConditions['className']::$tableName.'` '
                     .$joinConditions['aliasName']
@@ -2563,5 +2576,45 @@ class ActiveRecord
         }
 
         return null;
+    }
+
+    /*
+    *   Handles adding related fields to the query via $dynamicFields.
+    *   Accepts dot-separated string value of relationship (RelationshipName.RelationshipName) or an array of relationships to loop through
+    *   @params boolean Return only strings
+    *   @params array Options
+    */
+    public function getRelatedData($stringsOnly = false, array $options = [])
+    {
+        $relationships = $options['relationship'];
+        $value = null;
+
+        if (is_string($relationships)) {
+            $relationships = explode('.', $relationships);
+        }
+
+        $relatedObject = $this->getValue(array_shift($relationships));
+
+        while (is_object($relatedObject) && $relName = array_shift($relationships)) {
+            $relatedObject = $relatedObject->getValue($relName);
+        }
+
+        if ($relatedObject && is_object($relatedObject)) {
+            $value = $relatedObject->getValue($options['field']);
+        }
+
+        if ($stringsOnly && !is_string($value)) {
+            if (is_array($value)) {
+                $strings = array();
+                foreach ($value AS $key => $attr) {
+                    $strings[] = is_string($key) ? "$key=$attr" : $attr;
+                }
+                $value = implode(',', $strings);
+            } else {
+                $value = (string)$value;
+            }
+        }
+
+        return $value;
     }
 }

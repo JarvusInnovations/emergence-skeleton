@@ -38,9 +38,9 @@ class SearchRequestHandler extends RequestHandler
         $searchResults = array();
         $totalResults = 0;
         /*
-        
+
         // Extra feature. Specify which classes to search for in Request parameter 'searchClasses'
-        
+
         if(!empty($_REQUEST['searchClasses']))
         {
             $classes = explode(',', $_REQUEST['searchClasses']);
@@ -49,7 +49,7 @@ class SearchRequestHandler extends RequestHandler
                 if(!in_array($className,$classes))
                     unset(static::$searchClasses[$className]);
             }
-            
+
         }
         */
         foreach (static::$searchClasses AS $className => $options) {
@@ -131,27 +131,31 @@ class SearchRequestHandler extends RequestHandler
 
             $options['conditions'][] = join(' OR ', $matchConditions);
 
+            $tableAlias = $className::getTableAlias();
             try {
                 if (isset($Tag)) {
                     $results = DB::allRecords(
-                        'SELECT p.*'
+                        'SELECT %s.*'
                         .' FROM `tag_items` t'
                         .' INNER JOIN `%s` p ON (p.ID = t.`ContextID`)'
                         .' WHERE t.`TagID` = %u AND t.`ContextClass` = "%s"'
                         .' AND (%s)'
                         , array(
-                            $className::$tableName
-                            ,$Tag->ID
-                            ,$className
-                            ,join(') AND (', $className::mapConditions($options['conditions']))
+                            $tableAlias,
+                            $className::$tableName,
+                            $tableAlias,
+                            $Tag->ID,
+                            $className,
+                            join(') AND (', $className::mapConditions($options['conditions']))
                         )
                     );
                 } else {
                     $results = DB::allRecords(
-                        'SELECT * FROM `%s` p WHERE (%s)'
+                        'SELECT * FROM `%s` %s WHERE (%s)'
                         , array(
-                            $className::$tableName
-                            ,join(') AND (', $className::mapConditions($options['conditions']))
+                            $className::$tableName,
+                            $tableAlias,
+                            join(') AND (', $className::mapConditions($options['conditions']))
                         )
                     );
                 }

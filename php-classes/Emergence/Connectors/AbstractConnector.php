@@ -2,6 +2,12 @@
 
 namespace Emergence\Connectors;
 
+use Emergence\EventBus;
+use Emergence\Logger;
+
+use Psr\Log\LoggerInterface;
+
+
 abstract class AbstractConnector extends \RequestHandler implements IConnector
 {
     public static $title;
@@ -37,12 +43,12 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         }
     }
 
-    public static function handleConnectorRequest()
+    public static function handleConnectorRequest(array $responseData = array())
     {
-        return static::respond('connector', array(
-            'class' => get_called_class(),
-            'title' => static::getTitle()
-        ));
+        $responseData['class'] = get_called_class();
+        $responseData['title'] = static::getTitle();
+
+        return static::respond('connector', $responseData);
     }
 
     // TODO: this should be moved to SychronizeTrait
@@ -68,7 +74,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 $logPath = $Job->getLogPath().'.bz2';
 
                 if (file_exists($logPath)) {
-                    header('Content-Type: application/json');
+                    header('Content-Type: application/json; charset=utf-8');
                     header(sprintf('Content-Disposition: attachment; filename="%s-%u.json"', $Job->Connector, $Job->ID));
                     passthru("bzcat $logPath");
                     exit();
@@ -207,5 +213,15 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         return array(
             'reportTo' => !empty($requestData['reportTo']) ? $requestData['reportTo'] : null
         );
+    }
+
+    protected static function _fireEvent($name, array $payload)
+    {
+        return EventBus::fireEvent($name, __NAMESPACE__ . '\\' . static::getConnectorId(), $payload);
+    }
+
+    protected static function getLogger(LoggerInterface $logger = null)
+    {
+        return $logger ?: Logger::getLogger();
     }
 }

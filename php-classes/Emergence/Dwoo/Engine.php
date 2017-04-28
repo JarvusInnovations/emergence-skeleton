@@ -113,12 +113,20 @@ class Engine extends \Dwoo_Core
         );
 
         // add magic globals
-        foreach (self::$magicGlobals AS $name) {
-            if (isset($GLOBALS[$name])) {
-                $this->globals[$name] = &$GLOBALS[$name];
-            } else {
-                $this->globals[$name] = false;
+        foreach (self::$magicGlobals AS $name => $value) {
+            if (is_int($name)) {
+                $name = $value;
             }
+
+            if (is_callable($value)) {
+                $value = call_user_func($value, $this, $name);
+            } elseif (isset($GLOBALS[$value])) {
+                $value = $GLOBALS[$value];
+            } else {
+                $value = false;
+            }
+
+            $this->globals[$name] = $value;
         }
 
         // set user

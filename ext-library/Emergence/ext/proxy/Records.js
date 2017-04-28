@@ -45,7 +45,7 @@ Ext.define('Emergence.ext.proxy.Records', {
             });
 
         request.method = me.getMethod(request);
-        request.url = me.buildUrl(request);
+        request.url = operation.url || me.buildUrl(request);
         
         // compatibility with Jarvus.ext.override.proxy.DirtyParams since we're entirely replacing the buildRequest method it overrides
         if (Ext.isFunction(me.clearParamsDirty)) {

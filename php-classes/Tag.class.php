@@ -43,10 +43,18 @@ class Tag extends ActiveRecord
             'qualifiers' => array('prefix')
             ,'points' => 2
             ,'sql' => 'Handle LIKE "%%%s%%.%"'
+        ),
+        'Title' => array(
+            'qualifiers' => ['any', 'title'],
+            'points' => 1,
+            'sql' => 'Title LIKE "%%%1$s%%"'
+        ),
+        'Handle' => array(
+            'qualifiers' => ['any', 'handle'],
+            'points' => 1,
+            'sql' => 'Handle LIKE "%%%1$s%%"'
         )
     );
-
-
 
     // public methods
     public static function assignTags($contextClass, $contextID, $tags, $autoCreate = true)
@@ -415,5 +423,24 @@ class Tag extends ActiveRecord
         return array_filter($tags, function($Tag) use ($prefix) {
             return $Tag->HandlePrefix == $prefix;
         });
+    }
+
+    public function getReadableItems()
+    {
+        $items = array();
+
+        foreach ($this->Items AS $item) {
+            try {
+                if (!$item->Context) {
+                    continue;
+                }
+
+                $items[] = $item;
+            } catch (UserUnauthorizedException $e) {
+                continue;
+            }
+        }
+
+        return $items;
     }
 }

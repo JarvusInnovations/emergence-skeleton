@@ -22,14 +22,12 @@ class RegistrationRequestHandler extends RequestHandler
 
     // RequestHandler
     public static $responseMode = 'html';
-
     public static $userResponseModes = array(
         'application/json' => 'json'
     );
 
     public static function handleRequest()
     {
-
         // handle JSON requests
         if (static::peekPath() == 'json') {
             static::$responseMode = static::shiftPath();
@@ -37,29 +35,18 @@ class RegistrationRequestHandler extends RequestHandler
 
         switch ($action = static::shiftPath()) {
             case 'recover':
-            {
                 return static::handleRecoverPasswordRequest();
-            }
-
             case '':
             case false:
-            {
                 return static::handleRegistrationRequest();
-            }
-
             default:
-            {
                 return static::throwNotFoundException();
-            }
-
-
         }
     }
 
-
     public static function handleRegistrationRequest($overrideFields = array())
     {
-        if ($_SESSION['User']) {
+        if (!empty($_SESSION['User'])) {
             return static::throwError('You are already logged in. Please log out if you need to register a new account.');
         }
 
@@ -81,21 +68,27 @@ class RegistrationRequestHandler extends RequestHandler
             // save person fields
             $User->setFields(array_merge($filteredRequestFields, $overrideFields));
 
-            if (!empty($_REQUEST['Password'])) {
-                $User->setClearPassword($_REQUEST['Password']);
+            if (!empty($filteredRequestFields['Password'])) {
+                $User->setClearPassword($filteredRequestFields['Password']);
             }
 
             // additional checks
-            if (empty($_REQUEST['Password']) || (strlen($_REQUEST['Password']) < $User::$minPasswordLength)) {
+            if (empty($filteredRequestFields['Password']) || (strlen($filteredRequestFields['Password']) < $User::$minPasswordLength)) {
                 $additionalErrors['Password'] = 'Password must be at least '.$User::$minPasswordLength.' characters long.';
-            } elseif (empty($_REQUEST['PasswordConfirm']) || ($_REQUEST['Password'] != $_REQUEST['PasswordConfirm'])) {
+            } elseif (empty($_REQUEST['PasswordConfirm']) || ($filteredRequestFields['Password'] != $_REQUEST['PasswordConfirm'])) {
                 $additionalErrors['PasswordConfirm'] = 'Please enter your password a second time for confirmation.';
             }
 
             // configurable hook
             if (is_callable(static::$applyRegistrationData)) {
-                call_user_func_array(static::$applyRegistrationData, array($User, $_REQUEST, &$additionalErrors));
+                call_user_func_array(static::$applyRegistrationData, array($User, $filteredRequestFields, &$additionalErrors));
             }
+
+            Emergence\EventBus::fireEvent('beforeRegister', self::class, array(
+                'User' => $User,
+                'requestData' => $_REQUEST,
+                'additionalErrors' => &$additionalErrors
+            ));
 
             // validate
             if ($User->validate() && empty($additionalErrors)) {
@@ -109,12 +102,18 @@ class RegistrationRequestHandler extends RequestHandler
 
                 // send welcome email
                 Emergence\Mailer\Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', array(
-                    'User' => $User
+                    'User' => $User,
+                    'registrationData' => $filteredRequestFields
                 ));
 
                 if (is_callable(static::$onRegisterComplete)) {
-                    call_user_func(static::$onRegisterComplete, $User, $_REQUEST);
+                    call_user_func(static::$onRegisterComplete, $User, $filteredRequestFields);
                 }
+
+                Emergence\EventBus::fireEvent('registerComplete', self::class, array(
+                    'User' => $User,
+                    'requestData' => $_REQUEST
+                ));
 
                 return static::respond('registerComplete', array(
                     'success' => true
@@ -131,7 +130,6 @@ class RegistrationRequestHandler extends RequestHandler
             // apply overrides to phantom
             $User->setFields($overrideFields);
         }
-
 
         return static::respond('register', array(
             'success' => false

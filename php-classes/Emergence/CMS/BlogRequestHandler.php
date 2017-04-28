@@ -24,7 +24,7 @@ class BlogRequestHandler extends AbstractRequestHandler
 
     public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
     {
-        if (!$GLOBALS['Session']->Person) {
+        if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
             $conditions['Visibility'] = 'Public';
         }
 

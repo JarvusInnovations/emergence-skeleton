@@ -33,6 +33,7 @@ class GroupMember extends ActiveRecord
         )
         ,'Joined' => array(
             'type' => 'timestamp'
+            ,'default' => null
         )
         ,'Expires' => array(
             'type' => 'timestamp'

@@ -36,7 +36,7 @@ class Email
         }
 
         $headers .= 'MIME-Version: 1.0'.PHP_EOL;
-        $headers .= 'Content-Type: text/html; charset=iso-8859-1'.PHP_EOL;
+        $headers .= 'Content-Type: text/html; charset=utf-8'.PHP_EOL;
 
         return @mail($to, $subject, $body, $headers, $sendmailParams);
     }
@@ -72,7 +72,7 @@ class Email
         $data .= '--'.$mimeBoundary.PHP_EOL;
 
         // html version
-        $data .= 'Content-Type: text/html; charset=iso-8859-1'.PHP_EOL;
+        $data .= 'Content-Type: text/html; charset=utf-8'.PHP_EOL;
         $data .= 'Content-Transfer-Encoding: 7bit'.PHP_EOL.PHP_EOL;
         $data .= $body.PHP_EOL.PHP_EOL;
         $data .= '--'.$mimeBoundary.PHP_EOL;
@@ -93,7 +93,7 @@ class Email
 
     public static function removeReplyQuote($messageBody)
     {
-        /* 
+        /*
         *   Remove's email reply quote.
         *   Return's leftover body if quote is extracted. Returns same string if no quote is extracted.
         *   Currently supports Gmail and AOL

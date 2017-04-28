@@ -44,7 +44,7 @@ class SpreadsheetWriter
 
     public function writeHeaders()
     {
-        header('Content-Type: text/csv');
+        header('Content-Type: text/csv; charset=utf-8');
 
         $contentDisposition = 'attachment';
         if ($this->_options['filename']) {

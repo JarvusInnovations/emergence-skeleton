@@ -6,11 +6,11 @@ class HandleBehavior extends RecordBehavior
     public static $suffixFormat = '%s-%u';
     public static $transliterate = true;
 
-    public static function onSave(ActiveRecord $Record, $handleInput = false)
+    public static function onSave(ActiveRecord $Record, $handleInput = false, array $handleOptions = array())
     {
         // set handle
         if (!$Record->Handle) {
-            $Record->Handle = static::getUniqueHandle($Record, $handleInput ? $handleInput : $Record->Title);
+            $Record->Handle = static::getUniqueHandle($Record, $handleInput ? $handleInput : $Record->Title, $handleOptions);
         }
     }
 
@@ -103,6 +103,7 @@ class HandleBehavior extends RecordBehavior
         $where = $options['domainConstraints'];
         $incarnation = 0;
         $handle = $text;
+        $recordExists = false;
         do {
             $incarnation++;
 
@@ -111,7 +112,12 @@ class HandleBehavior extends RecordBehavior
             }
 
             $where[$options['handleField']] = $handle;
-        } while ($class::getByWhere($where));
+            try {
+                $recordExists = $class::getByWhere($where);
+            } catch (UserUnauthorizedException $e) {
+                $recordExists = true;
+            }
+        } while ($recordExists);
 
         return $handle;
     }

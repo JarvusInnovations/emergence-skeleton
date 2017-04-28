@@ -16,13 +16,13 @@
 
 		<fieldset class="shrink show-required left-labels">
 		
-			{* field name label='' error='' type=text placeholder='' hint='' required=false attribs='' *}
+			{* field inputName label='' error='' type=text placeholder='' hint='' required=false attribs='' *}
             
-            {field name=Name  label=Name  error=$validationErrors.Name  required=true attribs='autofocus autocapitalize="words"'}
-            {field name=Email label=Email error=$validationErrors.Email type=email required=true}
-            {field name=Phone label=Phone error=$validationErrors.Phone type=tel hint='Optional. Include your area code.'}
+            {field inputName=Name  label=Name  error=$validationErrors.Name  required=true attribs='autofocus autocapitalize="words"'}
+            {field inputName=Email label=Email error=$validationErrors.Email type=email required=true}
+            {field inputName=Phone label=Phone error=$validationErrors.Phone type=tel hint='Optional. Include your area code.'}
 
-            {textarea name=Message label=Message error=$validationErrors.Message required=true}
+            {textarea inputName=Message label=Message error=$validationErrors.Message required=true}
             
             <div class="submit-area">
             	<input type="submit" value="Send">

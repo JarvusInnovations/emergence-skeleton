@@ -5,10 +5,15 @@ namespace Emergence\Connectors;
 use ActiveRecord;
 use HandleBehavior;
 use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
+use Emergence\Logger;
 
-class Job extends ActiveRecord
+class Job extends ActiveRecord implements LoggerInterface
 {
-    public $log;
+
+    use \Psr\Log\LoggerTrait;
+
+    public $logEntries;
 
     // ActiveRecord configuration
     public static $tableName = 'connector_jobs';
@@ -83,31 +88,21 @@ class Job extends ActiveRecord
         return $className::getTitle();
     }
 
-    public function log($message, $level = null)
-    {
-        if (is_string($message)) {
-            $entry = array(
-                'message' => $message
-            );
-        } else {
-            $entry = $message;
-        }
-
-        if ($level !== null) {
-            $entry['level'] = $level;
-        } elseif (!array_key_exists('level', $entry)) {
-            $entry['level'] = LogLevel::INFO;
-        }
-
-        return $this->log[] = $entry;
-    }
-
     public function logRecordDelta(ActiveRecord $Record, $options = array())
     {
         $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : array();
         $labelRenderers = is_array($options['labelRenderers']) ? $options['labelRenderers'] : array();
         $valueRenderers = is_array($options['valueRenderers']) ? $options['valueRenderers'] : array();
-        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function($logEntry) { return "{$logEntry[action]} ".$logEntry['record']->getTitle(); };
+        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function ($logEntry) {
+            $title = $logEntry['record']->getTitle();
+            $class = $logEntry['record']->Class;
+
+            if (strpos($title, $class) === false) {
+                $title = "$class \"$title\"";
+            }
+
+            return $logEntry['action'].' '.$title;
+        };
 
         $logEntry = array(
             'changes' => array()
@@ -151,23 +146,40 @@ class Job extends ActiveRecord
 
         $logEntry['message'] = call_user_func($messageRenderer, $logEntry);
 
-        return $this->log[] = $logEntry;
+        return $this->log(
+            $logEntry['level'],
+            $logEntry['message'],
+            [
+                'changes' => $changes,
+                'record' => $Record
+            ]
+        );
     }
 
     public function logInvalidRecord(\ActiveRecord $Record)
     {
-        return $this->log(array(
-            'message' => 'Invalid '.get_class($Record).' record: '.$Record->getTitle()
-            ,'validationErrors' => $Record->validationErrors
-        ), LogLevel::WARNING);
+        return $this->log(
+            LogLevel::WARNING,
+            'Invalid {recordClass} record: {recordTitle}',
+            [
+                'validationErrors' => $Record->validationErrors,
+                'recordClass' => get_class($Record),
+                'recordTitle' => $Record->getTitle()
+            ]
+        );
     }
 
     public function logException(\Exception $e)
     {
-        return $this->log(array(
-            'message' => get_class($e).': '.$e->getMessage()
-            ,'exception' => $e
-        ), LogLevel::ERROR);
+        return $this->log(
+            LogLevel::ERROR,
+            'Exception({exceptionClass}): {exceptionMessage}',
+            [
+                'exception' => $e,
+                'exceptionClass' => get_class($e),
+                'exceptionMessage' => $e->getMessage()
+            ]
+        );
     }
 
     public function getLogPath()
@@ -175,16 +187,34 @@ class Job extends ActiveRecord
         return $this->isPhantom ? null : \Site::$rootPath.'/site-data/connector-jobs/'.$this->ID.'.json';
     }
 
-    public function writeLog()
+    public function writeLog($logEntry, $compress = false)
     {
         $logPath = $this->getLogPath();
-        $logDirectory = dirname($logPath);
 
+        if (!$logPath) { // record is phantom
+            return;
+        }
+
+        $logDirectory = dirname($logPath);
         if (!is_dir($logDirectory)) {
             mkdir($logDirectory, 0777, true);
         }
 
-        file_put_contents($logPath, json_encode($this->log));
-        exec("bzip2 $logPath");
+        file_put_contents($logPath, json_encode($logEntry), FILE_APPEND | LOCK_EX);
+        if ($compress === true) {
+            exec("bzip2 $logPath");
+        }
+    }
+
+    public function log($level, $message, array $context = [])
+    {
+        $entry = [
+            'message' => $message,
+            'context' => $context,
+            'level' => $level
+        ];
+
+        $this->logEntries[] = $entry;
+        $this->writeLog($entry);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\Yaml\Yaml;
+
+
 abstract class RequestHandler
 {
     // configurables
@@ -7,6 +10,7 @@ abstract class RequestHandler
     public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
     public static $beforeRespond;
     public static $wkhtmltopdfPath = 'wkhtmltopdf';
+    public static $wkhtmltopdfArguments = '-L 0.5in -R 0.5in -T 0.5in -B 0.5in';
 
 
     // static properties
@@ -80,6 +84,9 @@ abstract class RequestHandler
             case 'json':
                 return static::respondJson($responseID, $responseData);
 
+            case 'yaml':
+                return static::respondYaml($responseID, $responseData);
+
             case 'csv':
                 return static::respondCsv($responseID, $responseData);
 
@@ -106,6 +113,15 @@ abstract class RequestHandler
     public static function respondJson($responseID, $responseData = array())
     {
         return JSON::translateAndRespond($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
+    }
+
+    public static function respondYaml($responseID, $responseData = array())
+    {
+        header('Content-type: application/x-yaml; charset=utf-8');
+
+        $responseData = JSON::translateObjects($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
+        print(Yaml::dump($responseData, 10, 2, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE));
+        exit();
     }
 
     public static function respondCsv($responseID, $responseData = array())
@@ -137,7 +153,12 @@ abstract class RequestHandler
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
 
-        exec(static::$wkhtmltopdfPath." \"$tmpPath.html\" \"$tmpPath.pdf\"");
+        exec(implode(' ', [
+            static::$wkhtmltopdfPath,
+            static::$wkhtmltopdfArguments,
+            escapeshellarg($tmpPath.'.html'),
+            escapeshellarg($tmpPath.'.pdf')
+        ]));
 
         if (!file_exists("$tmpPath.pdf")) {
             header('HTTP/1.0 501 Not Implemented');
@@ -150,7 +171,7 @@ abstract class RequestHandler
 
     public static function respondXml($responseID, $responseData = array())
     {
-        header('Content-Type: text/xml');
+        header('Content-Type: text/xml; charset=utf-8');
         return Emergence\Dwoo\Engine::respond($responseID, $responseData);
     }
 

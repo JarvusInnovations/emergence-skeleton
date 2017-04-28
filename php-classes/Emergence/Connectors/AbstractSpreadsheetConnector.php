@@ -10,6 +10,11 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 {
     public static $logRowColumnCount = 3;
 
+    public static $onBeforeValidateRecord;
+    public static $onValidateRecord;
+    public static $onBeforeSaveRecord;
+    public static $onSaveRecord;
+
     // protected methods
     protected static function _requireColumns($noun, SpreadsheetReader $spreadsheet, array $requiredColumns, array $columnsMap = null)
     {
@@ -29,6 +34,8 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             throw new \Exception(
                 $noun.' spreadsheet is missing required column'.(count($missingColumns) != 1 ? 's' : '').': '
                 .join(',', $missingColumns)
+                .'. Found columns: '
+                .join(', ', $columns)
             );
         }
     }
@@ -109,6 +116,10 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             $results['created']++;
         } elseif ($logEntry['action'] == 'update') {
             $results['updated']++;
+
+            foreach (array_keys($logEntry['changes']) AS $changedField) {
+                $results['updated-fields'][$changedField]++;
+            }
         }
 
 

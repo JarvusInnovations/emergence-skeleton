@@ -1,3 +1,3 @@
 <?php
 
-Emergence\SiteAdmin\RequestHandler::handleRequest();
+Emergence\SiteAdmin\DashboardRequestHandler::handleRequest();
