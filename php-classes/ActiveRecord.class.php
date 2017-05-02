@@ -2284,6 +2284,19 @@ class ActiveRecord
             }
 
             $this->_setFieldValue($rel['local'], $value ? $value->Handle : null);
+        } elseif ($rel['type'] == 'context-children') {
+            $set = [];
+
+            foreach ($value as $related) {
+                if (!$related || !is_a($related, 'ActiveRecord')) {
+                    continue;
+                }
+
+                $related->Context = $this;
+                $set[] = $related;
+            }
+
+            $value = $set;
         } else {
             return false;
         }
