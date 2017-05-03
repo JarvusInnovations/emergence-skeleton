@@ -62,9 +62,15 @@ class Validators
             'domain' => null
         ], $options);
 
-        return !empty($email)
-            && preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/', $email)
-            && (empty($options['domain']) || preg_match('/^[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@'.$options['domain'].'$/', $email));
+        $pattern = '[_a-zA-Z0-9-+]+(\.[_+a-zA-Z0-9-]+)*@';
+
+        if (empty($options['domain'])) {
+            $pattern .= '[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})';
+        } else {
+            $pattern .= preg_quote($options['domain']);
+        }
+
+        return !empty($email) && preg_match('/^'.$pattern.'$/', $email);
     }
 
     public static function URL($url, $options = array())
