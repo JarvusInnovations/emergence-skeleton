@@ -883,6 +883,26 @@ class ActiveRecord
         ));
     }
 
+    protected function _preSaveRelationships()
+    {
+        // save relationship objects
+        foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
+            if (!isset($this->_relatedObjects[$relationship])) {
+                continue;
+            }
+
+            if ($options['type'] == 'one-many' && $options['local'] == 'ID') {
+                foreach ($this->_relatedObjects[$relationship] AS $related) {
+                    foreach ($related::getStackedConfig('relationships') as $otherRelationship => $otherOptions) {
+                        if ($otherOptions['type'] == 'one-one' && $otherOptions['local'] == $options['foreign']) {
+                            $related->_setRelationshipValue($otherRelationship, $this);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     protected function _saveRelationships()
     {
         // save relationship objects
