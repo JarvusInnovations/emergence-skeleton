@@ -541,8 +541,15 @@ class ActiveRecord
     }
 
 
+    private $_isValidating = false;
     public function validate($deep = true)
     {
+        if ($this->_isValidating) {
+            return null;
+        }
+
+        $this->_isValidating = true;
+
         $this->_isValid = true;
         $this->_validationErrors = array();
 
@@ -616,6 +623,8 @@ class ActiveRecord
                 }
             }
         }
+
+        $this->_isValidating = false;
 
         return $this->_isValid;
     }
@@ -735,8 +744,15 @@ class ActiveRecord
         Debug::dump($this->getData(), $exit, get_class($this));
     }
 
+    private $_isSaving = false;
     public function save($deep = true)
     {
+        if ($this->_isSaving) {
+            return null;
+        }
+
+        $this->_isSaving = true;
+
         // fire event
         Emergence\EventBus::fireEvent('beforeRecordSave', $this->getRootClass(), array(
             'Record' => $this,
@@ -752,6 +768,12 @@ class ActiveRecord
         // set created
         if (static::_fieldExists('Created') && (!$this->Created || ($this->Created == 'CURRENT_TIMESTAMP'))) {
             $this->Created = time();
+        }
+
+
+        // traverse relationships before validation
+        if ($deep) {
+            $this->_preSaveRelationships();
         }
 
         // validate
@@ -875,6 +897,8 @@ class ActiveRecord
         if ($deep) {
             $this->_postSaveRelationships();
         }
+
+        $this->_isSaving = false;
 
         // fire event
         Emergence\EventBus::fireEvent('afterRecordSave', $this->getRootClass(), array(
@@ -2304,7 +2328,7 @@ class ActiveRecord
             }
 
             $this->_setFieldValue($rel['local'], $value ? $value->Handle : null);
-        } elseif ($rel['type'] == 'context-children') {
+                    } elseif ($rel['type'] == 'context-children') {
             $set = [];
 
             foreach ($value as $related) {
