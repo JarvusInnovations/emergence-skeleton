@@ -988,6 +988,50 @@ class ActiveRecord
                     $related->setField($options['foreign'], $this->getValue($options['local']));
                     $related->save();
                 }
+            } elseif ($options['type'] == 'context-children') {
+                $relatedObjectClass = $options['class'];
+                $relatedObjects = [];
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->Context = $this;
+                    $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+                if (isset($options['prune'])) {
+                    switch ($options['prune']) {
+                        case 'unlink':
+                            DB::nonQuery(
+                                'UPDATE `%s` %s '.
+                                '   SET '.
+                                'ContextID = NULL, '.
+                                'ContextClass = NULL '.
+
+                                ' WHERE ID NOT IN (%s)',
+                                [
+                                    $relatedObjectClass::$tableName,
+                                    $relatedObjectClass::getTableAlias(),
+                                    join(', ', array_keys($relatedObjects))
+                                ]
+                            );
+
+                            break;
+
+                        case 'delete':
+                            DB::nonQuery(
+                                'DELETE FROM `%s` '.
+                                ' WHERE ContextClass = "%s" '.
+                                '   AND ContextID = %u '.
+                                '   AND ID NOT IN (%s) ',
+                                [
+                                    $relatedObjectClass::$tableName,
+                                    DB::escape($this->getRootClass()),
+                                    $this->ID,
+                                    join(", ", array_keys($relatedObjects))
+                                ]
+                            );
+
+                            break;
+                    }
+                }
             }
         }
     }
