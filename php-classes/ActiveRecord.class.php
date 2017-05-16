@@ -920,6 +920,7 @@ class ActiveRecord
                     foreach ($related::getStackedConfig('relationships') as $otherRelationship => $otherOptions) {
                         if ($otherOptions['type'] == 'one-one' && $otherOptions['local'] == $options['foreign']) {
                             $related->_setRelationshipValue($otherRelationship, $this);
+                            break;
                         }
                     }
                 }
