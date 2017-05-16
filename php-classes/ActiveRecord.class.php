@@ -923,6 +923,10 @@ class ActiveRecord
                         }
                     }
                 }
+            } elseif ($options['type'] == 'context-children') {
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->_setRelationshipValue('Context', $this);
+                }
             }
         }
     }
