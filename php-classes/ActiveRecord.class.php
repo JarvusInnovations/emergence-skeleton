@@ -744,7 +744,7 @@ class ActiveRecord
         Debug::dump($this->getData(), $exit, get_class($this));
     }
 
-    private $_isSaving = false;
+    protected $_isSaving = false;
     public function save($deep = true)
     {
         if ($this->_isSaving) {
