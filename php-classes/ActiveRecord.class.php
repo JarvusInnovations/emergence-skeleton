@@ -984,9 +984,28 @@ class ActiveRecord
                 $this->_relatedObjects[$relationship]->setField($options['foreign'], $this->getValue($options['local']));
                 $this->_relatedObjects[$relationship]->save();
             } elseif ($options['type'] == 'one-many' && $options['local'] == 'ID') {
+                $relatedObjectClass = $options['class'];
+                $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] AS $related) {
                     $related->setField($options['foreign'], $this->getValue($options['local']));
                     $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+
+                if (isset($options['prune'])) {
+                    if ($options['prune'] == 'delete') {
+                        DB::nonQuery(
+                            'DELETE FROM `%s` '.
+                            ' WHERE %s = "%s" '.
+                            '   AND ID NOT IN (%s) ',
+                            [
+                                $relatedObjectClass::$tableName,
+                                $options['foreign'],
+                                $this->ID,
+                                join(", ", array_keys($relatedObjects))
+                            ]
+                        );
+                    }
                 }
             } elseif ($options['type'] == 'context-children') {
                 $relatedObjectClass = $options['class'];
