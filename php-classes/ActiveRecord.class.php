@@ -2399,6 +2399,13 @@ class ActiveRecord
         } elseif ($rel['type'] == 'context-children') {
             $set = [];
 
+            if (!is_array($value)) {
+                if (!empty($value)) {
+                    $value = [$value];
+                } else {
+                    $value = [];
+                }
+            }
             foreach ($value as $related) {
                 if (!$related || !is_a($related, 'ActiveRecord')) {
                     continue;
