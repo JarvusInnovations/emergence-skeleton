@@ -419,6 +419,16 @@ class Source
                 'workTreeStatus' => $matches['workTreeStatus'] == ' ' ? null : $matches['workTreeStatus']
             ];
 
+            // handle quoted paths
+            if ($file['path'][0] == '"') {
+                $file['path'] = stripslashes(substr($file['path'], 1, -1));
+            }
+
+            if ($file['renamedPath'] && $file['renamedPath'][0] == '"') {
+                $file['renamedPath'] = stripslashes(substr($file['renamedPath'], 1, -1));
+            }
+
+            // decode status
             $file['tracked'] = $file['indexStatus'] != '?' && $file['workTreeStatus'] != '?';
             $file['ignored'] = $file['indexStatus'] == '!' && $file['workTreeStatus'] == '!';
             $file['staged'] = $file['tracked'] && !$file['ignored'] && (bool)$file['indexStatus'];
