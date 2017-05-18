@@ -101,6 +101,10 @@ class App
             // append nested array data from app.json config on top of dotted-key tree
             \Emergence\Util\Data::collapseTreeToDottedKeys($this->config, $this->antConfig, 'app');
 
+            // apply local build config if present
+            if ($localConfigNode = Site::resolvePath("sencha-workspace/$this/local.properties")) {
+                $this->antConfig = array_merge($this->antConfig, Util::loadAntProperties($localConfigNode->RealPath));
+            }
             // TODO: cache this with an event handler to clear?
         }
 
@@ -149,7 +153,7 @@ class App
     {
         $packages = $this->getConfig('requires') ?: [];
 
-        if (($themePackage = $this->getConfig('theme')) && !in_array($themePackage, $packages)) {
+        if (($themePackage = $this->getAntConfig('app.theme')) && !in_array($themePackage, $packages)) {
             $packages[] = $themePackage;
         }
 
