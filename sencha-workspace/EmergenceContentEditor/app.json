@@ -65,7 +65,8 @@
      *      ]
      */
     "requires": [
-        "emergence-cms"
+        "emergence-cms",
+        "emergence-cms-summaries"
     ],
 
     /**
