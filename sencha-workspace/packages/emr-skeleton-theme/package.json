@@ -9,5 +9,5 @@
     "format": "1",
     "local": true,
     "requires": [],
-    "extend": "ext-theme-crisp-touch"
+    "extend": "theme-crisp-touch"
 }
