@@ -408,7 +408,7 @@ class Source
                 continue; // skip comment lines
             }
 
-            if (!preg_match('/^(?<indexStatus>[ MADRCU?!])(?<workTreeStatus>[ MADRCU?!]) (?<path>\S+)( -> (?<renamePath>\S+))?$/', $line, $matches)) {
+            if (!preg_match('/^(?<indexStatus>[ MADRCU?!])(?<workTreeStatus>[ MADRCU?!]) (?<path>.+?)( -> (?<renamePath>.+?))?$/', $line, $matches)) {
                 throw new \Exception('Could not parse git status output line: ' . $line);
             }
 
