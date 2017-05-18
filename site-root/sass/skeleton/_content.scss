@@ -250,6 +250,30 @@ dd {
     margin: 0;
 }
 
+dl.align-left {
+    @media #{$mq-tablet} {
+        display: table;
+        
+        .dli {
+            display: table-row;
+        }
+        
+        dt, dd {
+            display: table-cell;
+            padding: ($em-spacer/2) 0;
+        }
+        
+        dt {
+            padding-right: ($em-spacer/2);
+            white-space: nowrap;
+            
+            &.wrap {
+                white-space: normal;
+            }
+        }
+    }
+}
+
 dl.align-right {
     @media #{$mq-tablet} {
         display: table;
@@ -271,6 +295,18 @@ dl.align-right {
             &.wrap {
                 white-space: normal;
             }
+        }
+    }
+}
+
+dl.compact {
+   @media #{$mq-tablet} {
+        dt, dd {
+            padding: ($em-spacer/6) 0;
+        }
+
+        dt {
+            padding-right: ($em-spacer/2);
         }
     }
 }

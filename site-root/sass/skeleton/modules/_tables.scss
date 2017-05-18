@@ -1,6 +1,10 @@
 table {
     margin: 1em 0;
     width: 100%;
+    
+    .button {
+        margin-bottom: 0;
+    }
 }
 
 caption {
@@ -64,6 +68,10 @@ thead {
 
 // special features
 // ---------------------------------------------------------
+
+table.auto-width {
+    width: auto;
+}
 
 table.cell-borders {
     td + td {
