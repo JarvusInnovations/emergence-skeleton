@@ -50,6 +50,7 @@ Ext.application({
 
         // load DualView UI into viewport element or created viewport container
         if (viewportEl) {
+            viewportEl.empty();
             mainView.render(viewportEl);
 
             viewportEl.on('resize', function(el, info) {
