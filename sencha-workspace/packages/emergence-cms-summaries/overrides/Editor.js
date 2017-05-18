@@ -1,17 +1,17 @@
 /*jslint browser: true, undef: true *//*global Ext*/
-Ext.define('Emergence.cms.summaries.overrides.Editor', {
+Ext.define('Emergence.cmssummaries.overrides.Editor', {
     override: 'Emergence.cms.view.Editor',
     requires: [
-        'Emergence.cms.summaries.field.Summary'
+        'Emergence.cmssummaries.field.Summary'
     ],
 
     initComponent: function() {
         var editorView = this,
-            summaryField = Ext.create('Emergence.cms.summaries.field.Summary', {
+            summaryField = Ext.create('Emergence.cmssummaries.field.Summary', {
                 dock: 'top',
                 hidden: true
             });
-        
+
         editorView.on({
             syncfromrecord: function(editorView, contentRecord) {
                 summaryField.setValue(contentRecord.get('Summary'));
@@ -23,7 +23,7 @@ Ext.define('Emergence.cms.summaries.overrides.Editor', {
         });
 
         editorView.callParent(arguments);
-        
+
         editorView.addDocked(summaryField);
     }
 });
