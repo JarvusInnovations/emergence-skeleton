@@ -70,7 +70,7 @@ Ext.define('Emergence.cms.view.composer.Multimedia', {
     },
 
     getPreviewHtml: function(callback) {
-        callback(this.getTpl('previewTpl').apply(this.getItemData()));
+        callback(this.lookupTpl('previewTpl').apply(this.getItemData()));
     },
 
     getItemData: function() {

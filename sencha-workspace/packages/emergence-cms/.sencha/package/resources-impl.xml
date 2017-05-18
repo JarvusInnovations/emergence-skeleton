@@ -1,4 +1,4 @@
-<project name="resources-impl">
+<project name="x-resources-impl">
     <target name="-before-inherit-resources"/>
     <target name="-after-inherit-resources"/>
     <target name="-inherit-resources">
@@ -12,7 +12,7 @@
                 <if>
                     <available file="${base.resource.path}" type="dir"/>
                     <then>
-                        <copy todir="${build.dir}/resources/" overwrite="true">
+                        <copy todir="${build.out.resources.dir}/" overwrite="true">
                             <fileset dir="${base.resource.path}" includes="**/*"/>
                         </copy>
                     </then>
@@ -25,8 +25,21 @@
     <target name="-after-copy-resources"/>
     <target name="-copy-resources">
         <echo>Merging resources from current package ${package.resources.dir}</echo>
-        <copy todir="${build.dir}/resources" overwrite="true">
+        <copy todir="${build.out.resources.dir}" overwrite="true">
             <fileset dir="${package.resources.dir}" includes="**/*"/>
         </copy>
+        <property name="target.json.resources.dir" value="${package.output.base}"/>
+        <property name="target.config.resources.dir" value="${build.resources.dir}"/>
+        <x-compile refid="${compiler.ref.id}">
+            <![CDATA[
+                resources
+                    -excludes=-all*.css
+                    -out=${target.config.resources.dir}
+                and
+                resources
+                    -model=true
+                    -out=${target.json.resources.dir}
+            ]]>
+        </x-compile>
     </target>
 </project>

@@ -79,7 +79,7 @@ Ext.define('Emergence.cms.view.EditorController', {
 
                 if (success && wasPhantom) {
                     editorView.setLoading('Opening new post&hellip;');
-                    location.href = contentRecord.toUrl() + '/edit';
+                    location.href = contentRecord.getProxy().getConnection().buildUrl(contentRecord.toUrl() + '/edit');
                 } else {
                     editorView.setLoading(false);
 

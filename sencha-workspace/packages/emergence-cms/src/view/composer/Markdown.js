@@ -21,8 +21,6 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
     height: 200,
     tools: [{
         type: 'help',
-        glyph: true,
-        cls: 'icon-w-20',
         tooltip: 'Markdown formatting guide',
         callback: function() {
             window.open('https://help.github.com/articles/markdown-basics', '_blank');
@@ -50,7 +48,7 @@ Ext.define('Emergence.cms.view.composer.Markdown', {
             _doRender = function() {
                 callback(window.markdown.toHTML(me.textarea.getValue()));
             };
-        
+
         if (window.markdown) {
             _doRender();
         } else {

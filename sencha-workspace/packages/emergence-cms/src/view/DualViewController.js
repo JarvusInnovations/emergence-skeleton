@@ -64,7 +64,7 @@ Ext.define('Emergence.cms.view.DualViewController', {
             }
         }
     },
-    
+
     onTitleChange: function(titleField, value) {
         var previewCmp = this.lookupReference('preview'),
             contentRecord = this.lookupReference('editor').getContentRecord(),
@@ -72,7 +72,7 @@ Ext.define('Emergence.cms.view.DualViewController', {
 
         previewCmp.titleLink.set({href: href || '#'}).update(value);
     },
-    
+
     onTagsChange: function(tagsField) {
         var previewCmp = this.lookupReference('preview'),
             tagsWrapper = previewCmp.tagsWrapper,
@@ -83,13 +83,13 @@ Ext.define('Emergence.cms.view.DualViewController', {
         if (!tagsData || !tagsData.length) {
             tagsWrapper.hide();
         } else {
-            previewCmp.getTpl('tagsListTpl').overwrite(previewCmp.tagsCt, tagsData);
+            previewCmp.lookupTpl('tagsListTpl').overwrite(previewCmp.tagsCt, tagsData);
             tagsWrapper.show();
         }
 
         Ext.resumeLayouts(true);
     },
-    
+
     onPublishTimeChange: Ext.Function.createBuffered(function() {
         var editorView = this.lookupReference('editor'),
             previewCmp = this.lookupReference('preview'),
@@ -104,7 +104,7 @@ Ext.define('Emergence.cms.view.DualViewController', {
         var me = this,
             itemEls = me.itemEls,
             previewCmp = me.lookupReference('preview'),
-            itemTpl = previewCmp.getTpl('itemTpl'),
+            itemTpl = previewCmp.lookupTpl('itemTpl'),
             itemId = itemComposer.getContentItemId(),
             itemData = {
                 itemId: itemId,
@@ -121,7 +121,7 @@ Ext.define('Emergence.cms.view.DualViewController', {
             }
         });
     },
-    
+
     onComposerMove: function(column, itemComposer, prevIndex, newIndex) {
         var me = this,
             itemEls = me.itemEls,
@@ -141,15 +141,15 @@ Ext.define('Emergence.cms.view.DualViewController', {
         itemEls.remove(itemEl);
         itemEls.insert(newIndex, itemId, itemEl);
     },
-    
+
     onComposerRemove: function(column, itemComposer) {
         var itemEls = this.itemEls,
             itemEl = itemEls.get(itemComposer.getContentItemId());
-        
+
         itemEls.remove(itemEl);
         itemEl.destroy();
     },
-    
+
     onComposerPreviewChange: function(itemComposer, html) {
         this.itemEls.get(itemComposer.getContentItemId()).update(html);
     }
