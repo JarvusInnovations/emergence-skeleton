@@ -12,7 +12,7 @@
     {if $urlOnly}
         {$src}
     {else}
-        <img height={$size} alt="{personName $Person}" src="{$src}" class="avatar" {if $imgCls}class="{$imgCls}"{/if}>
+        <img height="{$size}" width="{$size}" alt="{personName $Person}" src="{$src}" class="avatar" {if $imgCls}class="{$imgCls}"{/if}>
     {/if}
 {/strip}{/template}
 
