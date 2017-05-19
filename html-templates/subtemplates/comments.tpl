@@ -5,17 +5,19 @@
 {template commentForm Context url=no Comment=no}
     {if $.User}
         {if $Comment}
+            {$author = $Comment->Creator}
             {$url = cat($Comment->getURL() '/edit')}
         {elseif !$url}
+            {$author = $.User}
             {$url = cat($Context->getURL() '/comment')}
         {/if}
 
         <form class="comment-form" action="{$url|escape}" method="POST">
             <fieldset class="comment stretch">
-                <div class="author">{avatar $.User size=56}</div>
+                <div class="author">{avatar $author size=56}</div>
 
                 <div class="message">
-                    {capture assign=authorName}{personName $.User}{/capture}
+                    {capture assign=authorName}{personName $author}{/capture}
                     {textarea Message $authorName $validationErrors.Message hint='You can use <a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown</a> for formatting.' required=true default=$Comment->Message}
 
                     <div class="submit-area">
@@ -46,9 +48,9 @@
                 <footer>
                     <time><a href="#comment-{$Comment->ID}">{$Comment->Created|date_format:'%a, %b %e, %Y &middot; %-l:%M %P'}</a></time>
                     {if Emergence\Comments\CommentsRequestHandler::checkWriteAccess($Comment)}
-                        {if $.User->hasAccountLevel(Staff)}<a href="{$Comment->getURL()}/edit" class="button tiny edit">Edit</a>{/if}
+                        {if $.User->hasAccountLevel(Staff)}<a href="{$Comment->getURL()}/edit" class="edit">Edit</a>{/if}
                         <a href="{$Comment->getURL()}/delete"
-                           class="button destructive tiny confirm"
+                           class="confirm"
                            data-confirm-yes="Delete Comment"
                            data-confirm-no="Don&rsquo;t Delete"
                            data-confirm-title="Deleting Comment"
