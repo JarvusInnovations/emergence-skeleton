@@ -132,6 +132,90 @@ class SQL
         return $createSQL;
     }
 
+    static public function getExistingFields($table)
+    {
+        $columns = DB::allRecords(sprintf("SHOW COLUMNS FROM %s",$table));
+        foreach($columns as $column)
+        {
+            $output[] = $column['Field'];
+        }
+        return $output;
+    }
+    
+    static public function getAdds($recordClass, $historyVariant = false, $enforceOrder = true)
+    {
+        // compile fields
+    	$rootClass = $recordClass::getStaticRootClass();
+        $existingFields = static::getExistingFields($recordClass::$tableName);
+	foreach($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field)
+	{
+            if(!in_array($field['columnName'],$existingFields))
+            {
+                if($field['columnName'] == 'RevisionID')
+            	{
+    			continue;
+    		}
+    			
+    		// force notnull=false on non-rootclass fields
+    		if($rootClass && !$rootClass::fieldExists($fieldId))
+    		{
+    			$field['notnull'] = false;
+    		}
+    			
+    		// auto-prepend class type
+    		if($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses()))
+    		{
+    			array_unshift($field['values'], $rootClass);
+    		}
+    
+    		$fieldDef = '`'.$field['columnName'].'`';
+    		$fieldDef .= ' '.static::getSQLType($field);
+                
+                if (!empty($field['charset'])) {
+                    $fieldDef .= " CHARACTER SET $field[charset]";
+                }
+    
+                if (!empty($field['collate'])) {
+                    $fieldDef .= " COLLATE $field[collate]";
+                }
+    
+    		$fieldDef .= ' '. ($field['notnull'] ? 'NOT NULL' : 'NULL');
+    
+    		if($field['autoincrement'] && !$historyVariant)
+    			$fieldDef .= ' auto_increment';
+    		elseif( ($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP') )
+    			$fieldDef .= ' default CURRENT_TIMESTAMP';
+    		elseif(empty($field['notnull']) && ($field['default'] == null))
+    			$fieldDef .= ' default NULL';
+    		elseif(isset($field['default']))
+    		{
+    			if($field['type'] == 'boolean')
+    			{
+    				$fieldDef .= ' default ' . ($field['default'] ? 1 : 0);
+    			}
+    			else
+    			{
+    				$fieldDef .= ' default "'.DB::escape($field['default']).'"';
+    			}
+    		}
+                
+                
+                $fieldDef = 'ADD ' . $fieldDef;
+                if($lastColumn && $enforceOrder)
+                {
+                    $fieldDef .= ' AFTER `' . $lastColumn . '`';
+                }
+                
+                $queryFields[] = $fieldDef;
+                
+            }
+            
+            $lastColumn = $field['columnName'];
+            
+	}
+        return 'ALTER TABLE `'.$recordClass::$tableName.'` '.implode(", \n",$queryFields);
+    }
+
     public static function getSQLType($field)
     {
         switch ($field['type']) {
