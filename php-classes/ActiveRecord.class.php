@@ -920,8 +920,13 @@ class ActiveRecord
                     foreach ($related::getStackedConfig('relationships') as $otherRelationship => $otherOptions) {
                         if ($otherOptions['type'] == 'one-one' && $otherOptions['local'] == $options['foreign']) {
                             $related->_setRelationshipValue($otherRelationship, $this);
+                            break;
                         }
                     }
+                }
+            } elseif ($options['type'] == 'context-children') {
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->_setRelationshipValue('Context', $this);
                 }
             }
         }
@@ -979,9 +984,72 @@ class ActiveRecord
                 $this->_relatedObjects[$relationship]->setField($options['foreign'], $this->getValue($options['local']));
                 $this->_relatedObjects[$relationship]->save();
             } elseif ($options['type'] == 'one-many' && $options['local'] == 'ID') {
+                $relatedObjectClass = $options['class'];
+                $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] AS $related) {
                     $related->setField($options['foreign'], $this->getValue($options['local']));
                     $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+
+                if (isset($options['prune'])) {
+                    if ($options['prune'] == 'delete') {
+                        DB::nonQuery(
+                            'DELETE FROM `%s` '.
+                            ' WHERE %s = "%s" '.
+                            '   AND ID NOT IN (%s) ',
+                            [
+                                $relatedObjectClass::$tableName,
+                                $options['foreign'],
+                                $this->ID,
+                                join(', ', array_keys($relatedObjects))
+                            ]
+                        );
+                    }
+                }
+            } elseif ($options['type'] == 'context-children') {
+                $relatedObjectClass = $options['class'];
+                $relatedObjects = [];
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->Context = $this;
+                    $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+                if (isset($options['prune'])) {
+                    switch ($options['prune']) {
+                        case 'unlink':
+                            DB::nonQuery(
+                                'UPDATE `%s` %s '.
+                                '   SET '.
+                                'ContextID = NULL, '.
+                                'ContextClass = NULL '.
+
+                                ' WHERE ID NOT IN (%s)',
+                                [
+                                    $relatedObjectClass::$tableName,
+                                    $relatedObjectClass::getTableAlias(),
+                                    join(', ', array_keys($relatedObjects))
+                                ]
+                            );
+
+                            break;
+
+                        case 'delete':
+                            DB::nonQuery(
+                                'DELETE FROM `%s` '.
+                                ' WHERE ContextClass = "%s" '.
+                                '   AND ContextID = %u '.
+                                '   AND ID NOT IN (%s) ',
+                                [
+                                    $relatedObjectClass::$tableName,
+                                    DB::escape($this->getRootClass()),
+                                    $this->ID,
+                                    join(', ', array_keys($relatedObjects))
+                                ]
+                            );
+
+                            break;
+                    }
                 }
             }
         }
@@ -2328,9 +2396,16 @@ class ActiveRecord
             }
 
             $this->_setFieldValue($rel['local'], $value ? $value->Handle : null);
-                    } elseif ($rel['type'] == 'context-children') {
+        } elseif ($rel['type'] == 'context-children') {
             $set = [];
 
+            if (!is_array($value)) {
+                if (!empty($value)) {
+                    $value = [$value];
+                } else {
+                    $value = [];
+                }
+            }
             foreach ($value as $related) {
                 if (!$related || !is_a($related, 'ActiveRecord')) {
                     continue;
