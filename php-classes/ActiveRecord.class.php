@@ -1002,7 +1002,7 @@ class ActiveRecord
                                 $relatedObjectClass::$tableName,
                                 $options['foreign'],
                                 $this->ID,
-                                join(", ", array_keys($relatedObjects))
+                                join(', ', array_keys($relatedObjects))
                             ]
                         );
                     }
@@ -1044,7 +1044,7 @@ class ActiveRecord
                                     $relatedObjectClass::$tableName,
                                     DB::escape($this->getRootClass()),
                                     $this->ID,
-                                    join(", ", array_keys($relatedObjects))
+                                    join(', ', array_keys($relatedObjects))
                                 ]
                             );
 
