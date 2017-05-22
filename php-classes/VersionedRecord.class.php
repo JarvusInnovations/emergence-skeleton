@@ -140,6 +140,10 @@ abstract class VersionedRecord extends ActiveRecord
         // save record as usual
         $return = parent::save($deep);
 
+        if ($this->_isSaving) {
+            return null;
+        }
+
         if ($wasDirty) {
             // save a copy to history table
             $recordValues = $this->_prepareRecordValues();
