@@ -146,7 +146,7 @@ class Job extends ActiveRecord implements LoggerInterface
 
         $logEntry['message'] = call_user_func($messageRenderer, $logEntry);
 
-        return $this->log(
+        $this->log(
             $logEntry['level'],
             $logEntry['message'],
             [
@@ -154,6 +154,8 @@ class Job extends ActiveRecord implements LoggerInterface
                 'record' => $Record
             ]
         );
+
+        return $logEntry;
     }
 
     public function logInvalidRecord(\ActiveRecord $Record)
@@ -187,7 +189,7 @@ class Job extends ActiveRecord implements LoggerInterface
         return $this->isPhantom ? null : \Site::$rootPath.'/site-data/connector-jobs/'.$this->ID.'.json';
     }
 
-    public function writeLog($logEntry, $compress = false)
+    public function writeLog($compress = true)
     {
         $logPath = $this->getLogPath();
 
@@ -200,7 +202,7 @@ class Job extends ActiveRecord implements LoggerInterface
             mkdir($logDirectory, 0777, true);
         }
 
-        file_put_contents($logPath, json_encode($logEntry), FILE_APPEND | LOCK_EX);
+        file_put_contents($logPath, json_encode($this->logEntries));
         if ($compress === true) {
             exec("bzip2 $logPath");
         }
@@ -215,6 +217,7 @@ class Job extends ActiveRecord implements LoggerInterface
         ];
 
         $this->logEntries[] = $entry;
-        $this->writeLog($entry);
+
+        return $entry;
     }
 }
