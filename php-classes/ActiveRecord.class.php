@@ -2177,10 +2177,20 @@ class ActiveRecord
 
         if ($forceDirty || !array_key_exists($columnName, $this->_record) || $this->_record[$columnName] !== $value) {
             if (array_key_exists($columnName, $this->_record)) {
-                $this->_originalValues[$field] = $originalValue;
+                // only store original value if it hasn't been previously set
+                if (!array_key_exists($field, $this->_originalValues)) {
+                    $this->_originalValues[$field] = $originalValue;
+                } elseif ($this->_originalValues[$field] == $value) { // the value was reverted back to it's original value
+                    unset($this->_originalValues[$field]);
+                }
             }
             $this->_record[$columnName] = $value;
-            $this->_isDirty = true;
+            // set record dirty if there are still dirty fields remaining
+            if (!empty($this->_originalValues) || $forceDirty || $this->isPhantom) {
+                $this->_isDirty = true;
+            } else {
+                $this->_isDirty = false;
+            }
 
             // unset invalidated relationships
             if (!empty($fieldOptions['relationships'])) {
@@ -2390,6 +2400,7 @@ class ActiveRecord
 
             // so any invalid values are removed
             $value = $set;
+            $this->_isDirty = true;
         } elseif ($rel['type'] ==  'handle') {
             if ($value !== null && !is_a($value,'ActiveRecord')) {
                 return false;
@@ -2416,12 +2427,12 @@ class ActiveRecord
             }
 
             $value = $set;
+            $this->_isDirty = true;
         } else {
             return false;
         }
 
         $this->_relatedObjects[$relationship] = $value;
-        $this->_isDirty = true;
     }
 
     public function appendRelated($relationship, $values)
