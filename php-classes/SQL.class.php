@@ -17,47 +17,8 @@ class SQL
         // compile fields
         $rootClass = $recordClass::getStaticRootClass();
         foreach ($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field) {
-            if ($field['columnName'] == 'RevisionID') {
-                continue;
-            }
 
-            // force notnull=false on non-rootclass fields
-            if ($rootClass && !$rootClass::fieldExists($fieldId)) {
-                $field['notnull'] = false;
-            }
-
-            // auto-prepend class type
-            if ($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses())) {
-                array_unshift($field['values'], $rootClass);
-            }
-
-            $fieldDef = '`'.$field['columnName'].'`';
-            $fieldDef .= ' '.static::getSQLType($field);
-
-            if (!empty($field['charset'])) {
-                $fieldDef .= " CHARACTER SET $field[charset]";
-            }
-
-            if (!empty($field['collate'])) {
-                $fieldDef .= " COLLATE $field[collate]";
-            }
-
-            $fieldDef .= ' '.($field['notnull'] ? 'NOT NULL' : 'NULL');
-
-            if ($field['autoincrement'] && !$historyVariant) {
-                $fieldDef .= ' auto_increment';
-            } elseif (($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP')) {
-                $fieldDef .= ' default CURRENT_TIMESTAMP';
-            } elseif (empty($field['notnull']) && ($field['default'] == null)) {
-                $fieldDef .= ' default NULL';
-            } elseif (isset($field['default'])) {
-                if ($field['type'] == 'boolean') {
-                    $fieldDef .= ' default '.($field['default'] ? 1 : 0);
-                } else {
-                    $fieldDef .= ' default "'.DB::escape($field['default']).'"';
-                }
-            }
-            $queryFields[] = $fieldDef;
+            $queryFields[] = static::getFieldDefinition($field);
 
             if (!empty($field['primary'])) {
                 if ($historyVariant) {
@@ -184,5 +145,54 @@ class SQL
             default:
                 die("getSQLType: unhandled type $field[type]");
         }
+    }
+
+    public static function getFieldDefinition($recordClass, $fieldName)
+    {
+        $field = $recordClass::getFieldOptions($fieldName);
+        $rootClass = $recordClass::getStaticRootClass();
+
+        if ($field['columnName'] == 'RevisionID') {
+            continue;
+        }
+
+        // force notnull=false on non-rootclass fields
+        if ($rootClass && !$rootClass::fieldExists($fieldName)) {
+            $field['notnull'] = false;
+        }
+
+        // auto-prepend class type
+        if ($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses())) {
+            array_unshift($field['values'], $rootClass);
+        }
+
+        $fieldDef = '`'.$field['columnName'].'`';
+        $fieldDef .= ' '.static::getSQLType($field);
+
+        if (!empty($field['charset'])) {
+            $fieldDef .= " CHARACTER SET $field[charset]";
+        }
+
+        if (!empty($field['collate'])) {
+            $fieldDef .= " COLLATE $field[collate]";
+        }
+
+        $fieldDef .= ' '.($field['notnull'] ? 'NOT NULL' : 'NULL');
+
+        if ($field['autoincrement'] && !$historyVariant) {
+            $fieldDef .= ' auto_increment';
+        } elseif (($field['type'] == 'timestamp') && ($field['default'] == 'CURRENT_TIMESTAMP')) {
+            $fieldDef .= ' default CURRENT_TIMESTAMP';
+        } elseif (empty($field['notnull']) && ($field['default'] == null)) {
+            $fieldDef .= ' default NULL';
+        } elseif (isset($field['default'])) {
+            if ($field['type'] == 'boolean') {
+                $fieldDef .= ' default '.($field['default'] ? 1 : 0);
+            } else {
+                $fieldDef .= ' default "'.DB::escape($field['default']).'"';
+            }
+        }
+
+        return $fieldDef;
     }
 }
