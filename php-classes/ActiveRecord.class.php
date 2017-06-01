@@ -682,15 +682,27 @@ class ActiveRecord
     {
         $data = array();
 
-        foreach ($this->getClassFields() AS $field => $options) {
-            if (!empty($options['includeInSummary'])) {
-                $data[$field] = $this->_getFieldValue($field);
-            }
-        }
+        $summaryFields = array_filter(static::getStackedConfig('summaryFields'));
 
-        foreach (static::$dynamicFields AS $field => $options) {
-            if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
-                $data[$field] = $this->getDynamicFieldValue($field, true);
+        if (!empty($summaryFields)) {
+            foreach (array_keys($summaryFields) AS $field) {
+                if (static::_fieldExists($field)) {
+                    $data[$field] = $this->_getFieldValue($field);
+                } elseif ($this->userCanEnumerateDynamicField($field)) {
+                    $data[$field] = $this->getDynamicFieldValue($field, true);
+                }
+            }
+        } else {
+            foreach ($this->getClassFields() AS $field => $options) {
+                if (!empty($options['includeInSummary'])) {
+                    $data[$field] = $this->_getFieldValue($field);
+                }
+            }
+    
+            foreach (static::getStackedConfig('dynamicFields') AS $field => $options) {
+                if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
+                    $data[$field] = $this->getDynamicFieldValue($field, true);
+                }
             }
         }
 
