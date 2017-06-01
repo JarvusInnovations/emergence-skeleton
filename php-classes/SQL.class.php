@@ -21,7 +21,7 @@ class SQL
                 continue;
             }
 
-            $queryFields[] = static::getFieldDefinition($field);
+            $queryFields[] = static::getFieldDefinition($recordClass, $fieldId, $historyVariant);
 
             if (!empty($field['primary'])) {
                 if ($historyVariant) {
@@ -150,7 +150,7 @@ class SQL
         }
     }
 
-    public static function getFieldDefinition($recordClass, $fieldName)
+    public static function getFieldDefinition($recordClass, $fieldName, $historyVariant = false)
     {
         $field = $recordClass::getFieldOptions($fieldName);
         $rootClass = $recordClass::getStaticRootClass();
