@@ -17,6 +17,9 @@ class SQL
         // compile fields
         $rootClass = $recordClass::getStaticRootClass();
         foreach ($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field) {
+            if ($field['columnName'] == 'RevisionID') {
+                continue;
+            }
 
             $queryFields[] = static::getFieldDefinition($field);
 
@@ -151,10 +154,6 @@ class SQL
     {
         $field = $recordClass::getFieldOptions($fieldName);
         $rootClass = $recordClass::getStaticRootClass();
-
-        if ($field['columnName'] == 'RevisionID') {
-            continue;
-        }
 
         // force notnull=false on non-rootclass fields
         if ($rootClass && !$rootClass::fieldExists($fieldName)) {
