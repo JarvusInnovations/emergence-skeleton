@@ -2,6 +2,21 @@
 
 class SQL
 {
+    protected static $aggregateFieldConfigs;
+
+    protected static function getAggregateFieldOptions($recordClass, $field = null)
+    {
+        if (!isset(static::$aggregateFieldConfigs[$recordClass])) {
+            static::$aggregateFieldConfigs[$recordClass] = $recordClass::aggregateStackedConfig('fields');
+        }
+
+        if ($field) {
+            return static::$aggregateFieldConfigs[$recordClass][$field];
+        } else {
+            return static::$aggregateFieldConfigs[$recordClass];
+        }
+    }
+
     public static function getCreateTable($recordClass, $historyVariant = false)
     {
         $queryFields = array();
@@ -16,7 +31,7 @@ class SQL
 
         // compile fields
         $rootClass = $recordClass::getStaticRootClass();
-        foreach ($recordClass::aggregateStackedConfig('fields') AS $fieldId => $field) {
+        foreach (static::getAggregateFieldOptions($recordClass) AS $fieldId => $field) {
             if ($field['columnName'] == 'RevisionID') {
                 continue;
             }
@@ -152,7 +167,7 @@ class SQL
 
     public static function getFieldDefinition($recordClass, $fieldName, $historyVariant = false)
     {
-        $field = $recordClass::getFieldOptions($fieldName);
+        $field = static::getAggregateFieldOptions($recordClass, $fieldName);
         $rootClass = $recordClass::getStaticRootClass();
 
         // force notnull=false on non-rootclass fields
