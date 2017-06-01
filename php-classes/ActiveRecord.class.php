@@ -258,6 +258,7 @@ class ActiveRecord
 
     public static function &getStackedConfig($propertyName, $key = null)
     {
+        $null = null;
         $className = get_called_class();
 
         if (!isset(static::$_stackedConfigs[$className][$propertyName])) {
@@ -268,7 +269,7 @@ class ActiveRecord
             if (array_key_exists($key, static::$_stackedConfigs[$className][$propertyName])) {
                 return static::$_stackedConfigs[$className][$propertyName][$key];
             } else {
-                return null;
+                return $null;
             }
         } else {
             return static::$_stackedConfigs[$className][$propertyName];
@@ -698,7 +699,7 @@ class ActiveRecord
                     $data[$field] = $this->_getFieldValue($field);
                 }
             }
-    
+
             foreach (static::getStackedConfig('dynamicFields') AS $field => $options) {
                 if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
                     $data[$field] = $this->getDynamicFieldValue($field, true);
