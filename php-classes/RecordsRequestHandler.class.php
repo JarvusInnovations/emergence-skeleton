@@ -148,6 +148,18 @@ abstract class RecordsRequestHandler extends RequestHandler
             if ($sqlSearchConditions['joins']) {
                 $joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
             }
+
+            $sqlSearchConditions = $className::getSqlSearchConditions('any', $term);
+
+            if (count($sqlSearchConditions['conditions']) == 0 && !$sqlSearchConditions['qualifierFound']) {
+                return static::throwError('Unknown search qualifier: '.$qualifier);
+            }
+
+            $matchers = array_merge($matchers, $sqlSearchConditions['conditions']);
+
+            if ($sqlSearchConditions['joins']) {
+                $joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
+            }
         }
 
         if (empty($matchers)) {
