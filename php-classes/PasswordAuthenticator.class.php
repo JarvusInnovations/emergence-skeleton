@@ -139,7 +139,11 @@ class PasswordAuthenticator extends Authenticator
      */
     public function respondLoginPrompt($authException = false)
     {
-        if (Site::$pathStack[0] == 'json' || $_REQUEST['format'] == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
+        if (
+            (!empty(Site::$pathStack[0]) && Site::$pathStack[0] == 'json')
+            || (!empty($_REQUEST['format']) && $_REQUEST['format'] == 'json')
+            || (!empty($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] == 'application/json')
+        ) {
             RequestHandler::$responseMode = 'json';
         }
 
