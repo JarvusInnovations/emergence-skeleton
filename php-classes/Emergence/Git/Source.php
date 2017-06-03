@@ -428,6 +428,8 @@ class Source
                 $file['renamedPath'] = stripslashes(substr($file['renamedPath'], 1, -1));
             }
 
+            $file['currentPath'] = !empty($file['renamedPath']) ? $file['renamedPath'] : $file['path'];
+
             // decode status
             $file['tracked'] = $file['indexStatus'] != '?' && $file['workTreeStatus'] != '?';
             $file['ignored'] = $file['indexStatus'] == '!' && $file['workTreeStatus'] == '!';
@@ -436,18 +438,18 @@ class Source
 
             if (!empty($options['groupByStatus'])) {
                 if ($file['staged']) {
-                    $files['staged'][$matches['path']] = $file;
+                    $files['staged'][$file['currentPath']] = $file;
                 }
 
                 if ($file['unstaged']) {
-                    $files['unstaged'][$matches['path']] = $file;
+                    $files['unstaged'][$file['currentPath']] = $file;
                 }
 
                 if ($file['ignored']) {
-                    $files['ignored'][$matches['path']] = $file;
+                    $files['ignored'][$file['currentPath']] = $file;
                 }
             } else {
-                $files[$matches['path']] = $file;
+                $files[$file['currentPath']] = $file;
             }
 
         }
