@@ -679,7 +679,7 @@ class ActiveRecord
         $this->_setFieldValue($field, $value);
     }
 
-    public function getSummary()
+    public function getSummary($include = [])
     {
         $data = array();
 
@@ -690,7 +690,7 @@ class ActiveRecord
                 if (static::_fieldExists($field)) {
                     $data[$field] = $this->_getFieldValue($field);
                 } elseif ($this->userCanEnumerateDynamicField($field)) {
-                    $data[$field] = $this->getDynamicFieldValue($field, true);
+                    $data[$field] = $this->getDynamicFieldValue($field, $include != '*' && !in_array($field, $include));
                 }
             }
         } else {
@@ -702,7 +702,7 @@ class ActiveRecord
 
             foreach (static::getStackedConfig('dynamicFields') AS $field => $options) {
                 if (!empty($options['includeInSummary']) && $this->userCanEnumerateDynamicField($field)) {
-                    $data[$field] = $this->getDynamicFieldValue($field, true);
+                    $data[$field] = $this->getDynamicFieldValue($field, $include != '*' && !in_array($field, $include));
                 }
             }
         }

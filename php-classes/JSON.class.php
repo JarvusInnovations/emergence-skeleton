@@ -70,9 +70,10 @@ class JSON
     public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
     {
         if (is_object($input)) {
-            if ($summary && method_exists($input, 'getSummary')) {
-                $input = $input->getSummary();
-            } elseif (!empty($include) && method_exists($input, 'getDetails')) {
+            if (
+                !empty($include) && 
+                $summary ? method_exists($input, 'getSummary') : method_exists($input, 'getDetails')
+            ) {
                 $includeThisLevel = array();
                 $includeLater = array();
 
@@ -110,7 +111,7 @@ class JSON
                     }
                 }
 
-                $input = $input->getDetails($includeThisLevel, $stringsOnly);
+                $input = $summary ? $input->getSummary($includeThisLevel) : $input->getDetails($includeThisLevel, $stringsOnly);
             } elseif (method_exists($input, 'getData')) {
                 $input = $input->getData();
             }
@@ -137,7 +138,7 @@ class JSON
         }
     }
 
-#	public static function mapArrayToRecords($array)
+#    public static function mapArrayToRecords($array)
 #	{
 #		return array_map(create_function('$value', 'return array($value);'), $array);
 #	}
