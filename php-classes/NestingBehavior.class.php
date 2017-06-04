@@ -95,8 +95,10 @@ class NestingBehavior extends RecordBehavior
     }
 
 
-    public static function repairTable($tableName, $leftCol = 'Left', $rightCol = 'Right', $parentCol = 'ParentID')
+    public static function repairTable($className, $leftCol = 'Left', $rightCol = 'Right', $parentCol = 'ParentID')
     {
+        $tableName = $className::$tableName;
+
         // check for orphan collections first
         $orphanCollections = DB::allValues('ID', 'SELECT c1.ID FROM _e_file_collections c1 LEFT JOIN _e_file_collections c2 ON c2.ID = c1.ParentID WHERE c1.ParentID IS NOT NULL AND c2.ID IS NULL');
 
@@ -110,10 +112,11 @@ class NestingBehavior extends RecordBehavior
         $cursor = 1;
 
         $result = DB::query(
-            'SELECT ID, `%2$s` FROM `%1$s` ORDER BY `%2$s`, ID'
+            'SELECT ID, `%2$s` FROM `%1$s` ORDER BY `%2$s`, %3$s'
             ,array(
                 $tableName
                 ,$parentCol
+                ,!empty($className::$siblingOrder) ? $className::$siblingOrder : 'ID'
             )
         );
 

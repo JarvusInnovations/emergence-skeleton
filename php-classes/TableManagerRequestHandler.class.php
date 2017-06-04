@@ -155,7 +155,7 @@ class TableManagerRequestHandler extends RequestHandler
             return static::throwInvalidRequestError();
         }
 
-        NestingBehavior::repairTable($_REQUEST['class']::$tableName);
+        NestingBehavior::repairTable($_REQUEST['class']);
 
         return static::respond('message', array(
             'message' => 'Renesting complete'

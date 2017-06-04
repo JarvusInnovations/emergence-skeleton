@@ -81,7 +81,7 @@ return [
 
             if (in_array('renest', $ops)) {
                 // renest all collections
-                $renestedCount = NestingBehavior::repairTable('_e_file_collections', 'PosLeft', 'PosRight');
+                $renestedCount = NestingBehavior::repairTable(SiteCollection::class, 'PosLeft', 'PosRight');
 
                 $messages[] = "Renested $renestedCount collections";
             }
