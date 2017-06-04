@@ -4,8 +4,7 @@ namespace Emergence\Connectors\Exceptions;
 
 class SyncException extends \Exception
 {
-    private $message;
-    private $context;
+    protected $context;
 
     public function __construct($message, array $context = [])
     {
@@ -13,11 +12,6 @@ class SyncException extends \Exception
         $this->context = $context;
 
         return parent::__construct($message);
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
     }
 
     public function getInterpolatedMessage()
