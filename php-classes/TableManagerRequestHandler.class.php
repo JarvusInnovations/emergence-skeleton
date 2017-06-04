@@ -3,7 +3,7 @@
 class TableManagerRequestHandler extends RequestHandler
 {
     public static $classFilters = array(
-        '/^(Dwoo|Sabre|PHPUnit)[\\\\_]/',
+        '/^(Dwoo|Sabre|PHPUnit|Symfony|Gitonomy)[\\\\_]/',
         '/^getID3/',
         '/(Trait|Interface|Test)$/'
     );
