@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Yaml\Yaml;
+use Emergence\Dwoo\Engine AS DwooEngine;
 
 
 abstract class RequestHandler
@@ -146,9 +147,15 @@ abstract class RequestHandler
             setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
         }
 
+        try {
+            $template = DwooEngine::findTemplate("$responseID.pdf");
+        } catch (Exception $e) {
+            $template = DwooEngine::findTemplate($responseID);
+        }
+
         $tmpPath = tempnam('/tmp', 'e_pdf_');
 
-        file_put_contents($tmpPath.'.html', Emergence\Dwoo\Engine::getSource("$responseID.pdf", $responseData));
+        file_put_contents($tmpPath.'.html', DwooEngine::getSource($template, $responseData));
 
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
@@ -172,14 +179,14 @@ abstract class RequestHandler
     public static function respondXml($responseID, $responseData = array())
     {
         header('Content-Type: text/xml; charset=utf-8');
-        return Emergence\Dwoo\Engine::respond($responseID, $responseData);
+        return DwooEngine::respond($responseID, $responseData);
     }
 
     public static function respondHtml($responseID, $responseData = array())
     {
         header('Content-Type: text/html; charset=utf-8');
         $responseData['responseID'] = $responseID;
-        return Emergence\Dwoo\Engine::respond($responseID, $responseData);
+        return DwooEngine::respond($responseID, $responseData);
     }
 
     public static function throwUnauthorizedError($message = 'You do not have authorization to access this resource')
