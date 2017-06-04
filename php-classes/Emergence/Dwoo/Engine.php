@@ -68,7 +68,7 @@ class Engine extends \Dwoo_Core
 
         if (is_string($template)) {
             $dwoo->globals['responseId'] = $template;
-            $template = $dwoo->templateFactory($factory ? $factory : static::$defaultTemplateResource, $template.'.tpl');
+            $template = static::findTemplate($template, $factory);
         } elseif (is_a($template, 'SiteFile')) {
             $template = new Template($template);
         }
@@ -82,12 +82,17 @@ class Engine extends \Dwoo_Core
         $dwoo = static::getInstance();
 
         if (is_string($template)) {
-            $template = $dwoo->templateFactory($factory ? $factory : static::$defaultTemplateResource, $template.'.tpl');
+            $template = static::findTemplate($template, $factory);
         } elseif (is_a($template, 'SiteFile')) {
             $template = new Template($template);
         }
 
         return $dwoo->get($template, $data);
+    }
+
+    public static function findTemplate($template, $factory = null)
+    {
+        return static::getInstance()->templateFactory($factory ? $factory : static::$defaultTemplateResource, $template.'.tpl');
     }
 
 
