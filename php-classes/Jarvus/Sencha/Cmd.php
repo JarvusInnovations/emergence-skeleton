@@ -62,7 +62,13 @@ class Cmd
     // public instance methods
     public function getExecutablePath()
     {
-        return $this->getPath().'/sencha';
+        $path = $this->getPath();
+
+        if (substr($path, 0, 5) == '/hab/') {
+            return 'hab pkg exec jarvus/sencha-cmd/'.$this->getVersion().' sencha';
+        }
+
+        return $path.'/sencha';
     }
 
     public function getDefaultEnv()
@@ -106,8 +112,10 @@ class Cmd
             $results[basename($directory)] = $directory;
         }
 
-        foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*') AS $directory) {
-            $results[basename($directory)] = "$directory/dist";
+        if (exec('which hab')) {
+            foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*/*') AS $directory) {
+                $results[basename(dirname($directory))] = "$directory/dist";
+            }
         }
 
         uksort($results, 'version_compare');
