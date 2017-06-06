@@ -106,6 +106,10 @@ class Cmd
             $results[basename($directory)] = $directory;
         }
 
+        foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*') AS $directory) {
+            $results[basename($directory)] = "$directory/dist";
+        }
+
         uksort($results, 'version_compare');
 
         return $results;
