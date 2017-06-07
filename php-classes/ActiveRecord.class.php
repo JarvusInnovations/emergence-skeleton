@@ -949,6 +949,10 @@ class ActiveRecord
     {
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
+            if (isset($options['ignoreDeepSave'])) {
+                continue;
+            }
+
             if ($options['type'] == 'one-one') {
                 if (isset($this->_relatedObjects[$relationship])) {
                     $this->_relatedObjects[$relationship]->save();
@@ -986,7 +990,7 @@ class ActiveRecord
         //die('psr');
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
-            if (!isset($this->_relatedObjects[$relationship])) {
+            if (isset($options['ignoreDeepSave']) || !isset($this->_relatedObjects[$relationship])) {
                 continue;
             }
 
