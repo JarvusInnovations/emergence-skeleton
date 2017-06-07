@@ -949,7 +949,7 @@ class ActiveRecord
     {
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
-            if (isset($options['ignoreDeepSave'])) {
+            if (!empty($options['ignoreDeepSave'])) {
                 continue;
             }
 
@@ -990,7 +990,7 @@ class ActiveRecord
         //die('psr');
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
-            if (isset($options['ignoreDeepSave']) || !isset($this->_relatedObjects[$relationship])) {
+            if (!empty($options['ignoreDeepSave']) || !isset($this->_relatedObjects[$relationship])) {
                 continue;
             }
 
