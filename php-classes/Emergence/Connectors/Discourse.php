@@ -29,14 +29,15 @@ class Discourse extends \Emergence\Connectors\AbstractConnector implements \Emer
             return static::throwInvalidRequestError('sig is invalid');
         }
 
-        if (!static::$host || !static::$ssoSecret) {
-            return static::throwError('Discourse SSO is not fully configured yet');
+        if (!static::$ssoSecret) {
+            return static::throwError('Discourse SSO secret is not configured yet');
         }
 
 
         // decode payload into associative array
         $payload = base64_decode($_GET['sso']);
         parse_str($payload, $payload);
+        $returnUrl = $payload['return_sso_url'];
 
 
         // append return values to payload
@@ -56,7 +57,7 @@ class Discourse extends \Emergence\Connectors\AbstractConnector implements \Emer
 
 
         // redirect with payload and its signature
-        Site::redirect('http://'.static::$host.'/session/sso_login', [
+        Site::redirect($returnUrl, [
             'sso' => $payload,
             'sig' => hash_hmac('sha256', $payload, static::$ssoSecret)
         ]);
