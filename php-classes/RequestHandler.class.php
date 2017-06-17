@@ -191,7 +191,7 @@ abstract class RequestHandler
 
     public static function throwUnauthorizedError($message = 'You do not have authorization to access this resource')
     {
-        if (!$GLOBALS['Session']->Person) {
+        if (!empty($GLOBALS['Session']) && !$GLOBALS['Session']->Person) {
             $GLOBALS['Session']->requireAuthentication();
         }
 
