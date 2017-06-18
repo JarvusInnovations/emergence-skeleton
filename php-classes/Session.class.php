@@ -52,6 +52,7 @@ class Session extends ActiveRecord
         // auto-detect cookie domain by trimming leading www. from current hostname
         if (!static::$cookieDomain && !empty($_SERVER['HTTP_HOST'])) {
             static::$cookieDomain = preg_replace('/^www\.([^.]+\.[^.]+)$/i', '$1', $_SERVER['HTTP_HOST']);
+            static::$cookieDomain = preg_replace('/^([^:]+):\d+$/i', '$1', static::$cookieDomain);
         }
     }
 
