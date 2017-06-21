@@ -3,6 +3,7 @@
 namespace Emergence\SSH;
 
 use Site;
+use Exception;
 
 
 class KeyPair
@@ -81,7 +82,7 @@ class KeyPair
         $publicKey = trim(file_get_contents($publicKeyPath));
 
         if (!$privateKey || !$publicKey) {
-            throw new \Exception('Could not load public/private key pair');
+            throw new Exception('Could not load public/private key pair');
         }
 
         return new static($privateKey, $publicKey);
