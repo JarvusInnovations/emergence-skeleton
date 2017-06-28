@@ -150,7 +150,7 @@ class Job extends ActiveRecord implements LoggerInterface
             $logEntry['level'],
             $logEntry['message'],
             [
-                'changes' => $changes,
+                'changes' => $logEntry['changes'],
                 'record' => $Record
             ]
         );
