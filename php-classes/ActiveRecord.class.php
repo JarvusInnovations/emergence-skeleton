@@ -949,20 +949,22 @@ class ActiveRecord
     {
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
-            if ($options['type'] == 'one-one') {
-                if (isset($this->_relatedObjects[$relationship])) {
-                    $this->_relatedObjects[$relationship]->save();
+            if (!isset($this->_relatedObjects[$relationship])) {
+                continue;
+            }
 
-                    if (!empty($options['link']) && is_array($options['link'])) {
-                        foreach ($options['link'] AS $linkLocal => $linkForeign) {
-                            $this->_setFieldValue(is_string($linkLocal) ? $linkLocal : $linkForeign, $this->_relatedObjects[$relationship]->getValue($linkForeign));
-                        }
-                    } elseif ($options['local'] != 'ID') {
-                        $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->getValue($options['foreign']));
+            if ($options['type'] == 'one-one') {
+                $this->_relatedObjects[$relationship]->save();
+
+                if (!empty($options['link']) && is_array($options['link'])) {
+                    foreach ($options['link'] AS $linkLocal => $linkForeign) {
+                        $this->_setFieldValue(is_string($linkLocal) ? $linkLocal : $linkForeign, $this->_relatedObjects[$relationship]->getValue($linkForeign));
                     }
+                } elseif ($options['local'] != 'ID') {
+                    $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->getValue($options['foreign']));
                 }
             } elseif ($options['type'] == 'one-many') {
-                if (isset($this->_relatedObjects[$relationship]) && $options['local'] != 'ID') {
+                if ($options['local'] != 'ID') {
                     foreach ($this->_relatedObjects[$relationship] AS $related) {
                         if ($related->isPhantom) {
                             $related->_setFieldValue($options['foreign'], $this->_getFieldValue($options['local']));
@@ -972,9 +974,7 @@ class ActiveRecord
                     }
                 }
             } elseif ($options['type'] == 'handle') {
-                if (isset($this->_relatedObjects[$relationship])) {
-                    $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->Handle);
-                }
+                $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->Handle);
             } else {
                 // TODO: Implement other methods
             }
