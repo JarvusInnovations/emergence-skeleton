@@ -4,6 +4,7 @@ namespace Emergence\Dwoo;
 
 use Site;
 use Dwoo_Core;
+use Exception;
 
 class Template extends \Dwoo_Template_String
 {
@@ -94,7 +95,7 @@ class Template extends \Dwoo_Template_String
         }
 
         if (!$templateNode && $throwExceptionOnNotFound) {
-            throw new \Exception(
+            throw new Exception(
                 "Could not find template match for \"".implode('/', $path)."\", checked paths:\n\n"
                 .implode(PHP_EOL, array_map(function($a) {
                     return implode('/', $a);
