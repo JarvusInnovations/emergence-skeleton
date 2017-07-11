@@ -1574,10 +1574,15 @@ class ActiveRecord
         return $relationships;
     }
 
-    public static function getDefaultForeignIdentifierColumnName()
+    public static function getDefaultForeignRelationshipName()
     {
         $reflection = new \ReflectionClass(static::getStaticRootClass());
-        return $reflection->getShortName().'ID';
+        return $reflection->getShortName();
+    }
+
+    public static function getDefaultForeignIdentifierColumnName()
+    {
+        return static::getDefaultForeignRelationshipName().'ID';
     }
 
     protected static function _initRelationship($relationship, $options)
