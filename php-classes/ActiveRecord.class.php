@@ -2392,7 +2392,7 @@ class ActiveRecord
             } else {
                 // set Class and ID
                 $this->_setFieldValue($rel['classField'], $value->getRootClass());
-                $this->_setFieldValue($rel['local'], $value->__get($rel['foreign']));
+                $this->_setFieldValue($rel['local'], $value->_getFieldValue($rel['foreign']));
             }
         } elseif ($rel['type'] == 'one-many' && is_array($value)) {
             $set = array();
