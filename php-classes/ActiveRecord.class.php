@@ -2373,7 +2373,7 @@ class ActiveRecord
         $rel = static::getStackedConfig('relationships', $relationship);
 
         if ($rel['type'] ==  'one-one') {
-            if ($value !== null && !is_a($value,'ActiveRecord')) {
+            if ($value !== null && !is_a($value, __CLASS__)) {
                 return false;
             }
 
@@ -2381,7 +2381,7 @@ class ActiveRecord
                 $this->_setFieldValue($rel['local'], $value ? $value->getValue($rel['foreign']) : null);
             }
         } elseif ($rel['type'] ==  'context-parent') {
-            if ($value !== null && !is_a($value,'ActiveRecord')) {
+            if ($value !== null && !is_a($value, __CLASS__)) {
                 return false;
             }
 
@@ -2398,7 +2398,7 @@ class ActiveRecord
             $set = array();
 
             foreach ($value AS $related) {
-                if (!$related || !is_a($related,'ActiveRecord')) {
+                if (!$related || !is_a($related, __CLASS__)) {
                     continue;
                 }
 
@@ -2409,7 +2409,7 @@ class ActiveRecord
             // so any invalid values are removed
             $value = $set;
         } elseif ($rel['type'] ==  'handle') {
-            if ($value !== null && !is_a($value,'ActiveRecord')) {
+            if ($value !== null && !is_a($value, __CLASS__)) {
                 return false;
             }
 
@@ -2425,7 +2425,7 @@ class ActiveRecord
                 }
             }
             foreach ($value as $related) {
-                if (!$related || !is_a($related, 'ActiveRecord')) {
+                if (!$related || !is_a($related, __CLASS__)) {
                     continue;
                 }
 
@@ -2455,7 +2455,7 @@ class ActiveRecord
         }
 
         foreach ($values AS $relatedObject) {
-            if (!$relatedObject || !is_a($relatedObject,'ActiveRecord')) {
+            if (!$relatedObject || !is_a($relatedObject, __CLASS__)) {
                 continue;
             }
 
