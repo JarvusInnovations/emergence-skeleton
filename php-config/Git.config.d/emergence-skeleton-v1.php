@@ -40,4 +40,13 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
             ]
         ]
     ];
+
+    Git::$repositories['utf8'] = [
+        'remote' => 'https://github.com/tchwork/utf8.git'
+        ,'originBranch' => 'master'
+        ,'workingBranch' => 'master'
+        ,'trees' => [
+            'php-classes/Patchwork/Utf8.php' => 'src/Patchwork/Utf8.php'
+        ]
+    ];
 }

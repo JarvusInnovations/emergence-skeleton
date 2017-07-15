@@ -59,7 +59,7 @@ class HandleBehavior extends RecordBehavior
 
         // transliterate
         if ($options['transliterate']) {
-            $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+            $text = Patchwork\Utf8::toAscii($text);
 
             // trim any non-word characters created during transliterate and any adjacent placeholders
             $text = preg_replace('/[-_]*[^-\w\.]+[-_]*/u', '', $text);
@@ -67,9 +67,9 @@ class HandleBehavior extends RecordBehavior
 
         // transform case
         if ($options['case'] == 'lower') {
-            $text = strtolower($text);
+            $text = mb_strtolower($text, 'utf-8');
         } elseif ($options['case'] == 'upper') {
-            $text = strtoupper($text);
+            $text = mb_strtoupper($text, 'utf-8');
         }
 
         // clean up any placeholder characters from ends
