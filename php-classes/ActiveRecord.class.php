@@ -954,14 +954,15 @@ class ActiveRecord
             }
 
             if ($options['type'] == 'one-one') {
-                $this->_relatedObjects[$relationship]->save();
+                $related = $this->_relatedObjects[$relationship];
+                $related->save();
 
                 if (!empty($options['link']) && is_array($options['link'])) {
                     foreach ($options['link'] AS $linkLocal => $linkForeign) {
                         $this->_setFieldValue(is_string($linkLocal) ? $linkLocal : $linkForeign, $this->_relatedObjects[$relationship]->getValue($linkForeign));
                     }
                 } elseif ($options['local'] != 'ID') {
-                    $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->getValue($options['foreign']));
+                    $this->_setFieldValue($options['local'], $related->getValue($options['foreign']));
                 }
             } elseif ($options['type'] == 'one-many') {
                 if ($options['local'] != 'ID') {
