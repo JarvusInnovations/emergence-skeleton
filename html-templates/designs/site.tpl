@@ -42,7 +42,7 @@
 	{block "header"}
 		{* the things in here should probably be set up as configurable subtemplates in some way (especially nav) *}
 		<h1 id="logo">
-			<a href="/"><img src="http://placehold.it/300x40" alt="{Site::getConfig(label)|escape}" width="300" height="40"></a>
+			<a href="/"><img src="http://placehold.it/300x40" alt="{$.Site.title|escape}" width="300" height="40"></a>
 		</h1>
 		
 		<section id="user-info">
