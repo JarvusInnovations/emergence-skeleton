@@ -191,8 +191,15 @@
 
                     {foreach key=definition item=definitionData from=$definitions}
                         <section class="endpoint-model" id="{unique_dom_id}models//{$definition}{/unique_dom_id}">
-                            {*dump $definitionData*}
-                            {definition $definitionData definitionId=$definition}
+                            <header class="section-header">
+                                <h3 class="header-title"><a href="#{unique_dom_id}models//{$definition}{/unique_dom_id}">{$definition}</a></h3>
+                            </header>
+
+                            {if $definitionData.description}
+                                <div class="markdown indent">{$definitionData.description|escape|markdown}</div>
+                            {/if}
+
+                            {definition $definitionData}
                         </section>
                     {/foreach}
                 </section>
