@@ -53,7 +53,18 @@
             {if $input.type == 'array'}
                 [array] {definition $input.items}
             {else}
-                {$input.type} {if $input.format}({$input.format}){/if}
+                {$input.type}
+                {if $input.format}
+                    ({$input.format})
+                {/if}
+                {if $input.enum}
+                    (enum)
+                    <ul>
+                        {foreach item=value from=$input.enum}
+                            <li><q>{$value|escape}</q></li>
+                        {/foreach}
+                    </ul>
+                {/if}
             {/if}
         {/if}
     {/template}
