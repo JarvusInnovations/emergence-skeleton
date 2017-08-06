@@ -4,15 +4,17 @@ namespace Emergence\Connectors;
 
 use Emergence\People\IPerson;
 
+
 trait IdentityConsumerTrait
 {
+    public static $issuer;
     public static $requiredAccountLevel = 'User';
     public static $userIsPermitted;
     public static $beforeAuthenticate;
 
     public static function userIsPermitted(IPerson $Person)
     {
-        if (static::$requiredAccountLevel && !$Person->hasAccountLevel(static::$requiredAccountLevel)) {
+        if (static::$requiredAccountLevel && (!$Person || !$Person->hasAccountLevel(static::$requiredAccountLevel))) {
             return false;
         }
 
@@ -42,13 +44,25 @@ trait IdentityConsumerTrait
 
         return [
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-            'Value' => $Person->Username.'@'.SAML2::$issuer
+            'Value' => $Person->Username.'@'.static::$issuer
+        ];
+    }
+
+    public static function getSAMLAttributes(IPerson $Person)
+    {
+        return [
+            'User.Email' => [$Person->Email],
+            'User.Username' => [$Person->Username],
+            'first_name' => [$Person->FirstName],    	
+            'last_name' => [$Person->LastName]
         ];
     }
 
     public static function handleRequest($action = null)
     {
         switch ($action ?: $action = static::shiftPath()) {
+            case 'launch':
+                return static::handleLaunchRequest();
             case 'login':
                 $GLOBALS['Session']->requireAuthentication();
 
@@ -65,6 +79,11 @@ trait IdentityConsumerTrait
             default:
                 return parent::handleRequest($action);
         }
+    }
+
+    public static function handleLaunchRequest()
+    {
+        return static::throwInvalidRequestError('Launch method not implemented');
     }
 
     public static function handleLoginRequest(IPerson $Person)
