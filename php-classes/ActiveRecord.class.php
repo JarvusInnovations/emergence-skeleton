@@ -2600,7 +2600,7 @@ class ActiveRecord
         return ($count == 1) ? static::$singularNoun : static::$pluralNoun;
     }
 
-    public function getRootClass($boundingParentClass = __CLASS__)
+    public static function getRootClass($boundingParentClass = __CLASS__)
     {
         if (static::$rootClass) {
             return static::$rootClass;
@@ -2617,57 +2617,40 @@ class ActiveRecord
         }
     }
 
+    public static function getDefaultClass()
+    {
+        if (static::$defaultClass) {
+            return static::$defaultClass;
+        }
+
+        return static::getRootClass();
+    }
+
+    public static function getSubClasses()
+    {
+        if (static::$subClasses) {
+            return static::$subClasses;
+        }
+
+        return array_unique(array(static::getRootClass(), get_called_class()));
+    }
+
+    // @deprecated
     public static function getStaticRootClass($boundingParentClass = __CLASS__)
     {
-        if (static::$rootClass) {
-            return static::$rootClass;
-        }
-
-        // detect root class by crawling up the inheritence tree until an ActiveRecord parent is found
-        $class = get_called_class();
-        while ($parentClass = get_parent_class($class)) {
-            if ($parentClass == $boundingParentClass) {
-                return $class;
-            }
-
-            $class = $parentClass;
-        }
+        return static::getRootClass($boundingParentClass);
     }
 
-    public function getDefaultClass()
-    {
-        if (static::$defaultClass) {
-            return static::$defaultClass;
-        }
-
-        return $this->getRootClass();
-    }
-
+    // @deprecated
     public static function getStaticDefaultClass()
     {
-        if (static::$defaultClass) {
-            return static::$defaultClass;
-        }
-
-        return static::getStaticRootClass();
+        return static::getDefaultClass();
     }
 
-    public function getSubClasses()
-    {
-        if (static::$subClasses) {
-            return static::$subClasses;
-        }
-
-        return array_unique(array($this->getRootClass(), get_called_class()));
-    }
-
+    // @deprecated
     public static function getStaticSubClasses()
     {
-        if (static::$subClasses) {
-            return static::$subClasses;
-        }
-
-        return array_unique(array(static::getStaticRootClass(), get_called_class()));
+        return static::getSubClasses();
     }
 
     public static function sorterExists($name)

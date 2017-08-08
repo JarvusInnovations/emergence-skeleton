@@ -166,7 +166,7 @@ abstract class VersionedRecord extends ActiveRecord
         }
     }
 
-    public function getRootClass($boundingParentClass = __CLASS__)
+    public static function getRootClass($boundingParentClass = __CLASS__)
     {
         return parent::getRootClass($boundingParentClass);
     }
