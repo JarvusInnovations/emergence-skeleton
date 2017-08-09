@@ -25,6 +25,7 @@
 	    Ext.scopeCss = true;
 	</script>
 
+    {$App = $App|default:Sencha_App::getByName('EmergenceContentEditor')}
     {$appName = $App->getName()}
     <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath("build/production/resources/$appName-all.css")}" />
     <script type="text/javascript" src="{$App->getVersionedPath('.sencha/app/Boot.js')}"></script>

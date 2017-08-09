@@ -1,1 +1,1 @@
-{include app/EmergenceContentEditor/ext.tpl App=Sencha_App::getByName('EmergenceContentEditor')}
+{extends app/EmergenceContentEditor/ext.tpl}
