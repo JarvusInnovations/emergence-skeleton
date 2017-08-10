@@ -2486,7 +2486,7 @@ class ActiveRecord
     {
         $record = array();
 
-        foreach (static::getStackedConfig('fields')AS $field => $options) {
+        foreach (static::getStackedConfig('fields') AS $field => $options) {
             $columnName = static::_cn($field);
 
             if (array_key_exists($columnName, $this->_record)) {
