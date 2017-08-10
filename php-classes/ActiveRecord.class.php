@@ -1564,7 +1564,7 @@ class ActiveRecord
         }
 
         if (empty($options['label'])) {
-            $options['label'] = Inflector::labelIdentifier($field);
+            $options['label'] = Inflector::labelIdentifier($field == 'ID' ? static::getDefaultForeignIdentifierColumnName() : $field);
         }
 
         return $options;
