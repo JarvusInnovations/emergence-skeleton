@@ -573,8 +573,22 @@ class ActiveRecord
                 } elseif (isset($options['validator']) && is_callable($options['validator'])) {
                     call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
                 } else {
-                    $this->_validator->validate($options);
+                    $isValid = $this->_validator->validate($options);
+
+                    // check uniqueness
+                    if (
+                        !empty($options['unique']) &&
+                        $isValid &&
+                        $this->isFieldDirty($options['field']) &&
+                        ($value = $this->getValue($options['field'])) &&
+                        static::getByWhere([$options['field'] => $value, 'ID != ' . ($this->ID?:0)])
+                    ) {
+                        $this->_validator->addError(
+                            $fieldId,
+                            !empty($options['duplicateMessage']) ? _($options['duplicateMessage']) : sprintf(_('%s matches another existing record.'), Inflector::spacifyCaps($fieldId))
+                        );
                 }
+            }
             }
 
             $this->finishValidation();
