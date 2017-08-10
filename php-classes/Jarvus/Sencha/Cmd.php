@@ -112,10 +112,8 @@ class Cmd
             $results[basename($directory)] = $directory;
         }
 
-        if (exec('which hab')) {
-            foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*/*') AS $directory) {
-                $results[basename(dirname($directory))] = "$directory/dist";
-            }
+        foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*/*') AS $directory) {
+            $results[basename(dirname($directory))] = "$directory/dist";
         }
 
         uksort($results, 'version_compare');
