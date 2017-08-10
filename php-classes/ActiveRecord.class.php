@@ -564,9 +564,11 @@ class ActiveRecord
         $validators = static::getStackedConfig('validators');
         if (count(static::getStackedConfig('validators'))) {
             foreach (static::getStackedConfig('validators') AS $validator => $options) {
+                $fieldId = !empty($options['id']) ? $options['id'] : $options['field'];
+
                 if (isset($options['validator']) && $options['validator'] == 'require-relationship') {
                     if (!$this->_getRelationshipValue($options['field'])) {
-                        $this->_validator->addError($options['field'], !empty($options['errorMessage']) ? $options['errorMessage'] : 'Required relationship missing');
+                        $this->_validator->addError($options['field'], !empty($options['errorMessage']) ? $options['errorMessage'] : sprintf(_('Required related %s is missing.'), Inflector::spacifyCaps($fieldId)));
                     }
                 } elseif (isset($options['validator']) && is_callable($options['validator'])) {
                     call_user_func($options['validator'], $this->_validator, $this, $options, $validator);
