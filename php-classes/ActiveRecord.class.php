@@ -1461,6 +1461,7 @@ class ActiveRecord
     {
         $sqlSearchConditions = array(
             'conditions' => array()
+            ,'points' => 1
             ,'joins' => array()
             ,'qualifierFound' => false
         );
