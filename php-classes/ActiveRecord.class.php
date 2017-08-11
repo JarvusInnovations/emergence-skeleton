@@ -121,7 +121,13 @@ class ActiveRecord
     * Search Condition definitions
     * @var array
     */
-    public static $searchConditions = array();
+    public static $searchConditions = array(
+        'ID' => array(
+            'qualifiers' => ['id'],
+            'points' => 3,
+            'callback' => 'getIdSearchConditions'
+        )
+    );
 
     /*
     * Virtual fields for sorting
@@ -1508,7 +1514,15 @@ class ActiveRecord
     }
 
     // protected methods
+    protected static function getIdSearchConditions($ids) {
+        $ids = array_filter(array_map('intval', explode(',', $ids)));
 
+        if (count($ids)) {
+            return sprintf('`%s`.ID IN (%s)', static::getTableAlias(), implode(', ', $ids));
+        } else {
+            return '0';
+        }
+    }
 
 
     /**
