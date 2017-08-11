@@ -1504,7 +1504,7 @@ class ActiveRecord
 
             if ($sqlCondition) {
                 $sqlSearchConditions['conditions'][] = array(
-                    'condition' => $sqlCondition
+                    'condition' => is_array($sqlCondition) ? implode(' AND ', static::mapConditions($sqlCondition)) : $sqlCondition
                     ,'points' => $condition['points']
                     ,'qualifier' => $qualifier
                 );
