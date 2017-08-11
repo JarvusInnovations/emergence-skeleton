@@ -126,6 +126,10 @@ class ActiveRecord
             'qualifiers' => ['id'],
             'points' => 3,
             'callback' => 'getIdSearchConditions'
+        ),
+        'Class' => array(
+            'qualifiers' => ['class'],
+            'callback' => 'getClassSearchConditions'
         )
     );
 
@@ -1523,6 +1527,16 @@ class ActiveRecord
         } else {
             return '0';
         }
+    }
+
+    protected static function getClassSearchConditions($class) {
+        foreach (static::getSubclasses() AS $subClass) {
+            if (stripos($subClass, $class) !== false) {
+                return ['Class' => $subClass];
+            }
+        }
+
+        return false;
     }
 
 
