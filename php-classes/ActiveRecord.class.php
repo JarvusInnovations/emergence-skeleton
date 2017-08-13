@@ -290,7 +290,7 @@ class ActiveRecord
     {
         $config = array();
 
-        foreach (static::getStaticSubClasses() AS $subClass) {
+        foreach (static::getSubClasses() AS $subClass) {
             $config = array_merge($config, $subClass::getStackedConfig($propertyName));
         }
 
@@ -1581,7 +1581,7 @@ class ActiveRecord
 
         if ($field == 'Class') {
             // apply Class enum values
-            $options['values'] = static::getStaticSubClasses();
+            $options['values'] = static::getSubClasses();
         }
 
         if (!isset($options['blankisnull']) && empty($options['notnull'])) {
@@ -1704,7 +1704,7 @@ class ActiveRecord
             }
 
             if (empty($options['contextClass'])) {
-                $options['contextClass'] = static::getStaticRootClass();
+                $options['contextClass'] = static::getRootClass();
             }
 
             if (!isset($options['indexField'])) {
@@ -1724,7 +1724,7 @@ class ActiveRecord
             }
 
             if (empty($options['contextClass'])) {
-                $options['contextClass'] = static::getStaticRootClass();
+                $options['contextClass'] = static::getRootClass();
             }
 
             if (!isset($options['indexField'])) {
@@ -2745,7 +2745,7 @@ class ActiveRecord
 
     public static function getTableAlias()
     {
-        return str_replace('\\', '_', static::getStaticRootClass());
+        return str_replace('\\', '_', static::getRootClass());
     }
 
     protected function getUserFromEnvironment()
