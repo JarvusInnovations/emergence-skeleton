@@ -1623,8 +1623,9 @@ class ActiveRecord
 
     public static function getDefaultForeignRelationshipName()
     {
-        $reflection = new \ReflectionClass(static::getStaticRootClass());
-        return $reflection->getShortName();
+        $className = static::getRootClass();
+        $slashPosition = strrpos($className, '\\');
+        return $slashPosition === false ? $className : substr($className, $slashPosition + 1);
     }
 
     public static function getDefaultForeignIdentifierColumnName()
