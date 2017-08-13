@@ -1908,19 +1908,11 @@ class ActiveRecord
      */
     protected static function _getRecordClass($record)
     {
-        $static = get_called_class();
-
-        if (!static::_fieldExists('Class')) {
-            return $static;
+        if (!empty($record['Class'])) {
+            return $record['Class'];
         }
 
-        $columnName = static::_cn('Class');
-
-        if (!empty($record[$columnName])) {
-            return $record[$columnName];
-        } else {
-            return $static;
-        }
+        return get_called_class();
     }
 
     protected static function _fieldExists($field)
