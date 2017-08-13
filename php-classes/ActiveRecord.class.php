@@ -1593,7 +1593,8 @@ class ActiveRecord
         }
 
         if (empty($options['label'])) {
-            $options['label'] = Inflector::labelIdentifier($field == 'ID' ? static::getDefaultForeignIdentifierColumnName() : $field);
+            $rootClass = static::getRootClass();
+            $options['label'] = Inflector::labelIdentifier($field == 'ID' ? $rootClass::$singularNoun.' ID' : $field);
         }
 
         return $options;
