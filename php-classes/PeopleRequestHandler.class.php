@@ -1,6 +1,9 @@
 <?php
 
 use Emergence\People\Groups\Group;
+use Emergence\People\IPerson;
+use Emergence\People\IUser;
+
 
 class PeopleRequestHandler extends RecordsRequestHandler
 {
@@ -21,9 +24,13 @@ class PeopleRequestHandler extends RecordsRequestHandler
 
     public static function handleClassesRequest()
     {
+        $interface = empty($_GET['interface']) || $_GET['interface'] != 'user' ? IPerson::class : IUser::class;
+
         return static::respond('classes', array(
-            'data' => Person::getSubClasses()
-            ,'default' => Person::getDefaultClass()
+            'data' => array_filter(Person::getSubClasses(), function($class) use ($interface) {
+                return is_a($class, $interface, true);
+            })
+            ,'default' => $interface == IPerson::class ? Person::getDefaultClass() : User::getDefaultClass()
         ));
     }
 
