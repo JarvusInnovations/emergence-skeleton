@@ -9,6 +9,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
 {
     public static $personClass = Person::class;
     public static $userClass = User::class;
+    public static $groupClass = Group::class;
 
     // RecordRequestHandler configuration
     public static $recordClass = Person::class;
@@ -57,8 +58,10 @@ class PeopleRequestHandler extends RecordsRequestHandler
 
     protected static function onRecordSaved(ActiveRecord $Person, $requestData)
     {
+        $groupClass = static::$groupClass;
+
         if (isset($requestData['groupIDs'])) {
-            Group::setPersonGroups($Person, $requestData['groupIDs']);
+            $groupClass::setPersonGroups($Person, $requestData['groupIDs']);
         }
     }
 
