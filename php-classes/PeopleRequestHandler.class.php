@@ -11,18 +11,28 @@ class PeopleRequestHandler extends RecordsRequestHandler
     {
         switch ($action ? $action : $action = static::shiftPath()) {
             case '*classes':
-                return static::respond('classes', array(
-                    'data' => Person::getStaticSubClasses()
-                    ,'default' => Person::getStaticDefaultClass()
-                ));
+                return static::handleClassesRequest();
             case '*account-levels':
-                return static::respond('account-levels', array(
-                    'data' => User::getFieldOptions('AccountLevel', 'values')
-                    ,'default' => User::getFieldOptions('AccountLevel', 'default')
-                ));
+                return static::handleAccountLevelsRequest();
             default:
                 return parent::handleRecordsRequest($action);
         }
+    }
+
+    public static function handleClassesRequest()
+    {
+        return static::respond('classes', array(
+            'data' => Person::getStaticSubClasses()
+            ,'default' => Person::getStaticDefaultClass()
+        ));
+    }
+
+    public static function handleAccountLevelsRequest()
+    {
+        return static::respond('account-levels', array(
+            'data' => User::getFieldOptions('AccountLevel', 'values')
+            ,'default' => User::getFieldOptions('AccountLevel', 'default')
+        ));
     }
 
     public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
