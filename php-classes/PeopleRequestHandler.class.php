@@ -22,8 +22,8 @@ class PeopleRequestHandler extends RecordsRequestHandler
     public static function handleClassesRequest()
     {
         return static::respond('classes', array(
-            'data' => Person::getStaticSubClasses()
-            ,'default' => Person::getStaticDefaultClass()
+            'data' => Person::getSubClasses()
+            ,'default' => Person::getDefaultClass()
         ));
     }
 
