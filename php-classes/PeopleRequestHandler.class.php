@@ -7,8 +7,11 @@ use Emergence\People\IUser;
 
 class PeopleRequestHandler extends RecordsRequestHandler
 {
+    public static $personClass = Person::class;
+    public static $userClass = User::class;
+
     // RecordRequestHandler configuration
-    public static $recordClass = 'Person';
+    public static $recordClass = Person::class;
 
     public static function handleRecordsRequest($action = false)
     {
@@ -25,12 +28,13 @@ class PeopleRequestHandler extends RecordsRequestHandler
     public static function handleClassesRequest()
     {
         $interface = empty($_GET['interface']) || $_GET['interface'] != 'user' ? IPerson::class : IUser::class;
+        $baseClass = $interface == IPerson::class ? static::$personClass : static::$userClass;
 
         return static::respond('classes', array(
             'data' => array_filter(Person::getSubClasses(), function($class) use ($interface) {
                 return is_a($class, $interface, true);
             })
-            ,'default' => $interface == IPerson::class ? Person::getDefaultClass() : User::getDefaultClass()
+            ,'default' => $baseClass::getDefaultClass()
         ));
     }
 
