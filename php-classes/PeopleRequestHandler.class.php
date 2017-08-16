@@ -87,7 +87,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
         }
     }
 
-    public static function handleTemporaryPasswordRequest(Person $Person)
+    public static function handleTemporaryPasswordRequest(IPerson $Person)
     {
         $GLOBALS['Session']->requireAccountLevel('Administrator');
 
@@ -106,7 +106,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
         ));
     }
 
-    public static function handleThumbnailRequest(Person $Person)
+    public static function handleThumbnailRequest(IPerson $Person)
     {
         return MediaRequestHandler::handleThumbnailRequest($Person->PrimaryPhoto ? $Person->PrimaryPhoto : Media::getBlank('person'));
     }
