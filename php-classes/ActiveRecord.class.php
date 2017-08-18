@@ -1597,6 +1597,14 @@ class ActiveRecord
             $options['label'] = Inflector::labelIdentifier($field == 'ID' ? $rootClass::$singularNoun.' ID' : $field);
         }
 
+        if ($options['type'] == 'decimal') {
+            if (empty($options['length'])) {
+                $options['length'] = '10,0';
+            } elseif (is_int($options['length']) || ctype_digit($options['length'])) {
+                $options['length'] .= ',0';
+            }
+        }
+
         return $options;
     }
 
@@ -2042,6 +2050,16 @@ class ActiveRecord
                     return $this->_convertedValues[$field];
                 }
 
+                case 'float':
+                case 'double':
+                case 'decimal':
+                {
+                    if (!isset($this->_convertedValues[$field])) {
+                        $this->_convertedValues[$field] = (float)$value;
+                    }
+
+                    return $this->_convertedValues[$field];
+                }
 
                 case 'year':
                 case 'int':
@@ -2143,11 +2161,31 @@ class ActiveRecord
                 $value = $this->_convertedValues[$field] ? '1' : '0';
             }
 
+            case 'float':
+            case 'double':
             case 'decimal':
             {
-                $value = preg_replace('/(.)-/', '$1', preg_replace('/[^-\d.]/','', $value));
+                if (is_string($value)) {
+                    $value = preg_replace('/(.)-/', '$1', preg_replace('/[^-\d.]/','', $value));
+                }
+
+                if (!$fieldOptions['notnull'] && ($value === '' || $value === null)) {
+                    $this->_convertedValues[$field] = $value = NULL;
+                } else {
+                    $value = (float)$value;
+                    $this->_convertedValues[$field] = $value;
+
+                    if ($fieldOptions['type'] == 'decimal') {
+                        list ($precision, $decimals) = explode(',', $fieldOptions['length']);
+                        $value = number_format($value, $decimals, '.', '');
+                    } else {
+                        $value = (string)$value;
+                    }
+                }
+
                 break;
             }
+
             case 'json':
             {
                 $this->_convertedValues[$field] = $value;
