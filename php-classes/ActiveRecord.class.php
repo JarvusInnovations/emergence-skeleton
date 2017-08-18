@@ -2059,6 +2059,16 @@ class ActiveRecord
                     return $this->_convertedValues[$field];
                 }
 
+                case 'decimal':
+                {
+                    if (!isset($this->_convertedValues[$field])) {
+                        list(, $precision) = explode(',', $fieldOptions['length']);
+                        $this->_convertedValues[$field] = number_format($value, $precision ?: 2);
+                    }
+
+                    return $this->_convertedValues[$field];
+                }
+
                 default:
                 {
                     return $value;
