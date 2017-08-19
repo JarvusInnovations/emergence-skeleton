@@ -2,8 +2,11 @@
 
 namespace Emergence\Connectors;
 
+use Site;
+
 use Emergence\EventBus;
 use Emergence\Logger;
+use Emergence\Util\Url;
 
 use Psr\Log\LoggerInterface;
 
@@ -24,6 +27,13 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
     public static function getConnectorId()
     {
         return static::$connectorId ? static::$connectorId : get_called_class();
+    }
+
+    public static function getBaseUrl($external = false)
+    {
+        $path = '/connectors/' . static::getConnectorId();
+
+        return $external ? Url::buildAbsolute($path) : $path;;
     }
 
     public static function handleRequest($action = null)
@@ -200,12 +210,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
 
     protected static function _getConnectorBaseUrl($external = false)
     {
-        if ($external) {
-            $url = (empty($_SERVER['HTTPS']) ? 'http' : 'https').'://'.$_SERVER['HTTP_HOST'];
-        }
-
-        $url .= '/'.preg_replace('/\.php$/i', '', join('/', \Site::$resolvedPath));
-        return $url;
+        return static::getBaseUrl($external);
     }
 
     protected static function _getJobConfig(array $requestData)
