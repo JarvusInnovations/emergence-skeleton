@@ -56,6 +56,7 @@ class Job extends ActiveRecord implements LoggerInterface
         )
         ,'Results' => array(
             'type' => 'json'
+            ,'default' => null
         )
     );
 
