@@ -26,7 +26,9 @@ class Job extends ActiveRecord implements LoggerInterface
     public static $subClasses = array(__CLASS__);
 
     public static $fields = array(
-        'Title'
+        'Title' => array(
+            'default' => null
+        )
         ,'Handle' => array(
             'unique' => true
         )
