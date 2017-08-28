@@ -267,7 +267,11 @@ class Source
     public function getUpstreamBranch()
     {
         if ($repository = $this->getRepository()) {
-            $upstreamBranch = trim($repository->run('rev-parse', ['--abbrev-ref', '@{upstream}']));
+            try {
+                $upstreamBranch = trim($repository->run('rev-parse', ['--abbrev-ref', '@{upstream}']));
+            } catch (GitProcessException $e) {
+                return null;
+            }
 
             if (strpos($upstreamBranch, 'origin/') === 0) {
                 $upstreamBranch = substr($upstreamBranch, 7);
