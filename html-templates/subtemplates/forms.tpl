@@ -41,7 +41,6 @@
         <input type="checkbox"
             class="field-control {$class}"
             name="{$inputName|escape}"
-            value="{$value|escape}"
             {$attribs}
             {refill field=$inputName default=$default checked=$value}>
     {/capture}
@@ -53,10 +52,10 @@
     {labeledField html=$html type=checkbox label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template textarea inputName label='' error='' placeholder='' hint='' required=false attribs='' default=null}
+{template textarea inputName label='' error='' placeholder='' hint='' required=false attribs='' default=null class=null}
     {capture assign=html}
         <textarea
-            class="field-control"
+            class="field-control {$class}"
             name="{$inputName|escape}"
             {if $placeholder}placeholder="{$placeholder|escape}"{/if}
             {if $required}required aria-required="true"{/if}
@@ -67,5 +66,27 @@
     {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template loginField}{field inputName=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off"' hint='You can also log in with your email address.'}{/template}
+{template loginField}{field inputName=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off" spellcheck="false"' hint='You can also log in with your email address.'}{/template}
 {template passwordField}{field inputName=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
+
+{template selectField inputName label='' options=null useKeyAsValue=yes default=null error='' hint='' required=false attribs='' class=null fieldClass=null blankOption='Select'}
+    {capture assign=html}
+        <select
+            class="field-control {$class}"
+            name="{$inputName}"
+            {if $required}required aria-required="true"{/if}
+            {$attribs}
+        >
+            {if $blankOption}
+                <option value="">{$blankOption|escape}</option>
+            {/if}
+
+            {foreach key=value item=text from=$options}
+                {$value = tif($useKeyAsValue, $value, $text)}
+                <option {refill field=$inputName default=$default selected=$value} value="{$value|escape}">{$text|escape}</option>
+            {/foreach}
+        </select>
+    {/capture}
+
+    {labeledField html=$html type='select' label=$label error=$error hint=$hint required=$required class=$fieldClass}
+{/template}
