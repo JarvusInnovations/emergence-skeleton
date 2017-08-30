@@ -8,6 +8,8 @@ use Psr\Log\LogLevel;
 
 class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnector
 {
+    use \Emergence\Classes\StackedConfigTrait;
+
     public static $logRowColumnCount = 3;
 
     public static $onBeforeValidateRecord;
@@ -16,9 +18,33 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
     public static $onSaveRecord;
 
     // protected methods
+    protected static function initRequiredColumns(array $config)
+    {
+        $requiredColumns = [];
+
+        foreach ($config AS $key => $value) {
+            if (!$value) {
+                if (is_string($key) && array_key_exists($key, $requiredColumns)) {
+                    unset($requiredColumns[$key]);
+                }
+                continue;
+            }
+
+            if (!is_string($key)) {
+                $key = $value;
+                $value = true;
+            }
+
+            $requiredColumns[$key] = $value;
+        }
+
+        return $requiredColumns;
+    }
+
     protected static function _requireColumns($noun, SpreadsheetReader $spreadsheet, array $requiredColumns, array $columnsMap = null)
     {
         $columns = $spreadsheet->getColumnNames();
+        $requiredColumns = array_keys(array_filter($requiredColumns));
 
         if ($columnsMap) {
             $mappedColumns = array();
