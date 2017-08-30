@@ -72,8 +72,27 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 
         foreach ($columnsMap AS $externalKey => $internalKey) {
             if (array_key_exists($externalKey, $row)) {
-                $output[$internalKey] = $row[$externalKey];
+                if (substr($internalKey, -2) == '[]') {
+                    $internalKey = substr($internalKey, 0, -2);
+
+                    if (!array_key_exists($internalKey, $output)) {
+                        $output[$internalKey] = [$row[$externalKey]];
+                    } elseif (is_array($output[$internalKey])) {
+                        $output[$internalKey][] = $row[$externalKey];
+                    } else {
+                        $output[$internalKey] = [$output[$internalKey], $row[$externalKey]];
+                    }
+                } else {
+                    $output[$internalKey] = $row[$externalKey];
+                }
+
                 unset($row[$externalKey]);
+            }
+        }
+
+        foreach ($output AS $key => &$value) {
+            if (is_array($value)) {
+                $value = array_filter($value);
             }
         }
 
