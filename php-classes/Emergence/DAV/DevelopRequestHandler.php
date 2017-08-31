@@ -2,8 +2,19 @@
 
 namespace Emergence\DAV;
 
+use Site;
+use User;
+use RequestHandler;
+use Sencha_App;
+
+use Sabre\DAV\Server;
+use Sabre\DAV\TemporaryFileFilterPlugin;
+use Sabre\DAV\Mount\Plugin AS MountPlugin;
+
 class DevelopRequestHandler extends \RequestHandler
 {
+    public static $userClass = User::class;
+
     public static $userResponseModes = array(
         'application/json' => 'json'
     );
@@ -23,13 +34,14 @@ class DevelopRequestHandler extends \RequestHandler
             $authUserPass = $authEngine->getUserPass();
 
             // try to get user
-            $userClass = \User::$defaultClass;
+            $userClass = static::$userClass;
+            $userClass = $userClass::getDefaultClass();
             $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
 
             // send auth request if login is inadiquate
             if (!$User || !$User->hasAccountLevel('Developer')) {
                 $authEngine->requireLogin();
-                die("You must login using a ".\Site::getConfig('primary_hostname')." account with Developer access\n");
+                die('You must login using a '.Site::getConfig('primary_hostname').' account with Developer access');
             }
         }
 
@@ -41,7 +53,7 @@ class DevelopRequestHandler extends \RequestHandler
         }
 
         // detect base path
-        $basePath = array_slice(\Site::$requestPath, 0, count(\Site::$resolvedPath));
+        $basePath = array_slice(Site::$requestPath, 0, count(Site::$resolvedPath));
 
         // switch to JSON response mode
         if (static::peekPath() == 'json') {
@@ -50,15 +62,15 @@ class DevelopRequestHandler extends \RequestHandler
 
         // handle /develop request
         if ($_SERVER['REQUEST_METHOD'] == 'GET' && static::getResponseMode() == 'html' && !static::peekPath()) {
-            \RequestHandler::respond('app/ext', array(
-                'App' => \Sencha_App::getByName('EmergenceEditor')
+            RequestHandler::respond('app/ext', array(
+                'App' => Sencha_App::getByName('EmergenceEditor')
                 ,'mode' => 'production'
                 ,'title' => 'EmergenceEditor'
             ));
         }
 
         // initial and configure SabreDAV
-        $server = new \Sabre\DAV\Server(new RootCollection());
+        $server = new Server(new RootCollection());
         $server->setBaseUri('/'.join('/', $basePath));
 
         // The lock manager is reponsible for making sure users don't overwrite each others changes. Change 'data' to a different
@@ -68,13 +80,13 @@ class DevelopRequestHandler extends \RequestHandler
 #       $server->addPlugin($lockPlugin);
 
         // filter temporary files
-        $server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin('/tmp/dav-tmp'));
+        $server->addPlugin(new TemporaryFileFilterPlugin('/tmp/dav-tmp'));
 
         // ?mount support
-        $server->addPlugin(new \Sabre\DAV\Mount\Plugin());
+        $server->addPlugin(new MountPlugin());
 
         // emergence :)
-        $server->addPlugin(new \Emergence\DAV\ServerPlugin());
+        $server->addPlugin(new ServerPlugin());
 
         // All we need to do now, is to fire up the server
         $server->exec();
