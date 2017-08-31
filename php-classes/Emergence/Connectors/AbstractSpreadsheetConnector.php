@@ -70,27 +70,29 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
     {
         $output = array();
 
-        foreach ($columnsMap AS $externalKey => $internalKey) {
+        foreach ($columnsMap as $externalKey => $internalKey) {
             if (array_key_exists($externalKey, $row)) {
-                if (substr($internalKey, -2) == '[]') {
-                    $internalKey = substr($internalKey, 0, -2);
+                if ($internalKey) {
+                    if (substr($internalKey, -2) == '[]') {
+                        $internalKey = substr($internalKey, 0, -2);
 
-                    if (!array_key_exists($internalKey, $output)) {
-                        $output[$internalKey] = [$row[$externalKey]];
-                    } elseif (is_array($output[$internalKey])) {
-                        $output[$internalKey][] = $row[$externalKey];
+                        if (!array_key_exists($internalKey, $output)) {
+                            $output[$internalKey] = [$row[$externalKey]];
+                        } elseif (is_array($output[$internalKey])) {
+                            $output[$internalKey][] = $row[$externalKey];
+                        } else {
+                            $output[$internalKey] = [$output[$internalKey], $row[$externalKey]];
+                        }
                     } else {
-                        $output[$internalKey] = [$output[$internalKey], $row[$externalKey]];
+                        $output[$internalKey] = $row[$externalKey];
                     }
-                } else {
-                    $output[$internalKey] = $row[$externalKey];
                 }
 
                 unset($row[$externalKey]);
             }
         }
 
-        foreach ($output AS $key => &$value) {
+        foreach ($output as $key => &$value) {
             if (is_array($value)) {
                 $value = array_filter($value);
             }
