@@ -214,6 +214,7 @@ class Job extends ActiveRecord implements LoggerInterface
     public function log($level, $message, array $context = [])
     {
         $entry = [
+            'time' => date('Y-m-d H:i:s'),
             'message' => $message,
             'context' => $context,
             'level' => $level
