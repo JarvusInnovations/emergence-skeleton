@@ -57,9 +57,10 @@
                 </dl>
             {/if}
 
-            {if $entry.validationErrors}
+            {$validationErrors = default($entry.validationErrors, $entry.context.validationErrors)}
+            {if $validationErrors}
                 <dl>
-                    {foreach item=error key=field from=$entry.validationErrors}
+                    {foreach item=error key=field from=$validationErrors}
                         <dt>{$field}</dt>
                         <dd>{$error|escape}</dd>
                     {/foreach}
