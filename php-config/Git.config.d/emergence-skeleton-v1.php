@@ -55,7 +55,7 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
         ,'originBranch' => 'master'
         ,'workingBranch' => 'master'
         ,'trees' => [
-            'php-classes/Psr/Http' => 'src'
+            'php-classes/Psr/Http/Message' => 'src'
         ]
     ];
 }
