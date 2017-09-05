@@ -49,4 +49,13 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
             'php-classes/Patchwork/Utf8.php' => 'src/Patchwork/Utf8.php'
         ]
     ];
+
+    Git::$repositories['psr-http-message'] = [
+        'remote' => 'https://github.com/php-fig/http-message.git'
+        ,'originBranch' => 'master'
+        ,'workingBranch' => 'master'
+        ,'trees' => [
+            'php-classes/Psr/Http' => 'src'
+        ]
+    ];
 }
