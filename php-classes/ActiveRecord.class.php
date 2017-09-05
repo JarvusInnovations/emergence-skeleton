@@ -833,7 +833,8 @@ class ActiveRecord
             $this->_saveRelationships();
         }
 
-        if ($this->isDirty) {
+        $wasDirty = $this->isDirty;
+        if ($wasDirty) {
             if (!$this->_isPhantom && static::$trackModified) {
                 $this->Modified = time();
 
@@ -942,7 +943,8 @@ class ActiveRecord
         // fire event
         Emergence\EventBus::fireEvent('afterRecordSave', $this->getRootClass(), array(
             'Record' => $this,
-            'deep' => $deep
+            'deep' => $deep,
+            'wasDirty' => $wasDirty
         ));
     }
 
