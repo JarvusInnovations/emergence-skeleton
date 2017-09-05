@@ -91,7 +91,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
     {
         $GLOBALS['Session']->requireAccountLevel('Administrator');
 
-        if (!$Person instanceof User) {
+        if (!$Person instanceof IUser) {
             return static::throwInvalidRequestError('only a user can have a temporary password');
         }
 
