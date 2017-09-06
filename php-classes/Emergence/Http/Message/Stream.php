@@ -1,5 +1,5 @@
 <?php
-namespace GuzzleHttp\Psr7;
+namespace Emergence\Http\Message;
 
 use Psr\Http\Message\StreamInterface;
 

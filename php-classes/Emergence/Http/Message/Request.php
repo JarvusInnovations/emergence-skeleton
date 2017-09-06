@@ -1,7 +1,7 @@
 <?php
-namespace GuzzleHttp\Psr7;
 
-use InvalidArgumentException;
+namespace Emergence\Http\Message;
+
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -50,7 +50,16 @@ class Request implements RequestInterface
         }
 
         if ($body !== '' && $body !== null) {
-            $this->stream = stream_for($body);
+            if ($body instanceof StreamInterface) {
+                $this->stream = $body;
+            } elseif (gettype($body) == 'resource') {
+                $this->stream = new Stream($resource);
+            } else {
+                $stream = fopen('php://temp', 'r+');
+                fwrite($stream, $body);
+                fseek($stream, 0);
+                $this->stream = new Stream($stream);
+            }
         }
     }
 
@@ -74,7 +83,7 @@ class Request implements RequestInterface
     public function withRequestTarget($requestTarget)
     {
         if (preg_match('#\s#', $requestTarget)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'Invalid request target provided; cannot contain whitespace'
             );
         }

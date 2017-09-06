@@ -1,5 +1,5 @@
 <?php
-namespace GuzzleHttp\Psr7;
+namespace Emergence\Http\Message;
 
 use Psr\Http\Message\StreamInterface;
 
@@ -123,7 +123,8 @@ trait MessageTrait
     public function getBody()
     {
         if (!$this->stream) {
-            $this->stream = stream_for('');
+            $stream = fopen('php://temp', 'r+');
+            $this->stream = new Stream($stream);
         }
 
         return $this->stream;
