@@ -2,11 +2,12 @@
 {load_templates "subtemplates/comments.tpl"}
 {load_templates "subtemplates/contextLinks.tpl"}
 
-{template blogPost Post headingLevel=h1 showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true showContext=true useSummary=false}
-    <article class="blog-post reading-width">
+{template blogPost Post headingLevel=h1 showHeader=true showBody=true showFooter=true showComments=false showCommentsSummary=true showContext=true useSummary=false articleClass='' titlePrefix=''}
+    <article class="blog-post reading-width {$articleClass}">
         {if $showHeader}
             <header class="article-header">
                 <{$headingLevel} class="header-title">
+                    {$titlePrefix}
                     <a href="{$Post->getURL()}">{$Post->Title|escape}</a>
                 </{$headingLevel}>
 
