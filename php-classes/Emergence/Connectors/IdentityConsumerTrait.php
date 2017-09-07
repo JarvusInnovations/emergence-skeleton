@@ -53,9 +53,18 @@ trait IdentityConsumerTrait
         return [
             'User.Email' => [$Person->Email],
             'User.Username' => [$Person->Username],
-            'first_name' => [$Person->FirstName],    	
+            'first_name' => [$Person->FirstName],
             'last_name' => [$Person->LastName]
         ];
+    }
+
+    public static function getLaunchUrl(Mapping $Mapping = null)
+    {
+        if ($Mapping) {
+            return null;
+        }
+        
+        return static::getBaseUrl() . '/launch';
     }
 
     public static function handleRequest($action = null)

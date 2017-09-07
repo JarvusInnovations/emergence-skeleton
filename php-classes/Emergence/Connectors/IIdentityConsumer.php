@@ -11,6 +11,7 @@ interface IIdentityConsumer
     const RESULT_PUSH_USER_UPTODATE = 'user-up_to_date';
     const RESULT_PUSH_USER_FAILED = 'user-failed';
 
+    public static function getLaunchUrl(Mapping $Mapping = null);
     public static function handleLaunchRequest();
     public static function userIsPermitted(IPerson $Person);
 #    public static function userShouldAutoProvision(IPerson $Person);
