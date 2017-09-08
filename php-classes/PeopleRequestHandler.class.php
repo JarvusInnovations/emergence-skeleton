@@ -32,9 +32,9 @@ class PeopleRequestHandler extends RecordsRequestHandler
         $baseClass = $interface == IPerson::class ? static::$personClass : static::$userClass;
 
         return static::respond('classes', array(
-            'data' => array_filter(Person::getSubClasses(), function($class) use ($interface) {
+            'data' => array_values(array_filter(Person::getSubClasses(), function($class) use ($interface) {
                 return is_a($class, $interface, true);
-            })
+            }))
             ,'default' => $baseClass::getDefaultClass()
         ));
     }
