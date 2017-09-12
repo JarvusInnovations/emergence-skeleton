@@ -414,6 +414,7 @@ abstract class RecordsRequestHandler extends RequestHandler
 
                 // call template function
                 static::onRecordSaved($Record, $datum);
+
                 // fire event
                 Emergence\EventBus::fireEvent('afterRecordTransaction', $className::getRootClass(), array(
                     'Record' => $Record,
