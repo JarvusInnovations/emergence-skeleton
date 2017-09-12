@@ -16,9 +16,9 @@
     {/if}
 {/strip}{/template}
 
-{template personLink Person photo=no photoSize=64 pixelRatio=2 linkCls=no imgCls=no nameCls=no}{strip}
+{template personLink Person photo=no photoSize=64 pixelRatio=2 linkCls=no imgCls=no nameCls=no summary=no}{strip}
     {if $Person}
-        <a href="{$Person->getURL()}" title="{personName $Person}" {if $linkCls}class="{$linkCls}"{/if}>
+        <a href="{$Person->getURL()}" title="{personName $Person summary=yes}" {if $linkCls}class="{$linkCls}"{/if}>
             {if $photo}
                 {$pixels = $photoSize}
                 {if $pixelRatio}
@@ -31,7 +31,7 @@
                 {/if}
                 <div class="avatar" style="width:{$photoSize}px;height:{$photoSize}px;background-image:url({$src})" {if $imgCls}class="{$imgCls}"{/if}></div>
             {/if}
-            <span class="name {$imgCls}">{personName $Person}</span>
+            <span class="name {$imgCls}">{personName $Person summary=$summary}</span>
         </a>
     {else}
         <em class="anonymous">Anonymous</em>
