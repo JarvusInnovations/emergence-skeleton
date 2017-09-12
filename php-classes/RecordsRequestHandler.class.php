@@ -414,6 +414,11 @@ abstract class RecordsRequestHandler extends RequestHandler
 
                 // call template function
                 static::onRecordSaved($Record, $datum);
+                // fire event
+                Emergence\EventBus::fireEvent('afterRecordTransaction', __CLASS__, array(
+                    'Record' => $Record,
+                    'data' => $datum
+                ));
             } catch (RecordValidationException $e) {
                 $failed[] = array(
                     'record' => $Record->getData()
@@ -543,6 +548,12 @@ abstract class RecordsRequestHandler extends RequestHandler
 
                 // call template function
                 static::onRecordSaved($Record, $_REQUEST);
+
+                // fire event
+                Emergence\EventBus::fireEvent('afterRecordTransaction', __CLASS__, array(
+                    'Record' => $Record,
+                    'data' => $datum
+                ));
 
                 // fire created response
                 $responseID = static::getTemplateName($className::$singularNoun).'Saved';
