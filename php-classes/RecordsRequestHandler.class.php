@@ -415,7 +415,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 // call template function
                 static::onRecordSaved($Record, $datum);
                 // fire event
-                Emergence\EventBus::fireEvent('afterRecordTransaction', __CLASS__, array(
+                Emergence\EventBus::fireEvent('afterRecordTransaction', $className::getRootClass(), array(
                     'Record' => $Record,
                     'data' => $datum
                 ));
@@ -550,7 +550,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 static::onRecordSaved($Record, $_REQUEST);
 
                 // fire event
-                Emergence\EventBus::fireEvent('afterRecordTransaction', __CLASS__, array(
+                Emergence\EventBus::fireEvent('afterRecordTransaction', $className::getRootClass(), array(
                     'Record' => $Record,
                     'data' => $_REQUEST
                 ));
