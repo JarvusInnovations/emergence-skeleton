@@ -18,13 +18,13 @@
     {/strip}{/if}
 {/template}
 
-{template personLink Person photo=no photoSize=64 pixelRatio=2}{strip}
+{template personLink Person photo=no photoSize=64 pixelRatio=2 summary=no}{strip}
     {if $Person}
-        <a href="{$Person->getURL()}" title="{personName $Person}">
+        <a href="{$Person->getURL()}" title="{personName $Person summary=yes}">
             {if $photo}
                 {avatar $Person size=$photoSize pixelRatio=$pixelRatio}
             {/if}
-            <span class="name">{personName $Person}</span>
+            <span class="name">{personName $Person summary=$summary}</span>
         </a>
     {else}
         <em class="anonymous">Anonymous</em>

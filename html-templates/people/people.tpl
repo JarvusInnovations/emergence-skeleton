@@ -16,11 +16,10 @@
 	
 	<ul>
 	{foreach item=Person from=$data}
-		<li>{personLink $Person}</li>
+		<li>{personLink $Person summary=true}</li>
 	{foreachelse}
 		<li><em>No one's here yet =[</em></li>
 	{/foreach}
 	</ul>
-
 
 {/block}

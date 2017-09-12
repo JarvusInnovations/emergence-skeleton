@@ -19,7 +19,7 @@
                     </header>
                     <ul>
                     {foreach item=result from=$results}
-                        <li>{contextLink $result}</li>
+                        <li>{contextLink $result summary=yes}</li>
                     {/foreach}
                     </ul>
                 </section>

@@ -1,6 +1,6 @@
 {load_templates "subtemplates/people.tpl"}
 
-{template contextLink Context prefix='' suffix='' class=''}{strip}
+{template contextLink Context prefix='' suffix='' class='' summary=no}{strip}
 
 {if !$Context}
     <em>[context deleted]</em>
@@ -12,7 +12,7 @@
         {$suffix}
     </a>
 {elseif is_a($Context, 'Emergence\People\IPerson')}
-    {personLink $Context}
+    {personLink $Context summary=$summary}
 {else}
     {$url = $Context->getUrl()}
     <{if $url}a href="{$url|escape}"{else}span{/if} class="{$class}">{$prefix}{$Context->getTitle()|escape}{$suffix}</{tif $url ? a : span}>
