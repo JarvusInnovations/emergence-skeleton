@@ -338,6 +338,12 @@ class ActiveRecord
             case 'isDestroyed':
                 return $this->_isDestroyed;
 
+            case 'isSaving':
+                return $this->_isSaving;
+
+            case 'isValidating':
+                return $this->_isValidating;
+
             case 'validationErrors':
                 return $this->getValidationErrors();
 
