@@ -21,6 +21,6 @@ if ($GLOBALS['Session']->hasAccountLevel('User')) {
                 'sql' => 'CONCAT(FirstName, " ", LastName) = "%s"'
             ]
         ],
-        'conditions' => ['AccountLevel != "Deleted"']
+        'conditions' => ['AccountLevel != "Disabled"']
     ];
 }
