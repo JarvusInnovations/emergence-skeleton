@@ -552,7 +552,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 // fire event
                 Emergence\EventBus::fireEvent('afterRecordTransaction', __CLASS__, array(
                     'Record' => $Record,
-                    'data' => $datum
+                    'data' => $_REQUEST
                 ));
 
                 // fire created response
