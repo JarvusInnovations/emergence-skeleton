@@ -11,7 +11,9 @@ if (!empty($_POST['username'])) {
     $GLOBALS['Session']->save();
 
     RequestHandler::respond('message', array(
-        'message' => sprintf('You are now logged in as %s. Logout and then log back into your normal account when you are finished.', $User->Username)
+        'message' => sprintf('You are now logged in as %s. Logout and then log back into your normal account when you are finished.', $User->Username),
+        'returnURL' => '/',
+        'returnLabel' => 'Continue to '.Site::$hostname.' as '.$User->Username
     ));
 }
 
