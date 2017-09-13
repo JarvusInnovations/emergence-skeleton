@@ -92,7 +92,10 @@ abstract class RequestHandler
                 return static::respondCsv($responseID, $responseData);
 
             case 'pdf':
-                return static::respondPdf($responseID, $responseData);
+                return static::respondPrint($responseID, $responseData, 'pdf');
+
+            case 'print':
+                return static::respondPrint($responseID, $responseData, 'html');
 
             case 'xml':
                 return static::respondXml($responseID, $responseData);
@@ -141,39 +144,53 @@ abstract class RequestHandler
         exit();
     }
 
-    public static function respondPdf($responseID, $responseData = array())
+    public static function respondPrint($responseID, $responseData = array(), $format = 'html')
     {
         if (!empty($_REQUEST['downloadToken'])) {
             setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
         }
 
         try {
-            $template = DwooEngine::findTemplate("$responseID.pdf");
+            $template = DwooEngine::findTemplate("$responseID.print");
         } catch (Exception $e) {
-            $template = DwooEngine::findTemplate($responseID);
+            try {
+                $template = DwooEngine::findTemplate("$responseID.pdf");
+            } catch (Exception $e) {
+                $template = DwooEngine::findTemplate($responseID);
+            }
         }
 
-        $tmpPath = tempnam('/tmp', 'e_pdf_');
+        $html = DwooEngine::getSource($template, $responseData);
 
-        file_put_contents($tmpPath.'.html', DwooEngine::getSource($template, $responseData));
-
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
-
-        exec(implode(' ', [
-            static::$wkhtmltopdfPath,
-            static::$wkhtmltopdfArguments,
-            escapeshellarg($tmpPath.'.html'),
-            escapeshellarg($tmpPath.'.pdf')
-        ]));
-
-        if (!file_exists("$tmpPath.pdf")) {
-            header('HTTP/1.0 501 Not Implemented');
-            die('Unable to generate PDF, check that this system has wkhtmltopdf installed');
+        if ($format == 'pdf') {
+            $tmpPath = tempnam('/tmp', 'e_pdf_');
+    
+            file_put_contents($tmpPath.'.html', $html);
+    
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
+    
+            exec(implode(' ', [
+                static::$wkhtmltopdfPath,
+                static::$wkhtmltopdfArguments,
+                escapeshellarg($tmpPath.'.html'),
+                escapeshellarg($tmpPath.'.pdf')
+            ]));
+    
+            if (!file_exists("$tmpPath.pdf")) {
+                header('HTTP/1.0 501 Not Implemented');
+                die('Unable to generate PDF, check that this system has wkhtmltopdf installed');
+            }
+    
+            readfile($tmpPath.'.pdf');
+            exit();
+        } elseif ($format == 'html') {
+            header('Content-Type: text/html; charset=utf-8');
+            print($html);
+            exit();
+        } else {
+            throw new Exception('Invalid print format: '.$format);
         }
-
-        readfile($tmpPath.'.pdf');
-        exit();
     }
 
     public static function respondXml($responseID, $responseData = array())
