@@ -48,6 +48,7 @@ class Reader
         );
 
         $data['paths'] = array_map([__CLASS__, 'normalizePathObject'], $data['paths']);
+        ksort($data['paths']);
 
 
         // collapse and normalize definitions
@@ -60,6 +61,7 @@ class Reader
         );
 
         $data['definitions'] = array_map([__CLASS__, 'normalizeSchemaObject'], $data['definitions']);
+        ksort($data['definitions']);
 
 
         return $data;
