@@ -41,7 +41,9 @@ class Reader
             $data['paths'],
             [__CLASS__, 'isPathObject'],
             function (array $keys) {
-                return '/' . implode('/', $keys);
+                return '/' . implode('/', array_map(function ($key) {
+                    return trim($key, '/');
+                }, $keys));
             }
         );
 
