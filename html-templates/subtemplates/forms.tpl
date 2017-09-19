@@ -41,6 +41,7 @@
         <input type="checkbox"
             class="field-control {$class}"
             name="{$inputName|escape}"
+            value="{$value|escape}"
             {$attribs}
             {refill field=$inputName default=$default checked=$value}>
     {/capture}
@@ -52,7 +53,7 @@
     {labeledField html=$html type=checkbox label=$label error=$error hint=$hint required=$required}
 {/template}
 
-{template textarea inputName label='' error='' placeholder='' hint='' required=false attribs='' default=null class=null}
+{template textarea inputName label='' error='' placeholder='' hint='' required=false attribs='' default=null class=null fieldClass=null}
     {capture assign=html}
         <textarea
             class="field-control {$class}"
@@ -63,7 +64,7 @@
         >{refill field=$inputName default=$default}</textarea>
     {/capture}
 
-    {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required}
+    {labeledField html=$html type=textarea label=$label error=$error hint=$hint required=$required class=$fieldClass}
 {/template}
 
 {template loginField}{field inputName=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off" spellcheck="false"' hint='You can also log in with your email address.'}{/template}
