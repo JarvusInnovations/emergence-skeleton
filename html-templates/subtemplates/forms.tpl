@@ -70,7 +70,7 @@
 {template loginField}{field inputName=_LOGIN[username] label=Username required=true attribs='autofocus autocapitalize="none" autocorrect="off" spellcheck="false"' hint='You can also log in with your email address.'}{/template}
 {template passwordField}{field inputName=_LOGIN[password] label=Password hint='<a href="/register/recover">Forgot?</a>' required=true refill=false type=password}{/template}
 
-{template selectField inputName label='' options=null useKeyAsValue=yes default=null error='' hint='' required=false attribs='' class=null fieldClass=null blankOption='Select'}
+{template selectField inputName label='' options=null useKeyAsValue=yes default=null error='' hint='' required=false attribs='' class=null fieldClass=null blankOption='Select' blankValue=''}
     {capture assign=html}
         <select
             class="field-control {$class}"
@@ -79,7 +79,7 @@
             {$attribs}
         >
             {if $blankOption}
-                <option value="">{$blankOption|escape}</option>
+                <option value="{$blankValue|escape}">{$blankOption|escape}</option>
             {/if}
 
             {foreach key=value item=text from=$options}
