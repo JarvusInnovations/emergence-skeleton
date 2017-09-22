@@ -2,6 +2,8 @@
 
 class User extends Person implements Emergence\People\IUser
 {
+    public static $classLabel = 'User';
+
     public static $defaultClass = __CLASS__;
     public static $subClasses = array(__CLASS__);
     public static $singularNoun = 'user';
