@@ -28,22 +28,42 @@ class PeopleRequestHandler extends RecordsRequestHandler
 
     public static function handleClassesRequest()
     {
+        $personClass = static::$personClass;
+        $userClass = static::$userClass;
+
         $interface = empty($_GET['interface']) || $_GET['interface'] != 'user' ? IPerson::class : IUser::class;
-        $baseClass = $interface == IPerson::class ? static::$personClass : static::$userClass;
+        $baseClass = $interface == IPerson::class ? $personClass : $userClass;
+
+        $classes = array_values(array_filter(Person::getSubClasses(), function($class) use ($interface) {
+            return is_a($class, $interface, true);
+        }));
+
+        $defaultClass = $baseClass::getDefaultClass();
+        $defaultPersonClass = $personClass::getDefaultClass();
+        $defaultUserClass = $userClass::getDefaultClass();
 
         return static::respond('classes', array(
-            'data' => array_values(array_filter(Person::getSubClasses(), function($class) use ($interface) {
-                return is_a($class, $interface, true);
-            }))
-            ,'default' => $baseClass::getDefaultClass()
+            'data' => array_map(function ($class) use ($defaultClass, $defaultPersonClass, $defaultUserClass) {
+                return [
+                    'name' => $class,
+                    'label' => $class::$classLabel,
+                    'interfaces' => array_values(class_implements($class)),
+                    'default' => $class == $defaultClass,
+                    'personDefault' => $class == $defaultPersonClass,
+                    'userDefault' => $class == $defaultUserClass
+                ];
+            }, $classes),
+            'default' => $defaultClass,
+            'personDefault' => $defaultPersonClass,
+            'userDefault' => $defaultUserClass
         ));
     }
 
     public static function handleAccountLevelsRequest()
     {
         return static::respond('account-levels', array(
-            'data' => User::getFieldOptions('AccountLevel', 'values')
-            ,'default' => User::getFieldOptions('AccountLevel', 'default')
+            'data' => User::getFieldOptions('AccountLevel', 'values'),
+            'default' => User::getFieldOptions('AccountLevel', 'default')
         ));
     }
 
