@@ -11,6 +11,8 @@ class User extends Person implements IUser
     public static $usernameGenerator = 'flast';
     public static $onPasswordSet;
 
+    public static $classLabel = 'User';
+
     public static $defaultClass = __CLASS__;
     public static $subClasses = array(__CLASS__);
     public static $singularNoun = 'user';

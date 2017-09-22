@@ -9,6 +9,8 @@ use Emergence\Comments\Comment;
 
 class Person extends VersionedRecord implements IPerson
 {
+    public static $classLabel = 'Person / Contact';
+
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
