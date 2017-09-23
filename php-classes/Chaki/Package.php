@@ -70,6 +70,10 @@ class Package extends \Jarvus\Sencha\Package
             }
 
 
+            // ensure branch is up to date
+            $repo->run('fetch', ['origin', "$branchName:$branchName"]);
+
+
             // read packages.json
             $packageConfig = @json_decode(Util::cleanJson($repo->run('show', ["$branchName:package.json"])), true);
 
