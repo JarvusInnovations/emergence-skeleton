@@ -10,6 +10,7 @@ class BlogRequestHandler extends AbstractRequestHandler
     public static $recordClass = 'Emergence\CMS\BlogPost';
     public static $accountLevelAPI = false;
     public static $accountLevelWrite = 'User';
+    public static $accountLevelWriteAll = 'Staff';
     public static $browseConditions = array(
         'Class' => 'Emergence\CMS\BlogPost'
         ,'Status' => 'Published'
@@ -41,21 +42,21 @@ class BlogRequestHandler extends AbstractRequestHandler
             return false;
         }
 
-        return parent::checkReadAccess($BlogPost);
+        return parent::checkReadAccess($BlogPost, $suppressLogin);
     }
 
     public static function checkWriteAccess(ActiveRecord $BlogPost, $suppressLogin = false)
     {
         // only allow creating, editing your own, and staff editing
-        if (!$BlogPost->isPhantom && ($BlogPost->AuthorID != $GLOBALS['Session']->PersonID) && !$GLOBALS['Session']->hasAccountLevel('Staff')) {
+        if (
+            !$BlogPost->isPhantom &&
+            $BlogPost->AuthorID != $GLOBALS['Session']->PersonID &&
+            !$GLOBALS['Session']->hasAccountLevel(static::$accountLevelWriteAll)
+        ) {
             return false;
         }
 
-        if ($BlogPost->isPhantom && !$GLOBALS['Session']->PersonID) {
-            return false;
-        }
-
-        return true;
+        return parent::checkWriteAccess($BlogPost, $suppressLogin);
     }
 
     public static function respond($responseID, $responseData = Array(), $responseMode = false)
