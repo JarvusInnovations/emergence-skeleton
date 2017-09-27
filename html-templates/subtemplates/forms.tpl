@@ -84,6 +84,7 @@
 
             {foreach key=value item=text from=$options}
                 {$value = tif($useKeyAsValue, $value, $text)}
+                {$text = tif(is_a($text, 'ActiveRecord'), $text->getTitle(), $text)}
                 <option {refill field=$inputName default=$default selected=$value} value="{$value|escape}">{$text|escape}</option>
             {/foreach}
         </select>
