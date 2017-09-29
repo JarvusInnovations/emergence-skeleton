@@ -21,7 +21,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Script output</div>
         <div class="panel-body">
-            <samp class="panel-body">{$output|escape}</samp>
+            <samp class="panel-body">{$output|escape|nl2br}</samp>
         </div>
     </div>
 
