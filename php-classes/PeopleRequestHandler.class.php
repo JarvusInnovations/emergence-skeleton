@@ -13,6 +13,10 @@ class PeopleRequestHandler extends RecordsRequestHandler
 
     // RecordRequestHandler configuration
     public static $recordClass = Person::class;
+    public static $browseOrder = [
+        'LastName' => 'ASC',
+        'FirstName' => 'ASC'
+    ];
 
     public static function handleRecordsRequest($action = false)
     {
