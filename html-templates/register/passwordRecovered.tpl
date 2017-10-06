@@ -1,18 +1,13 @@
 {extends "designs/site.tpl"}
 
-{block "app-class"}login{/block}
-
-{block "app-menu"}{/block}
-
+{block "title"}Password Changed &mdash; {$dwoo.parent}{/block}
 
 {block "content"}
+    <header class="page-header">
+        <h1 class="header-title title-1">Password Changed</h1>
+	</header>
 
-<div id="app-body">
-	<h1>Password changed</h1>
+	<p class="lead">Your new password has been saved.</p>
 	
-	<p>Your new password has been saved.</p>
-	
-	<p><a href="/login">Login now</a></p>
-</div>
-
+	<a href="/login" class="button primary">Login now</a>
 {/block}

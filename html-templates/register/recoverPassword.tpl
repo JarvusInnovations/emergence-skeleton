@@ -4,7 +4,7 @@
 
 {block "content"}
     <header class="page-header">
-		<h2 class="header-title">Reset Your Password</h2>
+    	<h1 class="header-title title-1">Reset Your Password</h1>
 	</header>
 
 	<p class="page-info">Enter the username or email address associated with your account below, and you will receive an email with instructions to reset your password.</p>
@@ -17,7 +17,7 @@
 		<fieldset class="shrink">
 		    {field inputName='username' label='Email or Username' required=true attribs='autofocus'}
             <div class="submit-area">
-                <input type="submit" class="button submit" value="Reset Password">
+                <button type="submit" class="submit">Reset Password</button>
             </div>
 		</fieldset>
 	</form>

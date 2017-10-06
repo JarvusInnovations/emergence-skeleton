@@ -1,39 +1,24 @@
 {extends "designs/site.tpl"}
 
-{block "app-class"}login{/block}
-
-{block "app-menu"}{/block}
-
-{block "css"}
-	{$dwoo.parent}
-	<link rel="stylesheet" type="text/css" href="/css/forms.css">
-{/block}
+{block "title"}Create New Password &mdash; {$dwoo.parent}{/block}
 
 {block "content"}
+    <header class="page-header">
+        <h1 class="header-title title-1">Create New Password</h1>
+    </header>
 
-<div id="app-body">
-	<h1>Create new password</h1>
-	
 	{if $error}
-		<p class="error">{$error|escape}</p>
+		<p class="error lead">{$error|escape}</p>
 	{/if}
-	
-	<form method="POST" id="password-form" class="generic">
-		
-		<div class="field">
-			<label>Password</label>
-			<input class="text" type="password" name="Password" id="password">
-		</div>
 
-		<div class="field">
-			<label><span>Re-type</span> Password</label>
-			<input class="text" type="password" name="PasswordConfirm" id="password2">
-		</div>
-		
-		<div class="submit">	
-			<input type="submit" class="submit" value="Change password" class="sideSubmit">
-		</div>
-	</form>
-</div>
+    <form method="POST">
+        <fieldset class="shrink">
+            {field inputName=Password label=Password required=true attribs=autofocus type=password}
+            {field inputName=PasswordConfirm label='<span>Re-type</span> Password' required=true attribs=autofocus type=password}
 
+            <div class="submit-area">
+                <input type="submit" class="button submit" value="Set Password">
+            </div>
+        </fieldset>
+    </form>
 {/block}
