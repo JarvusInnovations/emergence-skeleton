@@ -8,7 +8,9 @@
         <a class="log-out-link" href="/logout">Log Out</a>
     {else}
         <a href="/login" id="log-in-link" class="mobile-only">Log In</a>
-        <a href="/register" id="register-link" class="mobile-hidden">Register</a>
+        {if Emergence\People\RegistrationRequestHandler::$enableRegistration}
+            <a href="/register" id="register-link" class="mobile-hidden">Register</a>
+        {/if}
         <a href="/register/recover" id="recover-link">Forgot Password</a>
         <form action="/login" method="post" class="mini-login mobile-hidden">
             <fieldset>
