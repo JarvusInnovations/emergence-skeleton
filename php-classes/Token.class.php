@@ -6,6 +6,7 @@ abstract class Token extends ActiveRecord
     public static $emailTemplate = 'token';
 
     public static $tableName = 'tokens';
+    public static $collectionRoute = '/tokens';
 
     // support subclassing
     public static $rootClass = __CLASS__;
