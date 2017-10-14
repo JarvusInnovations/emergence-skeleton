@@ -55,7 +55,7 @@ class Person extends VersionedRecord implements IPerson
         )
         ,'Phone' => array(
             'type' => 'decimal'
-            ,'length' => '10,0'
+            ,'length' => '15,0'
             ,'unsigned' => true
             ,'notnull' => false
             ,'accountLevelEnumerate' => 'User'
@@ -306,6 +306,19 @@ class Person extends VersionedRecord implements IPerson
 
         // save results
         return $this->finishValidation();
+    }
+
+    public function setFields($values)
+    {
+        foreach ($values AS $field => $value) {
+
+            // strip any non-digit characters from phone before setting
+            if ($field == 'Phone') {
+                $value = preg_replace('/\D/', '', $value);
+            }
+
+            $this->_setFieldValue($field, $value);
+        }
     }
 
     public static function getGroupConditions($handle, $matchedCondition)
