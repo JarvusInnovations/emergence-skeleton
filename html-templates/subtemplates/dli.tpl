@@ -1,6 +1,6 @@
-{template dli dt dd url=null default='&mdash;'}
+{template dli label value url=null default='&mdash;'}
     <div class="dli">
-        <dt>{$dt}</dt>
-        <dd>{if $url}<a href="{$url|escape}">{/if}{default $dd $default}{if $url}</a>{/if}</dd>
+        <dt>{$label}</dt>
+        <dd>{if $url}<a href="{$url|escape}">{/if}{default $value $default}{if $url}</a>{/if}</dd>
     </div>
 {/template}
