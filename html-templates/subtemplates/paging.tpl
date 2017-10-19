@@ -30,3 +30,15 @@
     {/if}
 </div>
 {/template}
+
+{template pagingArrows count total limit offset}
+    {if $limit}
+        Showing {$offset+1|number_format}&ndash;{$offset+$count|number_format} of {$total|number_format}
+        {if $offset}
+            <a class="paging-link previous" href="?{refill_query offset=$offset-$limit}">&larr;&nbsp;Previous</a>
+        {/if}
+        {if ($count == $limit) && ($total > $offset+$count)}
+            <a class="paging-link next" href="?{refill_query offset=$offset+$limit}">Next&nbsp;&rarr;</a>
+        {/if}
+    {/if}
+{/template}
