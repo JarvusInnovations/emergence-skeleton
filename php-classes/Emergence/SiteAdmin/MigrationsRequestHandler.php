@@ -15,6 +15,7 @@ class MigrationsRequestHandler extends \RequestHandler
     const STATUS_STARTED = 'started';
     const STATUS_FAILED = 'failed';
     const STATUS_EXECUTED = 'executed';
+    const STATUS_DEBUG = 'debug';
 
     public static $userResponseModes = [
         'application/json' => 'json',
@@ -100,22 +101,31 @@ class MigrationsRequestHandler extends \RequestHandler
             $debugLogStartIndex = count(\Debug::$log);
 
             ob_start();
-            $migrationStatus = include($migrationNode->RealPath);
+            $migration['status'] = include($migrationNode->RealPath);
             $output = ob_get_clean();
 
-            if (!in_array($migrationStatus, [static::STATUS_SKIPPED, static::STATUS_EXECUTED])) {
-                $migrationStatus = static::STATUS_FAILED;
-            }
-
             $migration['executed'] = time();
-            $migration['status'] = $migrationStatus;
-            $log = array_slice(\Debug::$log, $debugLogStartIndex);
 
-            DB::nonQuery('UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"', [$migration['executed'], $migration['status'], $migrationKey]);
+            if ($migration['status'] == static::STATUS_DEBUG) {
+                DB::nonQuery('DELETE FROM `_e_migrations` WHERE `Key` = "%s"', $migrationKey);
+            } else {
+                if (!in_array($migration['status'], [static::STATUS_SKIPPED, static::STATUS_EXECUTED])) {
+                    $migration['status'] = static::STATUS_FAILED;
+                }
+
+                DB::nonQuery(
+                    'UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"',
+                    [
+                        $migration['executed'],
+                        $migration['status'],
+                        $migrationKey
+                    ]
+                );
+            }
 
             return static::respond('migrationExecuted', [
                 'migration' => $migration,
-                'log' => $log,
+                'log' => array_slice(\Debug::$log, $debugLogStartIndex),
                 'output' => $output
             ]);
         }
@@ -224,4 +234,13 @@ class MigrationsRequestHandler extends \RequestHandler
         return 'YES' == DB::oneValue('SELECT IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
     }
 
+    protected static function getConstraints($tableName)
+    {
+        return DB::table('CONSTRAINT_NAME', 'SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s"', DB::escape($tableName));
+    }
+
+    protected static function getConstraint($tableName, $constraintName)
+    {
+        return DB::oneRecord('SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND CONSTRAINT_NAME = "%s"', DB::escape([$tableName, $constraintName]));
+    }
 }
