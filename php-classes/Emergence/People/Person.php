@@ -308,19 +308,6 @@ class Person extends VersionedRecord implements IPerson
         return $this->finishValidation();
     }
 
-    public function setFields($values)
-    {
-        foreach ($values AS $field => $value) {
-
-            // strip any non-digit characters from phone before setting
-            if ($field == 'Phone') {
-                $value = preg_replace('/\D/', '', $value);
-            }
-
-            $this->_setFieldValue($field, $value);
-        }
-    }
-
     public static function getGroupConditions($handle, $matchedCondition)
     {
         $group = Groups\Group::getByHandle($handle);
