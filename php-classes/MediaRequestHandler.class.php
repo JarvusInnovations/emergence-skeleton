@@ -4,6 +4,11 @@ class MediaRequestHandler extends RecordsRequestHandler
 {
     // RecordRequestHandler configuration
     public static $recordClass = 'Media';
+    public static $accountLevelRead = false;
+    public static $accountLevelComment = 'User';
+    public static $accountLevelBrowse = 'Staff';
+    public static $accountLevelWrite = 'Staff';
+    public static $accountLevelAPI = false;
     public static $browseLimit = 100;
     public static $browseOrder = array('ID' => 'DESC');
 
@@ -47,7 +52,7 @@ class MediaRequestHandler extends RecordsRequestHandler
         // handle action
         switch ($action = static::shiftPath()) {
 
-#			case 'media':
+#    		case 'media':
 #			{
 #				return static::handleMediaRequest();
 #			}
@@ -246,6 +251,10 @@ class MediaRequestHandler extends RecordsRequestHandler
             static::throwNotFoundError('Media ID #%u was not found', $media_id);
         }
 
+        if (!static::checkReadAccess($Media)) {
+            return static::throwUnauthorizedError();
+        }
+
         if (static::$responseMode == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
             JSON::translateAndRespond(array(
                 'success' => true
@@ -356,9 +365,12 @@ class MediaRequestHandler extends RecordsRequestHandler
             return static::throwUnauthorizedError('You are not authorized to download this media');
         }
 
-
         if (!$Media) {
             static::throwNotFoundError('Media ID #%u was not found', $mediaID);
+        }
+
+        if (!static::checkReadAccess($Media)) {
+            return static::throwUnauthorizedError();
         }
 
         return parent::handleRecordRequest($Media);
@@ -380,6 +392,10 @@ class MediaRequestHandler extends RecordsRequestHandler
 
         if (!$Media) {
             static::throwNotFoundError('Media ID #%u was not found', $media_id);
+        }
+
+        if (!static::checkReadAccess($Media)) {
+            return static::throwUnauthorizedError();
         }
 
         // determine filename
@@ -639,6 +655,10 @@ class MediaRequestHandler extends RecordsRequestHandler
 
             if ($Media = Media::getById($media_id)) {
                 $media_array[$Media->ID] = $Media;
+
+                if (!static::checkWriteAccess($Media)) {
+                    return static::throwUnauthorizedError();
+                }
             }
         }
 
