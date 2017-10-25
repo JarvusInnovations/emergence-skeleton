@@ -47,7 +47,7 @@
                 <div class="message-body">{$Comment->Message|escape|markdown}</div>
                 <footer>
                     <time><a href="#comment-{$Comment->ID}">{$Comment->Created|date_format:'%a, %b %e, %Y &middot; %-l:%M %P'}</a></time>
-                    {if Emergence\Comments\CommentsRequestHandler::checkWriteAccess($Comment)}
+                    {if Emergence\Comments\CommentsRequestHandler::checkWriteAccess($Comment, true)}
                         {if $.User->hasAccountLevel(Staff)}<a href="{$Comment->getURL()}/edit" class="edit">Edit</a>{/if}
                         <a href="{$Comment->getURL()}/delete"
                            class="confirm"

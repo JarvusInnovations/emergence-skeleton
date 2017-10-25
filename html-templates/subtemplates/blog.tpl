@@ -11,7 +11,7 @@
                     <a href="{$Post->getURL()}">{$Post->Title|escape}</a>
                 </{$headingLevel}>
 
-                {if Emergence\CMS\BlogRequestHandler::checkWriteAccess($Post)}
+                {if Emergence\CMS\BlogRequestHandler::checkWriteAccess($Post, true)}
                 <div class="header-buttons">
                     <a href="{$Post->getURL()}/edit" class="button small">Edit</a>&nbsp;
                     <a href="{$Post->getURL()}/delete"
