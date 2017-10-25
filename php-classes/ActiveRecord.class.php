@@ -456,7 +456,7 @@ class ActiveRecord
         $fieldOptions = static::getStackedConfig('fields', $field);
 
         if (!empty($fieldOptions['accountLevelEnumerate'])) {
-            return empty($GLOBALS['Session']) ? false : $GLOBALS['Session']->hasAccountLevel($fieldOptions['accountLevelEnumerate']);
+            return ($User = $this->getUserFromEnvironment()) ? $User->hasAccountLevel($fieldOptions['accountLevelEnumerate']) : false;
         }
 
         return true;
@@ -467,7 +467,7 @@ class ActiveRecord
         $fieldOptions = static::getStackedConfig('dynamicFields', $field);
 
         if (!empty($fieldOptions['accountLevelEnumerate'])) {
-            return empty($GLOBALS['Session']) ? false : $GLOBALS['Session']->hasAccountLevel($fieldOptions['accountLevelEnumerate']);
+            return ($User = $this->getUserFromEnvironment()) ? $User->hasAccountLevel($fieldOptions['accountLevelEnumerate']) : false;
         }
 
         return true;
@@ -478,7 +478,7 @@ class ActiveRecord
         $fieldOptions = static::getFieldOptions($field);
 
         if (!empty($fieldOptions['accountLevelWrite'])) {
-            return empty($GLOBALS['Session']) ? false : $GLOBALS['Session']->hasAccountLevel($fieldOptions['accountLevelWrite']);
+            return ($User = $this->getUserFromEnvironment()) ? $User->hasAccountLevel($fieldOptions['accountLevelWrite']) : false;
         }
 
         return true;
@@ -2782,7 +2782,7 @@ class ActiveRecord
         return str_replace('\\', '_', static::getRootClass());
     }
 
-    protected function getUserFromEnvironment()
+    protected static function getUserFromEnvironment()
     {
         if (!empty($_SESSION) && !empty($_SESSION['User'])) {
             return $_SESSION['User'];
