@@ -82,6 +82,60 @@
     {/template}
 
     {if $source->isInitialized()}
+        {$upstreamDiff = $source->getUpstreamDiff()}
+        <div class="panel panel-{tif $upstreamDiff.error ? danger : default}">
+            <div class="panel-heading">
+                <small class="pull-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
+                <h2 class="panel-title">Branch Status</h2>
+            </div>
+
+            {if $upstreamDiff.error}
+                <pre class="panel-body" role="alert">{$upstreamDiff.error|escape}</pre>
+            {else}
+                <table class="table panel-body">
+                    <thead>
+                        <tr>
+                            <th width="50%">
+                                <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
+                                    {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
+                                    {if $upstreamDiff.ahead && !$upstreamDiff.behind}
+                                        <button type="submit" class="btn btn-default btn-xs">Push</button>
+                                    {/if}
+                                </form>
+                            </th>
+                            <th width="50%">
+                                <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
+                                    {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
+                                    {if $upstreamDiff.behind && !$upstreamDiff.ahead}
+                                        <button type="submit" class="btn btn-default btn-xs">Pull (fast fwd)</button>
+                                    {/if}
+                                </form>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach item=commit from=$upstreamDiff.commits}
+                            <tr>
+                                {if $commit.position == behind}
+                                    <td width="50%"></td>
+                                {/if}
+                                <td width="50%">
+                                    <small class="label label-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
+                                    <div class="small">
+                                        by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
+                                        on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
+                                    </div>
+                                </td>
+                                {if $commit.position == ahead}
+                                    <td width="50%"></td>
+                                {/if}
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            {/if}
+        </div>
+
         {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStatus=yes))}
 
         <div class="panel panel-default">
@@ -191,58 +245,30 @@
             </div>
         </div>
 
-        {$upstreamDiff = $source->getUpstreamDiff()}
-        <div class="panel panel-{tif $upstreamDiff.error ? danger : default}">
+        <div class="panel panel-default">
             <div class="panel-heading">
-                <small class="pull-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
-                <h2 class="panel-title">Branch Status</h2>
+                <div class="btn-group btn-group-xs pull-right">
+                    <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/erase">Erase from VFS</a>
+                </div>
+                <h2 class="panel-title">VFS Mappings</h2>
             </div>
 
-            {if $upstreamDiff.error}
-                <pre class="panel-body" role="alert">{$upstreamDiff.error|escape}</pre>
-            {else}
-                <table class="table panel-body">
-                    <thead>
+            <table class="table table-striped panel-body">
+                <thead>
+                    <tr>
+                        <th>Repository Path</th>
+                        <th>Site Path</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach item=tree from=$source->getTrees()}
                         <tr>
-                            <th width="50%">
-                                <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
-                                    {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
-                                    {if $upstreamDiff.ahead && !$upstreamDiff.behind}
-                                        <button type="submit" class="btn btn-default btn-xs">Push</button>
-                                    {/if}
-                                </form>
-                            </th>
-                            <th width="50%">
-                                <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
-                                    {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
-                                    {if $upstreamDiff.behind && !$upstreamDiff.ahead}
-                                        <button type="submit" class="btn btn-default btn-xs">Pull (fast fwd)</button>
-                                    {/if}
-                                </form>
-                            </th>
+                            <td>{$tree.gitPath|escape}</td>
+                            <td>{$tree.vfsPath|escape}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {foreach item=commit from=$upstreamDiff.commits}
-                            <tr>
-                                {if $commit.position == behind}
-                                    <td width="50%"></td>
-                                {/if}
-                                <td width="50%">
-                                    <small class="label label-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
-                                    <div class="small">
-                                        by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
-                                        on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
-                                    </div>
-                                </td>
-                                {if $commit.position == ahead}
-                                    <td width="50%"></td>
-                                {/if}
-                            </tr>
-                        {/foreach}
-                    </tbody>
-                </table>
-            {/if}
+                    {/foreach}
+                </tbody>
+            </table>
         </div>
     {/if}
 
@@ -284,33 +310,6 @@
                     <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">Manage Deploy Key</a>
                 </dd>
             {/if}
-
-            {$trees = $source->getTrees()}
-            <dt>mappings</dt>
-            <dd>
-                <details>
-                    <summary>{$trees|count|number_format} mapping{tif count($trees) != 1 ? s}</summary>
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Repository Path</th>
-                                <th>Site Path</th>
-                                <th>Local Only</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {foreach item=tree from=$trees}
-                                <tr>
-                                    <td>{$tree.gitPath|escape}</td>
-                                    <td>{$tree.vfsPath|escape}</td>
-                                    <td>{tif $tree.localOnly ? 'yes' : 'no'}</td>
-                                </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
-                </details>
-            </dd>
         </dl>
     </div>
 {/block}

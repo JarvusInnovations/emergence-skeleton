@@ -72,6 +72,8 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleDiffRequest($source);
             case 'clean':
                 return static::handleCleanRequest($source);
+            case 'erase':
+                return static::handleEraseRequest($source);
             case '':
             case false:
                 return static::respond('source', [
@@ -292,6 +294,32 @@ class SourcesRequestHandler extends \RequestHandler
         $result = $source->clean();
 
         return static::respondStatusMessage($source, 'Cleaned git working tree');
+    }
+
+    public static function handleEraseRequest(Source $source)
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => 'Are you sure you want to erase all mapped paths from the VFS?'
+            ]);
+        }
+
+        $results = $source->eraseFromVfs();
+        
+        $collectionsDeleted = 0;
+        $filesDeleted = 0;
+        
+        foreach ($results as $path => $result) {
+            if (!empty($result['collectionsDeleted'])) {
+                $collectionsDeleted += count($result['collectionsDeleted']);
+            }
+
+            if (!empty($result['filesDeleted'])) {
+                $filesDeleted += is_array($result['filesDeleted']) ? count($result['filesDeleted']) : $result['filesDeleted'];
+            }
+        }
+
+        return static::respondStatusMessage($source, "Erased $filesDeleted files and $collectionsDeleted collections from VFS");
     }
 
 

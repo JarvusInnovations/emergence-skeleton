@@ -561,6 +561,41 @@ class Source
         return $results;
     }
 
+    public function eraseFromVfs()
+    {
+        $results = [];
+
+        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+            $treeOptions = static::getTreeOptions($treeKey, $treeValue);
+
+            $result = [];
+
+            try {
+                if ($srcFileNode = Site::resolvePath($treeOptions['vfsPath'])) {
+                    if ($srcFileNode instanceof SiteFile) {
+#                        \Debug::dumpVar($srcFileNode, false, "Found file at path: $treeOptions[vfsPath]");
+                        $srcFileNode->delete();
+                        $result = ['filesDeleted' => 1];
+                    } else {
+#                        \Debug::dumpVar($treeOptions, false, "Found tree at path: $treeOptions[vfsPath]");
+                        $result = static::eraseTree($treeOptions['vfsPath'], $treeOptions);
+                    }
+
+                    $result['success'] = true;
+                } else {
+                    $result['success'] = false;
+                }
+            } catch (Exception $e) {
+                $result['success'] = false;
+                $result['error'] = $e->getMessage();
+            }
+
+            $results[$treeOptions['vfsPath']] = $result;
+        }
+
+        return $results;
+    }
+
     public function stage(array $paths)
     {
         $this->getRepository()->run('add', array_merge(['--all'], $paths));
@@ -681,5 +716,159 @@ class Source
         }
 
         return $treeOptions;
+    }
+
+    // TODO: merge into Emergence_FS
+    protected static function eraseTree($path, array $options = [])
+    {
+        // initialize result accumulators
+        $collectionsAnalyzed = [];
+        $collectionsDeleted = [];
+        $collectionsExcluded = 0;
+        $collectionsNotEmptied = [];
+
+        $filesAnalyzed = 0;
+        $filesExcluded = 0;
+        $filesDeleted = [];
+
+
+        // prepare options
+        $options = array_merge([
+            'exclude' => [],
+            'pretend' => false
+        ], $options);
+
+
+        if (!empty($options['exclude']) && is_string($options['exclude'])) {
+            $options['exclude'] = [$options['exclude']];
+        }
+
+        // normalize input paths
+        if (!$path || $path == '/' || $path == '.' || $path == './') {
+            $path = null;
+        } else {
+            $path = trim($path, '/');
+        }
+
+
+        // build map of subtrees to be erased
+        $prefixLen = strlen($path);
+        $tree = Emergence_FS::getTree($path, true);
+
+        foreach ($tree AS $collectionId => &$node) {
+
+            if ($node['ParentID'] && $tree[$node['ParentID']]) {
+                $node['_path'] = $tree[$node['ParentID']]['_path'] . '/' . $node['Handle'];
+            } else {
+                $node['_path'] = $path;
+            }
+
+            $relPath = substr($node['_path'], $prefixLen);
+
+            if ($node['Status'] != 'Normal') {
+                continue;
+            }
+
+            if (Emergence_FS::matchesExclude($relPath, $options['exclude'])) {
+                $collectionsExcluded++;
+                $collectionsNotEmptied[] = $collectionId;
+                continue;
+            }
+
+            $collectionsAnalyzed[] = $collectionId;
+        }
+
+
+        // erase files
+        if (count($collectionsAnalyzed)) {
+            $conditions = [
+                sprintf('CollectionID IN (%s)', join(',', $collectionsAnalyzed)),
+                'Status != "Phantom"'
+            ];
+
+            $fileResult = \DB::query(
+                '
+                    SELECT f2.*
+                      FROM (
+                               SELECT MAX(f1.ID) AS ID
+                                 FROM `%1$s` f1
+                                WHERE (%2$s)
+                                GROUP BY f1.CollectionID, f1.Handle
+                           ) AS lastestFiles
+                      LEFT JOIN `%1$s` f2 USING (ID)
+                     WHERE Status = "Normal"
+                ',
+                [
+                    SiteFile::$tableName,
+                    implode(') AND (', $conditions)
+                ]
+            );
+
+            // copy each
+            while ($fileRow = $fileResult->fetch_assoc()) {
+                $filesAnalyzed++;
+                $fileCollection =& $tree[$fileRow['CollectionID']];
+                $filePath = $fileCollection['_path'].'/'.$fileRow['Handle'];
+                $relPath = substr($filePath, $prefixLen);
+
+                if (Emergence_FS::matchesExclude($relPath, $options['exclude'])) {
+                    $filesExcluded++;
+
+                    if (!in_array($fileRow['CollectionID'], $collectionsNotEmptied)) {
+                        $collectionsNotEmptied[] = $fileRow['CollectionID'];
+                    }
+
+                    continue;
+                }
+
+                \DB::nonQuery(
+                    'INSERT INTO `%s` SET CollectionID = %u, Handle = "%s", Status = "Deleted", AuthorID = %u, AncestorID = %u',
+                    [
+                        \SiteFile::$tableName,
+                        $fileRow['CollectionID'],
+                        $fileRow['Handle'],
+                        !empty($GLOBALS['Session']) ? $GLOBALS['Session']->PersonID : null,
+                        $fileRow['ID'],
+                    ]
+                );
+                \Cache::delete(\SiteFile::getCacheKey($fileRow['CollectionID'], $fileRow['Handle']));
+
+                $filesDeleted[] = $filePath;
+            }
+        }
+
+
+        // erase empty trees
+        foreach (array_reverse($tree, true) AS $collectionId => $collection) {
+            if (in_array($collectionId, $collectionsNotEmptied)) {
+                if (!empty($collection['ParentID'])) {
+                    $collectionsNotEmptied[] = $collection['ParentID'];
+                }
+
+                continue;
+            }
+
+            \DB::nonQuery(
+                'UPDATE `%s` SET Status = "Deleted" WHERE ID = %u',
+                [
+                    \SiteCollection::$tableName,
+                    $collectionId
+                ]
+            );
+            \Cache::delete(\SiteCollection::getCacheKey($collection['Handle'], $collection['ParentID']));
+
+            $collectionsDeleted[] = $collection['_path'];
+        }
+
+
+        return [
+            'collectionsExcluded' => $collectionsExcluded,
+            'collectionsAnalyzed' => count($collectionsAnalyzed),
+            'collectionsNotEmptied' => count($collectionsNotEmptied),
+            'collectionsDeleted' => $collectionsDeleted,
+            'filesExcluded' => $filesExcluded,
+            'filesAnalyzed' => $filesAnalyzed,
+            'filesDeleted' => $filesDeleted
+        ];
     }
 }
