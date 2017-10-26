@@ -1,5 +1,16 @@
 {extends "task.tpl"}
 
+{block css}
+    {$dwoo.parent}
+    <style>
+        #precache-textinput-ct input {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5em;
+        }
+    </style>
+{/block}
+
 {block content}
     <script>
     function selectAllCollections() {
@@ -26,11 +37,37 @@
                 </div>
             {/foreach}
 
-            <div class="form-group">
+            <div class="form-group" id="precache-textinput-ct">
                 <input type="text" placeholder="path/to/tree" name="collections[]">
             </div>
 
             <button type="submit" class="btn btn-primary">Precache selected collections</button>
         </div>
     </form>
+{/block}
+
+{block js-bottom}
+    {$dwoo.parent}
+
+    <script>
+    $(document).ready(function() {
+        var $textInputCt = $('#precache-textinput-ct');
+
+        _attachInputListeners($('input[type=text][name="collections[]"]'));
+
+        function _attachInputListeners($input) {
+            $input.keypress(_ensureBlankAvailable).change(_ensureBlankAvailable);
+        }
+
+        function _ensureBlankAvailable() {
+            var $blankInputs = $('input[type=text][name="collections[]"]').filter(function() {
+                return !this.value;
+            });
+
+            if (!$blankInputs.length) {
+                _attachInputListeners($textInputCt.append('<input type="text" placeholder="path/to/tree" name="collections[]">'));
+            }
+        }
+    });
+    </script>
 {/block}
