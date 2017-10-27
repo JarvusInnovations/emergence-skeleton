@@ -132,6 +132,11 @@ class Framework
 
     public function getDownloadUrl()
     {
+        // Use patched 5.0.1.1255 framework
+        if ($this->getName() == 'ext' && $this->getVersion() == '5.0.1.1255') {
+            return 'https://github.com/JarvusInnovations/extjs/archive/5.0.1.255-patched.zip';
+        }
+
         return $this->getConfig('downloadUrl');
     }
 
