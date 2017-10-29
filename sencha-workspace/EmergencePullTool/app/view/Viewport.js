@@ -3,7 +3,7 @@ Ext.define('EmergencePullTool.view.Viewport', {
     requires: [
         'Ext.layout.container.Fit',
         'EmergencePullTool.view.Main',
-        'Emergence.ext.ux.DiffPanel'
+        'EmergencePullTool.view.DiffPanel'
     ],
 
     layout: {
