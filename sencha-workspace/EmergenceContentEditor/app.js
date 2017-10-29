@@ -5,14 +5,5 @@
 Ext.application({
     extend: 'EmergenceContentEditor.Application',
 
-    name: 'EmergenceContentEditor',
-
-    requires: [
-        // This will automatically load all classes in the EmergenceContentEditor namespace
-        // so that application classes do not need to require each other.
-        'EmergenceContentEditor.*'
-    ],
-
-    // The name of the initial view to create.
-    mainView: 'EmergenceContentEditor.view.main.Main'
+    name: 'EmergenceContentEditor'
 });
