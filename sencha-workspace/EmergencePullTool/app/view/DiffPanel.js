@@ -1,6 +1,6 @@
 Ext.define('EmergencePullTool.view.DiffPanel', {
     extend: 'Ext.Panel',
-    xtype: 'diffpanel',
+    xtype: 'app-diffpanel',
 
 
     //  ,tbar: [{

@@ -7,39 +7,38 @@ Ext.define('EmergencePullTool.controller.Main', {
         'Emergence.util.API'
     ],
 
-    views: ['Main'],
-    stores: ['ChangesTree'],
 
-    refs: [{
-        ref: 'treePanel',
-        selector: 'app-main'
-    }, {
-        ref: 'diffPanel',
-        selector: 'diffpanel'
-    }, {
-        ref: 'selectionStatusCmp',
-        selector: 'app-main #selectionStatus'
-    }, {
-        ref: 'pullButton',
-        selector: 'app-main button[action=pull]'
-    }],
+    views: [
+        'Main'
+    ],
 
-    init: function() {
-        this.control({
-            'app-main': {
-                boxready: 'onTreePanelBoxReady',
-                checkchange: 'onTreePanelCheckChange',
-                itemclick: 'onTreePanelItemClick',
-                itemdblclick: 'onTreePanelItemDblClick'
-            },
-            'button[action=pull]': {
-                click: 'onPullButtonClick'
-            },
-            'button[action=selectall]': {
-                click: 'onSelectAllClick'
-            }
-        });
+    stores: [
+        'ChangesTree'
+    ],
+
+    refs: {
+        treePanel: 'app-changesgrid',
+        selectionStatusCmp: 'app-changesgrid #selectionStatus',
+        pullButton: 'app-changesgrid button[action=pull]',
+
+        diffPanel: 'app-diffpanel'
     },
+
+    control: {
+        'app-changesgrid': {
+            boxready: 'onTreePanelBoxReady',
+            checkchange: 'onTreePanelCheckChange',
+            itemclick: 'onTreePanelItemClick',
+            itemdblclick: 'onTreePanelItemDblClick'
+        },
+        'button[action=pull]': {
+            click: 'onPullButtonClick'
+        },
+        'button[action=selectall]': {
+            click: 'onSelectAllClick'
+        }
+    },
+
 
     syncCheckedCount: function() {
         var me = this,
