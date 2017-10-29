@@ -18,10 +18,9 @@ Ext.define('EmergencePullTool.view.Main', {
         xtype: 'app-diffpanel',
         title: 'Select change to view differences',
         region: 'south',
-        height: 400,
+        height: '40%',
         collapsible: true,
         split: true,
-        //        ,collapsed: true
         html: 'diff goes here'
     }]
 });
