@@ -35,21 +35,22 @@ Ext.define('EmergencePullTool.view.Main', {
             xtype: 'treecolumn',
             dataIndex: 'handle',
             text: 'Path',
-            width: 200
+            align: 'left',
+            flex: 1
         },
         {
             xtype: 'templatecolumn',
             dataIndex: 'localFile',
-            tpl: '{localFile.SHA1}',
+            tpl: '{localFile.SHA1:substr(0, 8)}',
             text: 'Local Version',
-            width: 250
+            width: 150
         },
         {
             xtype: 'templatecolumn',
             dataIndex: 'remoteFile',
-            tpl: '<tpl if="remoteFile">{remoteFile.SHA1}<tpl elseif="leaf"><em>DELETED</em></tpl>',
+            tpl: '<tpl if="remoteFile">{remoteFile.SHA1:substr(0, 8)}<tpl elseif="leaf"><em>DELETED</em></tpl>',
             text: 'Remote Version',
-            width: 250
+            width: 150
         }
     ]
 });
