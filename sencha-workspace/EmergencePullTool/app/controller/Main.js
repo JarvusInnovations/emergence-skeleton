@@ -4,6 +4,7 @@ Ext.define('EmergencePullTool.controller.Main', {
         'EmergencePullTool.util.Diff'
     ],
 
+    views: ['Main'],
     stores: ['ChangesTree'],
 
     refs: [{
