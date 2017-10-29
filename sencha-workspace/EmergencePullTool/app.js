@@ -8,5 +8,5 @@ Ext.application({
     name: 'EmergencePullTool',
 
     // The name of the initial view to create.
-    mainView: 'EmergencePullTool.view.main.Main'
+    mainView: 'EmergencePullTool.view.Main'
 });
