@@ -1,0 +1,5 @@
+.sass-cache
+sencha-error-*.log
+/ext-*/
+/build/
+/*/bootstrap.*
