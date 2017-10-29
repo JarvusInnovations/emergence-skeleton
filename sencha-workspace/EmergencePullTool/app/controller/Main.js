@@ -1,7 +1,10 @@
 Ext.define('EmergencePullTool.controller.Main', {
     extend: 'Ext.app.Controller',
     requires: [
-        'EmergencePullTool.util.Diff'
+        'EmergencePullTool.util.Diff',
+
+        /* global Emergence*/
+        'Emergence.util.API'
     ],
 
     views: ['Main'],
@@ -56,7 +59,7 @@ Ext.define('EmergencePullTool.controller.Main', {
 
         // load local tree
         treePanel.setLoading('Loading local file tree&hellip;');
-        Ext.Ajax.request({
+        Emergence.util.API.request({
             url: '/emergence',
             method: 'GET',
             timeout: 600000,
@@ -86,7 +89,7 @@ Ext.define('EmergencePullTool.controller.Main', {
 
                 // load remote tree
                 treePanel.setLoading('Loading remote file tree&hellip;');
-                Ext.Ajax.request({
+                Emergence.util.API.request({
                     url: '/emergence',
                     method: 'GET',
                     timeout: 600000,
@@ -224,7 +227,7 @@ Ext.define('EmergencePullTool.controller.Main', {
 
         // spawn async load of both
         leftCmp.setLoading('Loading local revision&hellip;');
-        Ext.Ajax.request({
+        Emergence.util.API.request({
             url: '/emergence/'+path,
             method: 'GET',
             headers: {
@@ -244,7 +247,7 @@ Ext.define('EmergencePullTool.controller.Main', {
         });
 
         rightCmp.setLoading('Loading remote revision&hellip;');
-        Ext.Ajax.request({
+        Emergence.util.API.request({
             url: '/emergence/'+path,
             method: 'GET',
             headers: {
@@ -294,7 +297,7 @@ Ext.define('EmergencePullTool.controller.Main', {
             checkedNodes = treePanel.getView().getChecked();
 
         treePanel.setLoading('Pulling '+checkedNodes.length+' updates&hellip;');
-        Ext.Ajax.request({
+        Emergence.util.API.request({
             url: '/efs/pull-remote-changes',
             method: 'POST',
             timeout: 600000,
