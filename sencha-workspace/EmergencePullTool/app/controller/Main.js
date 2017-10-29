@@ -3,7 +3,7 @@ Ext.define('EmergencePullTool.controller.Main', {
     requires: [
         'EmergencePullTool.util.Diff',
 
-        /* global Emergence*/
+        /* global Emergence */
         'Emergence.util.API'
     ],
 
