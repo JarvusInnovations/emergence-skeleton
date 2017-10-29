@@ -1,7 +1,7 @@
 Ext.define('EmergencePullTool.controller.Main', {
     extend: 'Ext.app.Controller',
     requires: [
-        'Emergence.util.Diff'
+        'EmergencePullTool.util.Diff'
     ],
 
     stores: ['ChangesTree'],
@@ -269,7 +269,7 @@ Ext.define('EmergencePullTool.controller.Main', {
         function _onBothLoaded() {
             var leftLines = localResponse.responseText.replace(/\r\n?/g, '\n').split(/\n/),
                 rightLines = remoteResponse.responseText.replace(/\r\n?/g, '\n').split(/\n/),
-                diff = Emergence.util.Diff.getDiff(leftLines, rightLines);
+                diff = EmergencePullTool.util.Diff.getDiff(leftLines, rightLines);
 
             diffPanel.setCode('A', leftLines, diff);
             diffPanel.setCode('B', rightLines, diff);

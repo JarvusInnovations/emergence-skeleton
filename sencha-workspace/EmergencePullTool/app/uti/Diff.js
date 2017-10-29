@@ -1,4 +1,4 @@
-Ext.define('Emergence.util.Diff', {
+Ext.define('EmergencePullTool.util.Diff', {
     singleton: true,
 
     getDiff: function(a, b) {
