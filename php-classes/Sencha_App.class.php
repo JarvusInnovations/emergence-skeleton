@@ -101,10 +101,7 @@ class Sencha_App
         $framework = $this->getFramework();
         $frameworkVersion = $this->getFrameworkVersion();
 
-        if ($filePath[0] == 'x') {
-            array_shift($filePath);
-            array_unshift($filePath, 'ext-library');
-        } elseif ($filePath[0] == 'sdk' || $filePath[0] == $framework) {
+        if ($filePath[0] == 'sdk' || $filePath[0] == $framework) {
             array_shift($filePath);
             array_unshift($filePath, 'sencha-workspace', "$framework-$frameworkVersion");
         } elseif ($filePath[0] == 'packages') {

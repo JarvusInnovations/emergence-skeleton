@@ -170,38 +170,6 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportResult));
 
 
-    // write any legacy ${workspace.dir}/x/ classpaths from ext-library
-    $libraryClassPaths = [];
-    foreach (array_merge([$app], $packages) AS $package) {
-        foreach ($package->getClassPaths() AS $classPath) {
-            if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-                $libraryClassPaths[] = substr($classPath, 19);
-            }
-        }
-    }
-
-    $libraryClassPaths = array_unique($libraryClassPaths);
-
-    foreach ($libraryClassPaths AS $libraryClassPath) {
-        $classPathSource = "ext-library/$libraryClassPath";
-        $classPathDest = "$libraryTmpPath/$libraryClassPath";
-
-        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
-        Benchmark::mark("precached $cachedFiles files in $classPathSource");
-
-        $sourceNode = Site::resolvePath($classPathSource);
-
-        if ($sourceNode instanceof SiteFile) {
-            mkdir(dirname($classPathDest), 0777, true);
-            copy($sourceNode->RealPath, $classPathDest);
-            Benchmark::mark("copied file $classPathSource to $classPathDest");
-        } else {
-            $exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-            Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
-        }
-    }
-
-
     // copy packages to workspace (except framework packages)
     foreach ($packages AS $packageName => $package) {
         if ($package instanceof Jarvus\Sencha\FrameworkPackage) {

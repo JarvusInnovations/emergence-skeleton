@@ -13,8 +13,6 @@
             ,paths: {
                 'Ext': '/app/{$App->getName()}/sdk/src'
                 ,'Ext.ux': '/app/{$App->getName()}/sdk/examples/ux'
-                ,'Emergence': '/app/{$App->getName()}/x/Emergence'
-                ,'Jarvus': '/app/{$App->getName()}/x/Jarvus'
             }
         });
     </script>

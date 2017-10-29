@@ -10,7 +10,6 @@ if (Site::getConfig('parent_hostname') == null) {
             'data-exporters',
             'dwoo-plugins',
             'event-handlers',
-            'ext-library',
             'html-templates',
             'php-classes',
             'php-config',

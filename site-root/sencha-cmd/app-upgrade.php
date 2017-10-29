@@ -77,21 +77,6 @@ $exportResult = Emergence_FS::exportTree($appPath, $appTmpPath);
 Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportResult));
 
 
-// write any libraries from classpath
-$classPaths = explode(',', $App->getBuildCfg('app.classpath'));
-
-foreach ($classPaths AS $classPath) {
-    if (substr($classPath, 0, 2) == 'x/') {
-        $classPathSource = 'ext-library'.substr($classPath, 1);
-        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
-        Benchmark::mark("precached $cachedFiles files from $classPathSource");
-        $exportResult = Emergence_FS::exportTree($classPathSource, "$appTmpPath/$classPath");
-        Benchmark::mark("exported $classPathSource to $appTmpPath/$classPath: ".http_build_query($exportResult));
-    }
-}
-
-
-
 // change into app's directory
 chdir($appTmpPath);
 Benchmark::mark("chdir to: $appTmpPath");
