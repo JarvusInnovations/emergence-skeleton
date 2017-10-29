@@ -1,3 +1,0 @@
-<?php
-
-JSLibraryRequestHandler::handleRequest();

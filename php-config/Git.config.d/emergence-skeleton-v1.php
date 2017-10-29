@@ -12,7 +12,6 @@ if (Site::getConfig('parent_hostname') == null) {
             'event-handlers',
             'ext-library',
             'html-templates',
-            'js-library',
             'php-classes',
             'php-config',
             'php-migrations',
