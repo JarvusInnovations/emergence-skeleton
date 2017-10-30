@@ -3,3 +3,6 @@ sencha-error-*.log
 /ext-*/
 /build/
 /*/bootstrap.*
+
+/packages/jarvus-apikit/
+/packages/emergence-apikit/
