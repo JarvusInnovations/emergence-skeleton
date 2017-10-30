@@ -240,6 +240,7 @@
          *
          *     "framework": "ext",
          */
+        "framework": "ext",
 
         /**
          * Packages can require other packages in the same way that applications can require
