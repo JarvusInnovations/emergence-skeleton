@@ -17,7 +17,7 @@
           * As a general rule, all classes that belong to this package should be under this namespace
           * if multiple namespaces are part of this package, set this to "".
           */
-         "namespace": "Emergence.cms.summaries",
+         "namespace": "Emergence.cmssummaries",
 
         /**
          * The package type.
@@ -82,14 +82,7 @@
         /**
          * Additional resources used during theme slicing operations
          */
-        "slicer": {
-            "js": [
-                {
-                    "path": "${package.dir}/sass/example/custom.js",
-                    "isWidgetManifest": true
-                }
-            ]
-        },
+        "slicer": null,
 
         /**
          * Controls the output directory.
@@ -115,15 +108,15 @@
         "sass" : {
             /**
              * The namespace to which this package's SASS corresponds. The default value of
-             * "Emergence.cms.summaries" means that the files in ./sass/src (and ./sass/var) match classes in
-             * the Emergence.cms.summaries" root namespace. In other words, "Emergence.cms.summaries.panel.Panel" maps to
+             * "Emergence.cmssummaries" means that the files in ./sass/src (and ./sass/var) match classes in
+             * the Emergence.cmssummaries" root namespace. In other words, "Emergence.cmssummaries.panel.Panel" maps to
              * ./sass/src/panel/Panel.scss.
              *
              * To style classes from any namespace, set this to blank. If this is blank,
-             * then to style "Emergence.cms.summaries.panel.Panel" you would put SASS in
-             * ./sass/src/Emergence.cms.summaries/panel/Panel.scss.
+             * then to style "Emergence.cmssummaries.panel.Panel" you would put SASS in
+             * ./sass/src/Emergence.cmssummaries/panel/Panel.scss.
              */
-            "namespace": "Emergence.cms.summaries",
+            "namespace": "Emergence.cmssummaries",
 
             /**
              * Comma-separated list of files or folders containing extra Sass. These
@@ -238,6 +231,7 @@
          *
          *     "framework": "ext",
          */
+        "framework": "ext",
 
         /**
          * Packages can require other packages in the same way that applications can require
