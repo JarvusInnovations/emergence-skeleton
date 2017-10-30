@@ -1,8 +1,14 @@
-.sass-cache
-sencha-error-*.log
+# framework sources
 /ext-*/
+
+# derived files produced by sencha-cmd
 /build/
 /*/bootstrap.*
 
+# temporary files produced by sencha-cmd
+.sass-cache
+sencha-error-*.log
+
+# remote packages
 /packages/jarvus-apikit/
 /packages/emergence-apikit/
