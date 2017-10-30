@@ -82,14 +82,7 @@
         /**
          * Additional resources used during theme slicing operations
          */
-        "slicer": {
-            "js": [
-                {
-                    "path": "${package.dir}/sass/example/custom.js",
-                    "isWidgetManifest": true
-                }
-            ]
-        },
+        "slicer": null,
 
         /**
          * Controls the output directory.
@@ -238,6 +231,7 @@
          *
          *     "framework": "ext",
          */
+        "framework": "ext",
 
         /**
          * Packages can require other packages in the same way that applications can require
@@ -264,6 +258,9 @@
          *          }
          *      }
          */
-        "requires": []
+        "requires": [
+            "emergence-apikit",
+            "jarvus-fileupload"
+        ]
     }
 }
