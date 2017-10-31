@@ -23,5 +23,14 @@ Ext.define('EmergenceEditor.view.file.Tree', {
             dragText: '{0} selected item{1}',
             containerScroll: true
         }
-    }
+    },
+
+    columns: [
+        {
+            xtype: 'treecolumn',
+            dataIndex: 'Handle',
+            align: 'left',
+            flex: 1
+        }
+    ]
 });

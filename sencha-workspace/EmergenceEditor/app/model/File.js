@@ -1,7 +1,9 @@
 /* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.model.File', {
     extend: 'Ext.data.Model',
-    // ,idProperty: 'ID' // ID isn't unique between SiteFile and SiteCollection!
+
+
+    idProperty: 'FullPath',
     fields: [{
         name: 'ID',
         type: 'integer'
@@ -30,23 +32,11 @@ Ext.define('EmergenceEditor.model.File', {
     }, {
         name: 'FullPath'
     }, {
-        // override the special "text" field to programmatically populate it from a different place
-        name: 'text',
-        type: 'string',
-        convert: function(v, r) {
-            if (r.raw) {
-                return r.raw.Handle;
-            }
-            return '[[Unknown Node]]';
-        }
-    }, {
         name: 'leaf',
         type: 'boolean',
+        depends: ['Class'],
         convert: function(v, r) {
-            if (r.raw) {
-                return r.raw.Class=='SiteFile';
-            }
-            return false;
+            return r.get('Class') == 'SiteFile';
         }
     }],
 

@@ -12,6 +12,7 @@ Ext.define('EmergenceEditor.store.FileTree', {
 
     folderSort: true,
     sortOnLoad: true,
+    nodeParam: null,
     sorters: [{
         property: 'Handle',
         direction: 'ASC'
@@ -25,7 +26,7 @@ Ext.define('EmergenceEditor.store.FileTree', {
     proxy: {
         type: 'api',
         connection: 'EmergenceEditor.API',
-        url: '/develop'
+        url: '/develop/json/'
     },
     refreshNodeByRecord: function(record) {
         this.load({
