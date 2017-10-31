@@ -2,28 +2,17 @@
 Ext.define('EmergenceEditor.controller.Editors', {
     extend: 'Ext.app.Controller',
 
-    views: ['editor.TabPanel', 'editor.ACE'],
+    views: ['editor.TabPanel', 'ace.Panel@Jarvus'],
     refs: [{
         ref: 'tabPanel',
         selector: 'tabpanel'
     }],
 
-    aceModules: [
-        '/jslib/ace/mode-javascript.js',
-        '/jslib/ace/mode-html.js',
-        '/jslib/ace/mode-php.js',
-        '/jslib/ace/mode-css.js',
-        '/jslib/ace/mode-json.js',
-        '/jslib/ace/mode-scss.js',
-        // ,'/jslib/ace/mode-smarty.js'
-        '/jslib/ace/theme-specials_board.js'
-    ],
-    aceTheme: 'ace/theme/specials_board',
+
 
     init: function() {
         var me = this,
-            app = me.application,
-            previousDisableCaching = Ext.Loader.getConfig('disableCaching');
+            app = me.application;
 
         // console.info('Emergence.Editor.controller.Editors.init()');
 
@@ -42,34 +31,6 @@ Ext.define('EmergenceEditor.controller.Editors', {
             fileclose: 'onFileClose',
             diffopen: 'onDiffOpen'
         });
-
-        // load ACE javascripts
-        app.aceReady = false;
-        app.aceModulesLoaded = [];
-
-        Ext.Loader.setConfig('disableCaching', false);
-        Ext.Loader.loadScript({
-            url: '/jslib/ace/ace.js',
-            onLoad: function() {
-                Ext.each(me.aceModules, function(moduleUrl) {
-                    Ext.Loader.loadScript({
-                        url: moduleUrl,
-                        onLoad: function() {
-                            app.aceModulesLoaded.push(moduleUrl);
-
-                            if (app.aceModulesLoaded.length == me.aceModules.length) {
-                                Ext.Loader.setConfig('disableCaching', previousDisableCaching);
-                                app.aceReady = true;
-                                app.fireEvent('aceReady');
-                            }
-                        }
-                    });
-                });
-            }
-        });
-    },
-    onLaunch: function() {
-        // console.info('Emergence.Editor.controller.Editors.onLaunch()');
     },
     onTabChange: function(tabPanel, newCard, oldCanel) {
         var token = newCard.itemId;
@@ -80,7 +41,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
         var activeCard = this.getTabPanel().getActiveTab();
 
-        if (activeCard.xtype == 'aceeditor' && typeof activeCard.aceEditor !== 'undefined') {
+        if (activeCard.xtype == 'acepanel' && typeof activeCard.aceEditor !== 'undefined') {
             activeCard.onResize();
         }
     },
@@ -134,14 +95,13 @@ Ext.define('EmergenceEditor.controller.Editors', {
         var tab = this.getTabPanel().getComponent(itemId);
 
         if (!tab) {
+            // TODO: use forceCreate ref
             tab = this.getTabPanel().add({
-                xtype: 'aceeditor',
-                path: path,
-                aceTheme: this.aceTheme,
+                xtype: 'acepanel',
+                openPath: path,
+                openLine: line,
                 title: title,
                 closable: true,
-                initialLine: line,
-                html: '<div></div>',
                 revisionID: id,
                 persistent: !id
             });
