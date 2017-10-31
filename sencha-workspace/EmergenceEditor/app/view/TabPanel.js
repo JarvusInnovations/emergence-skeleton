@@ -1,8 +1,12 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.view.editor.TabPanel', {
+Ext.define('EmergenceEditor.view.TabPanel', {
     extend: 'Ext.tab.Panel',
-    xtype: 'emergence-editortabpanel',
-    requires: ['Ext.ux.TabCloseMenu', 'Ext.ux.TabScrollerMenu', 'Ext.ux.TabReorderer'],
+    xtype: 'emergence-tabpanel',
+    requires: [
+        'Ext.ux.TabCloseMenu',
+        'Ext.ux.TabScrollerMenu',
+        'Ext.ux.TabReorderer'
+    ],
+
 
     listeners: {
         tabchange: function(tabpanel, newcard, oldcard, options) {

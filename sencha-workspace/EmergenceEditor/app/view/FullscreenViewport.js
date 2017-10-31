@@ -1,9 +1,12 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.view.FullscreenViewport', {
     extend: 'Ext.container.Viewport',
     requires: [
-        'Ext.layout.container.Fit'
+        'EmergenceEditor.view.TabPanel',
+        'EmergenceEditor.view.TransfersGrid',
+
+        'Ext.layout.container.Border'
     ],
+
 
     layout: 'border',
 
@@ -12,7 +15,7 @@ Ext.define('EmergenceEditor.view.FullscreenViewport', {
 
 
         this.items = [{
-            xtype: 'emergence-editortabpanel',
+            xtype: 'emergence-tabpanel',
             region: 'center',
             singleFile: true,
             listeners: {
@@ -22,7 +25,7 @@ Ext.define('EmergenceEditor.view.FullscreenViewport', {
                     tabPanel.doComponentLayout();
                 },
                 remove: function(tabPanel, oldCard) {
-                    if (!tabPanel.is('emergence-editortabpanel')) {
+                    if (!tabPanel.is('emergence-tabpanel')) {
                         return true;
                     }
 
@@ -43,7 +46,5 @@ Ext.define('EmergenceEditor.view.FullscreenViewport', {
         }];
 
         this.callParent();
-
     }
-
 });

@@ -1,13 +1,13 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.view.file.Tree', {
+Ext.define('EmergenceEditor.view.FilesTree', {
     extend: 'Ext.tree.Panel',
-    xtype: 'emergence-filetree',
+    xtype: 'emergence-filestree',
     requires: [
         'Ext.tree.plugin.TreeViewDragDrop'
     ],
 
-    stateId: 'editor-filetree',
-    store: 'FileTree',
+
+    stateId: 'editor-filestree',
+    store: 'FilesTree',
     title: 'Filesystem',
     useArrows: true,
     rootVisible: false,

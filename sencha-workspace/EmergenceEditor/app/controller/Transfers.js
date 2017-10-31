@@ -2,8 +2,6 @@
 Ext.define('EmergenceEditor.controller.Transfers', {
     extend: 'Ext.app.Controller',
 
-
-    views: ['Transfers'],
     // ,stores: ['Transfers']
     // ,models: ['Transfer']
 

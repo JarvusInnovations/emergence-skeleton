@@ -1,9 +1,15 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.view.Viewport', {
     extend: 'Ext.container.Viewport',
     requires: [
+        'EmergenceEditor.view.Menubar',
+        'EmergenceEditor.view.FilesTree',
+        'EmergenceEditor.view.TabPanel',
+        'EmergenceEditor.view.Revisions',
+        'EmergenceEditor.view.TransfersGrid',
+
         'Ext.layout.container.Border'
     ],
+
 
     layout: 'border',
 
@@ -16,7 +22,7 @@ Ext.define('EmergenceEditor.view.Viewport', {
             region: 'north'
             // ,html: 'Emergence Development Environment'
         }, {
-            xtype: 'emergence-filetree',
+            xtype: 'emergence-filestree',
             region: 'west',
             stateId: 'viewport-files',
             stateful: true,
@@ -25,7 +31,7 @@ Ext.define('EmergenceEditor.view.Viewport', {
             collapsible: true,
             split: true
         }, {
-            xtype: 'emergence-editortabpanel',
+            xtype: 'emergence-tabpanel',
             region: 'center'
         }, {
             //            xtype: 'tabpanel'

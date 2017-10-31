@@ -1,7 +1,8 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.view.Transfers', {
+Ext.define('EmergenceEditor.view.TransfersGrid', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.emergence-transfersgrid',
+    xtype: 'emergence-transfersgrid',
+
+
     title: 'Transfers',
     sortableColumns: false,
     enableColumnHide: false,
@@ -25,5 +26,4 @@ Ext.define('EmergenceEditor.view.Transfers', {
                 width: 150 }
         ]
     }
-
 });

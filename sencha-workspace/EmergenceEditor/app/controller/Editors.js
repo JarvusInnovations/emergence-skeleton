@@ -1,130 +1,147 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.controller.Editors', {
     extend: 'Ext.app.Controller',
-
-    views: ['editor.TabPanel', 'ace.Panel@Jarvus'],
-    refs: [{
-        ref: 'tabPanel',
-        selector: 'tabpanel'
-    }],
+    requires: [
+        'EmergenceEditor.API'
+    ],
 
 
+    views: [
+        'ace.Panel@Jarvus'
+    ],
 
-    init: function() {
-        var me = this,
-            app = me.application;
+    refs: {
+        tabPanel: 'tabpanel',
+        editorPanel: {
+            selector: 'acepanel',
+            forceCreate: true,
 
-        // console.info('Emergence.Editor.controller.Editors.init()');
-
-        // Start listening for events on views
-        me.control({
-            'emergence-editortabpanel': {
-                tabchange: me.onTabChange,
-                staterestore: me.onTabsStateRestore
-            }
-        });
-
-        app.on({
-            scope: me,
-            fileopen: 'onFileOpen',
-            filesave: 'onFileSave',
-            fileclose: 'onFileClose',
-            diffopen: 'onDiffOpen'
-        });
-    },
-    onTabChange: function(tabPanel, newCard, oldCanel) {
-        var token = newCard.itemId;
-
-        if (token) {
-            this.application.setActiveView(token, newCard.title);
-        }
-
-        var activeCard = this.getTabPanel().getActiveTab();
-
-        if (activeCard.xtype == 'acepanel' && typeof activeCard.aceEditor !== 'undefined') {
-            activeCard.onResize();
+            xtype: 'acepanel',
+            closable: true
         }
     },
-    onTabsStateRestore: function(tabPanel, state) {
 
-        Ext.each(state.openFiles, function(path) {
-            this.onFileOpen(path, false);
-        }, this);
-
+    control: {
+        // tabchange: 'onTabChange',
+        // staterestore: 'onTabsStateRestore'
     },
-    onDiffOpen: function(path, autoActivate, sideA, sideB) {
-        autoActivate = autoActivate !== false; // default to true
 
-        var itemId, title;
+    // init: function() {
+    //     var me = this;
+    //         // app = me.application;
 
-        title = path.substr(path.lastIndexOf('/')+1) + ' (' + sideA + '&mdash;' + sideB + ')';
-        itemId = 'diff:[' + sideA + ',' + sideB + ']/'+path;
+    //     // console.info('Emergence.Editor.controller.Editors.init()');
 
-        var tab = this.getTabPanel().getComponent(itemId);
+    //     // Start listening for events on views
+    //     // me.control({
+    //     //     'emergence-tabpanel':
+    //     // });
 
-        if (!tab) {
-            tab = this.getTabPanel().add({
-                xtype: 'emergence-diff-viewer',
-                path: path,
-                sideAid: sideA,
-                sideBid: sideB,
-                title: title,
-                closable: true,
-                html: '<div></div>'
-            });
-        }
+    //     // app.on({
+    //     //     scope: me,
+    //     //     fileopen: 'onFileOpen',
+    //     //     filesave: 'onFileSave',
+    //     //     fileclose: 'onFileClose',
+    //     //     diffopen: 'onDiffOpen'
+    //     // });
+    // },
 
-        if (autoActivate) {
-            this.getTabPanel().setActiveTab(tab);
-        }
-    },
-    onFileOpen: function(path, autoActivate, id, line) {
+    // onTabChange: function(tabPanel, newCard, oldCanel) {
+    //     var token = newCard.itemId;
 
-        autoActivate = autoActivate !== false; // default to true
+    //     if (token) {
+    //         this.application.setActiveView(token, newCard.title);
+    //     }
 
-        var itemId, title;
+    //     var activeCard = this.getTabPanel().getActiveTab();
 
-        if (id) {
-            itemId = 'revision:[' + id + ']/'+path;
-            title = path.substr(path.lastIndexOf('/')+1) + '(' + id + ')';
-        } else {
-            itemId = '/' + path;
-            title = path.substr(path.lastIndexOf('/')+1);
-        }
+    //     if (activeCard.xtype == 'acepanel' && typeof activeCard.aceEditor !== 'undefined') {
+    //         activeCard.onResize();
+    //     }
+    // },
 
-        var tab = this.getTabPanel().getComponent(itemId);
+    // onTabsStateRestore: function(tabPanel, state) {
 
-        if (!tab) {
-            // TODO: use forceCreate ref
-            tab = this.getTabPanel().add({
-                xtype: 'acepanel',
-                openPath: path,
-                openLine: line,
-                title: title,
-                closable: true,
-                revisionID: id,
-                persistent: !id
-            });
-        }
+    //     Ext.each(state.openFiles, function(path) {
+    //         this.onFileOpen(path, false);
+    //     }, this);
 
-        if (autoActivate) {
-            this.getTabPanel().setActiveTab(tab);
-        }
-    },
-    onFileSave: function() {
+    // },
 
-        var activeCard = this.getTabPanel().getActiveTab();
+    // onDiffOpen: function(path, autoActivate, sideA, sideB) {
+    //     autoActivate = autoActivate !== false; // default to true
 
-        if (activeCard.xtype == 'aceeditor') {
-            activeCard.saveFile();
-        }
-    },
-    onFileClose: function() {
+    //     var itemId, title;
 
-        var activeCard = this.getTabPanel().getActiveTab();
+    //     title = path.substr(path.lastIndexOf('/')+1) + ' (' + sideA + '&mdash;' + sideB + ')';
+    //     itemId = 'diff:[' + sideA + ',' + sideB + ']/'+path;
 
-        if (activeCard.closable) {
-            activeCard.close();
-        }
-    }
+    //     var tab = this.getTabPanel().getComponent(itemId);
+
+    //     if (!tab) {
+    //         tab = this.getTabPanel().add({
+    //             xtype: 'emergence-diff-viewer',
+    //             path: path,
+    //             sideAid: sideA,
+    //             sideBid: sideB,
+    //             title: title,
+    //             closable: true,
+    //             html: '<div></div>'
+    //         });
+    //     }
+
+    //     if (autoActivate) {
+    //         this.getTabPanel().setActiveTab(tab);
+    //     }
+    // },
+
+    // onFileOpen: function(path, autoActivate, id, line) {
+
+    //     autoActivate = autoActivate !== false; // default to true
+
+    //     var itemId, title;
+
+    //     if (id) {
+    //         itemId = 'revision:[' + id + ']/'+path;
+    //         title = path.substr(path.lastIndexOf('/')+1) + '(' + id + ')';
+    //     } else {
+    //         itemId = '/' + path;
+    //         title = path.substr(path.lastIndexOf('/')+1);
+    //     }
+
+    //     var tab = this.getTabPanel().getComponent(itemId);
+
+    //     if (!tab) {
+    //         // TODO: use forceCreate ref
+    //         tab = this.getTabPanel().add({
+    //             xtype: 'acepanel',
+    //             openPath: path,
+    //             openLine: line,
+    //             title: title,
+    //             revisionID: id,
+    //             persistent: !id
+    //         });
+    //     }
+
+    //     if (autoActivate) {
+    //         this.getTabPanel().setActiveTab(tab);
+    //     }
+    // },
+
+    // onFileSave: function() {
+
+    //     var activeCard = this.getTabPanel().getActiveTab();
+
+    //     if (activeCard.xtype == 'aceeditor') {
+    //         activeCard.saveFile();
+    //     }
+    // },
+
+    // onFileClose: function() {
+
+    //     var activeCard = this.getTabPanel().getActiveTab();
+
+    //     if (activeCard.closable) {
+    //         activeCard.close();
+    //     }
+    // }
 });

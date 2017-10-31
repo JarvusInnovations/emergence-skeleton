@@ -2,8 +2,8 @@
 Ext.define('EmergenceEditor.controller.Files', {
     extend: 'Ext.app.Controller',
 
-    views: ['file.Tree', 'contextmenu.CollectionMenu', 'contextmenu.FileMenu', 'contextmenu.MultiNodeMenu'],
-    stores: ['FileTree'],
+    views: ['contextmenu.CollectionMenu', 'contextmenu.FileMenu', 'contextmenu.MultiNodeMenu'],
+    stores: ['FilesTree'],
     models: ['File'],
     refs: [{
         ref: 'fileMenu',
@@ -21,9 +21,9 @@ Ext.define('EmergenceEditor.controller.Files', {
         selector: 'emergence-multinodemenu',
         xtype: 'emergence-multinodemenu'
     }, {
-        ref: 'fileTree',
-        selector: 'emergence-filetree',
-        xtype: 'emergence-filetree'
+        ref: 'filesTree',
+        selector: 'emergence-filestree',
+        xtype: 'emergence-filestree'
     }],
     onLaunch: function() {
         // console.info('Emergence.Editor.controller.Files.onLaunch()');
@@ -37,12 +37,12 @@ Ext.define('EmergenceEditor.controller.Files', {
             /*
              *  FILE TREE EVENTS
              */
-            'emergence-filetree': {
+            'emergence-filestree': {
                 itemcontextmenu: this.onNodeContextMenu,
                 itemdblclick: this.onNodeDblClick,
                 render: this.onTreeRendered
             },
-            'emergence-filetree treeview': {
+            'emergence-filestree treeview': {
                 beforedrop: this.onTreeNodeBeforeDrop,
                 drop: this.onTreeNodeMoveDrop
             },
@@ -94,15 +94,15 @@ Ext.define('EmergenceEditor.controller.Files', {
         });
     },
     onTreeRendered: function() {
-        this.getFileTree().el.on('dragover', this.onTreeDragover, this);
-        this.getFileTree().el.on('dragleave', this.onTreeDragleave, this);
-        this.getFileTree().el.on('drop', this.onFileTreeDrop, this);
+        this.getFilesTree().el.on('dragover', this.onTreeDragover, this);
+        this.getFilesTree().el.on('dragleave', this.onTreeDragleave, this);
+        this.getFilesTree().el.on('drop', this.onFilesTreeDrop, this);
     },
-    onFileTreeDrop: function(event) {
+    onFilesTreeDrop: function(event) {
         event.preventDefault();
 
         var e = event.browserEvent;
-        var treePanel = this.getFileTree();
+        var treePanel = this.getFilesTree();
         var treeView = treePanel.view;
         var node = treeView.findTargetByEvent(event);
         var record = treeView.getRecord(node);
@@ -147,13 +147,13 @@ Ext.define('EmergenceEditor.controller.Files', {
     },
     afterDropUpload: function(collectionRecord, files) {
         // console.log('file upload sequence completed');
-        this.getFileTreeStore().refreshNodeByRecord(collectionRecord);
+        this.getFilesTreeStore().refreshNodeByRecord(collectionRecord);
     },
     onTreeDragleave: function(event) {
         event.preventDefault();
 
         var e = event.browserEvent;
-        var treePanel = this.getFileTree();
+        var treePanel = this.getFilesTree();
         var treeView = treePanel.view;
         var node = treeView.findTargetByEvent(event);
 
@@ -165,7 +165,7 @@ Ext.define('EmergenceEditor.controller.Files', {
         event.preventDefault();
 
         var e = event.browserEvent;
-        var treePanel = this.getFileTree();
+        var treePanel = this.getFilesTree();
         var treeView = treePanel.view;
         var node = treeView.findTargetByEvent(event);
 
@@ -200,7 +200,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                 //                /* Bug Fix Start
                 //                 * see: http://www.sencha.com/forum/showthread.php?135377-beforedrop-not-working-as-expected&p=623011&viewfull=1#post623011
                 //                 */
-                //                var plugin = this.getFileTree().down('treeview').getPlugin('ddplugin');
+                //                var plugin = this.getFilesTree().down('treeview').getPlugin('ddplugin');
                 //                var dropZone = plugin.dropZone;
                 //
                 //                dropZone.overRecord = overModel;
@@ -226,7 +226,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                 if (record.parentNode) {
                     if (!toRefresh[record.parentNode.raw.ID]) {
                         toRefresh[record.parentNode.raw.ID] = true;
-                        this.getFileTreeStore().refreshNodeByRecord(record.parentNode);
+                        this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
                     }
                 }
             }, this);
@@ -249,7 +249,7 @@ Ext.define('EmergenceEditor.controller.Files', {
 
         this.currentRecord = record;
 
-        var selectionModel = this.getFileTree().getSelectionModel()
+        var selectionModel = this.getFilesTree().getSelectionModel()
 
         var selection = selectionModel.getSelection();
 
@@ -307,7 +307,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                 var newFile = this.currentRecord.raw.FullPath + '/' + value;
 
                 EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
-                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
+                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
                 }, this);
             }
         }, this);
@@ -318,13 +318,13 @@ Ext.define('EmergenceEditor.controller.Files', {
                 var newFolder = this.currentRecord.raw.FullPath + '/' + value;
 
                 EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
-                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
+                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
                 }, this);
             }
         }, this);
     },
     onRefreshClick: function(menuItem, event, options) {
-        this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
+        this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
     },
 
     /*
@@ -336,7 +336,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                 var newPath = this.currentRecord.parentNode.raw.FullPath + '/' + value;
 
                 EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
-                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
                 }, this);
             }
         }, this, false, this.currentRecord.raw.Handle);
@@ -345,7 +345,7 @@ Ext.define('EmergenceEditor.controller.Files', {
         Ext.Msg.confirm('Delete File', 'Are you sure you want to delete ' + this.currentRecord.raw.Handle + '?', function(button, value, options) {
             if (button == 'yes') {
                 EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
-                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
                 }, this);
             }
         }, this);
@@ -355,18 +355,18 @@ Ext.define('EmergenceEditor.controller.Files', {
      *           MULTI NODE CONTEXT MENU EVENT HANDLERS
      */
     onMultiOpenClick: function(menuItem, event, options) {
-        var selection = this.getFileTree().getSelectionModel().getSelection();
+        var selection = this.getFilesTree().getSelectionModel().getSelection();
 
         Ext.each(selection, function(record) {
             if (record.raw.Class == 'SiteFile') {
                 this.openFileByRecord(record);
             } else if (record.raw.Class == 'SiteCollection') {
-                this.getFileTree().expandPath(record.getPath());
+                this.getFilesTree().expandPath(record.getPath());
             }
         }, this);
     },
     onMultiDeleteClick: function(menuItem, event, options) {
-        var selection = this.getFileTree().getSelectionModel().getSelection();
+        var selection = this.getFilesTree().getSelectionModel().getSelection();
 
         var toRefresh = {};
 
@@ -377,7 +377,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                         if (record.parentNode) {
                             if (!toRefresh[record.parentNode.raw.ID]) {
                                 toRefresh[record.parentNode.raw.ID] = true;
-                                this.getFileTreeStore().refreshNodeByRecord(record.parentNode);
+                                this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
                             }
                         }
                     }, this);

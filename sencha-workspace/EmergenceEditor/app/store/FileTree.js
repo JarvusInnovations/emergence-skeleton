@@ -1,7 +1,6 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.store.FileTree', {
+Ext.define('EmergenceEditor.store.FilesTree', {
     extend: 'Ext.data.TreeStore',
-    alias: 'store.filetree',
+    alias: 'store.filestree',
     requires: [
         'EmergenceEditor.API',
         'Jarvus.proxy.API'
