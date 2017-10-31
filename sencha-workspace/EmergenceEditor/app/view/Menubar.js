@@ -30,15 +30,15 @@ Ext.define('EmergenceEditor.view.Menubar', {
                         xtype: 'menuseparator'
                     },
                     {
-                    	text: 'Import',
-                    	action: 'import',
-                    	icon: '/img/icons/fugue/inbox-download.png'
+                        text: 'Import',
+                        action: 'import',
+                        icon: '/img/icons/fugue/inbox-download.png'
                     },
                     {
-                    	text: 'Export',
-                    	action: 'export',
-                    	icon: '/img/icons/fugue/inbox-upload.png',
-                    	href: '/editor/export'
+                        text: 'Export',
+                        action: 'export',
+                        icon: '/img/icons/fugue/inbox-upload.png',
+                        href: '/editor/export'
                     },
                     {
                         xtype: 'menuseparator'
@@ -115,17 +115,17 @@ Ext.define('EmergenceEditor.view.Menubar', {
                 disabled: true
             },
             {
-			    text: 'Help',
-			    menu: {
-				    plain: true,
-				    items: [
+                text: 'Help',
+                menu: {
+                    plain: true,
+                    items: [
                         {
-    				        text: 'Emergence Homepage',
-					        // ,plain: true
-					        href: 'http://emr.ge',
-					        hrefTarget: '_blank',
+                            text: 'Emergence Homepage',
+                            // ,plain: true
+                            href: 'http://emr.ge',
+                            hrefTarget: '_blank',
                             icon: 'http://emr.ge/img/logo-16.png'
-				        },
+                        },
                         {
                             xtype: 'menuseparator'
                         },
@@ -149,10 +149,10 @@ Ext.define('EmergenceEditor.view.Menubar', {
                             hrefTarget: '_blank'
                         },
                         {
-    				        text: 'Working with Models',
-					        href: 'http://emr.ge/manual/models',
-					        hrefTarget: '_blank'
-				        },
+                            text: 'Working with Models',
+                            href: 'http://emr.ge/manual/models',
+                            hrefTarget: '_blank'
+                        },
                         {
                             text: 'Mapping Links with Controllers',
                             href: 'http://emr.ge/manual/controllers',
@@ -164,25 +164,25 @@ Ext.define('EmergenceEditor.view.Menubar', {
                             hrefTarget: '_blank'
                         }
                     ]
-			    }
-		    },
-		    '->',
+                }
+            },
+            '->',
             {
-		         xtype: 'textfield',
-		         name: 'globalSearch',
-		         hideLabel: true,
-		         width: 200,
-		         enableKeyEvents: true,
-		         emptyText: 'grep all living files...'
+                 xtype: 'textfield',
+                 name: 'globalSearch',
+                 hideLabel: true,
+                 width: 200,
+                 enableKeyEvents: true,
+                 emptyText: 'grep all living files...'
             },
             {
                 xtype: 'button',
                 text: 'Search'
             },
-		    {
-			    xtype: 'tbtext',
-			    text: '<a href="http://emr.ge" target="_blank">emergence</a>'
-		    }
+            {
+                xtype: 'tbtext',
+                text: '<a href="http://emr.ge" target="_blank">emergence</a>'
+            }
         ];
 
         this.callParent();

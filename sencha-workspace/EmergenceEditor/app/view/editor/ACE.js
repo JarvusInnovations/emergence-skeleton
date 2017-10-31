@@ -71,7 +71,7 @@ Ext.define('EmergenceEditor.view.editor.ACE', {
             this.loadFile();
         }
 
-        // this.setSplit('beside');	
+        // this.setSplit('beside');
 
         // relay resize events to ace
         this.on('resize', this.onResize, this);

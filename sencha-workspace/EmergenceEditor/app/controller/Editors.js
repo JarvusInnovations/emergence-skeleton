@@ -92,7 +92,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
     },
     onDiffOpen: function(path, autoActivate, sideA, sideB) {
-        autoActivate = autoActivate !== false; // default to true 
+        autoActivate = autoActivate !== false; // default to true
 
         var itemId, title;
 
@@ -134,21 +134,21 @@ Ext.define('EmergenceEditor.controller.Editors', {
         var tab = this.getTabPanel().getComponent(itemId);
 
         if (!tab) {
-        	tab = this.getTabPanel().add({
-	        	xtype: 'aceeditor',
-	        	path: path,
-	        	aceTheme: this.aceTheme,
-	        	title: title,
-	        	closable: true,
-	        	initialLine: line,
+            tab = this.getTabPanel().add({
+                xtype: 'aceeditor',
+                path: path,
+                aceTheme: this.aceTheme,
+                title: title,
+                closable: true,
+                initialLine: line,
                 html: '<div></div>',
                 revisionID: id,
                 persistent: !id
-	        });
+            });
         }
 
         if (autoActivate) {
-	    	this.getTabPanel().setActiveTab(tab);
+            this.getTabPanel().setActiveTab(tab);
         }
     },
     onFileSave: function() {

@@ -7,25 +7,25 @@ Ext.define('EmergenceEditor.view.contextmenu.CollectionMenu', {
     width: 100,
     items: [
         {
-		    text: 'New File',
+            text: 'New File',
             action: 'new-file',
             icon: '/img/icons/fugue/blue-document.png'
-	    }, {
-		    text: 'New Folder',
+        }, {
+            text: 'New Folder',
             action: 'new-folder',
             icon: '/img/icons/fugue/blue-folder-horizontal-open.png'
-	    }, {
-		    text: 'Rename',
+        }, {
+            text: 'Rename',
             action: 'rename',
             icon: '/img/icons/fugue/blue-folder-rename.png'
-	    }, {
-		    text: 'Refresh',
+        }, {
+            text: 'Refresh',
             action: 'refresh',
             icon: '/img/icons/fugue/arrow-circle-135.png'
-	    }, {
-		    text: 'Delete',
+        }, {
+            text: 'Delete',
             action: 'delete',
             icon: '/img/icons/fugue/cross.png'
-	    }
+        }
     ]
 });

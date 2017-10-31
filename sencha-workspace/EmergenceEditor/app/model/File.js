@@ -3,32 +3,32 @@ Ext.define('EmergenceEditor.model.File', {
     extend: 'Ext.data.Model',
     // ,idProperty: 'ID' // ID isn't unique between SiteFile and SiteCollection!
     fields: [{
-    	name: 'ID',
-    	type: 'integer'
+        name: 'ID',
+        type: 'integer'
     }, {
-    	name: 'Handle'
+        name: 'Handle'
     }, {
-    	name: 'Status'
+        name: 'Status'
     }, {
-    	name: 'Created',
-    	type: 'date',
-    	dateFormat: 'timestamp'
+        name: 'Created',
+        type: 'date',
+        dateFormat: 'timestamp'
     }, {
-    	name: 'CreatorID',
-    	type: 'integer'
+        name: 'CreatorID',
+        type: 'integer'
     }, {
-    	name: 'ParentID',
-    	type: 'integer'
+        name: 'ParentID',
+        type: 'integer'
     }, {
-    	name: 'PosLeft',
-    	type: 'integer'
+        name: 'PosLeft',
+        type: 'integer'
     }, {
-    	name: 'PosRight',
-    	type: 'integer'
+        name: 'PosRight',
+        type: 'integer'
     }, {
-    	name: 'Class'
+        name: 'Class'
     }, {
-    	name: 'FullPath'
+        name: 'FullPath'
     }, {
         // override the special "text" field to programmatically populate it from a different place
         name: 'text',
@@ -52,7 +52,7 @@ Ext.define('EmergenceEditor.model.File', {
 
     /*
      *   Default implementation tries to run destroy through the store just cause I asked for a refresh
-     *   This work around is as awesome as it is since it cuts down the call stack considerably.    
+     *   This work around is as awesome as it is since it cuts down the call stack considerably.
     */
     destroy: function() {
         this.remove(true);

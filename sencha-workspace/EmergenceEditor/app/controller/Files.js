@@ -190,37 +190,37 @@ Ext.define('EmergenceEditor.controller.Files', {
      *           FILE TREE NODE MOVEMENT HANDLERS
      */
     onTreeNodeBeforeDrop: function(node, oldNodeData, overModel, dropPosition, dropHandler) {
-    	var title = oldNodeData.records.length == 1?'Move Item':'Move Multiple Items';
-    	var prompt = oldNodeData.records.length == 1?'Are you sure you want to move this item to ' + overModel.data.FullPath + '?':'Are you sure you want to move these ' + oldNodeData.records.length + ' items to ' + overModel.data.FullPath + '?';
+        var title = oldNodeData.records.length == 1?'Move Item':'Move Multiple Items';
+        var prompt = oldNodeData.records.length == 1?'Are you sure you want to move this item to ' + overModel.data.FullPath + '?':'Are you sure you want to move these ' + oldNodeData.records.length + ' items to ' + overModel.data.FullPath + '?';
 
-    	dropHandler.wait = true;
+        dropHandler.wait = true;
 
-    	Ext.Msg.confirm(title, prompt, function(button, value, opts) {
-    		if (button == 'yes') {
-                //    			/* Bug Fix Start
-                //    			 * see: http://www.sencha.com/forum/showthread.php?135377-beforedrop-not-working-as-expected&p=623011&viewfull=1#post623011
-                //    			 */
-                //    			var plugin = this.getFileTree().down('treeview').getPlugin('ddplugin');
-                //    			var dropZone = plugin.dropZone;
-                //    			
-                //				dropZone.overRecord = overModel;
+        Ext.Msg.confirm(title, prompt, function(button, value, opts) {
+            if (button == 'yes') {
+                //                /* Bug Fix Start
+                //                 * see: http://www.sencha.com/forum/showthread.php?135377-beforedrop-not-working-as-expected&p=623011&viewfull=1#post623011
+                //                 */
+                //                var plugin = this.getFileTree().down('treeview').getPlugin('ddplugin');
+                //                var dropZone = plugin.dropZone;
+                //
+                //                dropZone.overRecord = overModel;
                 //                dropZone.currentPosition = dropPosition;
-                //    			
-                //    			/* Bug Fix End */
+                //
+                //                /* Bug Fix End */
 
-		    	dropHandler.processDrop();
-    		}
-    	}, this);
+                dropHandler.processDrop();
+            }
+        }, this);
 
-    	return false;
+        return false;
     },
     onTreeNodeMoveDrop: function(node, oldNodeData, overModel, dropPosition, options) {
         var from, to;
         var toRefresh = {};
 
         Ext.each(oldNodeData.records, function(record) {
-	    	from = record.data.FullPath;
-	    	to = overModel.data.FullPath + '/' + record.data.text;
+            from = record.data.FullPath;
+            to = overModel.data.FullPath + '/' + record.data.text;
 
             EmergenceEditor.store.DavClient.renameNode(from, to, function() {
                 if (record.parentNode) {
@@ -230,7 +230,7 @@ Ext.define('EmergenceEditor.controller.Files', {
                     }
                 }
             }, this);
-    	}, this);
+        }, this);
     },
 
     /*
@@ -241,7 +241,7 @@ Ext.define('EmergenceEditor.controller.Files', {
     },
     onNodeDblClick: function(view, record, item, index, event, options) {
         if (record.raw.Class == 'SiteFile') {
-		    this.openFileByRecord(record);
+            this.openFileByRecord(record);
         }
     },
     onNodeContextMenu: function(treePanel, record, item, index, event, options) {
@@ -256,13 +256,13 @@ Ext.define('EmergenceEditor.controller.Files', {
         var foundRecordInSelection = false;
 
         Ext.each(selection, function(item) {
-        	if (item.internalId == record.internalId) {
-        		foundRecordInSelection = true;
-        	}
+            if (item.internalId == record.internalId) {
+                foundRecordInSelection = true;
+            }
         }, this);
 
         if (!foundRecordInSelection) {
-        	selectionModel.select(record);
+            selectionModel.select(record);
         }
 
         if (record.raw.Class == 'SiteFile' && selection.length == 1) {
@@ -306,9 +306,9 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newFile = this.currentRecord.raw.FullPath + '/' + value;
 
-	            EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
-	                this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
-	            }, this);
+                EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
+                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
+                }, this);
             }
         }, this);
     },
@@ -317,9 +317,9 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newFolder = this.currentRecord.raw.FullPath + '/' + value;
 
-	            EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
-	                this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
-	            }, this);
+                EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
+                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord);
+                }, this);
             }
         }, this);
     },
@@ -335,44 +335,44 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newPath = this.currentRecord.parentNode.raw.FullPath + '/' + value;
 
-	            EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
-	                this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-	            }, this);
+                EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
+                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                }, this);
             }
         }, this, false, this.currentRecord.raw.Handle);
     },
     onDeleteClick: function(menuItem, event, options) {
-    	Ext.Msg.confirm('Delete File', 'Are you sure you want to delete ' + this.currentRecord.raw.Handle + '?', function(button, value, options) {
-    		if (button == 'yes') {
-		    	EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
-		        	this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-	            }, this);
-    		}
-    	}, this);
+        Ext.Msg.confirm('Delete File', 'Are you sure you want to delete ' + this.currentRecord.raw.Handle + '?', function(button, value, options) {
+            if (button == 'yes') {
+                EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
+                    this.getFileTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                }, this);
+            }
+        }, this);
     },
 
     /*
      *           MULTI NODE CONTEXT MENU EVENT HANDLERS
      */
     onMultiOpenClick: function(menuItem, event, options) {
-    	var selection = this.getFileTree().getSelectionModel().getSelection();
+        var selection = this.getFileTree().getSelectionModel().getSelection();
 
-    	Ext.each(selection, function(record) {
-    		if (record.raw.Class == 'SiteFile') {
-    			this.openFileByRecord(record);
-    		} else if (record.raw.Class == 'SiteCollection') {
-    			this.getFileTree().expandPath(record.getPath());
-    		}
-    	}, this);
+        Ext.each(selection, function(record) {
+            if (record.raw.Class == 'SiteFile') {
+                this.openFileByRecord(record);
+            } else if (record.raw.Class == 'SiteCollection') {
+                this.getFileTree().expandPath(record.getPath());
+            }
+        }, this);
     },
     onMultiDeleteClick: function(menuItem, event, options) {
-    	var selection = this.getFileTree().getSelectionModel().getSelection();
+        var selection = this.getFileTree().getSelectionModel().getSelection();
 
-    	var toRefresh = {};
+        var toRefresh = {};
 
-    	Ext.Msg.confirm('Delete Multiple Items', 'Are you sure you want to delete these ' + selection.length + ' items?', function(button, value, options) {
-    		if (button == 'yes') {
-		    	Ext.each(selection, function(record) {
+        Ext.Msg.confirm('Delete Multiple Items', 'Are you sure you want to delete these ' + selection.length + ' items?', function(button, value, options) {
+            if (button == 'yes') {
+                Ext.each(selection, function(record) {
                     EmergenceEditor.store.DavClient.deleteNode(record.raw.FullPath, function() {
                         if (record.parentNode) {
                             if (!toRefresh[record.parentNode.raw.ID]) {
@@ -380,9 +380,9 @@ Ext.define('EmergenceEditor.controller.Files', {
                                 this.getFileTreeStore().refreshNodeByRecord(record.parentNode);
                             }
                         }
-		            }, this);
-		    	}, this);
-    		}
-    	}, this);
+                    }, this);
+                }, this);
+            }
+        }, this);
     }
 });

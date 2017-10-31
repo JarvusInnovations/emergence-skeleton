@@ -118,7 +118,7 @@ Ext.define('EmergenceEditor.controller.Transfers', {
                 task: options.method,
                 path: options.url,
                 status: 'Complete'
-	        };
+            };
 
         // add method-specific attributes
         if (options.method == 'PUT') {

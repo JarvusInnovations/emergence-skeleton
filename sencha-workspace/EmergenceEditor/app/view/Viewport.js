@@ -28,7 +28,7 @@ Ext.define('EmergenceEditor.view.Viewport', {
             xtype: 'emergence-editortabpanel',
             region: 'center'
         }, {
-            //			xtype: 'tabpanel'
+            //            xtype: 'tabpanel'
             title: 'Revision History',
             xtype: 'emergence-file-revisions',
             icon: '/img/icons/fugue/edit-diff.png',
@@ -46,7 +46,7 @@ Ext.define('EmergenceEditor.view.Viewport', {
             //                    ,icon: '/img/icons/fugue/edit-diff.png'
             //                }
             //                /*,{
-            //                    title: 'Code Navigator'   
+            //                    title: 'Code Navigator'
             //                }*/
             //            ]
         }, {

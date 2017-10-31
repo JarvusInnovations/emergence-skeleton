@@ -5,29 +5,29 @@ Ext.define('EmergenceEditor.view.contextmenu.RevisionsMenu', {
     width: 150,
     items: [
         {
-		    text: 'Open',
+            text: 'Open',
             action: 'open',
             icon: '/img/icons/fugue/blue-folder-horizontal-open.png'
-	    },
-	    {
-		    text: 'Properties',
+        },
+        {
+            text: 'Properties',
             action: 'properties',
             icon: '/img/icons/fugue/property-blue.png'
-	    },
-	    {
-		    text: 'Compare Latest',
+        },
+        {
+            text: 'Compare Latest',
             action: 'compare_latest'
             // ,icon: ''
-	    },
+        },
         {
-		    text: 'Compare Next',
+            text: 'Compare Next',
             action: 'compare_next'
             // ,icon: ''
-	    },
-	   	{
-		    text: 'Compare Previous',
+        },
+           {
+            text: 'Compare Previous',
             action: 'compare_previous'
             // ,icon: ''
-	    }
+        }
     ]
 });

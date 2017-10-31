@@ -6,13 +6,13 @@ Ext.define('EmergenceEditor.view.contextmenu.MultiNodeMenu', {
     width: 130,
     items: [
         {
-		    text: 'Open',
+            text: 'Open',
             action: 'open',
             icon: '/img/icons/fugue/blue-folder-horizontal-open.png'
-	    }, {
-		    text: 'Delete',
+        }, {
+            text: 'Delete',
             action: 'delete',
             icon: '/img/icons/fugue/cross.png'
-	    }
+        }
     ]
 });

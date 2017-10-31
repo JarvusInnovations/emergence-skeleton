@@ -23,7 +23,7 @@ Ext.define('EmergenceEditor.view.editor.TabPanel', {
             console.log(this);
             EmergenceEditor.app.viewport.down('emergence-file-revisions').up().on('expand', function(viewportEast, options) {
                 console.log(this);
-            }, this);   
+            }, this);
         }*/
         scope: this
     },
@@ -36,7 +36,7 @@ Ext.define('EmergenceEditor.view.editor.TabPanel', {
             this.tabBar = this.tabBar || {};
             this.tabBar.hidden = true;
         } else {
-    		// todo: extend this plugin so we can use our own menu items
+            // todo: extend this plugin so we can use our own menu items
             this.plugins = [
                 Ext.create('Ext.ux.TabCloseMenu', {
                     listeners: {

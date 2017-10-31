@@ -1,10 +1,10 @@
 /* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 
-/* @Author Henry Paradiz <henry@jarv.us>	
- * 
- *	SimpleCodeViewer
+/* @Author Henry Paradiz <henry@jarv.us>
  *
- *	Ext4 reconstruction of Ext 3.2.1's Ext.ux.CodeViewer published online at <http://www.sencha.com/files/blog/old/blog/wp-content/uploads/js-diff-blog/codeViewer.js>
+ *    SimpleCodeViewer
+ *
+ *    Ext4 reconstruction of Ext 3.2.1's Ext.ux.CodeViewer published online at <http://www.sencha.com/files/blog/old/blog/wp-content/uploads/js-diff-blog/codeViewer.js>
  *
  */
 
@@ -50,7 +50,7 @@ Ext.define('EmergenceEditor.view.SimpleCodeViewer', {
 
             // If switching back to viewers, re-render
             if (!toggled) {
-            	panel.resetViewerCode();
+                panel.resetViewerCode();
             }
         }
     }],
@@ -93,7 +93,7 @@ Ext.define('EmergenceEditor.view.SimpleCodeViewer', {
     updateViewCode: function() {
         var diffdata = this.diff(this.linesA, this.linesB);
 
-        // Give code to viewer for rendering            
+        // Give code to viewer for rendering
         this.setCode('A', this.codeA, diffdata);
         this.setCode('B', this.codeB, diffdata);
 
@@ -118,7 +118,7 @@ Ext.define('EmergenceEditor.view.SimpleCodeViewer', {
             // Perform diff
             diff = this.diff(linesA, linesB);
 
-        // Give code to viewer for rendering            
+        // Give code to viewer for rendering
         this.setCode('A', codeA, diff);
         this.setCode('B', codeB, diff);
     },
@@ -126,194 +126,194 @@ Ext.define('EmergenceEditor.view.SimpleCodeViewer', {
 
         this.itemId = 'diff:[' + this.sideAid + ',' + this.sideBid + ']/'+this.path;
 
-    	this.codeViewer = new Ext.Template(
-    		'<div class=\'ux-codeViewer\'></div>'
-    	);
-
-        this.lineTpl = new Ext.Template(
-		    '<div class=\'ux-codeViewer-line\'>',
-		        '<span class=\'ux-codeViewer-lineNumber\'>',
-		            '{0:htmlEncode}',
-		        '</span>',
-		        '<span class=\'ux-codeViewer-lineText\'>',
-		            '{1}',
-		        '</span>',
-		    '</div>');
-        this.emptyLineTpl = new Ext.Template(
-		    '<div class=\'ux-codeViewer-line ux-codeViewer-empty\'>',
-		        '<span class=\'ux-codeViewer-lineNumber\'>',
-		        '</span>',
-		    '</div>');
-        this.tokenTpl = new Ext.Template(
-		    '<span class=\'ux-codeViewer-token-{0}\'>{1:htmlEncode}</span>'
+        this.codeViewer = new Ext.Template(
+            '<div class=\'ux-codeViewer\'></div>'
         );
 
-    	this.lineTpl.compile();
-    	this.emptyLineTpl.compile();
-    	this.tokenTpl.compile();
+        this.lineTpl = new Ext.Template(
+            '<div class=\'ux-codeViewer-line\'>',
+                '<span class=\'ux-codeViewer-lineNumber\'>',
+                    '{0:htmlEncode}',
+                '</span>',
+                '<span class=\'ux-codeViewer-lineText\'>',
+                    '{1}',
+                '</span>',
+            '</div>');
+        this.emptyLineTpl = new Ext.Template(
+            '<div class=\'ux-codeViewer-line ux-codeViewer-empty\'>',
+                '<span class=\'ux-codeViewer-lineNumber\'>',
+                '</span>',
+            '</div>');
+        this.tokenTpl = new Ext.Template(
+            '<span class=\'ux-codeViewer-token-{0}\'>{1:htmlEncode}</span>'
+        );
 
-    	this.items = [
-    		{
-	            cls: 'sideA',
-	            title: 'Side A',
-	            layout: 'card',
-	            flex: 1,
-	            margins: '6 3 6 6',
-	            activeItem: 0,
-	            items: [{
-	                cls: 'codeViewerA',
-	                xtype: 'box',
-	                autoEl: {
-				        tag: 'div',
-				        cls: 'ux-codeViewer'
-				    },
-	                style: 'overflow: scroll',
-	                 sideA: false
-	            }, {
-	                cls: 'codeEditorA',
-	                xtype: 'box',
-	                autoEl: {
-				        tag: 'textarea',
-				        cls: 'ux-codeEditor'
-				    }
-	            }]
-	        }, {
-	            cls: 'sideB',
-	            title: 'Side B',
-	            layout: 'card',
-	            flex: 1,
-	            margins: '6 6 6 3',
-	            activeItem: 0,
-	            items: [{
-	                cls: 'codeViewerB',
-	                xtype: 'box',
-	                autoEl: {
-				        tag: 'div',
-				        cls: 'ux-codeViewer'
-				    },
-	                style: 'overflow: scroll',
-	                 sideA: false
-	            }, {
-	                cls: 'codeEditorB',
-	                xtype: 'box',
-	                autoEl: {
-				        tag: 'textarea',
-				        cls: 'ux-codeEditor'
-				    }
-	            }]
-	        }
-	    ];
+        this.lineTpl.compile();
+        this.emptyLineTpl.compile();
+        this.tokenTpl.compile();
+
+        this.items = [
+            {
+                cls: 'sideA',
+                title: 'Side A',
+                layout: 'card',
+                flex: 1,
+                margins: '6 3 6 6',
+                activeItem: 0,
+                items: [{
+                    cls: 'codeViewerA',
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'div',
+                        cls: 'ux-codeViewer'
+                    },
+                    style: 'overflow: scroll',
+                     sideA: false
+                }, {
+                    cls: 'codeEditorA',
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'textarea',
+                        cls: 'ux-codeEditor'
+                    }
+                }]
+            }, {
+                cls: 'sideB',
+                title: 'Side B',
+                layout: 'card',
+                flex: 1,
+                margins: '6 6 6 3',
+                activeItem: 0,
+                items: [{
+                    cls: 'codeViewerB',
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'div',
+                        cls: 'ux-codeViewer'
+                    },
+                    style: 'overflow: scroll',
+                     sideA: false
+                }, {
+                    cls: 'codeEditorB',
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'textarea',
+                        cls: 'ux-codeEditor'
+                    }
+                }]
+            }
+        ];
 
 
-    	this.callParent();
+        this.callParent();
     },
     diff: function(a, b) {
-	    var calcMiddleSnake = function(a, aIndex, N, b, bIndex, M) {
-	        var V = {},
-	            rV = {},
-	            maxD = Math.ceil((M+N)/2),
-	            delta = N-M,
-	            odd = (delta & 1) != 0,
-	            x, y, xStart, yStart;
+        var calcMiddleSnake = function(a, aIndex, N, b, bIndex, M) {
+            var V = {},
+                rV = {},
+                maxD = Math.ceil((M+N)/2),
+                delta = N-M,
+                odd = (delta & 1) != 0,
+                x, y, xStart, yStart;
 
-	        V[1] = 0;
-	        rV[delta-1] = N;
-	        for (var D = 0; D <= maxD; D++) {
-	            for (var k = -D; k<=D; k+=2) {
-	                var down = k == -D || k != D && V[k-1] < V[k+1];
+            V[1] = 0;
+            rV[delta-1] = N;
+            for (var D = 0; D <= maxD; D++) {
+                for (var k = -D; k<=D; k+=2) {
+                    var down = k == -D || k != D && V[k-1] < V[k+1];
 
-	                if (down) {
-	                    xStart = x = V[k+1];
-	                    yStart = xStart-(k+1);
-	                } else {
-	                    xStart = x = V[k-1];
-	                    yStart = xStart-(k-1);
-	                    x++;
-	                }
+                    if (down) {
+                        xStart = x = V[k+1];
+                        yStart = xStart-(k+1);
+                    } else {
+                        xStart = x = V[k-1];
+                        yStart = xStart-(k-1);
+                        x++;
+                    }
 
-	                y = x-k;
-	                while (x < N && y < M && a[aIndex+x] == b[bIndex+y]) {
-	                    x++;
-	                    y++;
-	                }
-	                V[k] = x;
-	                if (odd && k >= delta-(D-1) && k <= delta+(D-1)) {
-	                    if (rV[k] <= V[k]) {
-	                        if (down && xStart == 0 && yStart == -1) {
-	                            yStart++;
-	                        }
-	                        return {
-	                            numDiffs: 2*D-1,
-	                            x: aIndex+xStart,
-	                            y: bIndex+yStart,
-	                            u: aIndex+x,
-	                            v: bIndex+y,
-	                            insertion: down,
-	                            index: down?bIndex+yStart:aIndex+xStart,
-	                            forward: true
-	                        };
-	                    }
-	                }
-	            }
-	            var dDelta = D+delta,
-	                dDeltaNeg = -D+delta;
+                    y = x-k;
+                    while (x < N && y < M && a[aIndex+x] == b[bIndex+y]) {
+                        x++;
+                        y++;
+                    }
+                    V[k] = x;
+                    if (odd && k >= delta-(D-1) && k <= delta+(D-1)) {
+                        if (rV[k] <= V[k]) {
+                            if (down && xStart == 0 && yStart == -1) {
+                                yStart++;
+                            }
+                            return {
+                                numDiffs: 2*D-1,
+                                x: aIndex+xStart,
+                                y: bIndex+yStart,
+                                u: aIndex+x,
+                                v: bIndex+y,
+                                insertion: down,
+                                index: down?bIndex+yStart:aIndex+xStart,
+                                forward: true
+                            };
+                        }
+                    }
+                }
+                var dDelta = D+delta,
+                    dDeltaNeg = -D+delta;
 
-	            for (var k = dDeltaNeg; k<=dDelta; k+=2) {
-	                var up = k == dDelta || k != dDeltaNeg && rV[k-1] < rV[k+1];
+                for (var k = dDeltaNeg; k<=dDelta; k+=2) {
+                    var up = k == dDelta || k != dDeltaNeg && rV[k-1] < rV[k+1];
 
-	                if (up) {
-	                    xStart = x = rV[k-1];
-	                    yStart = xStart-(k-1);
-	                } else {
-	                    xStart = x = rV[k+1];
-	                    yStart = xStart-(k+1);
-	                    x--;
-	                }
+                    if (up) {
+                        xStart = x = rV[k-1];
+                        yStart = xStart-(k-1);
+                    } else {
+                        xStart = x = rV[k+1];
+                        yStart = xStart-(k+1);
+                        x--;
+                    }
 
-	                y = x-k;
-	                while (x > 0 && y > 0 && a[aIndex+x-1] == b[bIndex+y-1]) {
-	                    x--;
-	                    y--;
-	                }
-	                rV[k] = x;
+                    y = x-k;
+                    while (x > 0 && y > 0 && a[aIndex+x-1] == b[bIndex+y-1]) {
+                        x--;
+                        y--;
+                    }
+                    rV[k] = x;
 
-	                if (!odd && k >= -D && k <= D) {
-	                    if (rV[k] <= V[k]) {
-	                        if (up && xStart == N && yStart == M+1) {
-	                            yStart--;
-	                        }
-	                        return {
-	                            numDiffs: 2*D,
-	                            x: aIndex+x,
-	                            y: bIndex+y,
-	                            u: aIndex+xStart,
-	                            v: bIndex+yStart,
-	                            insertion: up,
-	                            index: up?bIndex+yStart-1:aIndex+xStart-1,
-	                            forward: false
-	                        };
-	                    }
-	                }
-	            }
-	        }
-	        throw 'Didn\'t find middle snake';
-	    };
+                    if (!odd && k >= -D && k <= D) {
+                        if (rV[k] <= V[k]) {
+                            if (up && xStart == N && yStart == M+1) {
+                                yStart--;
+                            }
+                            return {
+                                numDiffs: 2*D,
+                                x: aIndex+x,
+                                y: bIndex+y,
+                                u: aIndex+xStart,
+                                v: bIndex+yStart,
+                                insertion: up,
+                                index: up?bIndex+yStart-1:aIndex+xStart-1,
+                                forward: false
+                            };
+                        }
+                    }
+                }
+            }
+            throw 'Didn\'t find middle snake';
+        };
 
-	    var calcSES = function(a, aIndex, N, b, bIndex, M, ses) {
-	        if (N == 0 && M == 0) {
+        var calcSES = function(a, aIndex, N, b, bIndex, M, ses) {
+            if (N == 0 && M == 0) {
                 return;
             }
 
-	        var middleSnake = calcMiddleSnake(a, aIndex, N, b, bIndex, M);
+            var middleSnake = calcMiddleSnake(a, aIndex, N, b, bIndex, M);
 
-	        if (middleSnake.numDiffs == 1) {
-	            (middleSnake.insertion?ses.insertions:ses.deletions).push(middleSnake.index);
-	        } else if (middleSnake.numDiffs > 1) {
-	            (middleSnake.insertion?ses.insertions:ses.deletions).push(middleSnake.index);
-	            calcSES(a, aIndex, middleSnake.x - aIndex, b, bIndex, middleSnake.y - bIndex, ses);
-	            calcSES(a, middleSnake.u, aIndex+N-middleSnake.u, b, middleSnake.v, bIndex+M-middleSnake.v, ses);
-	        }
-	    };
+            if (middleSnake.numDiffs == 1) {
+                (middleSnake.insertion?ses.insertions:ses.deletions).push(middleSnake.index);
+            } else if (middleSnake.numDiffs > 1) {
+                (middleSnake.insertion?ses.insertions:ses.deletions).push(middleSnake.index);
+                calcSES(a, aIndex, middleSnake.x - aIndex, b, bIndex, middleSnake.y - bIndex, ses);
+                calcSES(a, middleSnake.u, aIndex+N-middleSnake.u, b, middleSnake.v, bIndex+M-middleSnake.v, ses);
+            }
+        };
 
         var ses = {
             insertions: [],

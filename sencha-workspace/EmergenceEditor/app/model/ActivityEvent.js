@@ -4,22 +4,22 @@ Ext.define('EmergenceEditor.model.ActivityEvent', {
 
     idProperty: 'href',
     fields: [{
-    	name: 'EventType',
+        name: 'EventType',
         type: 'string'
     }, {
-    	name: 'Handle',
+        name: 'Handle',
         type: 'string'
     }, {
         name: 'CollectionPath',
         type: 'string'
     }, {
         name: 'FirstTimestamp',
-    	type: 'date',
+        type: 'date',
         dateFormat: 'timestamp',
         useNull: true
     }, {
         name: 'Timestamp',
-    	type: 'date',
+        type: 'date',
         dateFormat: 'timestamp'
     }, {
         name: 'RevisionID',
@@ -40,14 +40,14 @@ Ext.define('EmergenceEditor.model.ActivityEvent', {
     }, {
         name: 'revisionsCount',
         convert: function(v, r) {
-        	var revisions = r.get('revisions');
+            var revisions = r.get('revisions');
 
             return revisions ? revisions.length : null;
         },
         useNull: true
     }, {
-    	name: 'Author'
+        name: 'Author'
     }, {
-    	name: 'Collection'
+        name: 'Collection'
     }]
 });

@@ -7,22 +7,22 @@ Ext.define('EmergenceEditor.view.contextmenu.FileMenu', {
     width: 130,
     items: [
         {
-		    text: 'Open',
+            text: 'Open',
             action: 'open',
             icon: '/img/icons/fugue/blue-folder-horizontal-open.png'
-	    },
+        },
         {
-		    text: 'Properties',
+            text: 'Properties',
             action: 'properties',
             icon: '/img/icons/fugue/property-blue.png'
-	    }, {
-		    text: 'Rename',
+        }, {
+            text: 'Rename',
             action: 'rename',
             icon: '/img/icons/fugue/blue-document-rename.png'
-	    }, {
-		    text: 'Delete',
+        }, {
+            text: 'Delete',
             action: 'delete',
             icon: '/img/icons/fugue/cross.png'
-	    }
+        }
     ]
 });

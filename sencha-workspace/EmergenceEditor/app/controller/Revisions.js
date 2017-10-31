@@ -62,7 +62,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
     },
     openRevisionByRecord: function(record) {
-    	Ext.util.History.add('revision:[' + record.get('ID') + ']/'+record.get('FullPath'), true);
+        Ext.util.History.add('revision:[' + record.get('ID') + ']/'+record.get('FullPath'), true);
     },
     openRevision: function(view, record, itemindex, event, options) {
         this.openRevisionByRecord(record);

@@ -36,9 +36,9 @@ Ext.define('EmergenceEditor.store.FileTree', {
     /*
     // proxy INSTANCE was required when trying to parse an XML response who's root wasn't "children"
     ,constructor: function() {
-    	this.proxy = Ext.create('EmergenceEditor.proxy.Develop');
+        this.proxy = Ext.create('EmergenceEditor.proxy.Develop');
 
-    	return this.callParent(arguments);
+        return this.callParent(arguments);
     }
     */
 });

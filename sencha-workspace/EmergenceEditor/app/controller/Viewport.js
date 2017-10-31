@@ -137,19 +137,19 @@ Ext.define('EmergenceEditor.controller.Viewport', {
                 , function() {
 
                     /* uploadStatus[index] = true;
-					
-					var done = true;
-					
-					Ext.each(uploadStatus, function(status, index, uploadStatus) {
-						if(!status)
-						{
-							done = false;	
-						}
-					}, this);
-					
-					if(done) {
-						this.afterDropUpload.call(this,record,e.dataTransfer.files);
-					}*/
+
+                    var done = true;
+
+                    Ext.each(uploadStatus, function(status, index, uploadStatus) {
+                        if(!status)
+                        {
+                            done = false;
+                        }
+                    }, this);
+
+                    if(done) {
+                        this.afterDropUpload.call(this,record,e.dataTransfer.files);
+                    }*/
                 }
                 , function(percentage, event) {
                     // console.log(percentage);
@@ -184,7 +184,7 @@ Ext.define('EmergenceEditor.controller.Viewport', {
                 searchQuery: query,
                 title: 'Search Results for ' + query,
                 closable: true
-		    }),
+            }),
             store = tab.getStore();
 
         // load search results

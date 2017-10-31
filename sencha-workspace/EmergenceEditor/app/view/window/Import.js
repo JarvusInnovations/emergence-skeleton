@@ -14,8 +14,8 @@ Ext.define('EmergenceEditor.view.window.Import', {
     items: [
         {
             xtype: 'label',
-			 text: 'Drag and Drop Archive Here to Import',
-			 margins: '0 0 0 60'
+             text: 'Drag and Drop Archive Here to Import',
+             margins: '0 0 0 60'
         }
     ],
     defaults: {
