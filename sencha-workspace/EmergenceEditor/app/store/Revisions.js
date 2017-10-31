@@ -7,7 +7,7 @@ Ext.define('EmergenceEditor.store.Revisions', {
         'Jarvus.proxy.API'
     ],
 
-    storeId: 'revisions',
+
     // ,autoLoad: true
     fields: [
         { name: 'ID',
