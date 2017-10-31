@@ -10,5 +10,6 @@
 sencha-error-*.log
 
 # remote packages
+/packages/jarvus-hash/
 /packages/jarvus-apikit/
 /packages/emergence-apikit/
