@@ -211,6 +211,10 @@
         {
             "path": "app.js",
             "bundle": true
+        },
+        {
+            "path": "markdown.js",
+            "includeInBundle": true
         }
     ],
 
