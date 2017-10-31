@@ -2,6 +2,11 @@
 Ext.define('EmergenceEditor.store.Revisions', {
     extend: 'Ext.data.Store',
     alias: 'store.revisions',
+    requires: [
+        'EmergenceEditor.API',
+        'Jarvus.proxy.API'
+    ],
+
     storeId: 'revisions',
     // ,autoLoad: true
     fields: [
@@ -35,11 +40,12 @@ Ext.define('EmergenceEditor.store.Revisions', {
 
 
     proxy: {
-        type: 'ajax',
+        type: 'api',
+        connection: 'EmergenceEditor.API',
         url: '/editor/getRevisions/',
         reader: {
             type: 'json',
-            root: 'revisions'
+            rootProperty: 'revisions'
         }
     }
 });

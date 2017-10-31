@@ -5,6 +5,8 @@ Ext.define('EmergenceEditor.store.DavClient', {
     mixins: {
         observable: 'Ext.util.Observable'
     },
+
+
     disableCaching: false,
     JSONurl: '/develop/json/', /* this is only for getting collection directory listings */
     url: '/develop/', /* use this for 'most' calls */
@@ -108,11 +110,11 @@ Ext.define('EmergenceEditor.store.DavClient', {
             progressCallback.call(scope, percentage, event);
         }
 
-    	xhr.upload.addEventListener('progress', progress.bind(this, arguments));
+        xhr.upload.addEventListener('progress', progress.bind(this, arguments));
 
-    	xhr.open('PUT', url);
+        xhr.open('PUT', url);
 
-    	xhr.send(file);
+        xhr.send(file);
 
         var readStateChange = function() {
             if (xhr.readyState != 4) {
@@ -121,6 +123,6 @@ Ext.define('EmergenceEditor.store.DavClient', {
             }
         }
 
-    	xhr.onreadystatechange = readStateChange.bind(this, arguments);
+        xhr.onreadystatechange = readStateChange.bind(this, arguments);
     }
 });

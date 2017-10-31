@@ -2,14 +2,20 @@
 Ext.define('EmergenceEditor.store.ActivityStream', {
     extend: 'Ext.data.Store',
     alias: 'store.activitystream',
+    requires: [
+        'Jarvus.proxy.API'
+    ],
+
+
     // ,autoLoad: true
     model: 'EmergenceEditor.model.ActivityEvent',
     proxy: {
-        type: 'ajax',
+        type: 'api',
+        connection: 'EmergenceEditor.API',
         url: '/editor/activity',
         reader: {
             type: 'json',
-            root: 'data'
+            rootProperty: 'data'
         }
     }
 });

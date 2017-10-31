@@ -2,7 +2,10 @@
 Ext.define('EmergenceEditor.store.FileTree', {
     extend: 'Ext.data.TreeStore',
     alias: 'store.filetree',
-    requires: ['EmergenceEditor.proxy.Develop'],
+    requires: [
+        'EmergenceEditor.API',
+        'Jarvus.proxy.API'
+    ],
 
 
     model: 'EmergenceEditor.model.File',
@@ -20,7 +23,9 @@ Ext.define('EmergenceEditor.store.FileTree', {
         expanded: true
     },
     proxy: {
-        type: 'develop'
+        type: 'api',
+        connection: 'EmergenceEditor.API',
+        url: '/develop'
     },
     refreshNodeByRecord: function(record) {
         this.load({
@@ -32,7 +37,7 @@ Ext.define('EmergenceEditor.store.FileTree', {
     // proxy INSTANCE was required when trying to parse an XML response who's root wasn't "children"
     ,constructor: function() {
     	this.proxy = Ext.create('EmergenceEditor.proxy.Develop');
-    	
+
     	return this.callParent(arguments);
     }
     */
