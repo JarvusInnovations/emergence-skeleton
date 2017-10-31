@@ -26,7 +26,11 @@ Ext.define('EmergenceEditor.store.FileTree', {
     proxy: {
         type: 'api',
         connection: 'EmergenceEditor.API',
-        url: '/develop/json/'
+        url: function(operation) {
+            var node = operation.node;
+
+            return '/develop/json/' + (node.isRoot() ? '' : node.get('FullPath'));
+        }
     },
     refreshNodeByRecord: function(record) {
         this.load({
