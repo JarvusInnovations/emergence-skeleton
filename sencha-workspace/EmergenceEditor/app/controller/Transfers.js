@@ -23,8 +23,6 @@ Ext.define('EmergenceEditor.controller.Transfers', {
 
         }, this);
 
-        EmergenceEditor.store.DavClient.addEvents('beforefileupload', 'afterfileupload', 'fileuploadprogress');
-
         EmergenceEditor.store.DavClient.on('beforefileupload', this.onBeforeFileUpload, this);
         EmergenceEditor.store.DavClient.on('afterfileupload', this.onAfterFileUpload, this);
         EmergenceEditor.store.DavClient.on('fileuploadprogress', this.onFileUploadProgress, this);
