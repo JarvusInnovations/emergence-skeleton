@@ -4,7 +4,7 @@
     "version": "1.0.0.0",
     "framework": "ext",
     "toolkit": "classic",
-    "theme": "theme-triton",
+    "theme": "theme-crisp",
 
     /**
      * The list of required packages (with optional versions; default is "latest").
@@ -461,22 +461,7 @@
     /**
      * Additional resources used during theme slicing operations
      */
-    "slicer": {
-        "js": [
-            {
-                "path": "sass/example/custom.js",
-                "isWidgetManifest": true
-            }
-        ],
-        "output": {
-            "appCache": {
-                "enable": false
-            }
-        },
-        "cache": {
-            "enable": false
-        }
-    },
+    "slicer": null,
 
     /**
      * Build Profiles. This object's properties are each a "build profile". You can
