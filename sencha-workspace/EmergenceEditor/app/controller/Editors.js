@@ -1,13 +1,23 @@
 Ext.define('EmergenceEditor.controller.Editors', {
     extend: 'Ext.app.Controller',
     requires: [
-        'EmergenceEditor.API'
+        /* global EmergenceEditor */
+        'EmergenceEditor.DAV'
     ],
 
 
     views: [
         'ace.Panel@Jarvus'
     ],
+
+    routes: {
+        '/:path': {
+            action: 'showPath',
+            conditions: {
+                ':path': '(.+)'
+            }
+        }
+    },
 
     refs: {
         tabPanel: 'tabpanel',
@@ -23,6 +33,33 @@ Ext.define('EmergenceEditor.controller.Editors', {
     control: {
         // tabchange: 'onTabChange',
         // staterestore: 'onTabsStateRestore'
+    },
+
+
+    showPath: function(path, line) {
+        var me = this,
+            tabPanel = me.getTabPanel(),
+            editor = tabPanel.items.findBy(function(existing) {
+                return existing.isXType('acepanel') && existing.getPath() == path;
+            });
+
+        if (editor) {
+            tabPanel.setActiveTab(editor);
+            return;
+        }
+
+        EmergenceEditor.DAV.downloadFile(path, function(options, success, response) {
+            editor = me.getEditorPanel({
+                path: path
+            });
+
+            editor.onReady(function (newEditor, aceEditor, aceSession) {
+                aceSession.setValue(response.responseText);
+            });
+
+            tabPanel.add(editor);
+            tabPanel.setActiveTab(editor);
+        });
     },
 
     // init: function() {
