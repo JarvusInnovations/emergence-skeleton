@@ -32,34 +32,75 @@ Ext.define('EmergenceEditor.controller.Editors', {
     },
 
     control: {
-        // tabchange: 'onTabChange',
-        // staterestore: 'onTabsStateRestore'
+        tabPanel: {
+            tabchange: 'onTabChange',
+            staterestore: 'onTabsStateRestore'
+        }
     },
 
 
+    // route handlers
     showPath: function(path, line) {
+        this.openPath(path, line);
+    },
+
+
+    // event handlers
+    onTabsStateRestore: function(tabPanel, state) {
+        var openFiles = state.openFiles || [],
+            openFilesLength = openFiles.length,
+            openFileIndex = 0;
+
+        for (; openFileIndex < openFilesLength; openFileIndex++) {
+            this.openPath(openFiles[openFileIndex], null, false);
+        }
+    },
+
+    onTabChange: function(tabPanel, card) {
+        var path = card.isXType('acepanel') && card.getPath();
+
+        if (path) {
+            this.getApplication().setActiveView('/'+path, card.getTitle());
+        }
+    },
+
+
+    // local methods
+    openPath: function(path, line, activate) {
         var me = this,
             tabPanel = me.getTabPanel(),
-            editor = tabPanel.items.findBy(function(existing) {
-                return existing.isXType('acepanel') && existing.getPath() == path;
+            editor = tabPanel.items.findBy(function(card) {
+                return card.isXType('acepanel') && card.getPath() == path;
             });
 
+        activate = activate !== false;
+
         if (editor) {
-            tabPanel.setActiveTab(editor);
+            if (activate) {
+                tabPanel.setActiveTab(editor);
+            }
             return;
         }
 
-        EmergenceEditor.DAV.downloadFile(path, function(options, success, response) {
-            editor = me.getEditorPanel({
-                path: path
-            });
+        editor = me.getEditorPanel({
+            path: path
+        });
 
+        tabPanel.add(editor);
+
+        editor.setLoading({
+            msg: 'Opening ' + path.substr(path.lastIndexOf('/') + 1) + '&hellip;'
+        });
+
+        if (activate) {
+            tabPanel.setActiveTab(editor);
+        }
+
+        EmergenceEditor.DAV.downloadFile(path, function(options, success, response) {
             editor.onReady(function (newEditor, aceEditor, aceSession) {
                 aceSession.setValue(response.responseText);
+                editor.setLoading(false);
             });
-
-            tabPanel.add(editor);
-            tabPanel.setActiveTab(editor);
         });
     },
 
@@ -95,14 +136,6 @@ Ext.define('EmergenceEditor.controller.Editors', {
     //     if (activeCard.xtype == 'acepanel' && typeof activeCard.aceEditor !== 'undefined') {
     //         activeCard.onResize();
     //     }
-    // },
-
-    // onTabsStateRestore: function(tabPanel, state) {
-
-    //     Ext.each(state.openFiles, function(path) {
-    //         this.onFileOpen(path, false);
-    //     }, this);
-
     // },
 
     // onDiffOpen: function(path, autoActivate, sideA, sideB) {

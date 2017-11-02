@@ -83,20 +83,24 @@ Ext.define('EmergenceEditor.view.TabPanel', {
     /* implement statefulness for open tabs */
     stateful: true,
     stateId: 'editorTabs',
-    stateEvents: ['tabchange', 'remove', 'add', 'afterlayout'],
+    stateEvents: ['remove', 'add'],
 
 
     getState: function() {
+        var openFiles = [],
+            items = this.items,
+            itemsCount = items.getCount(),
+            itemIndex = 0,
+            item, path;
 
-        var openFiles = [];
+        for (; itemIndex < itemsCount; itemIndex++) {
+            item = items.get(itemIndex);
 
-        this.items.each(function(item) {
-            if (item.path && item.persistent) {
-                openFiles.push(item.path);
+            if (item.isXType('acepanel') && (path = item.getPath())) {
+                openFiles.push(path);
             }
-        });
-
-        // console.log('gotState: ', openFiles);
+        }
+console.log('setting state', openFiles);
         return { openFiles: openFiles };
     }
 });

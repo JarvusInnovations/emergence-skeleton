@@ -102,8 +102,8 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         });
 
         // init history
-        Ext.util.History.init(this.onHistoryChange, this);
-        Ext.util.History.on('change', this.onHistoryChange, this);
+        // Ext.util.History.init(this.onHistoryChange, this);
+        // Ext.util.History.on('change', this.onHistoryChange, this);
 
         // init keymap
         this.keyMap = Ext.create('Ext.util.KeyMap', document, [{
@@ -194,56 +194,56 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         // set search tab to activetab
         this.getTabPanel().setActiveTab(tab);
     },
-    onHistoryChange: function() {
-        var token = Ext.util.History.getToken();
+    // onHistoryChange: function() {
+    //     var token = Ext.util.History.getToken();
 
-        if (token) {
-            this.loadNavPath(token);
-        }
-    },
-    loadNavPath: function(navPath) {
-        if (navPath.charAt(0) == '/') {
-            if (navPath.indexOf(':') == -1) {
-                var path = navPath.substr(1);
-                var line = 1;
-            } else {
-                var path = navPath.substring(1, navPath.indexOf(':'));
-                var line = navPath.substring(navPath.indexOf(':')+1);
-            }
+    //     if (token) {
+    //         this.loadNavPath(token);
+    //     }
+    // },
+    // loadNavPath: function(navPath) {
+    //     if (navPath.charAt(0) == '/') {
+    //         if (navPath.indexOf(':') == -1) {
+    //             var path = navPath.substr(1);
+    //             var line = 1;
+    //         } else {
+    //             var path = navPath.substring(1, navPath.indexOf(':'));
+    //             var line = navPath.substring(navPath.indexOf(':')+1);
+    //         }
 
-            this.application.fireEvent('fileopen', path, true, false, line);
-        } else if (navPath.substr(0, 9).toLowerCase()== 'revision:') {
-            var pathpos = navPath.indexOf('/')+1;
-            var path = navPath.substr(pathpos);
+    //         this.application.fireEvent('fileopen', path, true, false, line);
+    //     } else if (navPath.substr(0, 9).toLowerCase()== 'revision:') {
+    //         var pathpos = navPath.indexOf('/')+1;
+    //         var path = navPath.substr(pathpos);
 
-            var idpos = navPath.indexOf('[')+1;
-            var idposend = navPath.indexOf(']');
-            var id = navPath.substring(idpos, idposend);
+    //         var idpos = navPath.indexOf('[')+1;
+    //         var idposend = navPath.indexOf(']');
+    //         var id = navPath.substring(idpos, idposend);
 
-            this.application.fireEvent('fileopen', path, true, id);
-        } else if (navPath.substr(0, 5).toLowerCase() == 'diff:') {
-            var pathpos = navPath.indexOf('/')+1;
-            var path = navPath.substr(pathpos);
+    //         this.application.fireEvent('fileopen', path, true, id);
+    //     } else if (navPath.substr(0, 5).toLowerCase() == 'diff:') {
+    //         var pathpos = navPath.indexOf('/')+1;
+    //         var path = navPath.substr(pathpos);
 
-            var idpos = navPath.indexOf('[')+1;
-            var idposend = navPath.indexOf(']');
-            var ids = navPath.substring(idpos, idposend);
+    //         var idpos = navPath.indexOf('[')+1;
+    //         var idposend = navPath.indexOf(']');
+    //         var ids = navPath.substring(idpos, idposend);
 
-            if (ids.indexOf(',') != false) {
-                var sides = ids.split(',');
-                var sideA = sides[0];
-                var sideB = sides[1];
+    //         if (ids.indexOf(',') != false) {
+    //             var sides = ids.split(',');
+    //             var sideA = sides[0];
+    //             var sideB = sides[1];
 
-                this.application.fireEvent('diffopen', path, true, sideA, sideB);
-            }
-        } else if (navPath.substr(0, 7).toLowerCase() == 'search:') {
-            var query = navPath.substr(navPath.indexOf(':')+1);
+    //             this.application.fireEvent('diffopen', path, true, sideA, sideB);
+    //         }
+    //     } else if (navPath.substr(0, 7).toLowerCase() == 'search:') {
+    //         var query = navPath.substr(navPath.indexOf(':')+1);
 
-            this.openSearch(query);
-        } else {
-            this.getTabPanel().getLayout().setActiveItem(navPath);
-        }
-    },
+    //         this.openSearch(query);
+    //     } else {
+    //         this.getTabPanel().getLayout().setActiveItem(navPath);
+    //     }
+    // },
     onImportClick: function(item, event, opts) {
         this.getImportWindow().show();
         this.getImportWindow().el.on('dragover', this.onImportDragover, this);
