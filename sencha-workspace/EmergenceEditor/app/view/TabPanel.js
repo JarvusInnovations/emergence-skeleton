@@ -100,7 +100,7 @@ Ext.define('EmergenceEditor.view.TabPanel', {
                 openFiles.push(path);
             }
         }
-console.log('setting state', openFiles);
+
         return { openFiles: openFiles };
     }
 });
