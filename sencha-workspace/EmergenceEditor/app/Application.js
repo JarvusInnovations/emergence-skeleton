@@ -51,7 +51,7 @@ Ext.define('EmergenceEditor.Application', {
     // todo: make this ask the tab for the title and moving this to ontabchange
     setActiveView: function(token, title) {
         Ext.util.History.add(token, true);
-        this.titleDom.innerHTML = title + ' - ' + location.hostname;
+        this.titleDom.innerHTML = title + ' @ ' + location.hostname;
     },
 
     onAppUpdate: function () {
