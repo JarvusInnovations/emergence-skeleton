@@ -26,7 +26,8 @@ Ext.define('EmergenceEditor.controller.Editors', {
             forceCreate: true,
 
             xtype: 'acepanel',
-            closable: true
+            closable: true,
+            title: 'Editor'
         }
     },
 
