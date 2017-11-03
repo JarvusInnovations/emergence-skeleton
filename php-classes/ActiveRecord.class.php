@@ -874,8 +874,7 @@ class ActiveRecord
                 } catch (DuplicateKeyException $e) {
                     if (
                         static::$updateOnDuplicateKey &&
-                        preg_match('/Duplicate entry \'.*?\' for key \'([^\']+)\'/', $e->getMessage(), $errorMatches) &&
-                        ($duplicateKeyName = $errorMatches[1]) &&
+                        ($duplicateKeyName = $e->getDuplicateKey()) &&
                         (
                             ($duplicateKeyName == 'PRIMARY') ||
                             ($duplicateKeyConfig = static::getStackedConfig('indexes', $duplicateKeyName))
