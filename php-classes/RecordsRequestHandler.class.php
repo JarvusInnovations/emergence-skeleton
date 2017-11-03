@@ -429,6 +429,19 @@ abstract class RecordsRequestHandler extends RequestHandler
                 if (!$message) {
                     $message = reset($e->validationErrors); // store the first validation error in message
                 }
+            } catch (DuplicateKeyException $e) {
+                $duplicateMessage = 'Duplicate value(s) "'.$e->getDuplicateValue().'" for key "'.$e->getDuplicateKey().'"';
+
+                $failed[] = array(
+                    'record' => $Record->getData()
+                    ,'validationErrors' => array(
+                        $e->getDuplicateKey() => $duplicateMessage
+                    )
+                );
+
+                if (!$message) {
+                    $message = $duplicateMessage;
+                }
             }
         }
 
