@@ -5,7 +5,6 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
         'EmergenceEditor.view.FilesTree',
         'EmergenceEditor.view.TabPanel',
         'EmergenceEditor.view.Revisions',
-        'EmergenceEditor.view.TransfersGrid',
 
         'Ext.layout.container.Border'
     ],
@@ -55,16 +54,6 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
             //                    title: 'Code Navigator'
             //                }*/
             //            ]
-        }, {
-            xtype: 'emergence-transfersgrid',
-            region: 'south',
-            stateful: true,
-            stateId: 'viewport-transfers',
-            height: 200,
-            collapsible: true,
-            split: true,
-            icon: '/img/icons/fugue/system-monitor-network.png',
-            collapsed: true
         }];
 
         this.callParent();

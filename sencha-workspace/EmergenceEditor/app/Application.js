@@ -22,7 +22,6 @@ Ext.define('EmergenceEditor.Application', {
     controllers: [
         'Viewport',
         'Files',
-        'Transfers',
         'Editors',
         'Revisions',
         'Activity'
