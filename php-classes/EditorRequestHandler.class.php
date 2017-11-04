@@ -28,7 +28,7 @@ class EditorRequestHandler extends RequestHandler {
             case 'activity':
                 return static::handleActivityRequest();
             case 'export':
-    			return static::handleExportRequest();
+        		return static::handleExportRequest();
 			case 'import':
 				return static::handleImportRequest();
 			case 'timesheet':
@@ -154,8 +154,13 @@ class EditorRequestHandler extends RequestHandler {
     
     public static function handleRevisionsRequest() {
     	$GLOBALS['Session']->requireAccountLevel('Developer');
-    	
-        $node = SiteFile::getByID($_REQUEST['ID']);
+
+        if (!empty($_REQUEST['ID'])) {
+            $node = SiteFile::getByID($_REQUEST['ID']);
+        } elseif (!empty($_REQUEST['path'])) {
+            $node = Site::resolvePath($_REQUEST['path']);
+        }
+
         if(!$node)
         {
             return static::throwNotFoundError();
