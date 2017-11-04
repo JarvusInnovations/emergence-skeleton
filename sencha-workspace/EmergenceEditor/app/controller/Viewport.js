@@ -8,7 +8,7 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         selector: 'emergence-menubar'
     }, {
         ref: 'tabPanel',
-        selector: 'viewport > tabpanel'
+        selector: 'emergence-tabpanel'
     }, {
         ref: 'siteTools',
         selector: 'emergence-site-tools',
@@ -16,10 +16,10 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         autoCreate: true
     }, {
         ref: 'searchInput',
-        selector: 'viewport textfield[name=globalSearch]'
+        selector: 'textfield[name=globalSearch]'
     }, {
-        ref: 'detailsPanel',
-        selector: 'viewport > tabpanel:last'
+        ref: 'revisionsPanel',
+        selector: 'emergence-file-revisions'
     }, {
         ref: 'findWindow',
         autoCreate: true,
@@ -32,7 +32,7 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         xtype: 'emergence-import-window'
     }],
     stores: ['SiteSearch'],
-    views: ['Viewport', 'Menubar', 'Activity', 'SimpleCodeViewer', 'SiteTools', 'window.Find', 'SearchResults', 'window.Import'],
+    views: ['Menubar', 'Activity', 'SimpleCodeViewer', 'SiteTools', 'window.Find', 'SearchResults', 'window.Import'],
 
     init: function() {
         // console.info('Emergence.Editor.controller.Viewport.init()');
@@ -70,13 +70,10 @@ Ext.define('EmergenceEditor.controller.Viewport', {
                 click: this.onFindPreviousButtonClick
             },
             // viewport
-            'viewport button[text=Search]': {
+            'button[text=Search]': { // TODO: use action=
                 'click': this.onSearchClick
             },
-            'viewport > tabpanel:last': {
-                expand: this.onDetailsPanelExpand
-            },
-            'viewport textfield[name=globalSearch]': {
+            'textfield[name=globalSearch]': {
                 keydown: this.onSearchKeydown
             }
         });
@@ -123,8 +120,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
                 this.onFindClick();
             }
         }]);
-
-        this.getDetailsPanel().on('expand', this.onDetailsPanelExpand, this);
     },
     onImportDrop: function(event) {
         event.preventDefault();
@@ -301,13 +296,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
 
         if (typeof activeTab.aceEditor !== 'undefined') {
             activeTab.aceEditor.findPrevious();
-        }
-    },
-    onDetailsPanelExpand: function(tabpanel, options) {
-        var activeTab = this.getTabPanel().activeTab;
-
-        if (activeTab.ID) {
-            tabpanel.down('emergence-file-revisions').store.load({ params: { ID: activeTab.ID } });
         }
     }
 });

@@ -39,6 +39,7 @@ Ext.define('EmergenceEditor.view.Revisions', {
         }, {
             header: 'Author',
             dataIndex: 'Author',
+            align: 'left',
             flex: 1,
             xtype: 'templatecolumn',
             tpl: [

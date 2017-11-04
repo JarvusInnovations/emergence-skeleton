@@ -2,7 +2,7 @@
 Ext.define('EmergenceEditor.controller.Revisions', {
     extend: 'Ext.app.Controller',
 
-    views: ['Revisions', 'contextmenu.RevisionsMenu', 'Viewport'],
+    views: ['Revisions', 'contextmenu.RevisionsMenu'],
     stores: ['Revisions'],
     models: [],
     refs: [{
@@ -21,8 +21,8 @@ Ext.define('EmergenceEditor.controller.Revisions', {
         selector: 'SimpleCodeViewer',
         xtype: 'emergence-diff-viewer'
     }, {
-        ref: 'tabPanel',
-        selector: 'viewport > tabpanel'
+        ref: 'editorTabPanel',
+        selector: 'emergence-tabpanel'
     }],
     onLaunch: function() {
         // console.info('Emergence.Editor.controller.Revisions.onLaunch()');
@@ -51,15 +51,15 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             'emergence-revisionsmenu > menuitem[action=compare_previous]': {
                 click: this.onComparePreviousClick
             },
-            'tabPanel': {
-                tabchange: this.onTabChange
+            editorTabPanel: {
+                tabchange: this.onEditorTabChange
+            },
+            revisionsGrid: {
+                expand: this.onRevisionsGridExpand
             }
         });
 
         this.application.on('afterloadfile', this.onAfterLoadFile, this);
-    },
-    onTabChange: function(tabpanel, newcard, oldcard, eopts) {
-
     },
     openRevisionByRecord: function(record) {
         Ext.util.History.add('revision:[' + record.get('ID') + ']/'+record.get('FullPath'), true);
@@ -116,6 +116,33 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             revisionsPanel.store.load({
                 params: { ID: revisionID }
             });
+        }
+    },
+
+    onEditorTabChange: function(editorTabPanel, card) {
+        var revisionsGrid = this.getRevisionsGrid(),
+            revisionsStore = this.getRevisionsStore(),
+            revisionsProxy = revisionsStore.getProxy();
+
+        if (card.isXType('emergence-activity')) {
+            revisionsStore.removeAll();
+            revisionsProxy.clearParamsDirty();
+            revisionsGrid.disable();
+        } else if (card.isXType('acepanel')) {
+            revisionsProxy.setExtraParam('path', card.getPath());
+            revisionsGrid.enable();
+
+            if (!revisionsGrid.getCollapsed()) {
+                revisionsStore.load();
+            }
+        }
+    },
+
+    onRevisionsGridExpand: function() {
+        var revisionsStore = this.getRevisionsStore();
+
+        if (revisionsStore.getProxy().isExtraParamsDirty()) {
+            revisionsStore.load();
         }
     }
 });

@@ -13,32 +13,7 @@ Ext.define('EmergenceEditor.view.TabPanel', {
     },
 
 
-    listeners: {
-        tabchange: function(tabpanel, newcard, oldcard, options) {
-            var revisionsPanel = EmergenceEditor.app.viewport.down('emergence-file-revisions');
-
-            if (newcard.itemId == 'activity') {
-                revisionsPanel.getStore().removeAll();
-                revisionsPanel.collapse();
-            } else if (newcard.ID) {
-                if (revisionsPanel.isVisible(true)) {
-                    revisionsPanel.store.load({ params: { ID: newcard.ID } });
-                }
-            }
-        },
-
-        /* ,activate: function(tabpanel, options)
-        {
-            console.log(this);
-            EmergenceEditor.app.viewport.down('emergence-file-revisions').up().on('expand', function(viewportEast, options) {
-                console.log(this);
-            }, this);
-        }*/
-        scope: this
-    },
-
     initComponent: function() {
-
         var me = this;
 
         if (this.singleFile) {
