@@ -34,6 +34,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
 
         xtype: 'emergence-revisions',
         width: 275,
+        disabled: true,
         collapsible: true,
         collapsed: true
     }]
