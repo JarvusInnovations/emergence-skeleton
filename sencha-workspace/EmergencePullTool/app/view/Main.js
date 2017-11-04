@@ -2,7 +2,7 @@ Ext.define('EmergencePullTool.view.Main', {
     extend: 'Ext.container.Container',
     xtype: 'app-mainview',
     requires: [
-        'Ext.layout.container.Fit',
+        'Ext.layout.container.Border',
         'EmergencePullTool.view.ChangesGrid',
         'EmergencePullTool.view.DiffPanel'
     ],

@@ -4,6 +4,10 @@
  */
 Ext.application({
     extend: 'EmergencePullTool.Application',
+    requires: [
+        'Ext.plugin.Viewport'
+    ],
+
 
     name: 'EmergencePullTool',
 
