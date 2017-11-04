@@ -35,6 +35,9 @@ Ext.define('EmergenceEditor.controller.Editors', {
         tabPanel: {
             tabchange: 'onTabChange',
             staterestore: 'onTabsStateRestore'
+        },
+        'acepanel': {
+            dirtychange: 'onAcePanelDirtyChange'
         }
     },
 
@@ -62,6 +65,10 @@ Ext.define('EmergenceEditor.controller.Editors', {
         if (path) {
             this.getApplication().setActiveView('/'+path, card.getTitle());
         }
+    },
+
+    onAcePanelDirtyChange: function(acePanel, isDirty) {
+        acePanel.tab.toggleCls('is-dirty', isDirty);
     },
 
 

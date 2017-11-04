@@ -8,6 +8,11 @@ Ext.define('EmergenceEditor.view.TabPanel', {
     ],
 
 
+    config: {
+        componentCls: 'emergence-tabpanel'
+    },
+
+
     listeners: {
         tabchange: function(tabpanel, newcard, oldcard, options) {
             var revisionsPanel = EmergenceEditor.app.viewport.down('emergence-file-revisions');

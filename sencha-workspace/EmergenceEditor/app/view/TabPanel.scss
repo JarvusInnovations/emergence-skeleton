@@ -1,0 +1,9 @@
+.emergence-tabpanel {
+    .x-tab.is-dirty {
+        .x-tab-inner:after {
+            content: '\f111';
+            font-family: FontAwesome;
+            margin-left: .5em;
+        }
+    }
+}
