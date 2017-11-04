@@ -65,8 +65,8 @@ Ext.define('EmergenceEditor.view.SimpleCodeViewer', {
         this.setSideTitle('A', 'Revision ' + this.sideAid);
         this.setSideTitle('B', 'Revision ' + this.sideBid);
 
-        EmergenceEditor.store.DavClient.getRevision(this.path, this.sideAid, this.readyCodeARequestHandler, this)
-        EmergenceEditor.store.DavClient.getRevision(this.path, this.sideBid, this.readyCodeBRequestHandler, this)
+        // EmergenceEditor.store.DavClient.getRevision(this.path, this.sideAid, this.readyCodeARequestHandler, this)
+        // EmergenceEditor.store.DavClient.getRevision(this.path, this.sideBid, this.readyCodeBRequestHandler, this)
     },
     readyCodeARequestHandler: function(response) {
         this.codeA = response.responseText.replace(/\r\n?/g, '\n');

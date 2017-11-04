@@ -21,13 +21,13 @@ Ext.define('EmergenceEditor.controller.Transfers', {
 
         }, this);
 
-        EmergenceEditor.store.DavClient.on('beforefileupload', this.onBeforeFileUpload, this);
-        EmergenceEditor.store.DavClient.on('afterfileupload', this.onAfterFileUpload, this);
-        EmergenceEditor.store.DavClient.on('fileuploadprogress', this.onFileUploadProgress, this);
+        // EmergenceEditor.store.DavClient.on('beforefileupload', this.onBeforeFileUpload, this);
+        // EmergenceEditor.store.DavClient.on('afterfileupload', this.onAfterFileUpload, this);
+        // EmergenceEditor.store.DavClient.on('fileuploadprogress', this.onFileUploadProgress, this);
 
-        EmergenceEditor.store.DavClient.on('beforerequest', this.onBeforeRequest, this);
-        EmergenceEditor.store.DavClient.on('requestcomplete', this.onRequestComplete, this);
-        EmergenceEditor.store.DavClient.on('requestexception', this.onRequestException, this);
+        // EmergenceEditor.store.DavClient.on('beforerequest', this.onBeforeRequest, this);
+        // EmergenceEditor.store.DavClient.on('requestcomplete', this.onRequestComplete, this);
+        // EmergenceEditor.store.DavClient.on('requestexception', this.onRequestException, this);
     },
 
     onBeforeFileUpload: function(path, DOMFile, XHRObject) {

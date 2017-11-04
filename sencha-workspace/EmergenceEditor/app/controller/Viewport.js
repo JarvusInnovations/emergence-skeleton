@@ -127,29 +127,29 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         var e = event.browserEvent;
 
         Ext.each(e.dataTransfer.files, function(file, index, files) {
-            EmergenceEditor.store.DavClient.putFile('/editor/import'
-                , file
-                , function() {
+            // EmergenceEditor.store.DavClient.putFile('/editor/import'
+            //     , file
+            //     , function() {
 
-                    /* uploadStatus[index] = true;
+            //         /* uploadStatus[index] = true;
 
-                    var done = true;
+            //         var done = true;
 
-                    Ext.each(uploadStatus, function(status, index, uploadStatus) {
-                        if(!status)
-                        {
-                            done = false;
-                        }
-                    }, this);
+            //         Ext.each(uploadStatus, function(status, index, uploadStatus) {
+            //             if(!status)
+            //             {
+            //                 done = false;
+            //             }
+            //         }, this);
 
-                    if(done) {
-                        this.afterDropUpload.call(this,record,e.dataTransfer.files);
-                    }*/
-                }
-                , function(percentage, event) {
-                    // console.log(percentage);
-                }
-                , this);
+            //         if(done) {
+            //             this.afterDropUpload.call(this,record,e.dataTransfer.files);
+            //         }*/
+            //     }
+            //     , function(percentage, event) {
+            //         // console.log(percentage);
+            //     }
+            //     , this);
         }, this);
     },
     onImportDragleave: function(event) {

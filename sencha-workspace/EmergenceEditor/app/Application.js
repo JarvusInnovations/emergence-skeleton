@@ -8,7 +8,6 @@ Ext.define('EmergenceEditor.Application', {
     requires: [
         'Ext.util.KeyMap', // TODO: move
         'Ext.state.LocalStorageProvider',
-        'EmergenceEditor.store.DavClient' // TODO: move
     ],
 
     name: 'EmergenceEditor',

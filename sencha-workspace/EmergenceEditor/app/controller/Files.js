@@ -121,27 +121,27 @@ Ext.define('EmergenceEditor.controller.Files', {
 
                 var path = record.raw.FullPath + '/' + file.name;
 
-                EmergenceEditor.store.DavClient.putDOMFile(path
-                    , file
-                    , function() {
-                        uploadStatus[index] = true;
+                // EmergenceEditor.store.DavClient.putDOMFile(path
+                //     , file
+                //     , function() {
+                //         uploadStatus[index] = true;
 
-                        var done = true;
+                //         var done = true;
 
-                        Ext.each(uploadStatus, function(status, index, uploadStatus) {
-                            if (!status) {
-                                done = false;
-                            }
-                        }, this);
+                //         Ext.each(uploadStatus, function(status, index, uploadStatus) {
+                //             if (!status) {
+                //                 done = false;
+                //             }
+                //         }, this);
 
-                        if (done) {
-                            this.afterDropUpload.call(this, record, e.dataTransfer.files);
-                        }
-                    }
-                    , function(percentage, event) {
-                        // console.log(percentage);
-                    }
-                    , this);
+                //         if (done) {
+                //             this.afterDropUpload.call(this, record, e.dataTransfer.files);
+                //         }
+                //     }
+                //     , function(percentage, event) {
+                //         // console.log(percentage);
+                //     }
+                //     , this);
             }, this);
         }
     },
@@ -222,14 +222,14 @@ Ext.define('EmergenceEditor.controller.Files', {
             from = record.data.FullPath;
             to = overModel.data.FullPath + '/' + record.data.text;
 
-            EmergenceEditor.store.DavClient.renameNode(from, to, function() {
-                if (record.parentNode) {
-                    if (!toRefresh[record.parentNode.raw.ID]) {
-                        toRefresh[record.parentNode.raw.ID] = true;
-                        this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
-                    }
-                }
-            }, this);
+            // EmergenceEditor.store.DavClient.renameNode(from, to, function() {
+            //     if (record.parentNode) {
+            //         if (!toRefresh[record.parentNode.raw.ID]) {
+            //             toRefresh[record.parentNode.raw.ID] = true;
+            //             this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
+            //         }
+            //     }
+            // }, this);
         }, this);
     },
 
@@ -306,9 +306,9 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newFile = this.currentRecord.raw.FullPath + '/' + value;
 
-                EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
-                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
-                }, this);
+                // EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
+                //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
+                // }, this);
             }
         }, this);
     },
@@ -317,9 +317,9 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newFolder = this.currentRecord.raw.FullPath + '/' + value;
 
-                EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
-                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
-                }, this);
+                // EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
+                //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
+                // }, this);
             }
         }, this);
     },
@@ -335,18 +335,18 @@ Ext.define('EmergenceEditor.controller.Files', {
             if (button == 'ok' && !Ext.isEmpty(value)) {
                 var newPath = this.currentRecord.parentNode.raw.FullPath + '/' + value;
 
-                EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
-                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-                }, this);
+                // EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
+                //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                // }, this);
             }
         }, this, false, this.currentRecord.raw.Handle);
     },
     onDeleteClick: function(menuItem, event, options) {
         Ext.Msg.confirm('Delete File', 'Are you sure you want to delete ' + this.currentRecord.raw.Handle + '?', function(button, value, options) {
             if (button == 'yes') {
-                EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
-                    this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-                }, this);
+                // EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
+                //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
+                // }, this);
             }
         }, this);
     },
@@ -373,14 +373,14 @@ Ext.define('EmergenceEditor.controller.Files', {
         Ext.Msg.confirm('Delete Multiple Items', 'Are you sure you want to delete these ' + selection.length + ' items?', function(button, value, options) {
             if (button == 'yes') {
                 Ext.each(selection, function(record) {
-                    EmergenceEditor.store.DavClient.deleteNode(record.raw.FullPath, function() {
-                        if (record.parentNode) {
-                            if (!toRefresh[record.parentNode.raw.ID]) {
-                                toRefresh[record.parentNode.raw.ID] = true;
-                                this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
-                            }
-                        }
-                    }, this);
+                    // EmergenceEditor.store.DavClient.deleteNode(record.raw.FullPath, function() {
+                    //     if (record.parentNode) {
+                    //         if (!toRefresh[record.parentNode.raw.ID]) {
+                    //             toRefresh[record.parentNode.raw.ID] = true;
+                    //             this.getFilesTreeStore().refreshNodeByRecord(record.parentNode);
+                    //         }
+                    //     }
+                    // }, this);
                 }, this);
             }
         }, this);
