@@ -1,5 +1,5 @@
 Ext.define('EmergenceEditor.view.FullscreenViewport', {
-    extend: 'Ext.container.Viewport',
+    extend: 'Ext.container.Container',
     requires: [
         'EmergenceEditor.view.TabPanel',
         'EmergenceEditor.view.TransfersGrid',

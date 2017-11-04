@@ -6,10 +6,9 @@
 Ext.define('EmergenceEditor.Application', {
     extend: 'Ext.app.Application',
     requires: [
-        'Ext.util.KeyMap',
+        'Ext.util.KeyMap', // TODO: move
         'Ext.state.LocalStorageProvider',
-        'EmergenceEditor.store.DavClient',
-        'EmergenceEditor.view.FullscreenViewport'
+        'EmergenceEditor.store.DavClient' // TODO: move
     ],
 
     name: 'EmergenceEditor',
@@ -30,23 +29,33 @@ Ext.define('EmergenceEditor.Application', {
         'Activity'
     ],
 
+    views: [
+        'Viewport',
+        'FullscreenViewport'
+    ],
+
+
     launch: function() {
+        var me = this,
+            launchParams = me.launchParams = Ext.Object.fromQueryString(location.search);
+
         // Create viewport
-        if (location.search.match(/\Wfullscreen\W/)) {
-            this.viewport = Ext.create('EmergenceEditor.view.FullscreenViewport');
+        if (launchParams.fullscreen) {
+            me.setMainView('FullscreenViewport');
         } else {
             // initialize state manager
             Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
 
-            this.viewport = Ext.create('EmergenceEditor.view.Viewport');
+            me.setMainView('Viewport');
         }
 
         // remove loading class
         Ext.getBody().removeCls('loading');
 
         // get ref to title tag
-        this.titleDom = document.querySelector('title');
+        me.titleDom = document.querySelector('title');
     },
+
 
     // todo: make this ask the tab for the title and moving this to ontabchange
     setActiveView: function(token, title) {
