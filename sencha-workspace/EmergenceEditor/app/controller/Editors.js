@@ -1,6 +1,9 @@
 Ext.define('EmergenceEditor.controller.Editors', {
     extend: 'Ext.app.Controller',
     requires: [
+        'Ext.util.KeyMap',
+        'Ext.window.MessageBox',
+
         /* global EmergenceEditor */
         'EmergenceEditor.DAV'
     ],
@@ -42,6 +45,30 @@ Ext.define('EmergenceEditor.controller.Editors', {
     },
 
 
+    // lifecycle methods
+    onLaunch: function() {
+        var me = this;
+
+        // init keymap
+        me.keyMap = Ext.create('Ext.util.KeyMap', {
+            target: document,
+            binding: [{
+                key: 's',
+                ctrl: true,
+                defaultEventAction: 'stopEvent',
+                scope: me,
+                handler: me.onSaveKey
+            // }, {
+            //     key: 'f',
+            //     ctrl: true,
+            //     defaultEventAction: 'stopEvent',
+            //     scope: me,
+            //     handler: me.onFindKey
+            }]
+        });
+    },
+
+
     // route handlers
     showPath: function(path, line) {
         this.openPath(path, line);
@@ -67,9 +94,37 @@ Ext.define('EmergenceEditor.controller.Editors', {
         }
     },
 
-    onAcePanelDirtyChange: function(acePanel, isDirty) {
-        acePanel.tab.toggleCls('is-dirty', isDirty);
+    onAcePanelDirtyChange: function(acePanel, dirty) {
+        acePanel.tab.toggleCls('is-dirty', dirty);
     },
+
+    onSaveKey: function() {
+        var card = this.getTabPanel().getActiveTab(),
+            tab = card.tab;
+
+        if (!card.isXType('acepanel') || !card.isDirty()) {
+            return;
+        }
+
+        tab.addCls('is-saving');
+        card.withContent(function(content) {
+            EmergenceEditor.DAV.uploadFile(card.getPath(), content, function(options, success, response) {
+                tab.removeCls('is-saving');
+
+                if (success) {
+                    card.markClean();
+                }
+
+                if (!success && response.status) {
+                    Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
+                }
+            });
+        });
+    },
+
+    // onFindKey: function() {
+    //     debugger;
+    // },
 
 
     // local methods

@@ -101,25 +101,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         // init history
         // Ext.util.History.init(this.onHistoryChange, this);
         // Ext.util.History.on('change', this.onHistoryChange, this);
-
-        // init keymap
-        this.keyMap = Ext.create('Ext.util.KeyMap', document, [{
-            key: 's',
-            ctrl: true,
-            defaultEventAction: 'stopEvent',
-            scope: this,
-            handler: function() {
-                this.application.fireEvent('filesave');
-            }
-        }, {
-            key: 'f',
-            ctrl: true,
-            defaultEventAction: 'stopEvent',
-            scope: this,
-            handler: function() {
-                this.onFindClick();
-            }
-        }]);
     },
     onImportDrop: function(event) {
         event.preventDefault();
