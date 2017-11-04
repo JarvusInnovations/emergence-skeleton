@@ -78,7 +78,7 @@ class ServerPlugin extends \Sabre\DAV\ServerPlugin
                     $node = $this->server->tree->getNodeForPath($uri);
                 }
 
-                $this->server->httpResponse->setHeader('X-VFS-ID',$node->ID);
+                $this->server->httpResponse->setHeader('X-Revision-ID', $node->ID);
                 break;
             case 'PUT' :
                 if (stripos($uri, '_parent/') === 0) {
