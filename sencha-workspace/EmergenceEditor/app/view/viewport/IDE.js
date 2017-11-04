@@ -1,4 +1,4 @@
-Ext.define('EmergenceEditor.view.Viewport', {
+Ext.define('EmergenceEditor.view.viewport.IDE', {
     extend: 'Ext.container.Container',
     requires: [
         'EmergenceEditor.view.Menubar',

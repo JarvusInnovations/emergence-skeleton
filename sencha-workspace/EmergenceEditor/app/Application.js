@@ -30,8 +30,8 @@ Ext.define('EmergenceEditor.Application', {
     ],
 
     views: [
-        'Viewport',
-        'FullscreenViewport'
+        'viewport.IDE',
+        'viewport.FullEditor'
     ],
 
 
@@ -41,12 +41,12 @@ Ext.define('EmergenceEditor.Application', {
 
         // Create viewport
         if (launchParams.fullscreen) {
-            me.setMainView('FullscreenViewport');
+            me.setMainView('viewport.FullEditor');
         } else {
             // initialize state manager
             Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
 
-            me.setMainView('Viewport');
+            me.setMainView('viewport.IDE');
         }
 
         // remove loading class
