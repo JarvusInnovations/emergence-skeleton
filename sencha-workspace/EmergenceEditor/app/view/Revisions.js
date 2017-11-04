@@ -1,15 +1,20 @@
 /* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.view.Revisions', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.emergence-file-revisions',
+    xtype: 'emergence-revisions',
     requires: [
         'Ext.grid.column.Template',
         'Ext.grid.column.Number',
         'Ext.util.Format'
     ],
 
+
+    title: 'Revision History',
     store: 'Revisions',
-    componentCls: 'emergence-file-revisions',
+    componentCls: 'emergence-revisions',
+    icon: '/img/icons/fugue/edit-diff.png',
+    stateId: 'emergence-revisions',
+    stateful: true,
 
 
     initComponent: function() {
@@ -22,6 +27,7 @@ Ext.define('EmergenceEditor.view.Revisions', {
         this.columns = [{
             header: 'Timestamp',
             dataIndex: 'Timestamp',
+            align: 'left',
             renderer: function(mtime) {
                 var now = new Date(),
                     str = Ext.util.Format.date(mtime, 'g:i a');
@@ -51,6 +57,7 @@ Ext.define('EmergenceEditor.view.Revisions', {
             header: 'Size',
             dataIndex: 'Size',
             width: 60,
+            align: 'left',
             xtype: 'templatecolumn',
             tpl: [
                 '<tpl if="Status==\'Deleted\'">',

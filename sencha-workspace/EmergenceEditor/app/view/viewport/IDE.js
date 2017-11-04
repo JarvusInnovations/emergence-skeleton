@@ -1,7 +1,7 @@
 Ext.define('EmergenceEditor.view.viewport.IDE', {
     extend: 'Ext.container.Container',
     requires: [
-        'EmergenceEditor.view.Menubar',
+        'EmergenceEditor.view.Toolbar',
         'EmergenceEditor.view.FilesTree',
         'EmergenceEditor.view.TabPanel',
         'EmergenceEditor.view.Revisions',
@@ -12,52 +12,29 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
 
     layout: 'border',
 
-    initComponent: function() {
-        // console.info('Emergence.Editor.view.Viewport.initComponent()');
+    items: [{
+        region: 'west',
+        split: true,
 
+        xtype: 'emergence-filestree',
+        width: 200,
+        collapsible: true
+    }, {
+        region: 'center',
 
-        this.items = [{
-            xtype: 'emergence-menubar',
-            region: 'north'
-            // ,html: 'Emergence Development Environment'
-        }, {
-            xtype: 'emergence-filestree',
-            region: 'west',
-            stateId: 'viewport-files',
-            stateful: true,
-            title: 'Files',
-            width: 200,
-            collapsible: true,
-            split: true
-        }, {
-            xtype: 'emergence-tabpanel',
-            region: 'center'
-        }, {
-            //            xtype: 'tabpanel'
-            title: 'Revision History',
-            xtype: 'emergence-file-revisions',
-            icon: '/img/icons/fugue/edit-diff.png',
-            region: 'east',
-            stateId: 'viewport-details',
-            width: 275,
-            collapsible: true,
-            collapsed: true,
-            split: true
-            //            ,preventHeader: true
-            //            ,items: [
-            //                {
-            //                    title: 'Revisions'
-            //                    ,xtype: 'emergence-file-revisions'
-            //                    ,icon: '/img/icons/fugue/edit-diff.png'
-            //                }
-            //                /*,{
-            //                    title: 'Code Navigator'
-            //                }*/
-            //            ]
-        }];
+        xtype: 'emergence-tabpanel',
+        dockedItems: [{
+            dock: 'top',
 
-        this.callParent();
+            xtype: 'emergence-toolbar'
+        }]
+    }, {
+        region: 'east',
+        split: true,
 
-    }
-
+        xtype: 'emergence-revisions',
+        width: 275,
+        collapsible: true,
+        collapsed: true
+    }]
 });

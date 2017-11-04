@@ -7,6 +7,7 @@ Ext.define('EmergenceEditor.view.FilesTree', {
 
 
     stateId: 'editor-filestree',
+    stateful: true,
     store: 'FilesTree',
     title: 'Filesystem',
     useArrows: true,

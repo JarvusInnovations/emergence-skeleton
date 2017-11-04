@@ -8,8 +8,8 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     refs: [{
         ref: 'revisionsGrid',
         autoCreate: true,
-        selector: 'emergence-file-revisions',
-        xtype: 'emergence-file-revisions'
+        selector: 'emergence-revisions',
+        xtype: 'emergence-revisions'
     }, {
         ref: 'revisionsMenu',
         autoCreate: true,
@@ -32,7 +32,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
         // Start listening for events on views
         this.control({
-            'emergence-file-revisions': {
+            'emergence-revisions': {
                 itemdblclick: this.openRevision,
                 itemcontextmenu: this.onRevisionContextMenu
             },

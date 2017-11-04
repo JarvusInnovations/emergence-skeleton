@@ -4,9 +4,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
     requires: ['Ext.util.History'],
 
     refs: [{
-        ref: 'menubar',
-        selector: 'emergence-menubar'
-    }, {
         ref: 'tabPanel',
         selector: 'emergence-tabpanel'
     }, {
@@ -19,7 +16,7 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         selector: 'textfield[name=globalSearch]'
     }, {
         ref: 'revisionsPanel',
-        selector: 'emergence-file-revisions'
+        selector: 'emergence-revisions'
     }, {
         ref: 'findWindow',
         autoCreate: true,
@@ -32,28 +29,13 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         xtype: 'emergence-import-window'
     }],
     stores: ['SiteSearch'],
-    views: ['Menubar', 'Activity', 'SimpleCodeViewer', 'SiteTools', 'window.Find', 'SearchResults', 'window.Import'],
+    views: ['Activity', 'SimpleCodeViewer', 'SiteTools', 'window.Find', 'SearchResults', 'window.Import'],
 
     init: function() {
         // console.info('Emergence.Editor.controller.Viewport.init()');
 
         // Start listening for events on views
         this.control({
-            'emergence-menubar menuitem[action=site-tools]': {
-                click: this.onSiteToolsClick
-            },
-            'emergence-menubar menuitem[action=import]': {
-                click: this.onImportClick
-            },
-            'emergence-menubar menuitem[action=save]': {
-                click: this.onSaveClick
-            },
-            'emergence-menubar menuitem[action=find]': {
-                click: this.onFindClick
-            },
-            'emergence-menubar textfield[action=help-lookup]': {
-                specialkey: this.onHelpLookupSpecialKey
-            },
             'emergence-find-window': {
                 show: this.onFindShow
             },
@@ -220,26 +202,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
     //         this.getTabPanel().getLayout().setActiveItem(navPath);
     //     }
     // },
-    onImportClick: function(item, event, opts) {
-        this.getImportWindow().show();
-        this.getImportWindow().el.on('dragover', this.onImportDragover, this);
-        this.getImportWindow().el.on('dragleave', this.onImportDragleave, this);
-        this.getImportWindow().el.on('drop', this.onImportDrop, this);
-    },
-    onSiteToolsClick: function(item, event, opts) {
-        this.getSiteTools().show();
-    },
-    onHelpLookupSpecialKey: function(field, event) {
-        if (event.getKey() == event.ENTER) {
-            window.open('http://emr.ge/classes/'+field.getValue());
-        }
-    },
-    onSaveClick: function() {
-        this.application.fireEvent('filesave');
-    },
-    onFindShow: function(window, options) {
-        window.down('textfield[name=find]').focus('', true);
-    },
     onFindSpecialKey: function(field, event) {
         if (event.getKey() == event.ENTER) {
             this.onFindButtonClick();
