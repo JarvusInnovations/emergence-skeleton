@@ -97,8 +97,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
         }
 
         EmergenceEditor.DAV.downloadFile(path, function(options, success, response) {
-            editor.onReady(function (newEditor, aceEditor, aceSession) {
-                aceSession.setValue(response.responseText);
+            editor.loadContent(response.responseText, function () {
                 editor.setLoading(false);
             });
         });
