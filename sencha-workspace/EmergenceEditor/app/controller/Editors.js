@@ -5,7 +5,10 @@ Ext.define('EmergenceEditor.controller.Editors', {
         'Ext.window.MessageBox',
 
         /* global EmergenceEditor */
-        'EmergenceEditor.DAV'
+        'EmergenceEditor.DAV',
+
+        /* global Jarvus */
+        'Jarvus.ace.Util'
     ],
 
 
@@ -148,7 +151,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
         tabPanel.add(editor);
 
         editor.setLoading({
-            msg: 'Opening ' + path.substr(path.lastIndexOf('/') + 1) + '&hellip;'
+            msg: 'Opening ' + Jarvus.ace.Util.basename(path) + '&hellip;'
         });
 
         if (activate) {
