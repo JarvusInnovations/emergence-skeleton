@@ -108,14 +108,11 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
         tab.addCls('is-saving');
         card.withContent(function(content) {
-            EmergenceEditor.DAV.uploadFile(card.getPath(), content, function(options, success, response) {
+            EmergenceEditor.DAV.uploadFile(card.getPath(), content).then(function(response) {
                 tab.removeCls('is-saving');
-
-                if (success) {
-                    card.markClean();
-                }
-
-                if (!success && response.status) {
+                card.markClean();
+            }).catch(function(response) {
+                if (response.status) {
                     Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
                 }
             });
@@ -158,7 +155,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
             tabPanel.setActiveTab(editor);
         }
 
-        EmergenceEditor.DAV.downloadFile(path, function(options, success, response) {
+        EmergenceEditor.DAV.downloadFile(path).then(function(response) {
             editor.loadContent(response.responseText, function () {
                 editor.setLoading(false);
             });
