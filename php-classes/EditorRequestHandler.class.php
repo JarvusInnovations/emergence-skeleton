@@ -152,7 +152,12 @@ class EditorRequestHandler extends RequestHandler
     {
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
-        $node = SiteFile::getByID($_REQUEST['ID']);
+        if (!empty($_REQUEST['ID'])) {
+            $node = SiteFile::getByID($_REQUEST['ID']);
+        } elseif (!empty($_REQUEST['path'])) {
+            $node = Site::resolvePath($_REQUEST['path']);
+        }
+
         if (!$node) {
             return static::throwNotFoundError();
         } else {
