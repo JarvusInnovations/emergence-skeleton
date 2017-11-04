@@ -1,50 +1,38 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
 Ext.define('EmergenceEditor.controller.Activity', {
     extend: 'Ext.app.Controller',
 
-    views: ['Activity'],
-    stores: ['ActivityStream'],
-    models: ['ActivityEvent'],
 
-    refs: [{
-        ref: 'activityStream',
-        selector: 'emergence-activity dataview'
-    }],
+    stores: [
+        'ActivityStream'
+    ],
 
-    onLaunch: function() {
-        // console.info('Emergence.Editor.controller.Activity.onLaunch()');
-        var activityStream = this.getActivityStream();
+    refs: {
+        activityPanel: 'emergence-activity'
+    },
 
-        if (activityStream) {
-            if (activityStream.isVisible()) {
-                this.loadActivity();
-            } else {
-                activityStream.on('activate', this.loadActivity, this, { single: true });
-            }
+    control: {
+        activityPanel: {
+            activate: 'onActivityPanelActivate'
+        },
+        'emergence-activity button[action=refresh]': {
+            click: 'onRefreshClick'
+        },
+        'emergence-activity button[action=load-all]': {
+            click: 'onLoadAllClick'
         }
     },
 
-    init: function() {
-        // console.info('Emergence.Editor.controller.Activity.init()');
 
-        // Start listening for events on views
-        this.control({
-            'emergence-activity button[action=refresh]': {
-                click: this.loadActivity
-            },
-            'emergence-activity button[action=load-all]': {
-                click: this.loadAllActivity
-            }
-        });
+    onActivityPanelActivate: function() {
+        this.getActivityStreamStore().load();
     },
 
-
-    loadActivity: function() {
-        this.getActivityStream().getStore().load();
+    onRefreshClick: function() {
+        this.getActivityStreamStore().load();
     },
 
-    loadAllActivity: function() {
-        this.getActivityStream().getStore().load({
+    onLoadAllClick: function() {
+        this.getActivityStreamStore().load({
             url: '/editor/activity/all'
         });
     }

@@ -1,0 +1,134 @@
+.emergence-activity {
+    font-size: 13px;
+
+    a {
+        color: black;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .user,
+    .action,
+    .file,
+    .timestamp {
+        border-bottom: 1px solid white;
+        display: table-cell;
+        padding: .5em;
+        white-space: nowrap;
+    }
+
+    .user {
+        font-weight: bold;
+
+        img {
+            background-position: center center;
+            background-repeat: no-repeat;
+            -moz-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            margin: -7px;
+            margin-right: .5em;
+            vertical-align: -3px;
+        }
+
+        figcaption {
+            display: inline;
+        }
+    }
+
+    .user,
+    .action,
+    .compare,
+    .revisions,
+    .timestamp {
+        font-size: smaller;
+        text-transform: uppercase;
+    }
+
+    .action {
+        .deleted { color: hsl(0, 80%, 35%); }
+        .edited  { color: hsl(212, 80%, 35%); }
+        .created { color: hsl(105, 100%, 25%); }
+    }
+
+    .path,
+    .filename {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Droid Sans Mono', 'Courier New', monospace
+    }
+
+    .path {
+        color: rgba(0,0,0,.5);
+        width: 100%;
+    }
+
+    .revisions {
+        float: right;
+        margin-left: 1em;
+        padding: .25em 0;
+    }
+
+    .compare {
+        border: 1px solid rgba(255,255,255,.5);
+        border-radius: 1em;
+        color: white;
+        margin-left: 1em;
+        padding: 1px 5px;
+        visibility: hidden;
+
+        &:hover {
+            border-color: white;
+        }
+
+        &:active {
+            background: rgba(255,255,255,.25);
+        }
+    }
+
+    .timestamp {
+        color: rgba(0,0,0,.5);
+    }
+
+    .activity-feed {
+        border-top: 1px solid white;
+        display: table;
+        width: 100%;
+    }
+
+    article {
+        display: table-row;
+
+        &:nth-child(even) {
+            background: hsla(212, 25%, 90%, .5);
+        }
+
+        &:hover {
+            background: hsl(212, 25%, 50%);
+            background: -webkit-linear-gradient(
+                hsl(212, 25%, 50%),
+                hsl(212, 25%, 40%)
+            );
+            color: white;
+
+            .path {
+                color: rgba(255,255,255,.5);
+            }
+
+            .compare {
+                text-decoration: none;
+                visibility: visible;
+            }
+
+            .timestamp {
+                color: rgba(255,255,255,.5);
+            }
+        }
+
+        &:hover .action,
+        &:hover a {
+            color: white;
+        }
+    }
+}
