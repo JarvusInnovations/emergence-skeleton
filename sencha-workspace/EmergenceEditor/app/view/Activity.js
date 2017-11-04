@@ -71,7 +71,7 @@ Ext.define('EmergenceEditor.view.Activity', {
             '            <span class="revisions"><span class="count">{revisionsCount}</span> times</span>',
             '        </tpl>',
             '        <tpl if="FirstAncestorID && RevisionID">',
-            '            <a class="compare" href="#diff:[{FirstAncestorID},{RevisionID}]/{CollectionPath}/{Handle}">compare</a>',
+            '            <a class="compare" href="#diff?from={CollectionPath}/{Handle}@{FirstAncestorID}&to=@{RevisionID}">compare</a>',
             '        </tpl>',
             '    </span>',
             '</tpl>',
