@@ -24,7 +24,11 @@ Ext.define('EmergenceEditor.controller.Activity', {
 
 
     onActivityPanelActivate: function() {
-        this.getActivityStreamStore().load();
+        var store = this.getActivityStreamStore();
+
+        if (!store.isLoaded() && !store.isLoading()) {
+            store.load();
+        }
     },
 
     onRefreshClick: function() {
