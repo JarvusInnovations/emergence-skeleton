@@ -27,6 +27,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
     refs: {
         tabPanel: 'tabpanel',
+
         editorPanel: {
             selector: 'acepanel',
             forceCreate: true,
@@ -34,7 +35,9 @@ Ext.define('EmergenceEditor.controller.Editors', {
             xtype: 'acepanel',
             closable: true,
             title: 'Editor'
-        }
+        },
+
+        saveBtn: 'emergence-toolbar button[action=save]'
     },
 
     control: {
@@ -44,6 +47,9 @@ Ext.define('EmergenceEditor.controller.Editors', {
         },
         'acepanel': {
             dirtychange: 'onAcePanelDirtyChange'
+        },
+        saveBtn: {
+            click: 'onSaveBtnClick'
         }
     },
 
@@ -90,36 +96,27 @@ Ext.define('EmergenceEditor.controller.Editors', {
     },
 
     onTabChange: function(tabPanel, card) {
-        var path = card.isXType('acepanel') && card.getPath();
+        var isEditor = card.isXType('acepanel'),
+            path = isEditor && card.getPath();
 
         if (path) {
             this.getApplication().setActiveView('/'+path, card.getTitle());
         }
+
+        this.getSaveBtn().setDisabled(!isEditor || !card.isDirty());
     },
 
     onAcePanelDirtyChange: function(acePanel, dirty) {
         acePanel.tab.toggleCls('is-dirty', dirty);
+        this.getSaveBtn().setDisabled(!dirty);
+    },
+
+    onSaveBtnClick: function() {
+        this.saveActive();
     },
 
     onSaveKey: function() {
-        var card = this.getTabPanel().getActiveTab(),
-            tab = card.tab;
-
-        if (!card.isXType('acepanel') || !card.isDirty()) {
-            return;
-        }
-
-        tab.addCls('is-saving');
-        card.withContent(function(content) {
-            EmergenceEditor.DAV.uploadFile(card.getPath(), content).then(function(response) {
-                tab.removeCls('is-saving');
-                card.markClean();
-            }).catch(function(response) {
-                if (response.status) {
-                    Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
-                }
-            });
-        });
+        this.saveActive();
     },
 
     // onFindKey: function() {
@@ -164,6 +161,27 @@ Ext.define('EmergenceEditor.controller.Editors', {
             });
         });
     },
+
+    saveActive: function() {
+        var card = this.getTabPanel().getActiveTab(),
+            tab = card.tab;
+
+        if (!card.isXType('acepanel') || !card.isDirty()) {
+            return;
+        }
+
+        tab.addCls('is-saving');
+        card.withContent(function(content) {
+            EmergenceEditor.DAV.uploadFile(card.getPath(), content).then(function(response) {
+                tab.removeCls('is-saving');
+                card.markClean();
+            }).catch(function(response) {
+                if (response.status) {
+                    Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
+                }
+            });
+        });
+    }
 
     // init: function() {
     //     var me = this;
