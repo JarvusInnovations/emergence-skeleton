@@ -30,9 +30,9 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             itemdblclick: 'onRevisionDoubleClick',
             itemcontextmenu: 'onRevisionContextMenu'
         },
-        // 'emergence-revisionsmenu > menuitem[action=open]': {
-        //     click: this.onOpenClick
-        // },
+        'emergence-revisionmenu menuitem[action=revision-open]': {
+            click: 'onOpenClick'
+        },
         // 'emergence-revisionsmenu > menuitem[action=properties]': {
         //     click: this.onPropertiesClick
         // },
@@ -93,6 +93,10 @@ Ext.define('EmergenceEditor.controller.Revisions', {
         revisionMenu.showAt(event.getXY());
 
     },
+
+    onOpenClick: function(menuItem) {
+        this.redirectTo(menuItem.up('menu').getRevision());
+    }
 
 
 
