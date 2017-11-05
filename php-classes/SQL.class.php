@@ -147,6 +147,8 @@ class SQL
 
             case 'timestamp':
                 return 'timestamp';
+            case 'datetime':
+                return 'datetime';
             case 'time':
                 return 'time';
             case 'date':
