@@ -97,13 +97,16 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
     onTabChange: function(tabPanel, card) {
         var isEditor = card.isXType('acepanel'),
-            path = isEditor && card.getPath();
+            path = isEditor && card.getPath(),
+            saveBtn = this.getSaveBtn();
 
         if (path) {
             this.getApplication().setActiveView('/'+path, card.getTitle());
         }
 
-        this.getSaveBtn().setDisabled(!isEditor || !card.isDirty());
+        if (saveBtn) {
+            saveBtn.setDisabled(!isEditor || !card.isDirty());
+        }
     },
 
     onAcePanelDirtyChange: function(acePanel, dirty) {
