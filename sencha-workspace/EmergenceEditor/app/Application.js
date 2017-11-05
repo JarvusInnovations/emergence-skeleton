@@ -12,6 +12,8 @@ Ext.define('EmergenceEditor.Application', {
 
     name: 'EmergenceEditor',
 
+    defaultToken: 'activity',
+
     quickTips: false,
     platformConfig: {
         desktop: {

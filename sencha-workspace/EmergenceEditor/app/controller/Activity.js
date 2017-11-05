@@ -6,11 +6,19 @@ Ext.define('EmergenceEditor.controller.Activity', {
         'ActivityStream'
     ],
 
+    routes: {
+        'activity': 'showActivity'
+    },
+
     refs: {
+        tabPanel: 'tabpanel',
         activityPanel: 'emergence-activity'
     },
 
     control: {
+        tabPanel: {
+            tabchange: 'onTabChange'
+        },
         activityPanel: {
             activate: 'onActivityPanelActivate'
         },
@@ -22,6 +30,19 @@ Ext.define('EmergenceEditor.controller.Activity', {
         }
     },
 
+
+    // route handlers
+    showActivity: function() {
+        this.getTabPanel().setActiveTab(this.getActivityPanel());
+    },
+
+
+    // event handlers
+    onTabChange: function(tabPanel, card, oldCard) {
+        if (oldCard && card === this.getActivityPanel()) {
+            this.getApplication().setActiveView('activity', 'Activity');
+        }
+    },
 
     onActivityPanelActivate: function() {
         var store = this.getActivityStreamStore();
