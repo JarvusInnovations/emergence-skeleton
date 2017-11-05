@@ -7,32 +7,20 @@ Ext.define('EmergenceEditor.view.viewport.FullEditor', {
     ],
 
 
-    layout: 'border',
+    layout: 'fit',
 
-    initComponent: function() {
-        this.items = [{
-            xtype: 'emergence-tabpanel',
-            region: 'center',
-            singleFile: true,
-            listeners: {
-                scope: this,
-                tabchange: function(tabPanel, newCard, oldCard) {
-                    tabPanel.getTabBar().show();
-                    tabPanel.doComponentLayout();
-                },
-                remove: function(tabPanel, oldCard) {
-                    if (!tabPanel.is('emergence-tabpanel')) {
-                        return true;
-                    }
-
-                    if (tabPanel.items.getCount() == 1) {
-                        tabPanel.getTabBar().hide();
-                        tabPanel.doComponentLayout();
-                    }
+    items: [{
+        xtype: 'emergence-tabpanel',
+        singleFile: true,
+        listeners: {
+            tabchange: function(tabPanel) {
+                tabPanel.getTabBar().show();
+            },
+            remove: function(tabPanel) {
+                if (tabPanel.items.getCount() == 1) {
+                    tabPanel.getTabBar().hide();
                 }
             }
-        }];
-
-        this.callParent();
-    }
+        }
+    }]
 });
