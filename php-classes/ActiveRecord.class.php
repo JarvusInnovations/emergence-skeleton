@@ -2003,6 +2003,7 @@ class ActiveRecord
 
             // apply type-dependent transformations
             switch ($fieldOptions['type']) {
+                case 'datetime':
                 case 'timestamp':
                 {
                     if (!isset($this->_convertedValues[$field])) {
@@ -2214,6 +2215,7 @@ class ActiveRecord
                 break;
             }
 
+            case 'datetime':
             case 'timestamp':
             {
                 if (is_numeric($value)) {
@@ -2570,7 +2572,7 @@ class ActiveRecord
             if (($options['type'] == 'date') && ($value == '0000-00-00') && !empty($options['blankisnull'])) {
                 $value = null;
             }
-            if (($options['type'] == 'timestamp')) {
+            if ($options['type'] == 'timestamp' || $options['type'] == 'datetime') {
                 if (is_numeric($value)) {
                     $value = date('Y-m-d H:i:s', $value);
                 } elseif ($value == '0000-00-00 00:00:00') {
