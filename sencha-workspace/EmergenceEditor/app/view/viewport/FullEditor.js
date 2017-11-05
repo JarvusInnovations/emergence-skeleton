@@ -11,7 +11,10 @@ Ext.define('EmergenceEditor.view.viewport.FullEditor', {
 
     items: [{
         xtype: 'emergence-tabpanel',
-        singleFile: true,
+        tabBar: {
+            hidden: true
+        },
+        stateful: false,
         listeners: {
             tabchange: function(tabPanel) {
                 tabPanel.getTabBar().show();

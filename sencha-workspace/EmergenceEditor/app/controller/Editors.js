@@ -42,8 +42,9 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
     control: {
         tabPanel: {
+            staterestore: 'onTabsStateRestore',
             tabchange: 'onTabChange',
-            staterestore: 'onTabsStateRestore'
+            beforetabmenu: 'onBeforeTabMenu'
         },
         'acepanel': {
             dirtychange: 'onAcePanelDirtyChange'
@@ -106,6 +107,33 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
         if (saveBtn) {
             saveBtn.setDisabled(!isEditor || !card.isDirty());
+        }
+    },
+
+    onBeforeTabMenu: function(menu, card) {
+        var tearItem = menu.getComponent('tear'),
+            cardPath = card.isXType('acepanel') && card.getPath(),
+            params = cardPath && Ext.applyIf({
+                fullscreen: true
+            }, this.getApplication().launchParams),
+            url = cardPath && '?' + Ext.urlEncode(params) + '#/' + cardPath;
+
+        if (tearItem) {
+            tearItem.itemEl.set({
+                href: url
+            });
+        } else {
+            menu.insert(0, [
+                {
+                    itemId: 'tear',
+                    text: 'Link to fullscreen',
+                    hrefTarget: '_blank',
+                    href: url
+                },
+                {
+                    xtype: 'menuseparator'
+                }
+            ]);
         }
     },
 

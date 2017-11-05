@@ -40,15 +40,11 @@ Ext.define('EmergenceEditor.Application', {
         var me = this,
             launchParams = me.launchParams = Ext.Object.fromQueryString(location.search);
 
-        // Create viewport
-        if (launchParams.fullscreen) {
-            me.setMainView('viewport.FullEditor');
-        } else {
-            // initialize state manager
-            Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+        // initialize state manager
+        Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
 
-            me.setMainView('viewport.IDE');
-        }
+        // initialize viewport
+        me.setMainView(launchParams.fullscreen ? 'viewport.FullEditor' : 'viewport.IDE');
 
         // remove loading class
         Ext.getBody().removeCls('loading');
