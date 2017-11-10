@@ -157,6 +157,7 @@ class MigrationsRequestHandler extends \RequestHandler
         foreach (Emergence_FS::getTreeFiles('php-migrations') AS $migrationPath => $migrationNodeData) {
             $migrationKey = preg_replace('#^php-migrations/(.*)\.php$#i', '$1', $migrationPath);
             $migrationRecord = array_key_exists($migrationKey, $migrationRecords) ? $migrationRecords[$migrationKey] : null;
+            preg_match('#^(\d{8})(\d*)#', basename($migrationKey), $matches);
 
             $migrations[$migrationKey] = [
                 'key' => $migrationKey,
@@ -164,15 +165,21 @@ class MigrationsRequestHandler extends \RequestHandler
                 'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
                 'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
                 'sha1' => $migrationNodeData['SHA1'],
-                'sequence' => preg_match('#(\d+)_[^/]+$#', $migrationKey, $matches) ? (int)$matches[1] : 0
+                'sequence' => $matches && $matches[1] ? (int)$matches[1] : 0,
+                'sequenceTime' => $matches && $matches[2] ? (int)$matches[2] : 0
             ];
         }
 
         // sort migrations by sequence
         uasort($migrations, function($a, $b) {
             if ($a['sequence'] == $b['sequence']) {
-                return 0;
+                if ($a['sequenceTime'] == $b['sequenceTime']) {
+                    return 0;
+                }
+
+                return ($a['sequenceTime'] < $b['sequenceTime']) ? -1 : 1;
             }
+
             return ($a['sequence'] < $b['sequence']) ? -1 : 1;
         });
 
