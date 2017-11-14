@@ -15,9 +15,6 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         ref: 'searchInput',
         selector: 'textfield[name=globalSearch]'
     }, {
-        ref: 'revisionsPanel',
-        selector: 'emergence-revisions'
-    }, {
         ref: 'findWindow',
         autoCreate: true,
         selector: 'emergence-find-window',

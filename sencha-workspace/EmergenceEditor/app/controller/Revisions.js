@@ -12,7 +12,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
     refs: {
         editorTabPanel: 'emergence-tabpanel',
-        revisionsGrid: 'emergence-revisions',
+        revisionsGrid: 'emergence-revisionsgrid',
         revisionMenu: {
             selector: 'emergence-revisionmenu',
             autoCreate: true,

@@ -4,7 +4,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
         'EmergenceEditor.view.Toolbar',
         'EmergenceEditor.view.FilesTree',
         'EmergenceEditor.view.TabPanel',
-        'EmergenceEditor.view.Revisions',
+        'EmergenceEditor.view.RevisionsGrid',
 
         'Ext.layout.container.Border'
     ],
@@ -32,7 +32,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
         region: 'east',
         split: true,
 
-        xtype: 'emergence-revisions',
+        xtype: 'emergence-revisionsgrid',
         width: 275,
         disabled: true,
         collapsible: true,

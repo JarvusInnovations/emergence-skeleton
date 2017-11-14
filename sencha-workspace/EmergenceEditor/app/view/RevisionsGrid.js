@@ -1,7 +1,6 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.view.Revisions', {
+Ext.define('EmergenceEditor.view.RevisionsGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'emergence-revisions',
+    xtype: 'emergence-revisionsgrid',
     requires: [
         'Ext.grid.column.Template',
         'Ext.grid.column.Number',
@@ -11,22 +10,22 @@ Ext.define('EmergenceEditor.view.Revisions', {
 
     title: 'Revision History',
     store: 'Revisions',
-    componentCls: 'emergence-revisions',
-    icon: '/img/icons/fugue/edit-diff.png',
-    stateId: 'emergence-revisions',
+    componentCls: 'emergence-revisionsgrid',
+    iconCls: 'x-fa fa-history',
+    stateId: 'emergence-revisionsgrid',
     stateful: true,
 
-
-    initComponent: function() {
-
-        this.viewConfig = this.viewConfig || {};
-        this.viewConfig.getRowClass = function(record) {
+    viewConfig: {
+        getRowClass: function(record) {
             return 'status-'+record.get('Status');
-        };
+        }
+    },
 
-        this.columns = [{
+    columns: [
+        {
             header: 'Timestamp',
             dataIndex: 'Timestamp',
+            width: 150,
             align: 'left',
             renderer: function(mtime) {
                 var now = new Date(),
@@ -40,8 +39,7 @@ Ext.define('EmergenceEditor.view.Revisions', {
                 }
 
                 return '<time datetime="'+Ext.util.Format.date(mtime, 'c')+'" title="'+Ext.util.Format.date(mtime, 'Y-m-d H:i:s')+'">'+str+'</time>';
-            },
-            width: 110
+            }
         }, {
             header: 'Author',
             dataIndex: 'Author',
@@ -50,7 +48,7 @@ Ext.define('EmergenceEditor.view.Revisions', {
             xtype: 'templatecolumn',
             tpl: [
                 '<tpl for="Author">',
-                '<a href="/people/{Username}" title="{FirstName} {LastName} <{Email}>" target="_blank">{Username}</a>',
+                '    <a href="/people/{Username}" title="{FirstName} {LastName} <{Email}>" target="_blank">{Username}</a>',
                 '</tpl>'
             ]
         }, {
@@ -61,14 +59,12 @@ Ext.define('EmergenceEditor.view.Revisions', {
             xtype: 'templatecolumn',
             tpl: [
                 '<tpl if="Status==\'Deleted\'">',
-                'DELETED',
+                '    DELETED',
                 '</tpl>',
                 '<tpl if="Status!=\'Deleted\'">',
-                '<abbr title="{Size} bytes">{Size:fileSize}</abbr>',
+                '    <abbr title="{Size} bytes">{Size:fileSize}</abbr>',
                 '</tpl>'
             ]
-        }];
-
-        this.callParent();
-    }
+        }
+    ]
 });
