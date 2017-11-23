@@ -62,7 +62,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             revisionsProxy.setExtraParam('path', card.getPath());
             revisionsGrid.enable();
 
-            if (!revisionsGrid.getCollapsed()) {
+            if (!revisionsGrid.getCollapsed() && revisionsProxy.isExtraParamsDirty()) {
                 revisionsStore.load();
             }
         }
