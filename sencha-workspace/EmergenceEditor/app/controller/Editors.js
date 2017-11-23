@@ -20,7 +20,29 @@ Ext.define('EmergenceEditor.controller.Editors', {
         '/:path': {
             action: 'showPath',
             conditions: {
-                ':path': '(.+)'
+                ':path': '([^@\\$]+)'
+            }
+        },
+        '/:path@:revision': {
+            action: 'showPathRevision',
+            conditions: {
+                ':path': '([^@\\$]+)',
+                ':revision': '(\\d+)'
+            }
+        },
+        '/:path\\$:line': {
+            action: 'showPathLine',
+            conditions: {
+                ':path': '([^@\\$]+)',
+                ':line': '(\\d+)'
+            }
+        },
+        '/:path@:revision\\$:line': {
+            action: 'showPathRevisionLine',
+            conditions: {
+                ':path': '([^@\\$]+)',
+                ':revision': '(\\d+)',
+                ':line': '(\\d+)'
             }
         }
     },
@@ -80,8 +102,27 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
 
     // route handlers
-    showPath: function(path, line) {
-        this.openPath(path, line);
+    showPath: function(path) {
+        this.openPath(path);
+    },
+
+    showPathRevision: function(path, revision) {
+        this.openPath(path, {
+            revision: revision
+        });
+    },
+
+    showPathLine: function(path, line) {
+        this.openPath(path, {
+            line: line
+        });
+    },
+
+    showPathRevisionLine: function(path, revision, line) {
+        this.openPath(path, {
+            revision: revision,
+            line: line
+        });
     },
 
 
@@ -89,20 +130,33 @@ Ext.define('EmergenceEditor.controller.Editors', {
     onTabsStateRestore: function(tabPanel, state) {
         var openFiles = state.openFiles || [],
             openFilesLength = openFiles.length,
-            openFileIndex = 0;
+            openFileIndex = 0, openFile;
 
         for (; openFileIndex < openFilesLength; openFileIndex++) {
-            this.openPath(openFiles[openFileIndex], null, false);
+            openFile = openFiles[openFileIndex];
+            this.openPath(openFile.path, Ext.applyIf({ activate: false }, openFile));
         }
     },
 
     onTabChange: function(tabPanel, card) {
         var isEditor = card.isXType('acepanel'),
-            path = isEditor && card.getPath(),
-            saveBtn = this.getSaveBtn();
+            saveBtn = this.getSaveBtn(),
+            token, revision, line;
 
-        if (path) {
-            this.getApplication().setActiveView('/'+path, card.getTitle());
+        if (isEditor) {
+            token = '/' + card.getPath();
+            revision = card.getRevision();
+            line = card.getLine();
+
+            if (revision) {
+                token += '@'+revision;
+            }
+
+            if (line) {
+                token += '$'+line;
+            }
+
+            this.getApplication().setActiveView(token, card.getTitle());
         }
 
         if (saveBtn) {
@@ -156,41 +210,47 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
 
     // local methods
-    openPath: function(path, line, activate) {
+    openPath: function(path, options) {
+        options = options || {};
+
+        // eslint-disable-next-line vars-on-top
         var me = this,
             tabPanel = me.getTabPanel(),
+            revision = options.revision || null,
+            line = options.line || null,
+            activate = options.activate !== false,
             editor = tabPanel.items.findBy(function(card) {
-                return card.isXType('acepanel') && card.getPath() == path;
+                return card.isXType('acepanel') && card.getPath() === path && card.getRevision() === revision;
             });
 
-        activate = activate !== false;
-
         if (editor) {
-            if (activate) {
-                tabPanel.setActiveTab(editor);
-            }
-            return;
+            editor.setLine(line);
+        } else {
+            editor = me.getEditorPanel({
+                path: path,
+                revision: revision,
+                line: line
+            });
+
+            tabPanel.add(editor);
+
+            editor.setLoading({
+                msg: 'Opening ' + Jarvus.ace.Util.basename(path) + '&hellip;'
+            });
+
+            EmergenceEditor.DAV.downloadFile({
+                url: path,
+                revision: revision
+            }).then(function(response) {
+                editor.loadContent(response.responseText, function () {
+                    editor.setLoading(false);
+                });
+            });
         }
-
-        editor = me.getEditorPanel({
-            path: path
-        });
-
-        tabPanel.add(editor);
-
-        editor.setLoading({
-            msg: 'Opening ' + Jarvus.ace.Util.basename(path) + '&hellip;'
-        });
 
         if (activate) {
             tabPanel.setActiveTab(editor);
         }
-
-        EmergenceEditor.DAV.downloadFile(path).then(function(response) {
-            editor.loadContent(response.responseText, function () {
-                editor.setLoading(false);
-            });
-        });
     },
 
     saveActive: function() {

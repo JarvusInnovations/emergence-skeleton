@@ -38,13 +38,16 @@ Ext.define('EmergenceEditor.view.TabPanel', {
             items = this.items,
             itemsCount = items.getCount(),
             itemIndex = 0,
-            item, path;
+            item;
 
         for (; itemIndex < itemsCount; itemIndex++) {
             item = items.get(itemIndex);
 
-            if (item.isXType('acepanel') && (path = item.getPath())) {
-                openFiles.push(path);
+            if (item.isXType('acepanel')) {
+                openFiles.push({
+                    path: item.getPath(),
+                    revision: item.getRevision()
+                });
             }
         }
 
