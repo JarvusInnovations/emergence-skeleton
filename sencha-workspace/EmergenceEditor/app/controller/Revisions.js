@@ -54,18 +54,18 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             revisionsStore = this.getRevisionsStore(),
             revisionsProxy = revisionsStore.getProxy();
 
-        if (card.isXType('emergence-activity')) {
-            revisionsStore.removeAll();
-            revisionsProxy.setExtraParams({});
-            revisionsProxy.clearParamsDirty();
-            revisionsGrid.disable();
-        } else if (card.isXType('acepanel')) {
+        if (card.isXType('emergence-editortab')) {
             revisionsProxy.setExtraParam('path', card.getPath());
             revisionsGrid.enable();
 
             if (!revisionsGrid.getCollapsed() && revisionsProxy.isExtraParamsDirty()) {
                 revisionsStore.load();
             }
+        } else {
+            revisionsStore.removeAll();
+            revisionsProxy.setExtraParams({});
+            revisionsProxy.clearParamsDirty();
+            revisionsGrid.disable();
         }
     },
 
