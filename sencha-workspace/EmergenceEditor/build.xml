@@ -45,13 +45,13 @@
                         var tmpFile = "tmp.sh";
                         echo("source ~/.bash_profile; sencha " + whichArgs.join(" "), tmpFile);
                         exec(["/bin/sh", tmpFile]);
-                        new java.io.File(tmpFile)['delete'](); 
+                        new java.io.File(tmpFile)['delete']();
                     }
                 }
             }
 
             if (cmdDir && !project.getTargets().containsKey("init-cmd")) {
-                var importDir = project.getProperty("build-impl.dir") || 
+                var importDir = project.getProperty("build-impl.dir") ||
                                 (cmdDir + "/ant/build/app/build-impl.xml");
                 var importTask = project.createTask("import");
 
@@ -95,4 +95,11 @@
             <target name="-after-build"/>
     -->
 
+    <target name="-after-build">
+        <delete includeemptydirs="true" verbose="true">
+            <fileset dir="${build.out.resources.dir}/images" excludes="**/loading.gif" />
+            <fileset dir="${build.out.resources.dir}/ext" />
+            <fileset dir="${build.out.resources.dir}/ux" />
+        </delete>
+    </target>
 </project>
