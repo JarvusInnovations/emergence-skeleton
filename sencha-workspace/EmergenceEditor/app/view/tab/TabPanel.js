@@ -48,7 +48,6 @@ Ext.define('EmergenceEditor.view.tab.TabPanel', {
             }
         }
 
-        console.info('build tabs state', openTabs);
         return { openTabs: openTabs };
     },
 
