@@ -3,6 +3,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
 
     views: [
+        'tab.Diff',
         'menu.Revision'
     ],
 
@@ -13,12 +14,18 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     refs: {
         editorTabPanel: 'emergence-tabpanel',
         revisionsGrid: 'emergence-revisionsgrid',
-        revisionMenu: {
+
+        menu: {
             selector: 'emergence-revisionmenu',
             autoCreate: true,
 
             xtype: 'emergence-revisionmenu'
-        }
+        },
+        openMenuItem: 'emergence-revisionmenu menuitem[action=revision-open]',
+        propertiesMenuItem: 'emergence-revisionmenu menuitem[action=revision-properties]',
+        compareLatestMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-latest]',
+        compareNextMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-next]',
+        comparePreviousMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-previous]'
     },
 
     control: {
@@ -30,21 +37,21 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             itemdblclick: 'onRevisionDoubleClick',
             itemcontextmenu: 'onRevisionContextMenu'
         },
-        'emergence-revisionmenu menuitem[action=revision-open]': {
+        openMenuItem: {
             click: 'onOpenClick'
         },
-        // 'emergence-revisionsmenu > menuitem[action=properties]': {
+        // propertiesMenuItem: {
         //     click: this.onPropertiesClick
         // },
-        // 'emergence-revisionsmenu > menuitem[action=compare_latest]': {
-        //     click: this.onCompareLatestClick
-        // },
-        // 'emergence-revisionsmenu > menuitem[action=compare_next]': {
-        //     click: this.onCompareNextClick
-        // },
-        // 'emergence-revisionsmenu > menuitem[action=compare_previous]': {
-        //     click: this.onComparePreviousClick
-        // },
+        compareLatestMenuItem: {
+            click: 'onCompareLatestClick'
+        },
+        compareNextMenuItem: {
+            click: 'onCompareNextClick'
+        },
+        comparePreviousMenuItem: {
+            click: 'onComparePreviousClick'
+        },
     },
 
 
@@ -82,21 +89,57 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     },
 
     onRevisionContextMenu: function(revisionsGrid, revision, itemDom, index, event) {
-        var revisionMenu = this.getRevisionMenu();
+        var me = this,
+            menu = me.getMenu();
 
         event.stopEvent();
 
-        revisionMenu.setRevision(revision);
-        revisionMenu.down('[action=revision-compare-latest]').setDisabled(index == 0);
-        revisionMenu.down('[action=revision-compare-next]').setDisabled(index == 0);
-        revisionMenu.down('[action=revision-compare-previous]').setDisabled(index + 1 == revisionsGrid.getStore().getCount());
+        menu.setRevision(revision);
 
-        revisionMenu.showAt(event.getXY());
+        me.getCompareLatestMenuItem().setDisabled(index == 0);
+        me.getCompareNextMenuItem().setDisabled(index == 0);
+        me.getComparePreviousMenuItem().setDisabled(index + 1 == revisionsGrid.getStore().getCount());
 
+        menu.showAt(event.getXY());
     },
 
-    onOpenClick: function(menuItem) {
-        this.redirectTo(menuItem.up('menu').getRevision());
+    onOpenClick: function() {
+        this.redirectTo(this.getMenu().getRevision());
+    },
+
+    onCompareLatestClick: function() {
+        var me = this,
+            store = me.getRevisionsStore(),
+            revision = this.getMenu().getRevision();
+
+        this.redirectToDiff(revision, store.getAt(0));
+    },
+
+    onCompareNextClick: function() {
+        var me = this,
+            store = me.getRevisionsStore(),
+            revision = this.getMenu().getRevision();
+
+        this.redirectToDiff(revision, store.getAt(store.indexOf(revision)-1));
+    },
+
+    onComparePreviousClick: function() {
+        var me = this,
+            store = me.getRevisionsStore(),
+            revision = this.getMenu().getRevision();
+
+        this.redirectToDiff(store.getAt(store.indexOf(revision)+1), revision);
+    },
+
+
+    // local methods
+    redirectToDiff: function(leftRevision, rightRevision) {
+        this.redirectTo('diff?' + this.getTabDiffView().buildToken({
+            leftPath: leftRevision.get('FullPath'),
+            leftRevision: leftRevision.getId(),
+            rightPath: rightRevision.get('FullPath'),
+            rightRevision: rightRevision.getId()
+        }));
     }
 
 
@@ -119,20 +162,5 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     //         layout: 'fit',
     //         html: html
     //     }).show();
-    // },
-    // onOpenClick: function(menuItem, event, options) {
-    //     this.openRevisionByRecord(this.currentRecord);
-    // },
-    // onCompareLatestClick: function(menuItem, event, options) {
-    //     this.openDiff(this.currentRecord, this.currentRecord.store.data.get(0));
-    // },
-    // onCompareNextClick: function(menuItem, event, options) {
-    //     this.openDiff(this.currentRecord, this.currentRecord.store.data.get(this.currentIndex-1));
-    // },
-    // onComparePreviousClick: function(menuItem, event, options) {
-    //     this.openDiff(this.currentRecord.store.data.get(this.currentIndex+1), this.currentRecord);
-    // },
-    // openDiff: function(sideA, sideB) {
-    //     Ext.util.History.add('diff:[' + sideA.get('ID') + ',' + sideB.get('ID') + ']/'+sideA.get('FullPath'), true);
     // }
 });
