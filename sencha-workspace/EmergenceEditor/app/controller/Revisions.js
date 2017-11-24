@@ -56,6 +56,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
         if (card.isXType('emergence-activity')) {
             revisionsStore.removeAll();
+            revisionsProxy.setExtraParams({});
             revisionsProxy.clearParamsDirty();
             revisionsGrid.disable();
         } else if (card.isXType('acepanel')) {
