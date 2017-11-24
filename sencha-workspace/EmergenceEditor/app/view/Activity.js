@@ -10,6 +10,8 @@ Ext.define('EmergenceEditor.view.Activity', {
     ],
 
 
+    staticToken: 'activity',
+
     title: 'Activity',
     layout: 'fit',
     componentCls: 'emergence-activity',

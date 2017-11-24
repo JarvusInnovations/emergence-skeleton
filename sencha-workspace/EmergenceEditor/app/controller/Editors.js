@@ -12,64 +12,40 @@ Ext.define('EmergenceEditor.controller.Editors', {
     ],
 
 
+    // controller config
     views: [
-        'ace.Panel@Jarvus'
+        'tab.Editor'
     ],
 
     routes: {
-        '/:path': {
-            action: 'showPath',
+        '/:token': {
+            action: 'showToken',
             conditions: {
-                ':path': '([^@\\$]+)'
-            }
-        },
-        '/:path@:revision': {
-            action: 'showPathRevision',
-            conditions: {
-                ':path': '([^@\\$]+)',
-                ':revision': '(\\d+)'
-            }
-        },
-        '/:path\\$:line': {
-            action: 'showPathLine',
-            conditions: {
-                ':path': '([^@\\$]+)',
-                ':line': '(\\d+)'
-            }
-        },
-        '/:path@:revision\\$:line': {
-            action: 'showPathRevisionLine',
-            conditions: {
-                ':path': '([^@\\$]+)',
-                ':revision': '(\\d+)',
-                ':line': '(\\d+)'
+                ':token': '(.+)'
             }
         }
     },
 
     refs: {
+        saveBtn: 'emergence-toolbar button[action=save]',
+
         tabPanel: 'tabpanel',
 
-        editorPanel: {
-            selector: 'acepanel',
+        editorTab: {
             forceCreate: true,
 
-            xtype: 'acepanel',
-            closable: true,
+            xtype: 'emergence-editortab',
             title: 'Editor'
-        },
-
-        saveBtn: 'emergence-toolbar button[action=save]'
+        }
     },
 
     control: {
         tabPanel: {
-            staterestore: 'onTabsStateRestore',
-            tabchange: 'onTabChange',
-            beforetabmenu: 'onBeforeTabMenu'
+            tabchange: 'onTabChange'
         },
-        'acepanel': {
-            dirtychange: 'onAcePanelDirtyChange'
+        'emergence-editortab': {
+            activate: 'onEditorActivate',
+            dirtychange: 'onEditorDirtyChange'
         },
         saveBtn: {
             click: 'onSaveBtnClick'
@@ -77,7 +53,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
     },
 
 
-    // lifecycle methods
+    // controller lifecycle
     onLaunch: function() {
         var me = this;
 
@@ -102,97 +78,54 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
 
     // route handlers
-    showPath: function(path) {
-        this.openPath(path);
-    },
+    showToken: function(token) {
+        var me = this,
+            tabPanel = me.getTabPanel(),
+            editorTab = tabPanel.findUsableTab('emergence-editortab', token);
 
-    showPathRevision: function(path, revision) {
-        this.openPath(path, {
-            revision: revision
-        });
-    },
+        if (editorTab) {
+            editorTab.setToken(token);
+        } else {
+            editorTab = tabPanel.add(me.getEditorTab({
+                token: token
+            }));
+        }
 
-    showPathLine: function(path, line) {
-        this.openPath(path, {
-            line: line
-        });
-    },
-
-    showPathRevisionLine: function(path, revision, line) {
-        this.openPath(path, {
-            revision: revision,
-            line: line
-        });
+        tabPanel.setActiveTab(editorTab);
     },
 
 
     // event handlers
-    onTabsStateRestore: function(tabPanel, state) {
-        var openFiles = state.openFiles || [],
-            openFilesLength = openFiles.length,
-            openFileIndex = 0, openFile;
-
-        for (; openFileIndex < openFilesLength; openFileIndex++) {
-            openFile = openFiles[openFileIndex];
-            this.openPath(openFile.path, Ext.applyIf({ activate: false }, openFile));
-        }
-    },
-
     onTabChange: function(tabPanel, card) {
-        var isEditor = card.isXType('acepanel'),
-            saveBtn = this.getSaveBtn(),
-            token, revision, line;
-
-        if (isEditor) {
-            token = '/' + card.getPath();
-            revision = card.getRevision();
-            line = card.getLine();
-
-            if (revision) {
-                token += '@'+revision;
-            }
-
-            if (line) {
-                token += '$'+line;
-            }
-
-            this.getApplication().setActiveView(token, card.getTitle());
-        }
+        var saveBtn = this.getSaveBtn();
 
         if (saveBtn) {
-            saveBtn.setDisabled(!isEditor || !card.isDirty());
+            saveBtn.setDisabled(!card.isSavable || !card.isDirty());
         }
     },
 
-    onBeforeTabMenu: function(menu, card) {
-        var tearItem = menu.getComponent('tear'),
-            cardPath = card.isXType('acepanel') && card.getPath(),
-            params = cardPath && Ext.applyIf({
-                fullscreen: true
-            }, this.getApplication().launchParams),
-            url = cardPath && '?' + Ext.urlEncode(params) + '#/' + cardPath;
+    onEditorActivate: function(editorTab) {
+        if (!editorTab.getLoadNeeded()) {
+            return;
+        }
 
-        if (tearItem) {
-            tearItem.itemEl.set({
-                href: url
+        editorTab.setLoadNeeded(false);
+        editorTab.setLoading({
+            msg: 'Opening ' + editorTab.getTitle() + '&hellip;'
+        });
+
+        EmergenceEditor.DAV.downloadFile({
+            url: editorTab.getPath(),
+            revision: editorTab.getRevision()
+        }).then(function(response) {
+            editorTab.loadContent(response.responseText, function () {
+                editorTab.setLoading(false);
             });
-        } else {
-            menu.insert(0, [
-                {
-                    itemId: 'tear',
-                    text: 'Link to fullscreen',
-                    hrefTarget: '_blank',
-                    href: url
-                },
-                {
-                    xtype: 'menuseparator'
-                }
-            ]);
-        }
+        });
     },
 
-    onAcePanelDirtyChange: function(acePanel, dirty) {
-        acePanel.tab.toggleCls('is-dirty', dirty);
+    onEditorDirtyChange: function(editorTab, dirty) {
+        editorTab.tab.toggleCls('is-dirty', dirty);
         this.getSaveBtn().setDisabled(!dirty);
     },
 
@@ -210,54 +143,11 @@ Ext.define('EmergenceEditor.controller.Editors', {
 
 
     // local methods
-    openPath: function(path, options) {
-        options = options || {};
-
-        // eslint-disable-next-line vars-on-top
-        var me = this,
-            tabPanel = me.getTabPanel(),
-            revision = options.revision || null,
-            line = options.line || null,
-            activate = options.activate !== false,
-            editor = tabPanel.items.findBy(function(card) {
-                return card.isXType('acepanel') && card.getPath() === path && card.getRevision() === revision;
-            });
-
-        if (editor) {
-            editor.setLine(line);
-        } else {
-            editor = me.getEditorPanel({
-                path: path,
-                revision: revision,
-                line: line
-            });
-
-            tabPanel.add(editor);
-
-            editor.setLoading({
-                msg: 'Opening ' + Jarvus.ace.Util.basename(path) + '&hellip;'
-            });
-
-            EmergenceEditor.DAV.downloadFile({
-                url: path,
-                revision: revision
-            }).then(function(response) {
-                editor.loadContent(response.responseText, function () {
-                    editor.setLoading(false);
-                });
-            });
-        }
-
-        if (activate) {
-            tabPanel.setActiveTab(editor);
-        }
-    },
-
     saveActive: function() {
         var card = this.getTabPanel().getActiveTab(),
             tab = card.tab;
 
-        if (!card.isXType('acepanel') || !card.isDirty()) {
+        if (!card.isXType('emergence-editortab') || !card.isDirty()) {
             return;
         }
 

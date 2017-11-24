@@ -3,7 +3,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
     requires: [
         'EmergenceEditor.view.Toolbar',
         'EmergenceEditor.view.FilesTree',
-        'EmergenceEditor.view.TabPanel',
+        'EmergenceEditor.view.tab.TabPanel',
         'EmergenceEditor.view.RevisionsGrid',
 
         'Ext.layout.container.Border'

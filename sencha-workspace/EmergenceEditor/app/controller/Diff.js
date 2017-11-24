@@ -8,68 +8,80 @@ Ext.define('EmergenceEditor.controller.Diff', {
     ],
 
 
+    // controller config
     views: [
-        'ace.DiffPanel@Jarvus'
+        'tab.Diff'
     ],
 
     routes: {
-        'diff\\?:query': {
-            action: 'showDiff',
+        'diff\\?:token': {
+            action: 'showToken',
             conditions: {
-                ':query': '(.+)'
+                ':token': '(.+)'
             }
         }
     },
 
     refs: {
         tabPanel: 'tabpanel',
-        diffPanel: {
-            selector: 'acediffpanel',
+
+        diffTab: {
             forceCreate: true,
 
-            xtype: 'acediffpanel',
-            closable: true,
+            xtype: 'emergence-difftab',
             title: 'Compare'
         }
     },
 
+    control: {
+        'emergence-difftab': {
+            activate: 'onDiffActivate'
+        }
+    },
 
-    showDiff: function(queryString) {
+
+    // route handlers
+    showToken: function(token) {
         var me = this,
-            query = Ext.Object.fromQueryString(queryString),
-            from = query.from.split('@'),
-            to = query.to.split('@'),
-            fromPath = from[0],
-            fromRevision = from[1] || null,
-            toPath = to[0] || fromPath,
-            toRevision = to[1] || null;
+            tabPanel = me.getTabPanel(),
+            diffTab = tabPanel.findUsableTab('emergence-difftab', token);
+
+        if (diffTab) {
+            diffTab.setToken(token);
+        } else {
+            diffTab = tabPanel.add(me.getDiffTab({
+                token: token
+            }));
+        }
+
+        tabPanel.setActiveTab(diffTab);
+    },
+
+
+    // event handlers
+    onDiffActivate: function(diffTab) {
+        if (!diffTab.getLoadNeeded()) {
+            return;
+        }
+
+        diffTab.setLoadNeeded(false);
+        diffTab.setLoading({
+            msg: 'Opening ' + diffTab.getTitle() + '&hellip;'
+        });
 
         Ext.Promise.all([
             EmergenceEditor.DAV.downloadFile({
-                url: fromPath,
-                revision: fromRevision
+                url: diffTab.getLeftPath(),
+                revision: diffTab.getLeftRevision()
             }),
             EmergenceEditor.DAV.downloadFile({
-                url: toPath,
-                revision: toRevision
+                url: diffTab.getRightPath(),
+                revision: diffTab.getRightRevision()
             })
         ]).then(function(responses) {
-            var tabPanel = me.getTabPanel(),
-                diffPanel = me.getDiffPanel({
-                    left: {
-                        path: fromPath,
-                        revision: fromRevision,
-                        content: responses[0].responseText
-                    },
-                    right: {
-                        path: toPath,
-                        revision: toRevision,
-                        content: responses[1].responseText
-                    }
-                });
-
-            tabPanel.add(diffPanel);
-            tabPanel.setActiveTab(diffPanel);
-        })
+            diffTab.loadContent(responses[0].responseText, responses[1].responseText, function () {
+                diffTab.setLoading(false);
+            });
+        });
     }
 });

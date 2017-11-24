@@ -1,7 +1,7 @@
 Ext.define('EmergenceEditor.view.viewport.FullEditor', {
     extend: 'Ext.container.Container',
     requires: [
-        'EmergenceEditor.view.TabPanel',
+        'EmergenceEditor.view.tab.TabPanel',
 
         'Ext.layout.container.Border'
     ],

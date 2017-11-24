@@ -137,8 +137,7 @@ Ext.define('EmergenceEditor.controller.Viewport', {
         var tab = this.getTabPanel().add({
                 xtype: 'search-results',
                 searchQuery: query,
-                title: 'Search Results for ' + query,
-                closable: true
+                title: 'Search Results for ' + query
             }),
             store = tab.getStore();
 

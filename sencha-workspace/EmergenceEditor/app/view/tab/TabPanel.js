@@ -1,4 +1,4 @@
-Ext.define('EmergenceEditor.view.TabPanel', {
+Ext.define('EmergenceEditor.view.tab.TabPanel', {
     extend: 'Ext.tab.Panel',
     xtype: 'emergence-tabpanel',
     requires: [
@@ -34,23 +34,37 @@ Ext.define('EmergenceEditor.view.TabPanel', {
 
     // lifecycle methods
     getState: function() {
-        var openFiles = [],
-            items = this.items,
-            itemsCount = items.getCount(),
+        var openTabs = [],
+            items = this.items.getRange(),
+            itemsLength = items.length,
             itemIndex = 0,
-            item;
+            state;
 
-        for (; itemIndex < itemsCount; itemIndex++) {
-            item = items.get(itemIndex);
+        for (; itemIndex < itemsLength; itemIndex++) {
+            state = items[itemIndex].getState();
 
-            if (item.isXType('acepanel')) {
-                openFiles.push({
-                    path: item.getPath(),
-                    revision: item.getRevision()
-                });
+            if (state.xtype) {
+                openTabs.push(state);
             }
         }
 
-        return { openFiles: openFiles };
+        console.info('build tabs state', openTabs);
+        return { openTabs: openTabs };
+    },
+
+    applyState: function(state) {
+        var openTabs = state.openTabs;
+
+        if (openTabs && openTabs.length) {
+            this.add(openTabs);
+        }
+    },
+
+
+    // local methods
+    findUsableTab: function(xtype, token) {
+        return this.items.findBy(function(card) {
+            return card.isXType(xtype) && card.usableForToken(token);
+        });
     }
 });
