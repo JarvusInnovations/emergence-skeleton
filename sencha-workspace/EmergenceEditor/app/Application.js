@@ -41,6 +41,9 @@ Ext.define('EmergenceEditor.Application', {
         var me = this,
             launchParams = me.launchParams = Ext.Object.fromQueryString(location.search);
 
+        // disable ARIA warnings
+        Ext.ariaWarn = Ext.emptyFn;
+
         // initialize state manager
         Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
 
