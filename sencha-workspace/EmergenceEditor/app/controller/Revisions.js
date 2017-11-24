@@ -60,24 +60,33 @@ Ext.define('EmergenceEditor.controller.Revisions', {
         var revisionsGrid = this.getRevisionsGrid(),
             revisionsStore = this.getRevisionsStore(),
             revisionsProxy = revisionsStore.getProxy(),
-            path;
+            path, revision;
 
-        if (
-            (
-                card.isXType('emergence-editortab')
-                && (path = card.getPath())
-            )
-            || (
-                card.isXType('emergence-difftab')
-                && (path = card.getLeftPath())
-                && path == card.getRightPath()
-            )
-        ) {
+        if (card.isXType('emergence-editortab')) {
+            path = card.getPath();
+            revision = card.getRevision();
+        } else if (card.isXType('emergence-difftab')) {
+            path = card.getLeftPath();
+
+            if (path == card.getRightPath()) {
+                revision = card.getRightRevision();
+            } else {
+                path = null;
+            }
+        }
+
+        if (path) {
             revisionsProxy.setExtraParam('path', path);
             revisionsGrid.enable();
 
             if (!revisionsGrid.getCollapsed() && revisionsProxy.isExtraParamsDirty()) {
-                revisionsStore.load();
+                revisionsStore.load({
+                    callback: function() {
+                        revisionsGrid.setSelection(revisionsStore.getById(revision));
+                    }
+                });
+            } else {
+                revisionsGrid.setSelection(revisionsStore.getById(revision));
             }
         } else {
             revisionsStore.removeAll();
