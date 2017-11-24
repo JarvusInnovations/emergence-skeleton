@@ -3,7 +3,6 @@ Ext.define('EmergenceEditor.view.tab.TabPanel', {
     xtype: 'emergence-tabpanel',
     requires: [
         'Ext.ux.TabCloseMenu',
-        'Ext.ux.TabScrollerMenu',
         'Ext.ux.TabReorderer'
     ],
 
@@ -22,8 +21,7 @@ Ext.define('EmergenceEditor.view.tab.TabPanel', {
                 }
             }
         },
-        'tabreorderer',
-        'tabscrollermenu'
+        'tabreorderer'
     ],
 
     items: [{
