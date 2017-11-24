@@ -1,0 +1,10 @@
+$button-toolbar-background-color: dynamic($bg-color2);
+$button-toolbar-background-color-over: dynamic($bg-color3);
+$button-toolbar-background-color-pressed: dynamic($bg-color3);
+$button-toolbar-background-color-disabled: dynamic($bg-color4);
+$button-toolbar-border-color: dynamic($bg-color3);
+$button-toolbar-border-color-pressed: dynamic($bg-color3);
+
+$button-toolbar-color-pressed: dynamic($fg-color2);
+$button-toolbar-color-over: dynamic($fg-color3);
+$button-toolbar-color: dynamic($fg-color2);

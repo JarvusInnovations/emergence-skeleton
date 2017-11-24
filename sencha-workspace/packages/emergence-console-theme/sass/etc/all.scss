@@ -1,0 +1,11 @@
+$bg-color1: #000;
+$bg-color2: #121314;
+$bg-color3: #222326;
+$bg-color4: darken(#88898C, 15%);
+
+$fg-color1: #f38429;
+$fg-color2: #adafb2;
+$fg-color3: #fff;
+
+$bg-highlight: lighten($bg-color1, 20%);
+$fg-highlight: darken($fg-color2, 20%);
