@@ -59,10 +59,21 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     onEditorTabChange: function(editorTabPanel, card) {
         var revisionsGrid = this.getRevisionsGrid(),
             revisionsStore = this.getRevisionsStore(),
-            revisionsProxy = revisionsStore.getProxy();
+            revisionsProxy = revisionsStore.getProxy(),
+            path;
 
-        if (card.isXType('emergence-editortab')) {
-            revisionsProxy.setExtraParam('path', card.getPath());
+        if (
+            (
+                card.isXType('emergence-editortab')
+                && (path = card.getPath())
+            )
+            || (
+                card.isXType('emergence-difftab')
+                && (path = card.getLeftPath())
+                && path == card.getRightPath()
+            )
+        ) {
+            revisionsProxy.setExtraParam('path', path);
             revisionsGrid.enable();
 
             if (!revisionsGrid.getCollapsed() && revisionsProxy.isExtraParamsDirty()) {
