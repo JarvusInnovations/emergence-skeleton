@@ -8,7 +8,8 @@ Ext.define('EmergenceEditor.controller.Editors', {
         'EmergenceEditor.DAV',
 
         /* global Jarvus */
-        'Jarvus.ace.Util'
+        'Jarvus.ace.Util',
+        'Jarvus.ace.Loader'
     ],
 
 
@@ -152,14 +153,21 @@ Ext.define('EmergenceEditor.controller.Editors', {
         }
 
         tab.addCls('is-saving');
-        card.withContent(function(content) {
-            EmergenceEditor.DAV.uploadFile(card.getPath(), content).then(function(response) {
-                tab.removeCls('is-saving');
-                card.markClean();
-            }).catch(function(response) {
-                if (response.status) {
-                    Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
-                }
+
+        Jarvus.ace.Loader.withAce(function(ace) {
+            card.withEditor(function(acePanel, aceEditor, aceSession) {
+                ace.require('ace/ext/whitespace').trimTrailingSpace(aceSession, { trimEmpty: true })
+
+                card.withContent(function(content) {
+                    EmergenceEditor.DAV.uploadFile(card.getPath(), content).then(function(response) {
+                        tab.removeCls('is-saving');
+                        card.markClean();
+                    }).catch(function(response) {
+                        if (response.status) {
+                            Ext.Msg.alert('Failed to save', 'Your changes failed to save to the server');
+                        }
+                    });
+                });
             });
         });
     }
