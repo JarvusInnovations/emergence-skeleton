@@ -16,7 +16,8 @@ Ext.define('EmergenceEditor.view.menu.Revision', {
         {
             text: 'Properties',
             action: 'revision-properties',
-            iconCls: 'x-fa fa-list'
+            iconCls: 'x-fa fa-list',
+            disabled: true // TODO: reimplement
         },
         {
             text: 'Compare Latest',
