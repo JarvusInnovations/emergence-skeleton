@@ -4,7 +4,7 @@
     "version": "1.0.0.0",
     "framework": "ext",
     "toolkit": "classic",
-    "theme": "theme-crisp",
+    "theme": "theme-triton",
 
     /**
      * The list of required packages (with optional versions; default is "latest").
