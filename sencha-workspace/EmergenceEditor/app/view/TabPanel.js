@@ -1,4 +1,4 @@
-Ext.define('EmergenceEditor.view.tab.TabPanel', {
+Ext.define('EmergenceEditor.view.TabPanel', {
     extend: 'Ext.tab.Panel',
     xtype: 'emergence-tabpanel',
     requires: [
