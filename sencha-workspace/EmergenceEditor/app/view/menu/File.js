@@ -86,6 +86,7 @@ Ext.define('EmergenceEditor.view.menu.File', {
             editItem = me.child('[action=edit]'),
             openFileItem = me.child('[action=open-file]'),
             openUrlItem = me.child('[action=open-url]'),
+            isLocal = file.parentNode.get('Site') == 'Local',
             filePath = file.get('FullPath'),
             editToken = '#/'+filePath,
             openUrl = EmergenceEditor.API.buildUrl('/develop/'+filePath),
@@ -134,6 +135,9 @@ Ext.define('EmergenceEditor.view.menu.File', {
                 openUrlItem.href = launchUrl;
             }
         }
+
+        me.child('[action=rename]').setDisabled(!isLocal);
+        me.child('[action=delete]').setDisabled(!isLocal);
 
         me.getComponent('detailsCmp').setData(file.getData());
     }
