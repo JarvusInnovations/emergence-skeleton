@@ -23,7 +23,7 @@ class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
             throw new \Sabre\DAV\Exception\Forbidden('Cannot create collections under _parent');
         }
 
-        return parent::setName($handle);
+        return parent::createDirectory($handle);
     }
 
     public function createFile($path, $data = null, $ancestorID = NULL)
