@@ -16,9 +16,6 @@ Ext.define('EmergenceEditor.controller.Activity', {
     },
 
     control: {
-        tabPanel: {
-            tabchange: 'onTabChange'
-        },
         activityPanel: {
             activate: 'onActivityPanelActivate'
         },
@@ -38,12 +35,6 @@ Ext.define('EmergenceEditor.controller.Activity', {
 
 
     // event handlers
-    onTabChange: function(tabPanel, card, oldCard) {
-        if (oldCard && card === this.getActivityPanel()) {
-            this.getApplication().setActiveView('activity', 'Activity');
-        }
-    },
-
     onActivityPanelActivate: function() {
         var store = this.getActivityStreamStore();
 
