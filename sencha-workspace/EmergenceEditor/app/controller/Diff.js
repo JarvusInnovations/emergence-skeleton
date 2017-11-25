@@ -1,3 +1,10 @@
+/**
+ * Controls any and all open Diff tabs
+ *
+ * Responsibilities:
+ * - Handle `#diff?*` routes, switching to a new or existing diff tab
+ * - Load content if needed when a diff tab is activated
+ */
 Ext.define('EmergenceEditor.controller.Diff', {
     extend: 'Ext.app.Controller',
     require: [

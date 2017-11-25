@@ -1,7 +1,16 @@
+/**
+ * Controls revisions sidebar
+ *
+ * Responsibilities:
+ * - Load and clear Revisions store as needed in response to tab switching
+ * - Open file revision on double-click
+ * - Show revision menu on context click and handle all items on it
+ */
 Ext.define('EmergenceEditor.controller.Revisions', {
     extend: 'Ext.app.Controller',
 
 
+    // controller config
     views: [
         'tab.Diff',
         'menu.Revision'

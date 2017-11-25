@@ -1,3 +1,13 @@
+/**
+ * Controls any and all open Editor tabs
+ *
+ * Responsibilities:
+ * - Handle `#/*` routes, switching to a new or existing diff tab
+ * - Load content if needed when an editor tab is activated
+ * - Handle global save hotkey and save buttons to save content
+ * - Manage state of global save button in response to current editor tab's dirtiness
+ * - Reflect editor dirty state to its tab's classes
+ */
 Ext.define('EmergenceEditor.controller.Editors', {
     extend: 'Ext.app.Controller',
     requires: [
@@ -67,12 +77,6 @@ Ext.define('EmergenceEditor.controller.Editors', {
                 defaultEventAction: 'stopEvent',
                 scope: me,
                 handler: me.onSaveKey
-            // }, {
-            //     key: 'f',
-            //     ctrl: true,
-            //     defaultEventAction: 'stopEvent',
-            //     scope: me,
-            //     handler: me.onFindKey
             }]
         });
     },
@@ -137,10 +141,6 @@ Ext.define('EmergenceEditor.controller.Editors', {
     onSaveKey: function() {
         this.saveActive();
     },
-
-    // onFindKey: function() {
-    //     debugger;
-    // },
 
 
     // local methods

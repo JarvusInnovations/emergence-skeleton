@@ -1,7 +1,17 @@
+/**
+ * Controls the unclosable activity tab in the main tab panel
+ *
+ * Responsibilities:
+ * - Handle `#activity` route and switch to activity tab
+ * - Create and manage ActivityStream store
+ * - Load ActivityStream store when activity tab is activated
+ * - Load ActivityStream store when refresh/load-all buttons are clicked
+ */
 Ext.define('EmergenceEditor.controller.Activity', {
     extend: 'Ext.app.Controller',
 
 
+    // controller config
     stores: [
         'ActivityStream'
     ],

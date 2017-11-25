@@ -1,5 +1,9 @@
 /**
- * Responsible for the general integration between the main tabPanel and navigation
+ * Controls navigation between tabs in the main tab panel
+ *
+ * Responsibilities:
+ * - Push token and title to browser navigation on tab change
+ * - Inject and update "Link to fullscreen" item in tab menu
  */
 Ext.define('EmergenceEditor.controller.Tabs', {
     extend: 'Ext.app.Controller',
