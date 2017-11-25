@@ -28,6 +28,24 @@ class File extends \SiteFile implements \Sabre\DAV\IFile
         }
     }
 
+    public function setName($handle)
+    {
+        if ($this->Collection->Site != 'Local') {
+            throw new \Sabre\DAV\Exception\Forbidden('Cannot rename files under _parent');
+        }
+
+        return parent::setName($handle);
+    }
+
+    public function delete()
+    {
+        if ($this->Collection->Site != 'Local') {
+            throw new \Sabre\DAV\Exception\Forbidden('Cannot delete files under _parent');
+        }
+
+        return parent::delete();
+    }
+
     public static function getByHandle($collectionID, $handle)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_SERVER['HTTP_X_REVISION_ID'])) {

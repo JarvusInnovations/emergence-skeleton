@@ -5,7 +5,7 @@ namespace Emergence\DAV;
 class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
 {
     public static $autoCreate = true;
-    public static $fileClass = '\Emergence\DAV\File';
+    public static $fileClass = File::class;
 
     public function __construct($handle, $record = null)
     {
@@ -17,6 +17,15 @@ class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
     }
 
     // localize file creation
+    public function createDirectory($handle)
+    {
+        if ($this->Site != 'Local') {
+            throw new \Sabre\DAV\Exception\Forbidden('Cannot create collections under _parent');
+        }
+
+        return parent::setName($handle);
+    }
+
     public function createFile($path, $data = null, $ancestorID = NULL)
     {
         if ($this->Site != "Local") {
@@ -27,9 +36,21 @@ class Collection extends \SiteCollection implements \Sabre\DAV\ICollection
         return parent::createFile($path, $data, $ancestorID);
     }
 
+    public function setName($handle)
+    {
+        if ($this->Site != 'Local') {
+            throw new \Sabre\DAV\Exception\Forbidden('Cannot rename collections under _parent');
+        }
+
+        return parent::setName($handle);
+    }
 
     public function delete()
     {
+        if ($this->Site != 'Local') {
+            throw new \Sabre\DAV\Exception\Forbidden('Cannot delete collections under _parent');
+        }
+
         return parent::delete();
     }
 
