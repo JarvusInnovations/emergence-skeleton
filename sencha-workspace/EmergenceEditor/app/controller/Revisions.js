@@ -25,16 +25,15 @@ Ext.define('EmergenceEditor.controller.Revisions', {
         revisionsGrid: 'emergence-revisionsgrid',
 
         menu: {
-            selector: 'emergence-revisionmenu',
             autoCreate: true,
 
-            xtype: 'emergence-revisionmenu'
+            xtype: 'emergence-menu-revision'
         },
-        openMenuItem: 'emergence-revisionmenu menuitem[action=revision-open]',
-        propertiesMenuItem: 'emergence-revisionmenu menuitem[action=revision-properties]',
-        compareLatestMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-latest]',
-        compareNextMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-next]',
-        comparePreviousMenuItem: 'emergence-revisionmenu menuitem[action=revision-compare-previous]'
+        openMenuItem: 'emergence-menu-revision menuitem[action=revision-open]',
+        propertiesMenuItem: 'emergence-menu-revision menuitem[action=revision-properties]',
+        compareLatestMenuItem: 'emergence-menu-revision menuitem[action=revision-compare-latest]',
+        compareNextMenuItem: 'emergence-menu-revision menuitem[action=revision-compare-next]',
+        comparePreviousMenuItem: 'emergence-menu-revision menuitem[action=revision-compare-previous]'
     },
 
     control: {

@@ -1,6 +1,6 @@
 Ext.define('EmergenceEditor.view.menu.Revision', {
     extend: 'Ext.menu.Menu',
-    xtype: 'emergence-revisionmenu',
+    xtype: 'emergence-menu-revision',
     requires: [
         'Ext.menu.Separator',
         'EmergenceEditor.API'
