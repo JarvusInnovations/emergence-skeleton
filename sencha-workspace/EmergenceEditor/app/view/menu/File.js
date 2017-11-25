@@ -23,14 +23,14 @@ Ext.define('EmergenceEditor.view.menu.File', {
             href: '#'
         },
         {
-            text: 'Open File',
+            text: 'Open via Browser',
             action: 'open-file',
             iconCls: 'x-fa fa-file-o',
             hrefTarget: '_blank',
             href: '#'
         },
         {
-            text: 'Open URL',
+            text: 'Open via Site',
             action: 'open-url',
             iconCls: 'x-fa fa-external-link',
             hrefTarget: '_blank',
@@ -89,8 +89,8 @@ Ext.define('EmergenceEditor.view.menu.File', {
             filePath = file.get('FullPath'),
             editToken = '#/'+filePath,
             openUrl = EmergenceEditor.API.buildUrl('/develop/'+filePath),
-            isInSiteRoot = filePath.indexOf('site-root/') === 0 || filePath.indexOf('_parent/site-root/') === 0,
-            fileUrl;
+            rootHandle = filePath.replace(/^(_parent\/)?([^\/]+).*$/, '$2'),
+            launchUrl;
 
         if (editItem.rendered) {
             editItem.itemEl.set({
@@ -108,17 +108,26 @@ Ext.define('EmergenceEditor.view.menu.File', {
             openFileItem.href = openUrl;
         }
 
-        openUrlItem.setDisabled(!isInSiteRoot);
+        // TODO: create plugin architecture for tree-specific helpers
+        if (rootHandle == 'site-root') {
+            launchUrl = EmergenceEditor.API.buildUrl('/'+filePath.replace(/^(_parent\/)?site-root\/(.*?)(\.php)?$/, '$2'));
+            openUrlItem.setText('Open via Site');
+            openUrlItem.show();
+        } else if (rootHandle == 'html-templates') {
+            launchUrl = EmergenceEditor.API.buildUrl('/template/'+filePath.replace(/^(_parent\/)?html-templates\/(.*?)(\.tpl)?$/, '$2'));
+            openUrlItem.setText('Preview Template');
+            openUrlItem.show();
+        } else {
+            openUrlItem.hide();
+        }
 
-        if (isInSiteRoot) {
-            fileUrl = EmergenceEditor.API.buildUrl('/'+filePath.replace(/^(_parent\/)?site-root\/(.*?)(\.php)?$/, '$2'));
-
+        if (launchUrl) {
             if (openUrlItem.rendered) {
                 openUrlItem.itemEl.set({
-                    href: fileUrl
+                    href: launchUrl
                 });
             } else {
-                openUrlItem.href = fileUrl;
+                openUrlItem.href = launchUrl;
             }
         }
 
