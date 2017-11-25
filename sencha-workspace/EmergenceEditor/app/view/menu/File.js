@@ -113,6 +113,10 @@ Ext.define('EmergenceEditor.view.menu.File', {
             launchUrl = EmergenceEditor.API.buildUrl('/'+filePath.replace(/^(_parent\/)?site-root\/(.*?)(\.php)?$/, '$2'));
             openUrlItem.setText('Open via Site');
             openUrlItem.show();
+        } else if (rootHandle == 'site-tasks') {
+            launchUrl = EmergenceEditor.API.buildUrl('/site-admin/tasks/'+filePath.replace(/^(_parent\/)?site-tasks\/(.*?)(\.php)?$/, '$2'));
+            openUrlItem.setText('Launch Task');
+            openUrlItem.show();
         } else if (rootHandle == 'html-templates') {
             launchUrl = EmergenceEditor.API.buildUrl('/template/'+filePath.replace(/^(_parent\/)?html-templates\/(.*?)(\.tpl)?$/, '$2'));
             openUrlItem.setText('Preview Template');
