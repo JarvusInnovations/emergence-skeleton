@@ -46,13 +46,34 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
 
     control: {
         filesystemTree: {
+            beforeedit: 'onItemBeforeEdit',
+            canceledit: 'onItemCancelEdit',
+            edit: 'onItemEdit',
             itemdblclick: 'onItemDblClick',
             itemcontextmenu: 'onItemContextMenu'
+        },
+        'emergence-menu-file menuitem[action=rename]': {
+            click: 'onFileRenameClick'
+        },
+        'emergence-menu-collection menuitem[action=rename]': {
+            click: 'onCollectionRenameClick'
         }
     },
 
 
     // event handlers
+    onItemBeforeEdit: function(editor, context) {
+        return context.record.get('renaming');
+    },
+
+    onItemCancelEdit: function(editor, context) {
+        context.record.set('renaming', false);
+    },
+
+    onItemEdit: function(editor, context) {
+        context.record.set('renaming', false);
+    },
+
     onItemDblClick: function(filesystemTree, file) {
         if (file.isLeaf()) {
             this.redirectTo(file);
@@ -78,6 +99,20 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
         }
 
         menu.showAt(event.getXY());
+    },
+
+    onFileRenameClick: function() {
+        var file = this.getFileMenu().getFile();
+
+        file.set('renaming', true);
+        this.getFilesystemTree().getPlugin('cellediting').startEdit(file, 0);
+    },
+
+    onCollectionRenameClick: function() {
+        var collection = this.getCollectionMenu().getCollection();
+
+        collection.set('renaming', true);
+        this.getFilesystemTree().getPlugin('cellediting').startEdit(collection, 0);
     }
 
 

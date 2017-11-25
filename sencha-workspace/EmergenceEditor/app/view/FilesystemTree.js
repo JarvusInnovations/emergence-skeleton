@@ -2,14 +2,21 @@ Ext.define('EmergenceEditor.view.FilesystemTree', {
     extend: 'Ext.tree.Panel',
     xtype: 'emergence-filesystemtree',
     requires: [
-        'Ext.tree.plugin.TreeViewDragDrop'
+        'Ext.tree.plugin.TreeViewDragDrop',
+        'Ext.grid.plugin.CellEditing'
     ],
 
 
-    stateId: 'editor-filesystemtree',
-    stateful: true,
-    store: 'FilesystemTree',
     title: 'Filesystem',
+    stateful: true,
+    stateId: 'editor-filesystemtree',
+    plugins: {
+        id: 'cellediting',
+        ptype: 'cellediting',
+        clicksToEdit: 1
+    },
+
+    store: 'FilesystemTree',
     useArrows: true,
     rootVisible: false,
     autoScroll: true,
@@ -19,7 +26,6 @@ Ext.define('EmergenceEditor.view.FilesystemTree', {
         loadMask: false,
         plugins: {
             ptype: 'treeviewdragdrop',
-            pluginId: 'ddplugin',
             appendOnly: true,
             dragText: '{0} selected item{1}',
             containerScroll: true
@@ -28,10 +34,12 @@ Ext.define('EmergenceEditor.view.FilesystemTree', {
 
     columns: [
         {
+            flex: 1,
+
             xtype: 'treecolumn',
             dataIndex: 'Handle',
             align: 'left',
-            flex: 1
+            editor: 'textfield'
         }
     ]
 });

@@ -34,6 +34,11 @@ Ext.define('EmergenceEditor.model.FilesystemNode', {
                 return r.get('Class') == 'SiteFile';
             }
         },
+        {
+            name: 'renaming',
+            defaultValue: false,
+            persist: false
+        },
 
         // collection properties
         {
@@ -106,78 +111,3 @@ Ext.define('EmergenceEditor.model.FilesystemNode', {
         return '/' + this.get('FullPath');
     }
 });
-
-/*
-Class
-:
-"SiteCollection"
-Created
-:
-"2017-09-05 09:40:18"
-CreatorID
-:
-"1"
-FullPath
-:
-"site-root/css"
-Handle
-:
-"css"
-ID
-:
-"239"
-ParentID
-:
-"25"
-PosLeft
-:
-"316"
-PosRight
-:
-"327"
-Site
-:
-"Local"
-Status
-:
-"Normal"
-6
-:
-{ID: "2692", CollectionID: "25", Handle: "LEGACY.md", Status: "Normal",…}
-AncestorID
-:
-"2666"
-AuthorID
-:
-"1"
-Class
-:
-"SiteFile"
-CollectionID
-:
-"25"
-FullPath
-:
-"site-root/LEGACY.md"
-Handle
-:
-"LEGACY.md"
-ID
-:
-"2692"
-SHA1
-:
-"2888f7b6cb235c08b90cfaee872825de851e8ee6"
-Size
-:
-"351"
-Status
-:
-"Normal"
-Timestamp
-:
-"2017-11-24 15:36:39"
-Type
-:
-"text/plain"
-*/
