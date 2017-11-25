@@ -6,7 +6,8 @@
 Ext.define('EmergenceEditor.Application', {
     extend: 'Ext.app.Application',
     requires: [
-        'Ext.state.LocalStorageProvider'
+        'Ext.state.LocalStorageProvider',
+        'Ext.plugin.Viewport'
     ],
 
 
