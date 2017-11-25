@@ -1,4 +1,4 @@
-Ext.define('EmergenceEditor.view.Activity', {
+Ext.define('EmergenceEditor.view.tab.Activity', {
     extend: 'Ext.panel.Panel',
     xtype: 'emergence-activity',
     requires: [

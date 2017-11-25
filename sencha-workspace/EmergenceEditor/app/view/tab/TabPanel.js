@@ -2,6 +2,8 @@ Ext.define('EmergenceEditor.view.tab.TabPanel', {
     extend: 'Ext.tab.Panel',
     xtype: 'emergence-tabpanel',
     requires: [
+        'EmergenceEditor.view.tab.Activity',
+
         'Ext.ux.TabCloseMenu',
         'Ext.ux.TabReorderer'
     ],
