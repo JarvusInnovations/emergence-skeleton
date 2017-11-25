@@ -3,6 +3,7 @@ Ext.define('EmergenceEditor.view.menu.Revision', {
     xtype: 'emergence-menu-revision',
     requires: [
         'Ext.menu.Separator',
+
         'EmergenceEditor.API'
     ],
 
@@ -79,5 +80,7 @@ Ext.define('EmergenceEditor.view.menu.Revision', {
     // config handlers
     updateRevision: function(revision) {
         this.getComponent('detailsCmp').setData(revision.getData());
+
+        // TODO: use hrefs on items instead of controller redirects
     }
 });

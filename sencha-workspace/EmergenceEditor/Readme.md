@@ -33,6 +33,7 @@ These should be completed before the editor is widely deployed:
 - [ ] Test/restore rename file
 - [ ] Test/restore delete file
 - [ ] erase dead code
+- [ ] Restore site search
 
 ### Low priority
 
@@ -59,3 +60,4 @@ Editor can ship without these:
 - [ ] Track current revision loaded into editor, send on save
   - [ ] warn if revisions reloads and a newer revision exits
 - [ ] Load full local+remote trees and cache them
+- [ ] Prevent opening binary files in editor (maybe go by ace being able to detect a mode? block open or show placeholder tab?)

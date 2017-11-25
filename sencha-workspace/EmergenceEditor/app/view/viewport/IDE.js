@@ -2,7 +2,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
     extend: 'Ext.container.Container',
     requires: [
         'EmergenceEditor.view.Toolbar',
-        'EmergenceEditor.view.FilesTree',
+        'EmergenceEditor.view.FilesystemTree',
         'EmergenceEditor.view.TabPanel',
         'EmergenceEditor.view.RevisionsGrid',
 
@@ -16,7 +16,7 @@ Ext.define('EmergenceEditor.view.viewport.IDE', {
         region: 'west',
         split: true,
 
-        xtype: 'emergence-filestree',
+        xtype: 'emergence-filesystemtree',
         width: 200,
         collapsible: true
     }, {

@@ -24,7 +24,7 @@ Ext.define('EmergenceEditor.Application', {
 
     controllers: [
         'Tabs',
-        'Files',
+        'Filesystem',
         'Editors',
         'Revisions',
         'Activity',

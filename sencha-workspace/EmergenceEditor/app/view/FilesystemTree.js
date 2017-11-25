@@ -1,14 +1,14 @@
-Ext.define('EmergenceEditor.view.FilesTree', {
+Ext.define('EmergenceEditor.view.FilesystemTree', {
     extend: 'Ext.tree.Panel',
-    xtype: 'emergence-filestree',
+    xtype: 'emergence-filesystemtree',
     requires: [
         'Ext.tree.plugin.TreeViewDragDrop'
     ],
 
 
-    stateId: 'editor-filestree',
+    stateId: 'editor-filesystemtree',
     stateful: true,
-    store: 'FilesTree',
+    store: 'FilesystemTree',
     title: 'Filesystem',
     useArrows: true,
     rootVisible: false,

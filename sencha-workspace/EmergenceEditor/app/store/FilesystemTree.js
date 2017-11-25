@@ -1,4 +1,4 @@
-Ext.define('EmergenceEditor.store.FilesTree', {
+Ext.define('EmergenceEditor.store.FilesystemTree', {
     extend: 'Ext.data.TreeStore',
     alias: 'store.filestree',
     requires: [
@@ -7,7 +7,7 @@ Ext.define('EmergenceEditor.store.FilesTree', {
     ],
 
 
-    model: 'EmergenceEditor.model.File',
+    model: 'EmergenceEditor.model.FilesystemNode',
 
     folderSort: true,
     sortOnLoad: true,
