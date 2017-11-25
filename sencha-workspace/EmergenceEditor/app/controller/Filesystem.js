@@ -3,7 +3,8 @@
  *
  * Responsibilities:
  * - Open file on double-click
- * - [ ] Show collection/file/multiple context menus
+ * - Show collection/file/multiple context menus
+ * - Coordinate renaming tree nodes
  * - [ ] Handle context menu items
  * - [ ] Handle drag+drop of files into tree
  */

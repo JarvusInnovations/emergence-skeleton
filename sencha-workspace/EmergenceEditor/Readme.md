@@ -29,7 +29,7 @@ These should be completed before the editor is widely deployed:
 - [X] Push #activity path on activate
 - [X] Support opening file at specific revision
 - [X] Support opening file to specific line
-- [ ] Fix file tree menus
+- [X] Fix file tree menus
 - [ ] Test/restore rename file
 - [ ] Test/restore delete file
 - [ ] erase dead code
