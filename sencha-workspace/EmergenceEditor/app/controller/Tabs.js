@@ -31,6 +31,13 @@ Ext.define('EmergenceEditor.controller.Tabs', {
             tearItem = menu.getComponent('tear'),
             pageParams, url;
 
+        if (!menu.iconsAdded) {
+            menu.getComponent('close').setIconCls('x-fa fa-times');
+            menu.getComponent('closeAll').setIconCls('x-fa fa-times-circle');
+            menu.getComponent('closeOthers').setIconCls('x-fa fa-times-circle-o');
+            menu.iconsAdded = true;
+        }
+
         if (!isTabbable) {
             if (tearItem) {
                 tearItem.hide();
@@ -55,7 +62,8 @@ Ext.define('EmergenceEditor.controller.Tabs', {
                     itemId: 'tear',
                     text: 'Link to fullscreen',
                     hrefTarget: '_blank',
-                    href: url
+                    href: url,
+                    iconCls: 'x-fa fa-external-link'
                 },
                 {
                     xtype: 'menuseparator'
