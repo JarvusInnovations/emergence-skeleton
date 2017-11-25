@@ -3,3 +3,15 @@ $color: dynamic($fg-color2);
 $body-background-color: dynamic($bg-color3);
 
 $enable-font-smoothing: dynamic(true);
+
+a {
+    color: rgba($fg-color3, 0.9);
+}
+
+a:active, a:hover {
+    color: rgba($fg-color3, 1);
+}
+
+a:visited {
+    color: rgba($fg-color3, 0.8);
+}
