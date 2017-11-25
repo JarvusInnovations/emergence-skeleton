@@ -2,7 +2,7 @@
     font-size: 13px;
 
     a {
-        color: black;
+        color: $fg-color3;
         text-decoration: none;
 
         &:hover {
@@ -14,7 +14,7 @@
     .action,
     .file,
     .timestamp {
-        border-bottom: 1px solid white;
+        border-bottom: 1px solid rgba($base-color, 0.5);
         display: table-cell;
         padding: .5em;
         white-space: nowrap;
@@ -60,75 +60,57 @@
     }
 
     .path {
-        color: rgba(0,0,0,.5);
+        color: $color;
         width: 100%;
     }
 
     .revisions {
         float: right;
         margin-left: 1em;
-        padding: .25em 0;
     }
 
     .compare {
-        border: 1px solid rgba(255,255,255,.5);
+        border: 1px solid rgba($fg-color3, .75);
         border-radius: 1em;
-        color: white;
+        color: rgba($fg-color3, .90);
         margin-left: 1em;
         padding: 1px 5px;
         visibility: hidden;
 
         &:hover {
-            border-color: white;
+            border-color: $fg-color3;
         }
 
         &:active {
-            background: rgba(255,255,255,.25);
+            background: rgba($fg-color3, .25);
         }
     }
 
-    .timestamp {
-        color: rgba(0,0,0,.5);
-    }
-
     .activity-feed {
-        border-top: 1px solid white;
+        border-top: 1px solid $fg-color3;
         display: table;
         width: 100%;
     }
 
     article {
+        color: $fg-color3;
         display: table-row;
 
         &:nth-child(even) {
-            background: hsla(212, 25%, 90%, .5);
+            background: rgba($base-color, .25);
         }
 
         &:hover {
-            background: hsl(212, 25%, 50%);
+            background: rgba($base-color, .75);
             background: -webkit-linear-gradient(
-                hsl(212, 25%, 50%),
-                hsl(212, 25%, 40%)
+                rgba($base-color, .90),
+                rgba($base-color, .75)
             );
-            color: white;
-
-            .path {
-                color: rgba(255,255,255,.5);
-            }
 
             .compare {
                 text-decoration: none;
                 visibility: visible;
             }
-
-            .timestamp {
-                color: rgba(255,255,255,.5);
-            }
-        }
-
-        &:hover .action,
-        &:hover a {
-            color: white;
         }
     }
 }
