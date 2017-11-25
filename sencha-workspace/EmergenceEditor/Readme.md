@@ -34,6 +34,7 @@ These should be completed before the editor is widely deployed:
 - [ ] Test/restore delete file
 - [ ] erase dead code
 - [ ] Restore site search
+- [ ] Uncollapse deletes in activity tree, let create+edit+delete for same file coallesce
 
 ### Low priority
 
@@ -44,12 +45,12 @@ Editor can ship without these:
 - [ ] Update revisions grid on save
 - [ ] Highlight left diff revision in revisions grid
 - [X] Fix fullscreen mode
-- [ ] Update controller ref and control syntax
+- [X] Update controller ref and control syntax
 - [X] Try out ace searchbox extension -- windout find command being killed?
-- [ ] Try out ace whitespace extension
-- [ ] Replace icons with fontawesome
+- [X] Try out ace whitespace extension
+- [X] Replace icons with fontawesome
 - [X] Restore / get rid of transfers log
-- [ ] Try to remove images from builds by changing theme and adding post-build delete task to build.xml
+- [X] Try to remove images from builds by changing theme and adding post-build delete task to build.xml
 - [ ] Minify ace / ace-diff
 - [ ] Overwrite protection
 - [X] Open and mask diff panel before content loads
@@ -60,4 +61,15 @@ Editor can ship without these:
 - [ ] Track current revision loaded into editor, send on save
   - [ ] warn if revisions reloads and a newer revision exits
 - [ ] Load full local+remote trees and cache them
+-  [ ] Add "sources" grid docked to top of filesystem tree with stats and checkboxs for "remote", "parent", and "local" to filter
+-  [ ] Add option to update parent from remote
 - [ ] Prevent opening binary files in editor (maybe go by ace being able to detect a mode? block open or show placeholder tab?)
+- [ ] More advanced filter options in bbar for activity stream (date range, author, tree, include parent)
+- [ ] Tree helper plugins architecture
+  - [ ] site-root launcher + versioned URL getter
+  - [ ] html-templates previewer + cache clearer
+  - [ ] site-tasks launcher
+  - [ ] php-migrations status check + runner + re-runner
+  - [ ] sencha-workspace app launcher + tree icons + build commands
+  - [ ] sencha-builds app build launcher + tree icons
+- [ ] Search within or load activity for any collection from tree context menu
