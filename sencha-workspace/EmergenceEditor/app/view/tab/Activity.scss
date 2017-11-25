@@ -10,6 +10,34 @@
         }
     }
 
+    .activity-feed {
+        border-top: 1px solid $fg-color3;
+        display: table;
+        width: 100%;
+    }
+
+    article {
+        color: $fg-color3;
+        display: table-row;
+
+        &:nth-child(even) {
+            background: rgba($base-color, .25);
+        }
+
+        &:hover {
+            background: rgba($base-color, .75);
+            background: -webkit-linear-gradient(
+                rgba($base-color, .90),
+                rgba($base-color, .75)
+            );
+
+            .compare {
+                text-decoration: none;
+                visibility: visible;
+            }
+        }
+    }
+
     .user,
     .action,
     .file,
@@ -18,6 +46,15 @@
         display: table-cell;
         padding: .5em;
         white-space: nowrap;
+    }
+
+    .user,
+    .action,
+    .compare,
+    .revisions,
+    .timestamp {
+        font-size: smaller;
+        text-transform: uppercase;
     }
 
     .user {
@@ -39,19 +76,10 @@
         }
     }
 
-    .user,
-    .action,
-    .compare,
-    .revisions,
-    .timestamp {
-        font-size: smaller;
-        text-transform: uppercase;
-    }
-
     .action {
-        .deleted { color: hsl(0, 80%, 35%); }
-        .edited  { color: hsl(212, 80%, 35%); }
-        .created { color: hsl(105, 100%, 25%); }
+        &.deleted { color: hsl(0, 80%, 65%); }
+        &.edited  { color: hsl(212, 80%, 65%); }
+        &.created { color: hsl(105, 100%, 55%); }
     }
 
     .path,
@@ -83,34 +111,6 @@
 
         &:active {
             background: rgba($fg-color3, .25);
-        }
-    }
-
-    .activity-feed {
-        border-top: 1px solid $fg-color3;
-        display: table;
-        width: 100%;
-    }
-
-    article {
-        color: $fg-color3;
-        display: table-row;
-
-        &:nth-child(even) {
-            background: rgba($base-color, .25);
-        }
-
-        &:hover {
-            background: rgba($base-color, .75);
-            background: -webkit-linear-gradient(
-                rgba($base-color, .90),
-                rgba($base-color, .75)
-            );
-
-            .compare {
-                text-decoration: none;
-                visibility: visible;
-            }
         }
     }
 }
