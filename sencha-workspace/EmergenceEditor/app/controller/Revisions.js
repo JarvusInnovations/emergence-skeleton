@@ -49,9 +49,6 @@ Ext.define('EmergenceEditor.controller.Revisions', {
         openMenuItem: {
             click: 'onOpenClick'
         },
-        // propertiesMenuItem: {
-        //     click: this.onPropertiesClick
-        // },
         compareLatestMenuItem: {
             click: 'onCompareLatestClick'
         },
@@ -170,26 +167,4 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             rightRevision: rightRevision.getId()
         }));
     }
-
-
-
-
-    // legacy
-    // onPropertiesClick: function(menuItem, event, options) {
-    //     var data = this.currentRecord.raw;
-
-    //     var html = '';
-
-    //     for (var key in data) {
-    //         html += key + ': ' + data[key] + '<br>\n';
-    //     }
-
-    //     Ext.create('Ext.window.Window', {
-    //         title: data.Handle,
-    //         height: 300,
-    //         width: 375,
-    //         layout: 'fit',
-    //         html: html
-    //     }).show();
-    // }
 });

@@ -1,10 +1,16 @@
 Ext.define('EmergenceEditor.view.menu.Revision', {
     extend: 'Ext.menu.Menu',
     xtype: 'emergence-revisionmenu',
+    requires: [
+        'Ext.menu.Separator',
+        'EmergenceEditor.API'
+    ],
 
 
     config: {
-        revision: null
+        revision: null,
+
+        plain: true
     },
 
     items: [
@@ -12,12 +18,6 @@ Ext.define('EmergenceEditor.view.menu.Revision', {
             text: 'Open',
             action: 'revision-open',
             iconCls: 'x-fa fa-file-o'
-        },
-        {
-            text: 'Properties',
-            action: 'revision-properties',
-            iconCls: 'x-fa fa-list',
-            disabled: true // TODO: reimplement
         },
         {
             text: 'Compare Latest',
@@ -33,6 +33,51 @@ Ext.define('EmergenceEditor.view.menu.Revision', {
             text: 'Compare Previous',
             action: 'revision-compare-previous',
             iconCls: 'x-fa fa-arrow-down'
+        },
+        {
+            xtype: 'menuseparator'
+        },
+        {
+            itemId: 'detailsCmp',
+
+            xtype: 'component',
+            autoEl: 'table',
+            tpl: [
+                '<tr>',
+                '    <th align="right">ID</th>',
+                '    <td>{ID}</td>',
+                '</tr>',
+                '<tr>',
+                '    <th align="right">Timestamp</th>',
+                '    <td>{Timestamp:date("Y-m-d H:i:s")}</td>',
+                '</tr>',
+                '<tr>',
+                '    <th align="right">Author</th>',
+                '    <td>',
+                '        <a target="_blank" href="{[EmergenceEditor.API.buildUrl("/people/"+values.AuthorUsername)]}">',
+                '            {Author.FirstName} {Author.LastName} <tpl if="Author.Email">&lt;{Author.Email}&gt;</tpl>',
+                '        </a>',
+                '    </td>',
+                '</tr>',
+                '<tr>',
+                '    <th align="right">Size</th>',
+                '    <td>{Size:number("0,000")} bytes</td>',
+                '</tr>',
+                '<tr>',
+                '    <th align="right">Hash</th>',
+                '    <td>{SHA1:substr(0,8)}</td>',
+                '</tr>',
+                '<tr>',
+                '    <th align="right">Type</th>',
+                '    <td>{Type}</td>',
+                '</tr>'
+            ]
         }
-    ]
+    ],
+
+
+    // config handlers
+    updateRevision: function(revision) {
+        this.getComponent('detailsCmp').setData(revision.getData());
+    }
 });
