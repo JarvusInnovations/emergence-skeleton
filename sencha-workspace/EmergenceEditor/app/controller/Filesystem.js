@@ -10,6 +10,12 @@
  */
 Ext.define('EmergenceEditor.controller.Filesystem', {
     extend: 'Ext.app.Controller',
+    requires: [
+        'Ext.window.MessageBox',
+
+        /* global EmergenceEditor */
+        'EmergenceEditor.DAV'
+    ],
 
 
     // controller config
@@ -45,6 +51,14 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
         }
     },
 
+    listen: {
+        store: {
+            '#FilesystemTree': {
+                update: 'onStoreNodeUpdate'
+            }
+        }
+    },
+
     control: {
         filesystemTree: {
             beforeedit: 'onItemBeforeEdit',
@@ -63,6 +77,33 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
 
 
     // event handlers
+    onStoreNodeUpdate: function(store, node, operation, modifiedFieldNames) {
+        var path, newPath;
+
+        if (Ext.Array.contains(modifiedFieldNames, 'Handle')) {
+            path = node.get('FullPath');
+            newPath = path.replace(/[^/]+$/, node.get('Handle'));
+
+            node.set('loading', true);
+
+            EmergenceEditor.DAV.move(path, newPath).then(function() {
+                node.set({
+                    loading: false,
+                    Handle: node.get('Handle')
+                }, {
+                    dirty: false,
+                    commit: true
+                });
+            }).catch(function(response) {
+                var message = response.responseXML.querySelector('message');
+
+                node.set('loading', false);
+
+                Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
+            });
+        }
+    },
+
     onItemBeforeEdit: function(editor, context) {
         return context.record.get('renaming');
     },
