@@ -50,6 +50,10 @@ Ext.define('EmergenceEditor.model.Revision', {
             name: 'Author'
         },
         {
+            name: 'AuthorUsername',
+            mapping: 'Author.Username'
+        },
+        {
             name: 'AncestorID',
             type: 'integer'
         },

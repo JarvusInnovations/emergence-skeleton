@@ -29,11 +29,11 @@ Ext.define('EmergenceEditor.view.RevisionsGrid', {
             align: 'left',
             renderer: function(mtime) {
                 var now = new Date(),
-                    str = Ext.util.Format.date(mtime, 'g:i a');
+                    str = Ext.util.Format.date(mtime, 'g:i a'),
+                    oneDay = 86400000; // 24 hr in ms
 
                 // add date if mtime > 24 hours ago
-                if (now.getTime() - mtime.getTime() > 86400000) // 24 hr in ms
-                {
+                if (now.getTime() - mtime.getTime() > oneDay) {
                     str += ' &ndash; ';
                     str += Ext.util.Format.date(mtime, now.getYear() == mtime.getYear() ? 'M d' : 'M d Y');
                 }
@@ -42,13 +42,13 @@ Ext.define('EmergenceEditor.view.RevisionsGrid', {
             }
         }, {
             header: 'Author',
-            dataIndex: 'Author',
+            dataIndex: 'AuthorUsername',
             align: 'left',
             flex: 1,
             xtype: 'templatecolumn',
             tpl: [
                 '<tpl for="Author">',
-                '    <a href="/people/{Username}" title="{FirstName} {LastName} <{Email}>" target="_blank">{Username}</a>',
+                '    <abbr title="{FirstName} {LastName}<tpl if="Email"> <{Email}></tpl>" target="_blank">{Username}</abbr>',
                 '</tpl>'
             ]
         }, {
