@@ -98,10 +98,10 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
                 var message = response.responseXML.querySelector('message');
 
                 node.set('loading', false);
+            node.reject();
 
                 Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
             });
-        }
     },
 
     onItemBeforeEdit: function(editor, context) {
