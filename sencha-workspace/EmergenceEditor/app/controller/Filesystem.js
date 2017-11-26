@@ -72,6 +72,9 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
         },
         'emergence-menu-file menuitem[action=delete], emergence-menu-collection menuitem[action=delete]': {
             click: 'onNodeDeleteClick'
+        },
+        'emergence-menu-collection menuitem[action=refresh]': {
+            click: 'onCollectionRefreshClick'
         }
     },
 
@@ -175,6 +178,12 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
             });
         });
     },
+
+    onCollectionRefreshClick: function() {
+        this.getFilesystemTreeStore().load({
+            node: this.getCollectionMenu().getNode()
+        });
+    }
 
 
     // // views: ['contextmenu.CollectionMenu', 'contextmenu.FileMenu', 'contextmenu.MultiNodeMenu'],
