@@ -1,4 +1,4 @@
-.emergence-activity {
+.emergence-feedview {
     font-size: 13px;
 
     a {
@@ -10,18 +10,25 @@
         }
     }
 
-    .activity-feed {
+    .feed-ct {
         border-top: 1px solid $fg-color3;
         display: table;
         width: 100%;
     }
 
-    article {
+    .feed-item {
         color: $fg-color3;
         display: table-row;
 
+        & > * {
+            //border-bottom: 1px solid rgba($base-color, 0.5);
+            display: table-cell;
+            padding: .5em;
+            white-space: nowrap;
+        }
+
         &:nth-child(even) {
-            background: rgba($base-color, .25);
+            background: $bg-color3;
         }
 
         &:hover {
@@ -35,17 +42,16 @@
                 text-decoration: none;
                 visibility: visible;
             }
+
+            mark {
+                color: $fg-color3;
+                background-color: $bg-color2;
+            }
         }
     }
 
-    .user,
-    .action,
-    .file,
-    .timestamp {
-        border-bottom: 1px solid rgba($base-color, 0.5);
-        display: table-cell;
-        padding: .5em;
-        white-space: nowrap;
+    .item-fill {
+        width: 100%;
     }
 
     .user,
@@ -82,14 +88,26 @@
         &.created { color: hsl(105, 100%, 55%); }
     }
 
+    code {
+        white-space: pre-wrap;
+    }
+
+    code,
     .path,
     .filename {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Droid Sans Mono', 'Courier New', monospace
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Droid Sans Mono', 'Courier New', monospace;
+    }
+
+    .filename + .line-number {
+        &:before {
+            content: ':';
+        }
+
+        padding-left: 0;
     }
 
     .path {
         color: $color;
-        width: 100%;
     }
 
     .revisions {

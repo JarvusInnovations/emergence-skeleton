@@ -15,3 +15,8 @@ a:active, a:hover {
 a:visited {
     color: rgba($fg-color3, 0.8);
 }
+
+mark {
+    color: $bg-color2;
+    background-color: rgba($fg-color1, 0.8);
+}

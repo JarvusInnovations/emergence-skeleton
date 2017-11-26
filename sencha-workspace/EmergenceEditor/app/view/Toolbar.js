@@ -1,6 +1,11 @@
 Ext.define('EmergenceEditor.view.Toolbar', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'emergence-toolbar',
+    requires: [
+        'Ext.form.Panel',
+        'Ext.form.field.Text',
+        'Ext.form.field.Checkbox'
+    ],
 
 
     items: [
@@ -9,6 +14,80 @@ Ext.define('EmergenceEditor.view.Toolbar', {
             text: 'Save',
             iconCls: 'x-fa fa-floppy-o',
             tooltip: 'Save current editor (Ctrl+s)'
+        },
+        {
+            text: 'Search Site',
+            iconCls: 'x-fa fa-search',
+            tooltip: 'Search contents of all files in site',
+            menu: {
+                plain: true,
+                listeners: {
+                    show: function(menu) {
+                        menu.down('textfield').focus();
+                    }
+                },
+                items: {
+                    xtype: 'form',
+                    itemId: 'searchForm',
+                    bodyPadding: 10,
+                    defaults: {
+                        labelAlign: 'top'
+                    },
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            name: 'content',
+                            fieldLabel: 'Search contents',
+                            emptyText: '$myVar',
+                            allowBlock: false
+                        },
+                        {
+                            xtype: 'checkbox',
+                            name: 'contentFormat',
+                            boxLabel: 'Use regex',
+                            inputValue: 'regex'
+                        },
+                        {
+                            xtype: 'checkbox',
+                            name: 'case',
+                            boxLabel: 'Match case',
+                            inputValue: 'match'
+                        },
+                        {
+                            xtype: 'checkbox',
+                            name: 'include',
+                            boxLabel: 'Include parent',
+                            inputValue: 'parent',
+                            checked: true
+                        },
+                        {
+                            xtype: 'textfield',
+                            name: 'filename',
+                            fieldLabel: 'Filename',
+                            emptyText: '*.php'
+                        },
+                        {
+                            xtype: 'textfield',
+                            name: 'path',
+                            fieldLabel: 'Search within',
+                            emptyText: 'php-classes/Emergence/'
+                        }
+                    ],
+                    buttons: [
+                        {
+                            xtype: 'button',
+                            action: 'reset',
+                            text: 'Reset'
+                        },
+                        {
+                            xtype: 'button',
+                            action: 'search',
+                            text: 'Search',
+                            formBind: true
+                        }
+                    ]
+                }
+            }
         },
         '->',
         {

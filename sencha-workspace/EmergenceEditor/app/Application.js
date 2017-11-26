@@ -28,7 +28,8 @@ Ext.define('EmergenceEditor.Application', {
         'Editors',
         'Revisions',
         'Activity',
-        'Diff'
+        'Diff',
+        'Search'
     ],
 
     views: [

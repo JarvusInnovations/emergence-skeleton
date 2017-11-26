@@ -17,7 +17,7 @@ Ext.define('EmergenceEditor.store.Revisions', {
         proxy: {
             type: 'api',
             connection: 'EmergenceEditor.API',
-            url: '/editor/getRevisions/',
+            url: '/editor/revisions',
             reader: {
                 type: 'json',
                 rootProperty: 'revisions'

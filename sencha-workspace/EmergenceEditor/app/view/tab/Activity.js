@@ -2,6 +2,8 @@ Ext.define('EmergenceEditor.view.tab.Activity', {
     extend: 'Ext.panel.Panel',
     xtype: 'emergence-tab-activity',
     requires: [
+        'EmergenceEditor.view.FeedView',
+
         /* global EmergenceEditor */
         'EmergenceEditor.API',
 
@@ -33,16 +35,14 @@ Ext.define('EmergenceEditor.view.tab.Activity', {
     }],
 
     items: [{
-        xtype: 'dataview',
+        xtype: 'emergence-feedview',
         store: 'ActivityStream',
         emptyText: 'No activity',
-        autoScroll: true,
-        itemSelector: 'article',
         tpl: [
             // opening wrapper
-            '<section class="activity-feed">',
+            '<section class="feed-ct">',
             '<tpl for=".">',
-            '<article>',
+            '<article class="feed-item">',
 
             // user
             '<tpl if="Author">',

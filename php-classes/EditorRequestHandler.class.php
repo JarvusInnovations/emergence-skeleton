@@ -1,155 +1,188 @@
 <?php
 
+use Emergence\People\Person;
+
 class EditorRequestHandler extends RequestHandler
 {
     public static $activitySessionThreshold = 3600;
     public static $activityPageSize = 100;
 
+    public static $userResponseModes = [
+        'application/json' => 'json',
+        'text/csv' => 'csv'
+    ];
+
+
     public static function handleRequest()
     {
-        static::$responseMode = 'json';
-
-        switch ($action ? $action : $action = static::shiftPath()) {
-            case 'viewSource': // Don't write verbs in the path, HTTP method is the verb!
-            {
-                return static::viewSourceRequest();
-            }
-            case 'getRevisions': // Don't write verbs in the path, HTTP method is the verb!
-            {
+        switch ($action ?: $action = static::shiftPath())
+        {
+            case 'revisions':
                 return static::handleRevisionsRequest();
-            }
-            case 'getCodeMap': // Don't write verbs in the path, HTTP method is the verb!
-                return static::handleCodeMapRequest($_REQUEST['class']);
+            // case 'getCodeMap': // Don't write verbs in the path, HTTP method is the verb!
+            //     return static::handleCodeMapRequest($_REQUEST['class']);
             case 'search':
-                return static::searchRequest();
+                return static::handleSearchRequest();
             case 'activity':
                 return static::handleActivityRequest();
-            case 'export':
-                return static::handleExportRequest();
-            case 'import':
-                return static::handleImportRequest();
             case 'timesheet':
                 return static::handleTimesheetRequest();
             default:
-            {
-                return static::respond('editor');
-            }
+                return static::throwInvalidRequestError();
         }
     }
 
-    public static function handleExportRequest()
+    public static function handleSearchRequest()
     {
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
-        $tmp = EmergenceIO::export();
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename='.$_SERVER["SERVER_NAME"].'-export.zip');
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: '.filesize($tmp));
-        readfile($tmp);
-    }
 
-    public static function handleImportRequest()
-    {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
+        // read content query
+        $contentQuery = null;
 
-        if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-            $put = fopen("php://input", "r"); // open input stream
+        if (!empty($_GET['content'])) {
+            if (!empty($_GET['contentFormat']) && $_GET['contentFormat'] == 'regex') {
+                $contentQuery = $_GET['content'];
+            } else {
+                $contentQuery = preg_quote($_GET['content']);
+            }
+        }
 
-            $tmp = tempnam("/tmp", "emr");  // use PHP to make a temporary file
-            $fp = fopen($tmp, "w"); // open write stream to temp file
+        // read case sensitivity
+        $caseMatch = false;
 
-            // write
-            while ($data = fread($put, 1024)) {
-                fwrite($fp, $data);
+        if (!empty($_GET['case']) && $_GET['case'] == 'match') {
+            $caseMatch = true;
+        }
+
+        // read path prefix
+        $path = null;
+
+        if (!empty($_GET['path'])) {
+            $path = trim($_GET['path'], '/');
+        }
+
+        // read sources/layours include
+        $localOnly = true;
+
+        if (!empty($_GET['include'])) {
+            $include = is_array($_GET['include']) ? $_GET['include'] : explode(',', $_GET['include']);
+
+            if (in_array('parent', $include)) {
+                $localOnly = false;
+            }
+        }
+
+        // read file conditions
+        $fileConditions = [];
+
+        if (!empty($_GET['filename'])) {
+            $filename = str_replace('_', '\\_', $_GET['filename']); // escape literal underscores which mean wildcard to LIKE
+            $filename = strtr($filename, '*?', '%_'); // translate * and ? wildcards to LIKE equivelents
+            $fileConditions[] = 'Handle LIKE "'.DB::escape($filename) . '"';
+        }
+
+        // read buffers limit
+        $contextLimit = 255;
+
+        if (!empty($_GET['contextLimit']) && ctype_digit($_GET['contextLimit'])) {
+            $contextLimit = intval($_GET['contextLimit']);
+        }
+
+
+        // query list of files
+        $filesByPath = Emergence_FS::getTreeFiles($path, $localOnly, $fileConditions);
+
+        // add Path to each as array value and build mirror by-id index
+        $filesById = [];
+        foreach ($filesByPath as $path => &$fileData) {
+            $fileData['Path'] = $path;
+            $fileData['ID'] = intval($fileData['ID']);
+            $fileData['CollectionID'] = intval($fileData['CollectionID']);
+
+            $filesById[$fileData['ID']] = &$fileData;
+        }
+
+
+        // filter by content
+        if ($contentQuery) {
+            // open grep process
+            $grepProc = proc_open(
+                'xargs grep -nIP '.escapeshellarg(($caseMatch ? '' : '(?i)').$contentQuery),
+                [
+                    0 => ['pipe', 'r'],
+                    1 => ['pipe', 'w']
+                ],
+                $pipes,
+                Site::$rootPath.'/data'
+            );
+
+            // pipe file list into xargs
+            foreach ($filesById as $id => $fileData) {
+                fwrite($pipes[0], $id.PHP_EOL);
+            }
+            fclose($pipes[0]);
+
+            // read results from piped output lines
+            $results = [];
+            while (!feof($pipes[1])) {
+                // read grep output
+                $outputLine = trim(stream_get_line($pipes[1], 100000000, PHP_EOL));
+
+                if (!$outputLine) {
+                    continue;
+                }
+
+                // parse grep output
+                list ($fileId, $line, $content) = explode(':', $outputLine, 3);
+
+                // build match data
+                $matchData = [
+                    'line' => intval($line)
+                ];
+
+                // find position of match within content
+                preg_match('/'.$contentQuery.'/'.($caseMatch ? '' : 'i'), $content, $matches, PREG_OFFSET_CAPTURE);
+
+                if ($match = array_shift($matches)) {
+                    list ($matchSubstring, $matchOffset) = $match;
+                    $matchLength = strlen($matchSubstring);
+
+                    // split content by prefix, match, suffix
+                    $matchData['prefix'] = substr($content, 0, $matchOffset) ?: '';
+                    $matchData['match'] = $matchSubstring;
+                    $matchData['suffix'] = substr($content, $matchOffset + $matchLength) ?: '';
+
+                    // apply context limit
+                    if ($contextLimit) {
+                        $matchData['prefix'] = substr($matchData['prefix'], $contextLimit * -1) ?: '';
+                        $matchData['suffix'] = substr($matchData['suffix'], 0, $contextLimit) ?: '';
+                    }
+                }
+
+                $filesById[$fileId]['ContentMatch'] = $matchData;
+                $results[] = $filesById[$fileId];
             }
 
-            // close handles
-            fclose($fp);
-            fclose($put);
+            // clean up
+            fclose($pipes[1]);
+            proc_close($grepProc);
 
-            EmergenceIO::import($tmp);
-        }
-    }
-
-    public static function viewSourceRequest()
-    {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
-
-        $file = SiteFile::getByID($_POST['ID']);
-
-        if (!$file) {
-            return static::throwNotFoundError();
+            // filter to matches
         } else {
-            readfile($file->RealPath);
-            exit();
+            $results = array_values($filesById);
         }
+
+
+        // respond with output
+        return static::respond('searchResults', [
+            'success' => true,
+            'total' => count($results),
+            'data' => $results
+        ]);
     }
 
-    public static function searchRequest()
-    {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
-        set_time_limit(180);
-
-        if (empty($_REQUEST['q'])) {
-            return static::throwInvalidRequestError('q required');
-        }
-
-        $fileResults = DB::query('SELECT f.ID FROM (SELECT MAX(ID) AS ID FROM _e_files GROUP BY Handle, CollectionID) matches JOIN _e_files f USING(ID) WHERE f.Status = "Normal"');
-
-        // open grep process
-        $cmd = sprintf('xargs grep -nIP "%s" ', addslashes($_REQUEST['q']));
-        $cwd = Site::$rootPath.'/data/';
-
-        $grepProc = proc_open($cmd, array(0 => array('pipe', 'r'), 1 => array('pipe', 'w')), $pipes, $cwd);
-
-        // pipe file list into xargs
-        $filesCount = 0;
-        while ($file = $fileResults->fetch_assoc()) {
-            fwrite($pipes[0], $file['ID'].PHP_EOL);
-        }
-        fclose($pipes[0]);
-
-        // pipe results out
-        $output = array();
-
-        while (!feof($pipes[1])) {
-            $line = trim($origLine =stream_get_line($pipes[1], 100000000, PHP_EOL));
-#            print "$origLine<hr>";
-            $line = explode(':', $line, 3);
-
-            if (count($line) === 3) {
-                $file = SiteFile::getByID($line[0]);
-                if (strlen($line[2]) > 255) {
-                    $result = preg_match("/$_REQUEST[q]/", $line[2], $matches, PREG_OFFSET_CAPTURE);
-                    $line[2] = substr(substr($line[2], max(0, $matches[0][1]-50)), 0, 255);
-                }
-                if (!$file) {
-                    Debug::dumpVar($line, true, 'no file');
-                }
-
-                $output[] = array(
-                    'File'  =>  $file ? $file->getData() : null
-                    ,'line' =>  $line[1]
-                    ,'result' => trim($line[2])
-                );
-            }
-        }
-        fclose($pipes[1]);
-        proc_close($grepProc);
-
-        JSON::respond(array(
-            'success'=> true
-            ,'data'    =>    $output
-        ));
-    }
-
-    public static function handleRevisionsRequest()
-    {
+    public static function handleRevisionsRequest() {
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
         if (!empty($_REQUEST['ID'])) {
@@ -161,18 +194,31 @@ class EditorRequestHandler extends RequestHandler
         if (!$node) {
             return static::throwNotFoundError();
         } else {
-            $data = array();
-
-            $Fields = array('ID','Class','Handle','Type','MIMEType','Size','SHA1','Status','Timestamp','AuthorID','AncestorID','CollectionID','FullPath');
+            $data = [];
+            $fields = [
+                'ID',
+                'Class',
+                'Handle',
+                'Type',
+                'MIMEType',
+                'Size',
+                'SHA1',
+                'Status',
+                'Timestamp',
+                'AuthorID',
+                'AncestorID',
+                'CollectionID',
+                'FullPath'
+            ];
 
             foreach ($node->getRevisions() as $item) {
-                $record = array();
+                $record = [];
 
-                foreach ($Fields as $Field) {
-                    $record[$Field] = $item->$Field;
+                foreach ($fields as $field) {
+                    $record[$field] = $item->$field;
 
-                    if ($Field == 'AuthorID') {
-                        $record['Author'] = $item->Author;
+                    if ($field == 'AuthorID') {
+                        $record['Author'] = Person::getByID($item->AuthorID);
                     }
                 }
                 $data['revisions'][] = $record;
@@ -182,45 +228,44 @@ class EditorRequestHandler extends RequestHandler
         }
     }
 
-    public static function handleCodeMapRequest($class=__CLASS__)
-    {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
+    // public static function handleCodeMapRequest($class=__CLASS__) {
+    //     $GLOBALS['Session']->requireAccountLevel('Developer');
 
-        $Reflection = new ReflectionClass($class);
+    //     $Reflection = new ReflectionClass($class);
 
-        $ReflectionMethods = $Reflection->getMethods();
+    //     $ReflectionMethods = $Reflection->getMethods();
 
-        $methods = array();
+    //     $methods = array();
 
-        foreach ($ReflectionMethods as $ReflectionMethod) {
-            if ($ReflectionMethod->class == $class) {
-                $methods[] = array(
-                    //'object' => $ReflectionMethod
-                    'Method' => $ReflectionMethod->name
-                    ,'Parameters' => $ReflectionMethod->getParameters()
-                    ,'StartLine' => $ReflectionMethod->getStartLine()
-                    ,'EndLine' => $ReflectionMethod->getEndLine()
-                );
-            }
-        }
+    //     foreach($ReflectionMethods as $ReflectionMethod)
+    //     {
+    //         if($ReflectionMethod->class == $class)
+    //         {
+    //             $methods[] = array(
+    //                 //'object' => $ReflectionMethod
+    //                 'Method' => $ReflectionMethod->name
+    //                 ,'Parameters' => $ReflectionMethod->getParameters()
+    //                 ,'StartLine' => $ReflectionMethod->getStartLine()
+    //                 ,'EndLine' => $ReflectionMethod->getEndLine()
+    //             );
+    //         }
+    //     }
 
-        $data = array(
-            'Class' => $class
-            ,'Parent' => $Reflection->getParentClass()
-            ,'Methods' => $methods
-        );
+    //     $data = array(
+    //         'Class' => $class
+    //         ,'Parent' => $Reflection->getParentClass()
+    //         ,'Methods' => $methods
+    //     );
 
-        return static::respond('codeMap', $data);
-    }
-
+    //     return static::respond('codeMap', $data);
+    // }
 
     public static function handleActivityRequest()
     {
         $GLOBALS['Session']->requireAccountLevel('Developer');
 
-        if (static::peekPath() == 'all') {
+        if(static::peekPath() == 'all')
             static::$activityPageSize = false;
-        }
 
         $activity = array();
         $openFiles = array();
@@ -255,21 +300,23 @@ class EditorRequestHandler extends RequestHandler
             unset($openFiles[$path]);
         };
 
-        while ((!static::$activityPageSize || (count($activity)+count($openFiles) < static::$activityPageSize)) && ($editRecord = $editResults->fetch_assoc())) {
+        while((!static::$activityPageSize || (count($activity)+count($openFiles) < static::$activityPageSize)) && ($editRecord = $editResults->fetch_assoc()))
+        {
             $editRecord['Timestamp'] = strtotime($editRecord['Timestamp']);
             $path = $editRecord['AuthorID'].'/'.$editRecord['CollectionID'].'/'.$editRecord['Handle'];
 
 
-            if ($editRecord['Status'] == 'Deleted') {
-                if (array_key_exists($path, $openFiles)) {
+            if($editRecord['Status'] == 'Deleted')
+            {
+                if(array_key_exists($path, $openFiles))
                     $closeFile($path);
-                }
 
                 $Author = Person::getByID($editRecord['AuthorID']);
                 $Collection = SiteCollection::getByID($editRecord['CollectionID']);
 
                 $lastActivity = count($activity) ? $activity[count($activity)-1] : null;
-                if ($lastActivity && $lastActivity['EventType'] == 'delete' && $lastActivity['Author']['ID'] == $Author->ID) {
+                if($lastActivity && $lastActivity['EventType'] == 'delete' && $lastActivity['Author']['ID'] == $Author->ID)
+                {
                     // compound into last activity entry if it was a delete by the same person
                     $activity[count($activity)-1]['FirstTimestamp'] = $editRecord['Timestamp'];
                     $activity[count($activity)-1]['files'][] = array(
@@ -278,7 +325,9 @@ class EditorRequestHandler extends RequestHandler
                         ,'CollectionPath' => $Collection->FullPath
                         ,'Timestamp' => $editRecord['Timestamp']
                     );
-                } else {
+                }
+                else
+                {
                     // push new activity
                     $activity[] = array(
                         'EventType' => 'delete'
@@ -294,14 +343,24 @@ class EditorRequestHandler extends RequestHandler
                         )
                     );
                 }
-            } elseif (array_key_exists($path, $openFiles)) {
-                if ($editRecord['Timestamp'] < $openFiles[$path][0]['Timestamp'] - static::$activitySessionThreshold) {
+
+
+
+            }
+            elseif(array_key_exists($path, $openFiles))
+            {
+                if($editRecord['Timestamp'] < $openFiles[$path][0]['Timestamp'] - static::$activitySessionThreshold)
+                {
                     $closeFile($path);
                     $openFiles[$path] = array($editRecord);
-                } else {
+                }
+                else
+                {
                     array_unshift($openFiles[$path], $editRecord);
                 }
-            } else {
+            }
+            else
+            {
                 $openFiles[$path] = array($editRecord);
             }
         }
@@ -324,7 +383,7 @@ class EditorRequestHandler extends RequestHandler
 
     public static function handleTimesheetRequest()
     {
-        if (static::peekPath() == 'html') {
+        if(static::peekPath() == 'html') {
             static::$responseMode = 'html';
         }
 
@@ -344,22 +403,22 @@ class EditorRequestHandler extends RequestHandler
             .' ORDER BY ID DESC'
         );
 
-        while ($editRecord = $editResults->fetch_assoc()) {
+        while($editRecord = $editResults->fetch_assoc()) {
             $day = date('Y-m-d', $editRecord['Timestamp'] - $dayShift);
 
-            if (!array_key_exists($day, $workDays)) {
-                if (count($workDays) == $daysLimit) {
+            if(!array_key_exists($day, $workDays)) {
+                if(count($workDays) == $daysLimit) {
                     break;
                 }
 
                 $workDays[$day] = array();
             }
 
-            if (!array_key_exists($editRecord['AuthorID'], $workDays[$day])) {
+            if(!array_key_exists($editRecord['AuthorID'], $workDays[$day])) {
                 $workDays[$day][$editRecord['AuthorID']] = array();
             }
 
-            if (
+            if(
                 !count($workDays[$day][$editRecord['AuthorID']])
                 || ($workDays[$day][$editRecord['AuthorID']][0]['firstEdit'] - $gapLimit) > $editRecord['Timestamp']
             ) {
@@ -367,37 +426,39 @@ class EditorRequestHandler extends RequestHandler
                     'firstEdit' => $editRecord['Timestamp']
                     ,'lastEdit' => $editRecord['Timestamp']
                 ));
-            } else {
+            }
+            else {
                 $workDays[$day][$editRecord['AuthorID']][0]['firstEdit'] = $editRecord['Timestamp'];
             }
+
         }
 
         // compile results
         $results = array();
-        foreach ($workDays AS $day => $authors) {
-            #        	print("<h1>$day</h1>");
+        foreach($workDays AS $day => $authors) {
+#            print("<h1>$day</h1>");
             $dayResults = array(
                 'date'  => $day
                 ,'authors' => array()
             );
 
-            foreach ($authors AS $authorID => $sessions) {
+            foreach($authors AS $authorID => $sessions) {
                 $authorResults = array(
                     'Person' => Person::getByID($authorID)
                     ,'totalDuration' => 0
                     ,'sessions' => array()
                 );
-#        		print("<h2>$Author->FullName</h2><pre>");
+#                print("<h2>$Author->FullName</h2><pre>");
 
-                foreach ($sessions AS $authorSession) {
+                foreach($sessions AS $authorSession) {
                     $authorSession['duration'] = $authorSession['lastEdit'] - $authorSession['firstEdit'];
                     $authorResults['sessions'][] = $authorSession;
-#        			printf("%s\t->\t%s\t:\t%s minutes\n", date('g:i:sa', $authorSession['firstEdit']), date('g:i:sa', $authorSession['lastEdit']), number_format($authorSession['duration']/60,1));
+#                    printf("%s\t->\t%s\t:\t%s minutes\n", date('g:i:sa', $authorSession['firstEdit']), date('g:i:sa', $authorSession['lastEdit']), number_format($authorSession['duration']/60,1));
                     $authorResults['totalDuration'] += max($authorSession['duration'], $minimumSessionDuration);
                 }
 
                 $dayResults['authors'][] = $authorResults;
-#        		print("</pre><p>".number_format($dayAuthor['duration'] / 60, 1)." minutes estimated total</p>");
+#                print("</pre><p>".number_format($dayAuthor['duration'] / 60, 1)." minutes estimated total</p>");
             }
 
             $results[] = $dayResults;

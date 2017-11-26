@@ -36,8 +36,10 @@ These should be completed before the editor is widely deployed:
 - [X] Restore collection create
 - [X] Handle refresh collection
 - [X] erase dead code
-- [ ] Restore site search
+- [X] Restore site search
 - [ ] Handle file(s) not found in file/diff open
+- [ ] Warn on close without save
+- [ ] Redirect to local path on save of _parent file
 
 ### Low priority
 
