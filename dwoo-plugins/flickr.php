@@ -2,7 +2,7 @@
 
 
 
-function Dwoo_Plugin_flickr(Dwoo $dwoo, $tags, $assign = 'flickrPhotos', $count = 5, $tagmode='all')
+function Dwoo_Plugin_flickr(Dwoo_Core $dwoo, $tags, $assign = 'flickrPhotos', $count = 5, $tagmode='all')
 {
     $cacheKey = sprintf('flickr?tagmode=%s&tags=%s', urlencode($tagmode), urlencode($tags));
 

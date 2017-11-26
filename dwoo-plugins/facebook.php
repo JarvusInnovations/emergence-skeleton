@@ -2,7 +2,7 @@
 
 
 
-function Dwoo_Plugin_facebook(Dwoo $dwoo, $page, $assign = 'fbFeed', $limit = 5, $since = false, $cacheTime = 60, $acessToken = '207886205923030|XNMhiHAb8MQp6KmSSIzfd3QH560')
+function Dwoo_Plugin_facebook(Dwoo_Core $dwoo, $page, $assign = 'fbFeed', $limit = 5, $since = false, $cacheTime = 60, $acessToken = '207886205923030|XNMhiHAb8MQp6KmSSIzfd3QH560')
 {
     $url = 'https://graph.facebook.com/'.urlencode($page).'/feed?access_token='.urlencode($acessToken);
     $cacheKey = 'fbFeed:'.$page;

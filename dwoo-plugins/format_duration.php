@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_format_duration(Dwoo $dwoo, $seconds, $showUnits = true)
+function Dwoo_Plugin_format_duration(Dwoo_Core $dwoo, $seconds, $showUnits = true)
 {
     $minutes = floor($seconds / 60);
     $seconds = $seconds % 60;

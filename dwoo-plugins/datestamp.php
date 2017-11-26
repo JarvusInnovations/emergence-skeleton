@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_datestamp(Dwoo $dwoo, $time = null)
+function Dwoo_Plugin_datestamp(Dwoo_Core $dwoo, $time = null)
 {
     $this_year = date('Y');
     $this_day = date('z');
