@@ -67,10 +67,10 @@ Ext.define('EmergenceEditor.controller.Revisions', {
             revisionsProxy = revisionsStore.getProxy(),
             path, revision;
 
-        if (card.isXType('emergence-editortab')) {
+        if (card.isXType('emergence-tab-editor')) {
             path = card.getPath();
             revision = card.getRevision();
-        } else if (card.isXType('emergence-difftab')) {
+        } else if (card.isXType('emergence-tab-diff')) {
             path = card.getLeftPath();
 
             if (path == card.getRightPath()) {

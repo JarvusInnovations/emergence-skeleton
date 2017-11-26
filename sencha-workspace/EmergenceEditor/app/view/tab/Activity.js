@@ -1,6 +1,6 @@
 Ext.define('EmergenceEditor.view.tab.Activity', {
     extend: 'Ext.panel.Panel',
-    xtype: 'emergence-activity',
+    xtype: 'emergence-tab-activity',
     requires: [
         /* global EmergenceEditor */
         'EmergenceEditor.API',

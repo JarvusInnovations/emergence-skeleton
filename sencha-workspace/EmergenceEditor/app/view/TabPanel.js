@@ -27,7 +27,7 @@ Ext.define('EmergenceEditor.view.TabPanel', {
     ],
 
     items: [{
-        xtype: 'emergence-activity',
+        xtype: 'emergence-tab-activity',
         itemId: 'activity'
     }],
 

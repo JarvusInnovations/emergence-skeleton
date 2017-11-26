@@ -35,13 +35,13 @@ Ext.define('EmergenceEditor.controller.Diff', {
         diffTab: {
             forceCreate: true,
 
-            xtype: 'emergence-difftab',
+            xtype: 'emergence-tab-diff',
             title: 'Compare'
         }
     },
 
     control: {
-        'emergence-difftab': {
+        'emergence-tab-diff': {
             activate: 'onDiffActivate'
         }
     },
@@ -51,7 +51,7 @@ Ext.define('EmergenceEditor.controller.Diff', {
     showToken: function(token) {
         var me = this,
             tabPanel = me.getTabPanel(),
-            diffTab = tabPanel.findUsableTab('emergence-difftab', token);
+            diffTab = tabPanel.findUsableTab('emergence-tab-diff', token);
 
         if (diffTab) {
             diffTab.setToken(token);

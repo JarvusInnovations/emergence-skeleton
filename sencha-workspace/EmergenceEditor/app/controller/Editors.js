@@ -45,7 +45,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
         editorTab: {
             forceCreate: true,
 
-            xtype: 'emergence-editortab',
+            xtype: 'emergence-tab-editor',
             title: 'Editor'
         }
     },
@@ -54,7 +54,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
         tabPanel: {
             tabchange: 'onTabChange'
         },
-        'emergence-editortab': {
+        'emergence-tab-editor': {
             activate: 'onEditorActivate',
             dirtychange: 'onEditorDirtyChange'
         },
@@ -86,7 +86,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
     showToken: function(token) {
         var me = this,
             tabPanel = me.getTabPanel(),
-            editorTab = tabPanel.findUsableTab('emergence-editortab', token);
+            editorTab = tabPanel.findUsableTab('emergence-tab-editor', token);
 
         if (editorTab) {
             editorTab.setToken(token);
@@ -148,7 +148,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
         var card = this.getTabPanel().getActiveTab(),
             tab = card.tab;
 
-        if (!card.isXType('emergence-editortab') || !card.isDirty()) {
+        if (!card.isXType('emergence-tab-editor') || !card.isDirty()) {
             return;
         }
 

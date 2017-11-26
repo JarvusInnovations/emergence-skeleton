@@ -22,17 +22,17 @@ Ext.define('EmergenceEditor.controller.Activity', {
 
     refs: {
         tabPanel: 'tabpanel',
-        activityPanel: 'emergence-activity'
+        activityPanel: 'emergence-tab-activity'
     },
 
     control: {
         activityPanel: {
             activate: 'onActivityPanelActivate'
         },
-        'emergence-activity button[action=refresh]': {
+        'emergence-tab-activity button[action=refresh]': {
             click: 'onRefreshClick'
         },
-        'emergence-activity button[action=load-all]': {
+        'emergence-tab-activity button[action=load-all]': {
             click: 'onLoadAllClick'
         }
     },

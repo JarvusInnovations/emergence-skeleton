@@ -1,6 +1,6 @@
 Ext.define('EmergenceEditor.view.tab.Diff', {
     extend: 'Jarvus.ace.DiffPanel',
-    xtype: 'emergence-difftab',
+    xtype: 'emergence-tab-diff',
     mixins: [
         'EmergenceEditor.mixin.Tabbable'
     ],

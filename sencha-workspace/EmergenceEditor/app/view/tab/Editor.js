@@ -1,6 +1,6 @@
 Ext.define('EmergenceEditor.view.tab.Editor', {
     extend: 'Jarvus.ace.Panel',
-    xtype: 'emergence-editortab',
+    xtype: 'emergence-tab-editor',
     mixins: [
         'EmergenceEditor.mixin.Tabbable'
     ],
