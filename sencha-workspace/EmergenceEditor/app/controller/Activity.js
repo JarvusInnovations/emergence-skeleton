@@ -21,7 +21,7 @@ Ext.define('EmergenceEditor.controller.Activity', {
     },
 
     refs: {
-        tabPanel: 'tabpanel',
+        tabPanel: 'emergence-tabpanel',
         activityPanel: 'emergence-tab-activity'
     },
 

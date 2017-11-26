@@ -30,7 +30,7 @@ Ext.define('EmergenceEditor.controller.Diff', {
     },
 
     refs: {
-        tabPanel: 'tabpanel',
+        tabPanel: 'emergence-tabpanel',
 
         diffTab: {
             forceCreate: true,

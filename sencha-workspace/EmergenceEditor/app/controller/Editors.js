@@ -40,7 +40,7 @@ Ext.define('EmergenceEditor.controller.Editors', {
     refs: {
         saveBtn: 'emergence-toolbar button[action=save]',
 
-        tabPanel: 'tabpanel',
+        tabPanel: 'emergence-tabpanel',
 
         editorTab: {
             forceCreate: true,

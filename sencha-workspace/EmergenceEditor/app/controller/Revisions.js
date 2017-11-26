@@ -21,7 +21,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     ],
 
     refs: {
-        editorTabPanel: 'emergence-tabpanel',
+        tabPanel: 'emergence-tabpanel',
         revisionsGrid: 'emergence-revisionsgrid',
 
         menu: {
@@ -37,8 +37,8 @@ Ext.define('EmergenceEditor.controller.Revisions', {
     },
 
     control: {
-        editorTabPanel: {
-            tabchange: 'onEditorTabChange'
+        tabPanel: {
+            tabchange: 'onTabChange'
         },
         revisionsGrid: {
             expand: 'onRevisionsGridExpand',
@@ -61,7 +61,7 @@ Ext.define('EmergenceEditor.controller.Revisions', {
 
 
     // event handlers
-    onEditorTabChange: function(editorTabPanel, card) {
+    onTabChange: function(tabPanel, card) {
         var revisionsGrid = this.getRevisionsGrid(),
             revisionsStore = this.getRevisionsStore(),
             revisionsProxy = revisionsStore.getProxy(),
