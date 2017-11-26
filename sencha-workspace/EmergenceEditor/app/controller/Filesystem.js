@@ -67,11 +67,8 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
             itemdblclick: 'onItemDblClick',
             itemcontextmenu: 'onItemContextMenu'
         },
-        'emergence-menu-file menuitem[action=rename]': {
-            click: 'onFileRenameClick'
-        },
-        'emergence-menu-collection menuitem[action=rename]': {
-            click: 'onCollectionRenameClick'
+        'emergence-menu-file menuitem[action=rename], emergence-menu-collection menuitem[action=rename]': {
+            click: 'onNodeRenameClick'
         }
     },
 
@@ -134,28 +131,21 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
             menu.setSelectedNodes(selectedNodes);
         } else if (node.isLeaf()) {
             menu = me.getFileMenu();
-            menu.setFile(node);
+            menu.setNode(node);
         } else {
             menu = me.getCollectionMenu();
-            menu.setCollection(node);
+            menu.setNode(node);
         }
 
         menu.showAt(event.getXY());
     },
 
-    onFileRenameClick: function() {
-        var file = this.getFileMenu().getFile();
+    onNodeRenameClick: function(menuItem) {
+        var node = menuItem.up('menu').getNode();
 
-        file.set('renaming', true);
-        this.getFilesystemTree().getPlugin('cellediting').startEdit(file, 0);
+        node.set('renaming', true);
+        this.getFilesystemTree().getPlugin('cellediting').startEdit(node, 0);
     },
-
-    onCollectionRenameClick: function() {
-        var collection = this.getCollectionMenu().getCollection();
-
-        collection.set('renaming', true);
-        this.getFilesystemTree().getPlugin('cellediting').startEdit(collection, 0);
-    }
 
 
     // // views: ['contextmenu.CollectionMenu', 'contextmenu.FileMenu', 'contextmenu.MultiNodeMenu'],

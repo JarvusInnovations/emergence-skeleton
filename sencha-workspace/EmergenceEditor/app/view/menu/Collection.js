@@ -4,7 +4,7 @@ Ext.define('EmergenceEditor.view.menu.Collection', {
 
 
     config: {
-        collection: null
+        node: null
     },
 
     items: [
@@ -37,7 +37,7 @@ Ext.define('EmergenceEditor.view.menu.Collection', {
 
 
     // config handlers
-    updateCollection: function(collection) {
+    updateNode: function(collection) {
         var me = this,
             isLocal = collection.get('Site') == 'Local';
 

@@ -10,7 +10,7 @@ Ext.define('EmergenceEditor.view.menu.File', {
 
 
     config: {
-        file: null,
+        node: null,
 
         plain: true
     },
@@ -81,7 +81,7 @@ Ext.define('EmergenceEditor.view.menu.File', {
 
 
     // config handlers
-    updateFile: function(file) {
+    updateNode: function(file) {
         var me = this,
             editItem = me.child('[action=edit]'),
             openFileItem = me.child('[action=open-file]'),
