@@ -77,7 +77,10 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     onStoreNodeUpdate: function(store, node, operation, modifiedFieldNames) {
         var path, newPath;
 
-        if (Ext.Array.contains(modifiedFieldNames, 'Handle')) {
+        if (!modifiedFieldNames || !Ext.Array.contains(modifiedFieldNames, 'Handle')) {
+            return;
+        }
+
             path = node.get('FullPath');
             newPath = path.replace(/[^/]+$/, node.get('Handle'));
 
