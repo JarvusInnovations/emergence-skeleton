@@ -97,7 +97,7 @@
 
     <target name="-after-build">
         <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${build.out.resources.dir}/images" excludes="**/loading.gif" />
+            <fileset dir="${build.out.resources.dir}/images" excludes="**/loading.gif,**/*.svg" />
             <fileset dir="${build.out.resources.dir}/ext" />
         </delete>
     </target>
