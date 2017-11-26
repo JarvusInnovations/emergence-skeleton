@@ -3,7 +3,8 @@ Ext.define('EmergenceEditor.view.FilesystemTree', {
     xtype: 'emergence-filesystemtree',
     requires: [
         'Ext.tree.plugin.TreeViewDragDrop',
-        'Ext.grid.plugin.CellEditing'
+        'Ext.grid.plugin.CellEditing',
+        'Ext.form.field.Text'
     ],
 
 
@@ -39,7 +40,10 @@ Ext.define('EmergenceEditor.view.FilesystemTree', {
             xtype: 'treecolumn',
             dataIndex: 'Handle',
             align: 'left',
-            editor: 'textfield'
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
         }
     ]
 });

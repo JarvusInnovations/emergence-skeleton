@@ -5,8 +5,9 @@
  * - Open file on double-click
  * - Show collection/file/multiple context menus
  * - Coordinate renaming tree nodes
- * - [ ] Handle context menu items
- * - [ ] Handle drag+drop of files into tree
+ * - Handle context menu items
+ * - [ ] Handle drag+drop of nodes to move
+ * - [ ] Handle drag+drop of external files to upload
  */
 Ext.define('EmergenceEditor.controller.Filesystem', {
     extend: 'Ext.app.Controller',
@@ -75,39 +76,120 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
         },
         'emergence-menu-collection menuitem[action=refresh]': {
             click: 'onCollectionRefreshClick'
+        },
+        'emergence-menu-collection menuitem[action=new-file]': {
+            click: 'onCollectionNewFileClick'
+        },
+        'emergence-menu-collection menuitem[action=new-collection]': {
+            click: 'onCollectionNewCollectionClick'
         }
     },
 
 
     // event handlers
     onStoreNodeUpdate: function(store, node, operation, modifiedFieldNames) {
-        var path, newPath;
+        var filesystemTree, path, newHandle, newPath, existingNode;
 
         if (!modifiedFieldNames || !Ext.Array.contains(modifiedFieldNames, 'Handle')) {
             return;
         }
 
-        path = node.get('FullPath');
-        newPath = path.replace(/[^/]+$/, node.get('Handle'));
+        filesystemTree = this.getFilesystemTree();
+
+        path = node.phantom ? null : node.get('FullPath');
+        newHandle = node.get('Handle');
+        newPath = node.parentNode.get('FullPath') + '/' + newHandle;
 
         node.set('loading', true);
 
-        EmergenceEditor.DAV.move(path, newPath).then(function() {
-            node.set({
-                loading: false,
-                Handle: node.get('Handle')
-            }, {
-                dirty: false,
-                commit: true
+        if (path && newPath) {
+            // move/rename
+            EmergenceEditor.DAV.move(path, newPath).then(function() {
+                node.set({
+                    loading: false,
+                    Handle: newHandle,
+                    FullPath: newPath
+                }, {
+                    dirty: false,
+                    commit: true
+                });
+
+                node.parentNode.sort();
+                filesystemTree.ensureVisible(node, {
+                    select: true,
+                    focus: true
+                });
+            }).catch(function(response) {
+                var message = response.responseXML && response.responseXML.querySelector('message');
+
+                node.set('loading', false);
+                node.reject();
+
+                Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
             });
-        }).catch(function(response) {
-            var message = response.responseXML.querySelector('message');
+        } else if (node.isLeaf()) {
+            existingNode = node.parentNode.findChildBy(function(childNode) {
+                return childNode !== node && childNode.get('Handle') == newHandle;
+            });
 
-            node.set('loading', false);
-            node.reject();
+            if (existingNode) {
+                Ext.Msg.alert('Cannot rename', 'A file with the same name already exists in the same collection', function() {
+                    node.set('renaming', true);
+                    filesystemTree.getPlugin('cellediting').startEdit(node, 0);
+                });
+                return;
+            }
 
-            Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
-        });
+            // create new file
+            EmergenceEditor.DAV.uploadFile(newPath, '').then(function() {
+                node.set({
+                    loading: false,
+                    Handle: newHandle,
+                    FullPath: newPath,
+                    Timestamp: new Date()
+                }, {
+                    dirty: false,
+                    commit: true
+                });
+
+                node.parentNode.sort();
+                filesystemTree.ensureVisible(node, {
+                    select: true,
+                    focus: true
+                });
+            }).catch(function(response) {
+                var message = response.responseXML && response.responseXML.querySelector('message');
+
+                node.remove();
+
+                Ext.Msg.alert('Failed to create', message ? message.textContent : 'Failed to create file');
+            });
+        } else {
+            // create new collection
+            EmergenceEditor.DAV.createCollection(newPath).then(function() {
+                node.set({
+                    loading: false,
+                    Handle: newHandle,
+                    FullPath: newPath,
+                    Created: new Date()
+                }, {
+                    dirty: false,
+                    commit: true
+                });
+
+                node.parentNode.sort();
+                filesystemTree.ensureVisible(node, {
+                    select: true,
+                    focus: true
+                });
+            }).catch(function(response) {
+                var message = response.responseXML && response.responseXML.querySelector('message');
+
+                node.remove();
+
+                Ext.Msg.alert('Failed to create', message ? message.textContent : 'Failed to create collection');
+            });
+        }
     },
 
     onItemBeforeEdit: function(editor, context) {
@@ -115,7 +197,13 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     },
 
     onItemCancelEdit: function(editor, context) {
-        context.record.set('renaming', false);
+        var node = context.record;
+
+        if (node.phantom) {
+            node.remove();
+        } else {
+            node.set('renaming', false);
+        }
     },
 
     onItemEdit: function(editor, context) {
@@ -182,6 +270,36 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     onCollectionRefreshClick: function() {
         this.getFilesystemTreeStore().load({
             node: this.getCollectionMenu().getNode()
+        });
+    },
+
+    onCollectionNewFileClick: function() {
+        var me = this,
+            collection = me.getCollectionMenu().getNode();
+
+        collection.expand(false, function() {
+            var newFile = collection.insertChild(0, {
+                Class: 'SiteFile',
+                CollectionID: collection.get('ID'),
+                renaming: true
+            });
+
+            me.getFilesystemTree().getPlugin('cellediting').startEdit(newFile, 0);
+        });
+    },
+
+    onCollectionNewCollectionClick: function() {
+        var me = this,
+            collection = me.getCollectionMenu().getNode();
+
+        collection.expand(false, function() {
+            var newCollection = collection.insertChild(0, {
+                Class: 'SiteCollection',
+                ParentID: collection.get('ID'),
+                renaming: true
+            });
+
+            me.getFilesystemTree().getPlugin('cellediting').startEdit(newCollection, 0);
         });
     }
 

@@ -30,16 +30,20 @@ These should be completed before the editor is widely deployed:
 - [X] Support opening file at specific revision
 - [X] Support opening file to specific line
 - [X] Fix file tree menus
-- [ ] Test/restore rename file
-- [ ] Test/restore delete file
+- [X] Test/restore rename file
+- [X] Test/restore delete file
+- [X] Restore file create
+- [X] Restore collection create
+- [X] Handle refresh collection
 - [ ] erase dead code
 - [ ] Restore site search
-- [ ] Uncollapse deletes in activity tree, let create+edit+delete for same file coallesce
+- [ ] Handle file(s) not found in file/diff open
 
 ### Low priority
 
 Editor can ship without these:
 
+- [ ] Uncollapse deletes in activity tree, let create+edit+delete for same file coallesce
 - [X] Select mode for diff view
 - [ ] Implement file properties view
 - [ ] Update revisions grid on save

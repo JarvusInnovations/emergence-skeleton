@@ -14,8 +14,8 @@ Ext.define('EmergenceEditor.view.menu.Collection', {
             iconCls: 'x-fa fa-file'
         },
         {
-            text: 'New Folder',
-            action: 'new-folder',
+            text: 'New Collection',
+            action: 'new-collection',
             iconCls: 'x-fa fa-folder'
         },
         {
