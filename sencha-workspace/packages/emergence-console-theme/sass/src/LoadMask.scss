@@ -1,0 +1,7 @@
+
+.#{$prefix}mask-msg-text {
+    background-image: theme-background-image('loadmask/loading', 'svg');
+    background-repeat: no-repeat;
+    background-position: $loadmask-msg-inner-icon-position;
+    background-size: 50px 50px;
+}
