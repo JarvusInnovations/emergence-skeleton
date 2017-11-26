@@ -83,26 +83,70 @@ Ext.define('EmergenceEditor.view.tab.Search', {
     // config handlers
     updateContent: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
     },
 
     updateContentFormat: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
     },
 
     updateCase: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
     },
 
     updateFilename: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
     },
 
     updateInclude: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
     },
 
     updatePath: function () {
         this.setLoadNeeded(true);
+        this.syncTitle();
+    },
+
+
+    // internal methods
+    syncTitle: function() {
+        var me = this,
+            path = me.getPath(),
+            filename = me.getFilename(),
+            content = me.getContent(),
+            title = '';
+
+        if (me.getInclude() != 'parent') {
+            title += '^';
+        }
+
+        if (path) {
+            title += path + '/';
+        }
+
+        if (filename) {
+            title += '**/' + filename;
+        } else {
+            title += '**/*';
+        }
+
+        if (content) {
+            if (me.getContentFormat() == 'regex') {
+                title += '&emsp;/'+content+'/'; // TODO: escape html?
+            } else {
+                title += '&emsp;&ldquo;'+content+'&rdquo;';
+            }
+
+            if (me.getCase() != 'match') {
+                title += 'i'
+            }
+        }
+
+        me.setTitle(title);
     },
 
 
