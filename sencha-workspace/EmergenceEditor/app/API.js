@@ -1,4 +1,4 @@
 Ext.define('EmergenceEditor.API', {
-    extend: 'Jarvus.util.AbstractAPI',
+    extend: 'Emergence.util.AbstractAPI',
     singleton: true
 });

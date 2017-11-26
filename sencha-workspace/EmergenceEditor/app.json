@@ -19,7 +19,7 @@
         "font-awesome",
         "ux",
         "jarvus-hash",
-        "jarvus-apikit",
+        "emergence-apikit",
         "jarvus-lazydata",
         "jarvus-ace"
     ],
