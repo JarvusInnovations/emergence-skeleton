@@ -69,6 +69,9 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
         },
         'emergence-menu-file menuitem[action=rename], emergence-menu-collection menuitem[action=rename]': {
             click: 'onNodeRenameClick'
+        },
+        'emergence-menu-file menuitem[action=delete], emergence-menu-collection menuitem[action=delete]': {
+            click: 'onNodeDeleteClick'
         }
     },
 
@@ -81,27 +84,27 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
             return;
         }
 
-            path = node.get('FullPath');
-            newPath = path.replace(/[^/]+$/, node.get('Handle'));
+        path = node.get('FullPath');
+        newPath = path.replace(/[^/]+$/, node.get('Handle'));
 
-            node.set('loading', true);
+        node.set('loading', true);
 
-            EmergenceEditor.DAV.move(path, newPath).then(function() {
-                node.set({
-                    loading: false,
-                    Handle: node.get('Handle')
-                }, {
-                    dirty: false,
-                    commit: true
-                });
-            }).catch(function(response) {
-                var message = response.responseXML.querySelector('message');
+        EmergenceEditor.DAV.move(path, newPath).then(function() {
+            node.set({
+                loading: false,
+                Handle: node.get('Handle')
+            }, {
+                dirty: false,
+                commit: true
+            });
+        }).catch(function(response) {
+            var message = response.responseXML.querySelector('message');
 
-                node.set('loading', false);
+            node.set('loading', false);
             node.reject();
 
-                Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
-            });
+            Ext.Msg.alert('Failed to rename', message ? message.textContent : 'Failed to rename file or collection');
+        });
     },
 
     onItemBeforeEdit: function(editor, context) {
@@ -148,6 +151,29 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
 
         node.set('renaming', true);
         this.getFilesystemTree().getPlugin('cellediting').startEdit(node, 0);
+    },
+
+    onNodeDeleteClick: function(menuItem) {
+        var node = menuItem.up('menu').getNode(),
+            noun = node.isLeaf() ? 'file' : 'collection';
+
+        Ext.Msg.confirm('Delete '+noun, 'Are you sure you want to delete the '+noun+' <strong><code>' + node.get('Handle') + '</code></strong>?', function(btnId) {
+            if (btnId != 'yes') {
+                return;
+            }
+
+            node.set('loading', true);
+
+            EmergenceEditor.DAV.delete(node.get('FullPath')).then(function() {
+                node.remove();
+            }).catch(function(response) {
+                var message = response.responseXML.querySelector('message');
+
+                node.set('loading', false);
+
+                Ext.Msg.alert('Failed to delete', message ? message.textContent : 'Failed to delete file or collection');
+            });
+        });
     },
 
 
