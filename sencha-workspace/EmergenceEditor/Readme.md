@@ -35,7 +35,7 @@ These should be completed before the editor is widely deployed:
 - [X] Restore file create
 - [X] Restore collection create
 - [X] Handle refresh collection
-- [ ] erase dead code
+- [X] erase dead code
 - [ ] Restore site search
 - [ ] Handle file(s) not found in file/diff open
 

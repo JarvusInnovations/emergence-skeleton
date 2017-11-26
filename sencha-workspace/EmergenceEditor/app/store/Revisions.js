@@ -1,6 +1,5 @@
 Ext.define('EmergenceEditor.store.Revisions', {
     extend: 'Ext.data.Store',
-    alias: 'store.revisions',
     requires: [
         'EmergenceEditor.API',
         'Jarvus.proxy.API'

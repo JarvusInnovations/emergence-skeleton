@@ -1,7 +1,8 @@
-/* jslint browser: true, undef: true, white: false, laxbreak: true *//* global Ext, EmergenceEditor*/
-Ext.define('EmergenceEditor.view.SearchResults', {
+Ext.define('EmergenceEditor.view.tab.SearchResults', {
     extend: 'Ext.view.View',
-    alias: 'widget.search-results',
+    xtype: 'emergence-tab-searchresults',
+
+
     layout: 'fit',
 
     store: 'SiteSearch',

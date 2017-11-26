@@ -6,6 +6,7 @@
  * - Show collection/file/multiple context menus
  * - Coordinate renaming tree nodes
  * - Handle context menu items
+ * - [ ] Handle multi-node operations
  * - [ ] Handle drag+drop of nodes to move
  * - [ ] Handle drag+drop of external files to upload
  */
@@ -304,96 +305,6 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     }
 
 
-    // // views: ['contextmenu.CollectionMenu', 'contextmenu.FileMenu', 'contextmenu.MultiNodeMenu'],
-    // stores: ['FilesTree'],
-    // models: ['File'],
-    // refs: [{
-    //     ref: 'fileMenu',
-    //     autoCreate: true,
-    //     selector: 'emergence-filemenu',
-    //     xtype: 'emergence-filemenu'
-    // }, {
-    //     ref: 'collectionMenu',
-    //     autoCreate: true,
-    //     selector: 'emergence-collectionmenu',
-    //     xtype: 'emergence-collectionmenu'
-    // }, {
-    //     ref: 'multiMenu',
-    //     autoCreate: true,
-    //     selector: 'emergence-multinodemenu',
-    //     xtype: 'emergence-multinodemenu'
-    // }, {
-    //     ref: 'filesTree',
-    //     selector: 'emergence-filestree',
-    //     xtype: 'emergence-filestree'
-    // }],
-    // onLaunch: function() {
-    //     // console.info('Emergence.Editor.controller.Files.onLaunch()');
-    // },
-    // init: function() {
-    //     // console.info('Emergence.Editor.controller.Files.init()');
-
-    //     // Start listening for events on views
-    //     this.control({
-
-    //         /*
-    //          *  FILE TREE EVENTS
-    //          */
-    //         'emergence-filestree': {
-    //             itemcontextmenu: this.onNodeContextMenu,
-    //             render: this.onTreeRendered
-    //         },
-    //         'emergence-filestree treeview': {
-    //             beforedrop: this.onTreeNodeBeforeDrop,
-    //             drop: this.onTreeNodeMoveDrop
-    //         },
-
-    //         /*
-    //          *  FILE NODE CONTEXT MENU
-    //          */
-    //         'emergence-filemenu > menuitem[action=properties]': {
-    //             click: this.onPropertiesClick
-    //         },
-    //         'emergence-filemenu > menuitem[action=rename]': {
-    //             click: this.onRenameClick
-    //         },
-    //         'emergence-filemenu > menuitem[action=open]': {
-    //             click: this.onOpenClick
-    //         },
-    //         'emergence-filemenu > menuitem[action=delete]': {
-    //             click: this.onDeleteClick
-    //         },
-
-    //         /*
-    //          *  FOLDER NODE CONTEXT MENU
-    //          */
-    //         'emergence-collectionmenu > menuitem[action=new-file]': {
-    //             click: this.onNewFileClick
-    //         },
-    //         'emergence-collectionmenu > menuitem[action=new-folder]': {
-    //             click: this.onNewFolderClick
-    //         },
-    //         'emergence-collectionmenu > menuitem[action=rename]': {
-    //             click: this.onRenameClick
-    //         },
-    //         'emergence-collectionmenu > menuitem[action=refresh]': {
-    //             click: this.onRefreshClick
-    //         },
-    //         'emergence-collectionmenu > menuitem[action=delete]': {
-    //             click: this.onDeleteClick
-    //         },
-
-    //         /*
-    //          *  MULTI NODE CONTEXT MENU
-    //          */
-    //         'emergence-multinodemenu > menuitem[action=open]': {
-    //             click: this.onMultiOpenClick
-    //         },
-    //         'emergence-multinodemenu > menuitem[action=delete]': {
-    //             click: this.onMultiDeleteClick
-    //         }
-    //     });
-    // },
     // onTreeRendered: function() {
     //     this.getFilesTree().el.on('dragover', this.onTreeDragover, this);
     //     this.getFilesTree().el.on('dragleave', this.onTreeDragleave, this);
@@ -480,12 +391,6 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     //         }
     //     }
     // },
-    // openFileByRecord: function(record) {
-    //     Ext.util.History.add('/'+record.get('FullPath'), true);
-    // },
-    // openRevisionByRecord: function(record) {
-
-    // },
 
     // /*
     //  *           FILE TREE NODE MOVEMENT HANDLERS
@@ -531,119 +436,6 @@ Ext.define('EmergenceEditor.controller.Filesystem', {
     //         //         }
     //         //     }
     //         // }, this);
-    //     }, this);
-    // },
-
-    // /*
-    //  *           FILE TREE EVENT HANDLERS
-    //  */
-    // onTreeStoreLoad: function(store, node, records, successful, options) {
-
-    // },
-    // onNodeContextMenu: function(treePanel, record, item, index, event, options) {
-    //     event.stopEvent();
-
-    //     this.currentRecord = record;
-
-    //     var selectionModel = this.getFilesTree().getSelectionModel()
-
-    //     var selection = selectionModel.getSelection();
-
-    //     var foundRecordInSelection = false;
-
-    //     Ext.each(selection, function(item) {
-    //         if (item.internalId == record.internalId) {
-    //             foundRecordInSelection = true;
-    //         }
-    //     }, this);
-
-    //     if (!foundRecordInSelection) {
-    //         selectionModel.select(record);
-    //     }
-
-    //     if (record.raw.Class == 'SiteFile' && selection.length == 1) {
-    //         this.getFileMenu().showAt(event.getXY());
-    //     } else if (record.raw.Class == 'SiteCollection' && selection.length == 1) {
-    //         this.getCollectionMenu().showAt(event.getXY());
-    //     } else if (selection.length > 1) {
-    //         this.getMultiMenu().showAt(event.getXY());
-    //     }
-    // },
-
-    // /*
-    //  *           FILE CONTEXT MENU EVENT HANDLERS
-    //  */
-    // onPropertiesClick: function(menuItem, event, options) {
-    //     var data = this.currentRecord.raw;
-
-    //     var html = '';
-
-    //     for (var key in data) {
-    //         html += key + ': ' + data[key] + '<br>\n';
-    //     }
-
-    //     Ext.create('Ext.window.Window', {
-    //         title: data.Handle,
-    //         height: 300,
-    //         width: 375,
-    //         layout: 'fit',
-    //         html: html
-    //     }).show();
-    // },
-    // onOpenClick: function(menuItem, event, options) {
-    //     this.openFileByRecord(this.currentRecord);
-    // },
-
-    // /*
-    //  *           FOLDER CONTEXT MENU EVENT HANDLERS
-    //  */
-    // onNewFileClick: function(menuItem, event, options) {
-    //     Ext.Msg.prompt('New File', 'Provide a filename:', function(button, value, options) {
-    //         if (button == 'ok' && !Ext.isEmpty(value)) {
-    //             var newFile = this.currentRecord.raw.FullPath + '/' + value;
-
-    //             // EmergenceEditor.store.DavClient.createFileNode(newFile, function() {
-    //             //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
-    //             // }, this);
-    //         }
-    //     }, this);
-    // },
-    // onNewFolderClick: function(menuItem, event, options) {
-    //     Ext.Msg.prompt('New Folder', 'Provide a folder name:', function(button, value, options) {
-    //         if (button == 'ok' && !Ext.isEmpty(value)) {
-    //             var newFolder = this.currentRecord.raw.FullPath + '/' + value;
-
-    //             // EmergenceEditor.store.DavClient.createCollectionNode(newFolder, function() {
-    //             //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
-    //             // }, this);
-    //         }
-    //     }, this);
-    // },
-    // onRefreshClick: function(menuItem, event, options) {
-    //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord);
-    // },
-
-    // /*
-    //  *           FOLDER & FILE CONTEXT MENU EVENT HANDLERS
-    //  */
-    // onRenameClick: function(menuItem, event, options) {
-    //     Ext.Msg.prompt('Rename File', 'Provide a new name:', function(button, value, options) {
-    //         if (button == 'ok' && !Ext.isEmpty(value)) {
-    //             var newPath = this.currentRecord.parentNode.raw.FullPath + '/' + value;
-
-    //             // EmergenceEditor.store.DavClient.renameNode(this.currentRecord.raw.FullPath, newPath, function() {
-    //             //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-    //             // }, this);
-    //         }
-    //     }, this, false, this.currentRecord.raw.Handle);
-    // },
-    // onDeleteClick: function(menuItem, event, options) {
-    //     Ext.Msg.confirm('Delete File', 'Are you sure you want to delete ' + this.currentRecord.raw.Handle + '?', function(button, value, options) {
-    //         if (button == 'yes') {
-    //             // EmergenceEditor.store.DavClient.deleteNode(this.currentRecord.raw.FullPath, function() {
-    //             //     this.getFilesTreeStore().refreshNodeByRecord(this.currentRecord.parentNode);
-    //             // }, this);
-    //         }
     //     }, this);
     // },
 
