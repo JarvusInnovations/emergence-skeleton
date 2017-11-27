@@ -42,7 +42,7 @@ class EditorRequestHandler extends RequestHandler
             if (!empty($_GET['contentFormat']) && $_GET['contentFormat'] == 'regex') {
                 $contentQuery = $_GET['content'];
             } else {
-                $contentQuery = preg_quote($_GET['content']);
+                $contentQuery = preg_quote($_GET['content'], '/');
             }
         }
 
