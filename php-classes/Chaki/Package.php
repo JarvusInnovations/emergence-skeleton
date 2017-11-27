@@ -46,6 +46,10 @@ class Package extends \Jarvus\Sencha\Package
             }
 
 
+            // ensure branches are all up to date
+            $repo->run('fetch', ['origin', '*:*']);
+
+
             // choose best branch
             $references = $repo->getReferences();
 
@@ -68,10 +72,6 @@ class Package extends \Jarvus\Sencha\Package
             if (!$branchName) {
                 $branchName = 'master';
             }
-
-
-            // ensure branch is up to date
-            $repo->run('fetch', ['origin', "$branchName:$branchName"]);
 
 
             // read packages.json
