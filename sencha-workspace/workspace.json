@@ -57,5 +57,9 @@
          * This folder contains all extracted (remote) packages.
          */
         "extract": "${workspace.dir}/packages.remote"
+    },
+
+    "cmd": {
+        "version": "6.5.2.15"
     }
 }

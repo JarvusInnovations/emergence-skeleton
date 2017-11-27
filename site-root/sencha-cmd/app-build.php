@@ -154,6 +154,8 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     // precache and write workspace config
     $cachedFiles = Emergence_FS::cacheTree($workspaceConfigPath);
     Benchmark::mark("precached $cachedFiles files in $workspaceConfigPath");
+    $exportResult = copy(Site::resolvePath("$workspacePath/workspace.json")->RealPath, "$tmpPath/workspace.json");
+    Benchmark::mark("exported $workspacePath/workspace.json to $tmpPath/workspace.json: ".var_export($exportResult, true));
     $exportResult = Emergence_FS::exportTree($workspaceConfigPath, $workspaceConfigTmpPath);
     Benchmark::mark("exported $workspaceConfigPath to $workspaceConfigTmpPath: ".http_build_query($exportResult));
 

@@ -110,7 +110,7 @@ class Sencha_App
         } elseif ($filePath[0] == 'microloaders') {
             array_shift($filePath);
             array_unshift($filePath, 'sencha-workspace', 'microloaders', $framework);
-        } elseif($filePath[0] == 'resources') {
+        } elseif ($filePath[0] == 'resources') {
             array_unshift($filePath, 'sencha-build', $appName, 'production');
         } elseif ($filePath[0] == 'build') {
             if ($filePath[1] == 'sdk' || $filePath[1] == $framework) {
