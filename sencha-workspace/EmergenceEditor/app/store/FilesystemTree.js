@@ -9,14 +9,22 @@ Ext.define('EmergenceEditor.store.FilesystemTree', {
     model: 'EmergenceEditor.model.FilesystemNode',
 
     config: {
-        folderSort: true,
-        sortOnLoad: true,
         nodeParam: null,
 
-        sorters: [{
-            property: 'Handle',
-            direction: 'ASC'
-        }],
+        sorters: [
+            {
+                property: 'leaf',
+                direction: 'ASC'
+            },
+            {
+                property: 'Local',
+                direction: 'ASC'
+            },
+            {
+                property: 'Handle',
+                direction: 'ASC'
+            }
+        ],
 
         root: {
             text: 'children',

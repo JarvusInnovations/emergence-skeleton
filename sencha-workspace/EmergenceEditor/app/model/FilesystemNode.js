@@ -26,6 +26,8 @@ Ext.define('EmergenceEditor.model.FilesystemNode', {
             name: 'Status',
             type: 'string'
         },
+
+        // common virtual fields
         {
             name: 'leaf',
             type: 'boolean',
@@ -34,6 +36,23 @@ Ext.define('EmergenceEditor.model.FilesystemNode', {
                 return r.get('Class') == 'SiteFile';
             }
         },
+        {
+            name: 'Local',
+            depends: ['FullPath'],
+            convert: function(v, r) {
+                v = r.get('FullPath');
+                return v != '_parent' && v.indexOf('_parent/') !== 0;
+            }
+        },
+        {
+            name: 'Remote',
+            depends: ['Local'],
+            convert: function(v, r) {
+                return !r.get('Local');
+            }
+        },
+
+        // common UI-state fields
         {
             name: 'renaming',
             defaultValue: false,
