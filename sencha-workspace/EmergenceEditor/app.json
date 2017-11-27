@@ -18,6 +18,7 @@
     "requires": [
         "font-awesome",
         "ux",
+        "jarvus-hotfixes",
         "jarvus-hash",
         "emergence-apikit",
         "jarvus-lazydata",

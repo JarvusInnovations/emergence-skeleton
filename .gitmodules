@@ -3,6 +3,10 @@
 	url = https://github.com/JarvusInnovations/dwoo.git
 	shallow = true
 	branch = 1.2
+[submodule "jarvus-hotfixes"]
+	path = sencha-workspace/packages/jarvus-hotfixes
+	url = https://github.com/JarvusInnovations/sencha-hotfixes.git
+	branch = ext/6/2/0/981
 [submodule "jarvus-apikit"]
 	path = sencha-workspace/packages/jarvus-apikit
 	url = https://github.com/JarvusInnovations/jarvus-apikit.git
