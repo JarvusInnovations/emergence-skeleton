@@ -37,9 +37,11 @@ These should be completed before the editor is widely deployed:
 - [X] Handle refresh collection
 - [X] erase dead code
 - [X] Restore site search
+- [ ] Implement multi-file options
 - [ ] Handle file(s) not found in file/diff open
 - [ ] Warn on close without save
 - [ ] Redirect to local path on save of _parent file
+- [ ] Save tab reorder to state
 
 ### Low priority
 
