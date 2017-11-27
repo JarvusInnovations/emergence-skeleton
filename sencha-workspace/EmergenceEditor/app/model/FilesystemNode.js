@@ -41,6 +41,11 @@ Ext.define('EmergenceEditor.model.FilesystemNode', {
             depends: ['FullPath'],
             convert: function(v, r) {
                 v = r.get('FullPath');
+
+                if (!v) {
+                    return true; // phantom files have on path yet and will be local
+                }
+
                 return v != '_parent' && v.indexOf('_parent/') !== 0;
             }
         },
