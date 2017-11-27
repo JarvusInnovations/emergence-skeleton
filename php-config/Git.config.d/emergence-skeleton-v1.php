@@ -22,6 +22,16 @@ if (Site::getConfig('parent_hostname') == null) {
         ]
     ];
 
+    Git::$repositories['dwoo'] = [
+        'remote' => 'https://github.com/dwoo-project/dwoo.git'
+        ,'originBranch' => '1.2'
+        ,'workingBranch' => '1.2'
+        ,'trees' => [
+            'php-classes/Dwoo' => 'lib/Dwoo',
+            'dwoo-plugins/builtin' => 'lib/plugins/builtin'
+        ]
+    ];
+
     Git::$repositories['symfony-yaml'] = [
         'remote' => 'https://github.com/symfony/Yaml.git'
         ,'originBranch' => '3.4'
