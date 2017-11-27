@@ -100,6 +100,7 @@
             <fileset dir="${build.out.resources.dir}/images" excludes="**/loading.gif,**/*.svg" />
             <fileset dir="${build.out.resources.dir}/ext" />
             <fileset dir="${build.out.resources.dir}/ux" />
+            <fileset dir="${build.out.resources.dir}/jarvus-ace/ace" excludes="ace.js,ext-modelist.js,ext-searchbox.js,ext-whitespace.js,mode-html.js,mode-php.js,mode-javascript.js,mode-css.js,mode-json.js,mode-scss.js,mode-sass.js,mode-smarty.js,mode-yaml.js,mode-xml.js,mode-svg.js,mode-sh.js,mode-sql.js,mode-markdown.js,mode-jsx.js,worker-css.js,worker-html.js,worker-javascript.js,worker-json.js,worker-php.js,theme-monokai.js" />
         </delete>
     </target>
 </project>
