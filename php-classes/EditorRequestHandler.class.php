@@ -1,7 +1,5 @@
 <?php
 
-use Emergence\People\Person;
-
 class EditorRequestHandler extends RequestHandler
 {
     public static $activitySessionThreshold = 3600;
