@@ -47,7 +47,7 @@ class Package extends \Jarvus\Sencha\Package
 
 
             // ensure branches are all up to date
-            $repo->run('fetch', ['origin', '*:*']);
+            $repo->run('fetch', ['--force', 'origin', '*:*']);
 
 
             // choose best branch
