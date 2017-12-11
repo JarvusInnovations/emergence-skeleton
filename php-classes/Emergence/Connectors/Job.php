@@ -96,8 +96,8 @@ class Job extends ActiveRecord implements LoggerInterface
         $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : array();
         $labelRenderers = is_array($options['labelRenderers']) ? $options['labelRenderers'] : array();
         $valueRenderers = is_array($options['valueRenderers']) ? $options['valueRenderers'] : array();
-        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function ($logEntry) {
-            $title = $logEntry['record']->getTitle();
+        $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function ($logEntry) use ($options) {
+            $title = $options['title'] ?: $logEntry['record']->getTitle();
             $class = $logEntry['record']->Class;
 
             if (strpos($title, $class) === false) {
@@ -161,7 +161,7 @@ class Job extends ActiveRecord implements LoggerInterface
         return $logEntry;
     }
 
-    public function logInvalidRecord(\ActiveRecord $Record)
+    public function logInvalidRecord(\ActiveRecord $Record, $title = null)
     {
         return $this->log(
             LogLevel::WARNING,
@@ -169,7 +169,7 @@ class Job extends ActiveRecord implements LoggerInterface
             [
                 'validationErrors' => $Record->validationErrors,
                 'recordClass' => get_class($Record),
-                'recordTitle' => $Record->getTitle()
+                'recordTitle' => $title ?: $Record->getTitle()
             ]
         );
     }
