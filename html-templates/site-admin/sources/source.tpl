@@ -289,14 +289,17 @@
                 <dd><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></dd>
             {/if}
 
+            <dt>commit</dt>
+            <dd>{$source->getCommitDescription()|escape}</dd>
+
             <dt>working branch</dt>
-            <dd>{$source->getWorkingBranch()}</dd>
+            <dd>{$source->getWorkingBranch()|escape}</dd>
 
             <dt>upstream branch</dt>
-            <dd>{$source->getUpstreamBranch()}</dd>
+            <dd>{$source->getUpstreamBranch()|escape}</dd>
 
             <dt>remote</dt>
-            <dd>{$source->getRemoteUrl()}</dd>
+            <dd>{$source->getRemoteUrl()|escape}</dd>
 
             {if $source->getRemoteProtocol() == 'ssh'}
                 <dt>ssh deploy key</dt>

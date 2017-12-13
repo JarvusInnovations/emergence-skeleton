@@ -255,6 +255,15 @@ class Source
         return $this->trees;
     }
 
+    public function getCommitDescription()
+    {
+        if (!$repository = $this->getRepository()) {
+            return null;
+        }
+
+        return trim($repository->run('describe', ['--tags', '--always']));
+    }
+
     public function getWorkingBranch()
     {
         if ($repository = $this->getRepository()) {
@@ -308,7 +317,7 @@ class Source
 
     public function fetch()
     {
-        return $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch()]);
+        return $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch(), '--tags']);
     }
 
     public function pull()

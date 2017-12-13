@@ -15,7 +15,8 @@
     <table class="table">
         <thead>
             <tr>
-            	<th>Repository ID</th>
+                <th>Repository ID</th>
+            	<th>Commit</th>
         		<th>Working Branch</th>
         		<th>Upstream Branch</th>
         		<th>Status</th>
@@ -27,6 +28,7 @@
                 {$status = $source->getStatus()}
         		<tr>
         			<td><a href="/site-admin/sources/{$id|escape:url}">{$id|escape}</a></td>
+        			<td>{$source->getCommitDescription()|escape}</td>
         			<td>{$source->getWorkingBranch()|escape}</td>
         			<td>{$source->getUpstreamBranch()|escape}</td>
         			<td><span class="label label-{sourceStatusCls $status}">{$status}</span></td>
