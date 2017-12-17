@@ -293,7 +293,30 @@
             <dd>{$source->getCommitDescription()|escape}</dd>
 
             <dt>working branch</dt>
-            <dd>{$source->getWorkingBranch()|escape}</dd>
+            {$workingBranch = $source->getWorkingBranch()}
+            <dd>
+                {if $status == 'clean'}
+                    <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/checkout">
+                        <select name="ref">
+                            {if !$workingBranch}
+                                <option value="" selected>(detached HEAD)</option>
+                            {/if}
+                            {foreach item=refs key=group from=$source->getGroupedRefs()}
+                                <optgroup label="{$group|escape}">
+                                    {foreach item=ref from=$refs}
+                                        <option value="{$group|escape}/{$ref|escape}" {if $group == 'heads' && $ref == $workingBranch}selected{/if}>{$ref|escape}</option>
+                                    {/foreach}
+                                </optgroup>
+                            {/foreach}
+                        </select>
+                        <button type="submit" class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-play"></span> Checkout
+                        </button>
+                    </form>
+                {else}
+                    {$workingBranch|escape} (clean working tree to switch)
+                {/if}
+            </dd>
 
             <dt>upstream branch</dt>
             <dd>{$source->getUpstreamBranch()|escape}</dd>
@@ -310,7 +333,9 @@
                     {else}
                         <em>None configured</em>
                     {/if}
-                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">Manage Deploy Key</a>
+                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">
+                        <span class="glyphicon glyphicon-lock"></span> Manage Deploy Key
+                    </a>
                 </dd>
             {/if}
         </dl>

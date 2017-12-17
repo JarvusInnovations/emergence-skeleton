@@ -264,13 +264,53 @@ class Source
         return trim($repository->run('describe', ['--tags', '--always']));
     }
 
-    public function getWorkingBranch()
+    public function getRefs($root = null)
     {
-        if ($repository = $this->getRepository()) {
-            $workingBranch = trim($repository->run('symbolic-ref', ['HEAD', '--short']));
+        if (!$repository = $this->getRepository()) {
+            return null;
         }
 
-        return $workingBranch ?: $this->getConfig('workingBranch') ?: static::$defaultBranch;
+        $output = trim($repository->run('for-each-ref', ['--format=%(refname)', 'refs/'.$root]));
+        $output = explode(PHP_EOL, $output);
+
+        return $output;
+    }
+
+    public function getGroupedRefs($root = null, array $metaGroups = ['remotes'])
+    {
+        $refs = $this->getRefs($root);
+        $groups = [];
+
+        foreach ($refs as $ref) {
+            $ref = explode('/', $ref);
+
+            array_shift($ref); // throw out 'refs/'
+
+            $groupName = array_shift($ref); // grab root group name
+
+            // append next path component to group name for meta-groups
+            if (in_array($groupName, $metaGroups)) {
+                $groupName .= '/' . array_shift($ref);
+            }
+
+            $groups[$groupName][] = implode('/', $ref);
+        }
+
+
+        return $groups;
+    }
+
+    public function getWorkingBranch()
+    {
+        if (!$repository = $this->getRepository()) {
+            return $this->getConfig('workingBranch') ?: static::$defaultBranch;
+        }
+
+        try {
+            return trim($repository->run('symbolic-ref', ['HEAD', '--short']));
+        } catch (GitProcessException $e) {
+            return null;
+        }
     }
 
     public function getUpstreamBranch()
@@ -318,6 +358,43 @@ class Source
     public function fetch()
     {
         return $this->getRepository()->run('fetch', ['origin', $this->getUpstreamBranch(), '--tags']);
+    }
+
+    public function checkout($ref, $branch = null)
+    {
+        if (!$repository = $this->getRepository()) {
+            throw new \Exception('repository must be initialized first');
+        }
+
+
+        // determine ref / branch
+        if (strpos($ref, 'heads/') === 0) {
+            $branch = substr($ref, 6);
+            $ref = null;
+        } elseif (strpos($ref, 'remotes/') === 0) {
+            list($remotes, $remote, $branch) = explode('/', $ref, 3);
+        }
+
+
+        // build and run git command
+        $args = [];
+
+        if ($branch) {
+            if ($branch && $ref) {
+                $args[] = '-b';
+            }
+
+            $args[] = $branch;
+        }
+
+        if ($ref) {
+            $args[] = "refs/$ref";
+        }
+
+        $repository->run('checkout', $args);
+
+
+        return $branch;
     }
 
     public function pull()

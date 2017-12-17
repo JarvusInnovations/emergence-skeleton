@@ -56,6 +56,8 @@ class SourcesRequestHandler extends \RequestHandler
                 return static::handleDeployKeyRequest($source);
             case 'pull':
                 return static::handlePullRequest($source);
+            case 'checkout':
+                return static::handleCheckoutRequest($source);
             case 'push':
                 return static::handlePushRequest($source);
             case 'sync-from-vfs':
@@ -140,6 +142,25 @@ class SourcesRequestHandler extends \RequestHandler
         ]);
     }
 
+    public static function handleCheckoutRequest(Source $source)
+    {
+        if (empty($_REQUEST['ref'])) {
+            return static::throwInvalidRequestError('ref required');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return static::respond('confirm', [
+                'question' => "Are you sure you want to checkout ref \"$_REQUEST[ref]\"?"
+            ]);
+        }
+
+        $branch = $source->checkout($_REQUEST['ref'], empty($_REQUEST['branch']) ? null : $_REQUEST['branch']);
+
+        $destination = $branch ? "branch \"$branch\"" : 'detached HEAD';
+
+        return static::respondStatusMessage($source, "Checkout out ref \"$_REQUEST[ref]\" to $destination");
+    }
+
     public static function handlePullRequest(Source $source)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -193,7 +214,7 @@ class SourcesRequestHandler extends \RequestHandler
             'results' => $source->syncToVfs()
         ]);
     }
-    
+
     public static function handleStageRequest(Source $source)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -208,7 +229,7 @@ class SourcesRequestHandler extends \RequestHandler
 
         return static::respondStatusMessage($source, "Staged $result change" . ($result == 1 ? '' : 's'));
     }
-    
+
     public static function handleUnstageRequest(Source $source)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -223,7 +244,7 @@ class SourcesRequestHandler extends \RequestHandler
 
         return static::respondStatusMessage($source, "Untaged $result change" . ($result == 1 ? '' : 's'));
     }
-    
+
     public static function handleCommitRequest(Source $source)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -305,10 +326,10 @@ class SourcesRequestHandler extends \RequestHandler
         }
 
         $results = $source->eraseFromVfs();
-        
+
         $collectionsDeleted = 0;
         $filesDeleted = 0;
-        
+
         foreach ($results as $path => $result) {
             if (!empty($result['collectionsDeleted'])) {
                 $collectionsDeleted += count($result['collectionsDeleted']);
