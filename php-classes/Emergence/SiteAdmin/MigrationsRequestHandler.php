@@ -100,14 +100,21 @@ class MigrationsRequestHandler extends \RequestHandler
             \Site::$debug = true;
             $debugLogStartIndex = count(\Debug::$log);
 
+
+            $resetMigrationStatus = function() use ($migrationKey) {
+                static::resetMigrationStatus($migrationKey);
+            };
+
             ob_start();
-            $migration['status'] = include($migrationNode->RealPath);
+            $migration['status'] = call_user_func(function() use ($migration, $migrationNode, $resetMigrationStatus) {
+                return include($migrationNode->RealPath);
+            });
             $output = ob_get_clean();
 
             $migration['executed'] = time();
 
             if ($migration['status'] == static::STATUS_DEBUG) {
-                DB::nonQuery('DELETE FROM `_e_migrations` WHERE `Key` = "%s"', $migrationKey);
+                static::resetMigrationStatus($migrationKey);
             } else {
                 if (!in_array($migration['status'], [static::STATUS_SKIPPED, static::STATUS_EXECUTED])) {
                     $migration['status'] = static::STATUS_FAILED;
@@ -203,6 +210,8 @@ class MigrationsRequestHandler extends \RequestHandler
     // conveniance methods for use within migrations
     protected static function resetMigrationStatus($migrationKey)
     {
+        printf("Resetting migration status for key '%s'\n", $migrationKey);
+
         DB::nonQuery('DELETE FROM `_e_migrations` WHERE `Key` = "%s"', $migrationKey);
     }
 
@@ -214,6 +223,16 @@ class MigrationsRequestHandler extends \RequestHandler
     protected static function columnExists($tableName, $columnName)
     {
         return (boolean)DB::oneRecord('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND COLUMN_NAME = "%s"', DB::escape([$tableName, $columnName]));
+    }
+
+    protected static function getColumns($tableName)
+    {
+        return DB::allRecords('SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s"', DB::escape($tableName));
+    }
+
+    protected static function getColumnNames($tableName)
+    {
+        return DB::allValues('COLUMN_NAME', 'SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s"', DB::escape($tableName));
     }
 
     protected static function getColumn($tableName, $columnName)
@@ -249,5 +268,52 @@ class MigrationsRequestHandler extends \RequestHandler
     protected static function getConstraint($tableName, $constraintName)
     {
         return DB::oneRecord('SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = "%s" AND CONSTRAINT_NAME = "%s"', DB::escape([$tableName, $constraintName]));
+    }
+
+    protected static function addColumn($tableName, $columnName, $definition, $position = null)
+    {
+        printf("Adding column `%s`.`%s`\n", $tableName, $columnName);
+
+        return DB::nonQuery(
+            'ALTER TABLE `%s` ADD COLUMN `%s` %s %s',
+            [
+                $tableName,
+                $columnName,
+                $definition,
+                $position ?: ''
+            ]
+        );
+    }
+
+    protected static function addIndex($tableName, $indexName, array $columns = [], $type = null)
+    {
+        if (!count($columns)) {
+            $columns[] = $indexName;
+        }
+
+        printf("Adding index `%s`.`%s`\n", $tableName, $indexName);
+
+        return DB::nonQuery(
+            'ALTER TABLE `%s` ADD INDEX `%s` %s (`%s`)',
+            [
+                $tableName,
+                $indexName,
+                $type ?: '',
+                implode('`, `', $columns)
+            ]
+        );
+    }
+
+    protected static function dropColumn($tableName, $columnName)
+    {
+        printf("Dropping column `%s`.`%s`\n", $tableName, $columnName);
+
+        return DB::nonQuery(
+            'ALTER TABLE `%s` DROP COLUMN `%s`',
+            [
+                $tableName,
+                $columnName
+            ]
+        );
     }
 }
