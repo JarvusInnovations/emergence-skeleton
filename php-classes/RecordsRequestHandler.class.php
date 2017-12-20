@@ -222,12 +222,7 @@ abstract class RecordsRequestHandler extends RequestHandler
             return static::throwUnauthorizedError();
         }
 
-        if (static::$browseConditions) {
-            if (!is_array(static::$browseConditions)) {
-                static::$browseConditions = array(static::$browseConditions);
-            }
-            $conditions = array_merge(static::$browseConditions, $conditions);
-        }
+        $conditions = static::buildBrowseConditions($conditions);
 
         $limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
         $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? (integer)$_REQUEST['offset'] : false;
@@ -686,6 +681,19 @@ abstract class RecordsRequestHandler extends RequestHandler
         } else {
             return $Record->setFields($data);
         }
+    }
+
+    protected static function buildBrowseConditions(array $conditions = array())
+    {
+        if (static::$browseConditions) {
+            if (is_array(static::$browseConditions)) {
+                $conditions = array_merge(static::$browseConditions, $conditions);
+            } else {
+                $conditions[] = static::$browseConditions;
+            }
+        }
+
+        return $conditions;
     }
 
     // event template functions
