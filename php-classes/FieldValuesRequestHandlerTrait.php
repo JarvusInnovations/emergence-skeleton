@@ -2,7 +2,7 @@
 
 trait FieldValuesRequestHandlerTrait
 {
-    public static function handleFieldValuesRequest($fieldName)
+    public static function handleFieldValuesRequest($fieldName, array $additionalValues = array())
     {
         $recordClass = static::$recordClass;
 
@@ -19,9 +19,9 @@ trait FieldValuesRequestHandlerTrait
             case 'enum':
                 $values = $field['values'];
                 if ($query) {
-                    $values = array_values(array_filter($values, function($value) use ($query) {
+                    $values = array_filter($values, function($value) use ($query) {
                         return stripos($value, $query) !== false;
-                    }));
+                    });
                 }
 
                 break;
@@ -52,8 +52,12 @@ trait FieldValuesRequestHandlerTrait
                 break;
         }
 
+        $values = array_unique(array_merge($values, $additionalValues));
+
+        natcasesort($values);
+
         return static::respond('task-field-values', [
-            'data' => $values,
+            'data' => array_values($values),
             'field' => $fieldName,
             'total' => count($values)
         ]);
