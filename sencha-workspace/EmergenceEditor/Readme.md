@@ -42,12 +42,14 @@ These should be completed before the editor is widely deployed:
 - [ ] Warn on close without save
 - [ ] Redirect to local path on save of _parent file
 - [ ] Save tab reorder to state
+- [ ] Ignore open on phantom files (double clicking on editor tries to open)
 
 ### Low priority
 
 Editor can ship without these:
 
 - [ ] Uncollapse deletes in activity tree, let create+edit+delete for same file coallesce
+- [ ] Add "Save Current As..." to collection context menu -- enter a name and then your current editor saves to it. Defaults to current file's name selected
 - [X] Select mode for diff view
 - [ ] Implement file properties view
 - [ ] Update revisions grid on save
@@ -81,3 +83,4 @@ Editor can ship without these:
   - [ ] sencha-workspace app launcher + tree icons + build commands
   - [ ] sencha-builds app build launcher + tree icons
 - [ ] Search within or load activity for any collection from tree context menu
+- [ ] Support a "developer-templates/" tree in the app FS, read it when it's detected and offer a menu of templates to create files from in the collection context menu
