@@ -33,6 +33,10 @@
         .worktree-file.untracked {
             background-color: #dddddd;
         }
+        .worktree-file:hover {
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, .5), rgba(255, 255, 255, .4));
+            outline: 1px solid rgba(0, 0, 0, .1);
+        }
     </style>
 {/block}
 
