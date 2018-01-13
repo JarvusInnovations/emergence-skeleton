@@ -328,7 +328,7 @@ class Media extends ActiveRecord
 
             if (static::$useFaceDetection && extension_loaded('facedetect')) {
                 Cache::store($cacheKey, time());
-                set_time_limit(10);
+                set_time_limit(static::$faceDetectionTimeLimit);
 
                 $cropper = new CropFace($this->FilesystemPath);
             } else {
