@@ -94,6 +94,7 @@ class Media extends ActiveRecord
     public static $newFilePermissions = 0664;
     public static $magicPath = null;//'/usr/share/misc/magic.mgc';
     public static $useFaceDetection = true;
+    public static $faceDetectionTimeLimit = 10;
 
     public static $mimeHandlers = array();
 
@@ -303,13 +304,43 @@ class Media extends ActiveRecord
         $thumbHeight = $maxHeight;
 
         if ($cropped && extension_loaded('imagick')) {
+            $originalTimeLimit = ini_get('max_execution_time');
+
+            // check for existing facedetect job
+            $cacheKey = "facedetect:{$thumbPath}";
+            $faceDetectTime = Cache::fetch($cacheKey);
+
+            // a parallel or dead worker is already working on this thumb
+            if ($faceDetectTime) {
+                // wait for existing job to finish or timeout
+                while (time() - $faceDetectTime < static::$faceDetectionTimeLimit) {
+                    sleep(1);
+                }
+
+                // other worker succeeded, we're done
+                if (file_exists($thumbPath)) {
+                    return true;
+                }
+
+                // disable face detection because it already failed for this thumb
+                static::$useFaceDetection = false;
+            }
+
             if (static::$useFaceDetection && extension_loaded('facedetect')) {
+                Cache::store($cacheKey, time());
+                set_time_limit(10);
+
                 $cropper = new CropFace($this->FilesystemPath);
             } else {
                 $cropper = new stojg\crop\CropEntropy($this->FilesystemPath);
             }
+
             $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
+
             $croppedImage->writeimage($thumbPath);
+
+            set_time_limit($originalTimeLimit);
+            Cache::delete($cacheKey);
         } else {
             // load source image
             $srcImage = $this->getImage();
