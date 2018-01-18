@@ -25,8 +25,8 @@ if (Site::getConfig('parent_hostname') == null) {
 
     Git::$repositories['symfony-yaml'] = [
         'remote' => 'https://github.com/symfony/Yaml.git'
-        ,'originBranch' => 'master'
-        ,'workingBranch' => 'master'
+        ,'originBranch' => '3.4'
+        ,'workingBranch' => '3.4'
         ,'trees' => [
             'php-classes/Symfony/Component/Yaml' => [
                 'path' => '.'
