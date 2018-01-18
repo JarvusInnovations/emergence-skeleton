@@ -120,11 +120,11 @@ class App
             $appPath = "sencha-workspace/$this";
             $antConfigNode = Site::resolvePath("$appPath/.sencha/app/sencha.cfg");
 
-            if (!$antConfigNode) {
-                throw new \Exception("Could not find .sencha/app/sencha.cf for $appPath");
+            if ($antConfigNode) {
+                $this->appAntConfig = Util::loadAntProperties($antConfigNode->RealPath);
+            } else {
+                $this->appAntConfig = [];
             }
-
-            $this->appAntConfig = Util::loadAntProperties($antConfigNode->RealPath);
         }
 
         return $key ? $this->appAntConfig[$key] : $this->appAntConfig;
