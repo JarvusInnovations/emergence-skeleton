@@ -80,8 +80,9 @@ class App
 
     public function getCmd()
     {
-        if (!$this->cmd) {
-            $this->cmd = Cmd::get($this->getAntConfig('app.cmd.version'));
+        if ($this->cmd === null) {
+            $cmdVersion = $this->getAntConfig('app.cmd.version');
+            $this->cmd = $cmdVersion ? Cmd::get($cmdVersion) : null;
         }
 
         return $this->cmd;
