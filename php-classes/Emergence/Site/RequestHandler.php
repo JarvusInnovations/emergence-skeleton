@@ -5,8 +5,14 @@ namespace Emergence\Site;
 
 abstract class RequestHandler extends \RequestHandler implements IRequestHandler
 {
-    protected static function sendResponse(IResponse $response)
+    public static function sendResponse(IResponse $response, $templatePrefix = null)
     {
-        return static::respond($response->getId(), $response->getPayload(), $response->getMode());
+        $templateId = $response->getId();
+
+        if ($templatePrefix) {
+            $templateId = trim($templatePrefix, '/').'/'.$templateId;
+        }
+
+        return static::respond($templateId, $response->getPayload(), $response->getMode());
     }
 }
