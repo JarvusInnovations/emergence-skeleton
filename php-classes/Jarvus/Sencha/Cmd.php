@@ -11,9 +11,15 @@ class Cmd
 
 
     // factories
-    public static function get($ident)
+    public static function get($version)
     {
-        return new static($ident);
+        $availableVersions = static::getAvailableVersions();
+
+        if (!array_key_exists($version, $availableVersions)) {
+            throw new \Exception(sprintf('sencha-cmd version %1$s is not available, try running `hab pkg install jarvus/sencha-cmd/%1$s` on the host system. Available versions currently include: %2$s', $version, implode(', ', array_keys($availableVersions))));
+        }
+
+        return new static($availableVersions[$version]);
     }
 
     public static function getLatest()
@@ -24,7 +30,7 @@ class Cmd
             throw new \Exception(sprintf('No version of %s/%s is installed', static::$pkgOrigin, static::$pkgName));
         }
 
-        return static::get(end($availableVersions));
+        return new static(end($availableVersions));
     }
 
 
