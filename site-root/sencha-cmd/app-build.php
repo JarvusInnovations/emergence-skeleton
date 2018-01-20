@@ -279,7 +279,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
         $process = proc_open(
             "$shellCommand 2>&1",
             [
-        		1 => ['pipe', 'wb'] // STDOUT
+                1 => ['pipe', 'wb'] // STDOUT
             ],
             $pipes
         );
@@ -299,20 +299,46 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 
 
 
+/**
+ * Fix build
+ */
+    $appJson = json_decode(file_get_contents("{$buildTmpPath}/app.json"), true);
+
+    // remove erroneous path prefixes that some versions of CMD include
+    $badPrefix = "{$buildTmpPath}/";
+    $badPrefixLength = strlen($badPrefix);
+
+    foreach ($appJson['js'] as &$file) {
+        if (substr($file['path'], 0, $badPrefixLength) == $badPrefix) {
+            $file['path'] = substr($file['path'], $badPrefixLength);
+        }
+    }
+
+    foreach ($appJson['css'] as &$file) {
+        if (substr($file['path'], 0, $badPrefixLength) == $badPrefix) {
+            $file['path'] = substr($file['path'], $badPrefixLength);
+        }
+    }
+
+    file_put_contents("{$buildTmpPath}/app.json", json_encode($appJson, JSON_PRETTY_PRINT));
+
+
+
+
+
 
 /**
  * Import build
  */
-// import build
-if ($cmdStatus == 0) {
-    Benchmark::mark("importing $buildTmpPath");
+    if ($cmdStatus == 0) {
+        Benchmark::mark("importing $buildTmpPath");
 
-    $importResults = Emergence_FS::importTree($buildTmpPath, "webapp-builds/$app", [
-        'exclude' => $defaultExclude
-    ]);
+        $importResults = Emergence_FS::importTree($buildTmpPath, "webapp-builds/$app", [
+            'exclude' => $defaultExclude
+        ]);
 
-    Benchmark::mark("imported files: ".http_build_query($importResults));
-}
+        Benchmark::mark("imported files: ".http_build_query($importResults));
+    }
 
 
 
@@ -322,7 +348,7 @@ if ($cmdStatus == 0) {
 /**
  * Clean up
  */
-if (empty($_GET['leaveWorkspace'])) {
-    exec("rm -R $tmpPath");
-    Benchmark::mark("erased $tmpPath");
-}
+    if (empty($_GET['leaveWorkspace'])) {
+        exec("rm -R $tmpPath");
+        Benchmark::mark("erased $tmpPath");
+    }
