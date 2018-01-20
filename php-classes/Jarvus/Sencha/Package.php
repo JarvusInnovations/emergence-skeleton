@@ -86,13 +86,11 @@ abstract class Package implements IPackage
     public function getPackageAntConfig($key = null)
     {
         if (!$this->packageAntConfig) {
-            $antConfigPointer = $this->getFilePointer('.sencha/package/sencha.cfg');
-
-            if (!$antConfigPointer) {
-                throw new \Exception("Could not get pointer to .sencha/package/sencha.cfg for package $this");
+            if ($antConfigPointer = $this->getFilePointer('.sencha/package/sencha.cfg')) {
+                $this->packageAntConfig = Util::loadAntProperties($antConfigPointer);
+            } else {
+                $this->packageAntConfig = [];
             }
-
-            $this->packageAntConfig = Util::loadAntProperties($antConfigPointer);
         }
 
         return $key ? $this->packageAntConfig[$key] : $this->packageAntConfig;
