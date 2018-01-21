@@ -1594,7 +1594,7 @@ class ActiveRecord
         }
 
         if (empty($options['label'])) {
-            $rootClass = static::getRootClass();
+            $rootClass = static::getRootClass() ?: get_called_class();
             $options['label'] = Inflector::labelIdentifier($field == 'ID' ? $rootClass::$singularNoun.' ID' : $field);
         }
 
