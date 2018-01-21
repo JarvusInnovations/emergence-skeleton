@@ -302,25 +302,18 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 /**
  * Fix build
  */
-    $appJson = json_decode(file_get_contents("{$buildTmpPath}/app.json"), true);
+    // make JSON readable and strip absolute path prefix
+    $appJson = file_get_contents("{$buildTmpPath}/app.json");
+    $appJson = str_replace("{$buildTmpPath}/", '', $appJson);
+    $appJson = json_encode(json_decode($appJson, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $appJson = str_replace('    ', '  ', $appJson);
+    file_put_contents("{$buildTmpPath}/app.json", $appJson);
 
-    // remove erroneous path prefixes that some versions of CMD include
-    $badPrefix = "{$buildTmpPath}/";
-    $badPrefixLength = strlen($badPrefix);
+    // strip absolute path prefix in index.html
+    $indexHtml = file_get_contents("{$buildTmpPath}/index.html");
+    $indexHtml = str_replace("{$buildTmpPath}/", '', $indexHtml);
+    file_put_contents("{$buildTmpPath}/index.html", $indexHtml);
 
-    foreach ($appJson['js'] as &$file) {
-        if (substr($file['path'], 0, $badPrefixLength) == $badPrefix) {
-            $file['path'] = substr($file['path'], $badPrefixLength);
-        }
-    }
-
-    foreach ($appJson['css'] as &$file) {
-        if (substr($file['path'], 0, $badPrefixLength) == $badPrefix) {
-            $file['path'] = substr($file['path'], $badPrefixLength);
-        }
-    }
-
-    file_put_contents("{$buildTmpPath}/app.json", json_encode($appJson, JSON_PRETTY_PRINT));
 
 
 
