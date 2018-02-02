@@ -4,91 +4,66 @@ namespace Jarvus\Sencha;
 
 class Cmd
 {
-    public static $installRoot = '/usr/local/bin/Sencha/Cmd';
+    public static $pkgOrigin = 'jarvus';
+    public static $pkgName = 'sencha-cmd';
 
-    protected $version;
-    protected $path;
+    protected $ident;
 
 
     // factories
-    public static function get($version, $path = null)
+    public static function get($version)
     {
-        if (!$path) {
-            $availableVersions = static::getAvailableVersions();
+        $availableVersions = static::getAvailableVersions();
 
-            if (empty($availableVersions[$version])) {
-                throw new \Exception('Could not detect path for CMD version');
-            }
-
-            $path = $availableVersions[$version];
+        if (!array_key_exists($version, $availableVersions)) {
+            throw new \Exception(sprintf('sencha-cmd version %1$s is not available, try running `hab pkg install jarvus/sencha-cmd/%1$s` on the host system. Available versions currently include: %2$s', $version, implode(', ', array_keys($availableVersions))));
         }
 
-        return new static($version, $path);
+        return new static($availableVersions[$version]);
     }
 
     public static function getLatest()
     {
         $availableVersions = static::getAvailableVersions();
 
-        end($availableVersions);
-        $latestVersion = key($availableVersions);
+        if (!count($availableVersions)) {
+            throw new \Exception(sprintf('No version of %s/%s is installed', static::$pkgOrigin, static::$pkgName));
+        }
 
-        return static::get($latestVersion, $availableVersions[$latestVersion]);
+        return new static(end($availableVersions));
     }
 
 
     // magic methods and property getters
-    public function __construct($version, $path)
+    public function __construct($ident)
     {
-        $this->version = $version;
-        $this->path = $path;
+        $this->ident = $ident;
     }
 
     public function __toString()
     {
-        return $this->path;
+        return $this->ident;
     }
 
     public function getVersion()
     {
-        return $this->version;
+        return basename(dirname($this->ident));
     }
 
     public function getPath()
     {
-        return $this->path;
+        return '/hab/pkgs/'.$this->ident;
     }
 
     // public instance methods
-    public function getExecutablePath()
+    public function getExecutable()
     {
-        $path = $this->getPath();
-
-        if (substr($path, 0, 5) == '/hab/') {
-            return 'hab pkg exec jarvus/sencha-cmd/'.$this->getVersion().' sencha';
-        }
-
-        return $path.'/sencha';
-    }
-
-    public function getDefaultEnv()
-    {
-        return [
-            'SENCHA_CMD_3_0_0' => $this->getPath()
-        ];
+        return 'hab pkg exec '.$this->ident.' sencha';
     }
 
     public function buildShellCommand()
     {
-        $shellCommand = $this->getExecutablePath();
-
-        $env = $this->getDefaultEnv();
-
-        if (count($env)) {
-            $shellCommand = implode(' ', array_map(function($envKey) use ($env) {
-                return $envKey.'='.escapeshellarg($env[$envKey]);
-            }, array_keys($env))).' '.$shellCommand;
-        }
+        $shellCommand = $this->getExecutable();
 
         $args = array_filter(func_get_args());
         foreach ($args AS $arg) {
@@ -108,12 +83,23 @@ class Cmd
     {
         $results = [];
 
-        foreach (glob(static::$installRoot.'/*.*.*.*') AS $directory) {
-            $results[basename($directory)] = $directory;
+        foreach (glob(sprintf('/hab/pkgs/%s/%s/*/*', static::$pkgOrigin, static::$pkgName)) as $path) {
+            $version = basename(dirname($path));
+            $build = intval(basename($path));
+
+            if (isset($results[$version]) && $results[$version]['build'] > $build) {
+                continue;
+            }
+
+            $results[$version] = [
+                'ident' => substr($path, 10),
+                'version' => $version,
+                'build' => $build
+            ];
         }
 
-        foreach (glob('/hab/pkgs/jarvus/sencha-cmd/*/*') AS $directory) {
-            $results[basename(dirname($directory))] = "$directory/dist";
+        foreach ($results as &$result) {
+            $result = $result['ident'];
         }
 
         uksort($results, 'version_compare');

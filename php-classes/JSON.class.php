@@ -19,6 +19,36 @@ class JSON
             newrelic_disable_autorum();
         }
 
+        if (
+            (!empty($_GET['$profile']) || !empty($_COOKIE['$profile']) || !empty($_SERVER['HTTP_X_PROFILE']))
+            && !empty($GLOBALS['Session'])
+            && $GLOBALS['Session']->hasAccountLevel('Developer')
+        ) {
+            $now = microtime(true);
+            $siteDataPrefix = Site::$rootPath.'/'.SiteFile::$dataPath.'/';
+            $siteDataPrefixLength = strlen($siteDataPrefix);
+
+            $data['$profile'] = array(
+                'log' => Debug::$log,
+                'time' => array(
+                    'initialized' => Site::$initializeTime,
+                    'finished' => $now,
+                    'elapsed' => $now - Site::$initializeTime
+                ),
+                'memory' => array(
+                    'finished' => memory_get_usage(),
+                    'peak' => memory_get_peak_usage()
+                ),
+                'included' => array_map(function ($path) use ($siteDataPrefix, $siteDataPrefixLength) {
+                    if (substr($path, 0, $siteDataPrefixLength) == $siteDataPrefix) {
+                        return 'site://'.SiteFile::getByID(substr($path, $siteDataPrefixLength))->FullPath;
+                    }
+
+                    return 'file://'.$path;
+                }, get_included_files())
+            );
+        }
+
         $text = json_encode($data);
 
         if ($text === false) {
@@ -139,7 +169,7 @@ class JSON
     }
 
 #    public static function mapArrayToRecords($array)
-#	{
+#    {
 #		return array_map(create_function('$value', 'return array($value);'), $array);
 #	}
 #

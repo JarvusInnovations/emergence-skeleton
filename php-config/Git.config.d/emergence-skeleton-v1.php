@@ -1,6 +1,6 @@
 <?php
 
-if (Site::getConfig('handle') == 'skeleton-v1') {
+if (Site::getConfig('parent_hostname') == null) {
     Git::$repositories['emergence-skeleton-v1'] = [
         'remote' => 'https://github.com/JarvusInnovations/emergence-skeleton.git',
         'originBranch' => 'master',
@@ -25,8 +25,8 @@ if (Site::getConfig('handle') == 'skeleton-v1') {
 
     Git::$repositories['symfony-yaml'] = [
         'remote' => 'https://github.com/symfony/Yaml.git'
-        ,'originBranch' => 'master'
-        ,'workingBranch' => 'master'
+        ,'originBranch' => '3.4'
+        ,'workingBranch' => '3.4'
         ,'trees' => [
             'php-classes/Symfony/Component/Yaml' => [
                 'path' => '.'

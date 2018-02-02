@@ -7,6 +7,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 
 
 
+
 /**
  * Configuration
  */
@@ -69,14 +70,14 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     $framework = $app->getFramework();
 
     if (!$framework) {
-        throw new \Exception('Failed to load framework');
+        throw new \Exception('Failed to load framework, ensure app.framework.version is set');
     }
 
     Benchmark::mark("loaded framework: $framework");
 
 
     // load CMD
-    $cmd = $app->getCmd();
+    $cmd = $app->getCmd() ?: Jarvus\Sencha\Cmd::getLatest();
 
     if (!$cmd) {
         throw new \Exception('Failed to load CMD');
@@ -111,7 +112,6 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     $workspacePath = 'sencha-workspace';
     $workspaceConfigPath = "$workspacePath/.sencha";
     $appPath = "$workspacePath/$app";
-    $archivePath = "sencha-build/$app/archive";
 
 
     // get temporary directory and set paths
@@ -120,8 +120,8 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     $workspaceConfigTmpPath = "$tmpPath/.sencha";
     $packagesTmpPath = "$tmpPath/packages";
     $appTmpPath = "$tmpPath/$app";
-    $archiveTmpPath = "$appTmpPath/archive";
-    $buildTmpPath = "$tmpPath/build/$app/$buildType";
+    $buildTmpPath = "$tmpPath/build";
+    $scratchTmpPath = "$tmpPath/temp";
     $libraryTmpPath = "$tmpPath/x";
 
     Benchmark::mark("created tmp: $tmpPath");
@@ -141,15 +141,15 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 /**
  * Copy files into temporary build workspace
  */
-    if (stat($frameworkPhysicalPath)['dev'] == stat($tmpPath)['dev']) {
-        // copy framework w/ hardlinks if paths are on the same device
-        exec("cp -al $frameworkPhysicalPath $frameworkTmpPath");
-        Benchmark::mark("copied framework: cp -al $frameworkPhysicalPath $frameworkTmpPath");
-    } else {
-        // make full copy because hardlines don't work across devices
-        exec("cp -a $frameworkPhysicalPath $frameworkTmpPath");
-        Benchmark::mark("copied framework: cp -a $frameworkPhysicalPath $frameworkTmpPath");
-    }
+    // if (stat($frameworkPhysicalPath)['dev'] == stat($tmpPath)['dev']) {
+    //     // copy framework w/ hardlinks if paths are on the same device
+    //     exec("cp -al $frameworkPhysicalPath $frameworkTmpPath");
+    //     Benchmark::mark("copied framework: cp -al $frameworkPhysicalPath $frameworkTmpPath");
+    // } else {
+    //     // make full copy because hardlines don't work across devices
+    //     exec("cp -a $frameworkPhysicalPath $frameworkTmpPath");
+    //     Benchmark::mark("copied framework: cp -a $frameworkPhysicalPath $frameworkTmpPath");
+    // }
 
     // precache and write workspace config
     $cachedFiles = Emergence_FS::cacheTree($workspaceConfigPath);
@@ -215,17 +215,6 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     }
 
 
-    // write archive
-    if (!empty($_GET['archive'])) {
-        try {
-            $exportResult = Emergence_FS::exportTree($archivePath, $archiveTmpPath);
-            Benchmark::mark("exported $archivePath to $archiveTmpPath: ".http_build_query($exportResult));
-        } catch (Exception $e) {
-            Benchmark::mark("failed to export $archivePath, continuing");
-        }
-    }
-
-
 
 
 
@@ -245,8 +234,13 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     $shellCommand = $cmd->buildShellCommand(
         'ant',
             // preset build directory parameters
-            "-Dbuild.dir=$buildTmpPath",
-            "-Dapp.output.base=$buildTmpPath", // CMD 5.0.1 needs this set directly too or it gets loaded from app.defaults.json
+            "-Dext.dir=$frameworkPhysicalPath",
+            "-Dbuild.temp.dir=$scratchTmpPath",
+            "-Dapp.output.base=$buildTmpPath",
+            '-Dapp.cache.deltas=false',
+            '-Dapp.output.microloader.enable=false',
+            '-Dbuild.enable.appmanifest=false',
+            '-Denable.standalone.manifest=true',
 
             // optional closure path
             class_exists('Jarvus\Closure\Compiler') && ($closureJarPath = Jarvus\Closure\Compiler::getJarPath()) ? "-Dbuild.compression.closure.jar=$closureJarPath" : null,
@@ -281,10 +275,44 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
         exec("rm -R $tmpPath");
         exit();
     } else {
-        passthru("$shellCommand 2>&1", $cmdStatus);
+        $pipes = [];
+        $process = proc_open(
+            "$shellCommand 2>&1",
+            [
+                1 => ['pipe', 'wb'] // STDOUT
+            ],
+            $pipes
+        );
+
+        while ($s = fgets($pipes[1])) {
+            print($s);
+            flush();
+        }
+
+        fclose($pipes[1]);
+        $cmdStatus = proc_close($process);
     }
 
     Benchmark::mark("CMD finished: exitCode=$cmdStatus");
+
+
+
+
+
+/**
+ * Fix build
+ */
+    // make JSON readable and strip absolute path prefix
+    $appJson = file_get_contents("{$buildTmpPath}/app.json");
+    $appJson = str_replace("{$buildTmpPath}/", '', $appJson);
+    $appJson = json_encode(json_decode($appJson, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $appJson = str_replace('    ', '  ', $appJson);
+    file_put_contents("{$buildTmpPath}/app.json", $appJson);
+
+    // strip absolute path prefix in index.html
+    $indexHtml = file_get_contents("{$buildTmpPath}/index.html");
+    $indexHtml = str_replace("{$buildTmpPath}/", '', $indexHtml);
+    file_put_contents("{$buildTmpPath}/index.html", $indexHtml);
 
 
 
@@ -295,27 +323,15 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
 /**
  * Import build
  */
-// import build
-if ($cmdStatus == 0) {
-    Benchmark::mark("importing $buildTmpPath");
+    if ($cmdStatus == 0) {
+        Benchmark::mark("importing $buildTmpPath");
 
-    $importResults = Emergence_FS::importTree($buildTmpPath, "sencha-build/$app/$buildType", [
-        'exclude' => $defaultExclude
-    ]);
-    Benchmark::mark("imported files: ".http_build_query($importResults));
+        $importResults = Emergence_FS::importTree($buildTmpPath, "webapp-builds/$app", [
+            'exclude' => $defaultExclude
+        ]);
 
-    if ($framework == 'ext') {
-        Emergence_FS::importFile("$appTmpPath/bootstrap.js", "$appPath/bootstrap.js");
-        Benchmark::mark("imported bootstrap.js");
-    }
-
-    if (!empty($_GET['archive'])) {
-        Benchmark::mark("importing $archiveTmpPath to $archivePath");
-
-        $importResults = Emergence_FS::importTree($archiveTmpPath, $archivePath);
         Benchmark::mark("imported files: ".http_build_query($importResults));
     }
-}
 
 
 
@@ -325,7 +341,7 @@ if ($cmdStatus == 0) {
 /**
  * Clean up
  */
-if (empty($_GET['leaveWorkspace'])) {
-    exec("rm -R $tmpPath");
-    Benchmark::mark("erased $tmpPath");
-}
+    if (empty($_GET['leaveWorkspace'])) {
+        exec("rm -R $tmpPath");
+        Benchmark::mark("erased $tmpPath");
+    }

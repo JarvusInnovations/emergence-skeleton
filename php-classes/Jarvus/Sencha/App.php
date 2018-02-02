@@ -80,8 +80,9 @@ class App
 
     public function getCmd()
     {
-        if (!$this->cmd) {
-            $this->cmd = Cmd::get($this->getAntConfig('app.cmd.version'));
+        if ($this->cmd === null) {
+            $cmdVersion = $this->getAntConfig('app.cmd.version');
+            $this->cmd = $cmdVersion ? Cmd::get($cmdVersion) : null;
         }
 
         return $this->cmd;
@@ -120,11 +121,11 @@ class App
             $appPath = "sencha-workspace/$this";
             $antConfigNode = Site::resolvePath("$appPath/.sencha/app/sencha.cfg");
 
-            if (!$antConfigNode) {
-                throw new \Exception("Could not find .sencha/app/sencha.cf for $appPath");
+            if ($antConfigNode) {
+                $this->appAntConfig = Util::loadAntProperties($antConfigNode->RealPath);
+            } else {
+                $this->appAntConfig = [];
             }
-
-            $this->appAntConfig = Util::loadAntProperties($antConfigNode->RealPath);
         }
 
         return $key ? $this->appAntConfig[$key] : $this->appAntConfig;

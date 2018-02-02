@@ -43,7 +43,7 @@ class Sencha_App
 
         // try to get from shared cache - this seems annoying and unecessary
 #		$cacheKey = "app/$this->_name/config";
-#		
+#
 #		if($this->_buildCfg = Cache::fetch($cacheKey))
 #		{
 #			return $key ? $this->_buildCfg[$key] : $this->_buildCfg;
@@ -52,11 +52,11 @@ class Sencha_App
         // get from filesystem
         $configPath = array('sencha-workspace', $this->_name, '.sencha', 'app', 'sencha.cfg');
 
-        if (!$configNode = Site::resolvePath($configPath, true, false)) {
-            throw new Exception('Could not find .sencha/app/sencha.cfg for '.$this->_name);
+        if ($configNode = Site::resolvePath($configPath, true, false)) {
+            $this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
+        } else {
+            $this->_buildCfg = array();
         }
-
-        $this->_buildCfg = Sencha::loadProperties($configNode->RealPath);
 
         if ($jsonCfg = $this->getAppCfg()) {
             Emergence\Util\Data::collapseTreeToDottedKeys($jsonCfg, $this->_buildCfg, 'app');
@@ -114,7 +114,7 @@ class Sencha_App
             array_shift($filePath);
             array_unshift($filePath, 'sencha-workspace', 'microloaders', $framework);
         } elseif($filePath[0] == 'resources') {
-            array_unshift($filePath, 'sencha-build', $appName, 'production');        
+            array_unshift($filePath, 'sencha-build', $appName, 'production');
         } elseif ($filePath[0] == 'build') {
             if ($filePath[1] == 'sdk' || $filePath[1] == $framework) {
                 array_shift($filePath);
