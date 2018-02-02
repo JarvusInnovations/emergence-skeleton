@@ -1,5 +1,6 @@
 {load_templates "subtemplates/contextLinks.tpl"}
 {load_templates "subtemplates/people.tpl"}
+{load_templates "subtemplates/personName.tpl"}
 {load_templates "subtemplates/forms.tpl"}
 
 {template commentForm Context url=no Comment=no}
