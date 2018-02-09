@@ -494,6 +494,9 @@ abstract class RecordsRequestHandler extends RequestHandler
                 continue;
             }
 
+            // call template function
+            static::onBeforeRecordDestroyed($Record);
+
             // destroy record
             if ($Record->destroy()) {
                 $results[] = $Record;
@@ -552,7 +555,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                 // call template function
                 static::onBeforeRecordSaved($Record, $_REQUEST);
 
-                // save session
+                // save record
                 $Record->save();
 
                 // call template function
@@ -595,6 +598,10 @@ abstract class RecordsRequestHandler extends RequestHandler
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // call template function
+            static::onBeforeRecordDestroyed($Record);
+
+            // destroy record
             $Record->destroy();
 
             // fire created response
@@ -704,6 +711,9 @@ abstract class RecordsRequestHandler extends RequestHandler
     {
     }
     protected static function onBeforeRecordSaved(ActiveRecord $Record, $data)
+    {
+    }
+    protected static function onBeforeRecordDestroyed(ActiveRecord $Record)
     {
     }
     protected static function onRecordSaved(ActiveRecord $Record, $data)
