@@ -1033,20 +1033,18 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
 
-                if (isset($options['prune'])) {
-                    if ($options['prune'] == 'delete') {
-                        DB::nonQuery(
-                            'DELETE FROM `%s` '.
-                            ' WHERE %s = "%s" '.
-                            '   AND ID NOT IN (%s) ',
-                            [
-                                $relatedObjectClass::$tableName,
-                                $options['foreign'],
-                                $this->ID,
-                                join(', ', array_keys($relatedObjects))
-                            ]
-                        );
-                    }
+                if (isset($options['prune']) && $options['prune'] == 'delete') {
+                    DB::nonQuery(
+                        'DELETE FROM `%s` '.
+                        ' WHERE %s = "%s" '.
+                        '   AND ID NOT IN (%s) ',
+                        [
+                            $relatedObjectClass::$tableName,
+                            $options['foreign'],
+                            $this->ID,
+                            count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
+                        ]
+                    );
                 }
             } elseif ($options['type'] == 'context-children') {
                 $relatedObjectClass = $options['class'];
@@ -1069,7 +1067,7 @@ class ActiveRecord
                                 [
                                     $relatedObjectClass::$tableName,
                                     $relatedObjectClass::getTableAlias(),
-                                    join(', ', array_keys($relatedObjects))
+                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
                                 ]
                             );
 
@@ -1085,7 +1083,7 @@ class ActiveRecord
                                     $relatedObjectClass::$tableName,
                                     DB::escape($this->getRootClass()),
                                     $this->ID,
-                                    join(', ', array_keys($relatedObjects))
+                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
                                 ]
                             );
 
