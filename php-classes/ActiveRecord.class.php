@@ -2420,7 +2420,6 @@ class ActiveRecord
 
                 $conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'];
 
-                // TODO: support order
                 $query = 'SELECT Related.* FROM `%s` Link JOIN `%s` Related ON (Related.`%s` = Link.%s) WHERE Link.`%s` = %u AND %s %s';
                 $params = array(
                     $rel['linkClass']::$tableName
