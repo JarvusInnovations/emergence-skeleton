@@ -2554,7 +2554,7 @@ class ActiveRecord
             if (array_key_exists($columnName, $this->_record)) {
                 $value = $this->_record[$columnName];
 
-                if (!$value && !empty($options['blankisnull'])) {
+                if ($value === '' && !empty($options['blankisnull'])) {
                     $value = null;
                 }
             } elseif (isset($options['default'])) {
