@@ -3,9 +3,9 @@
 {block title}Executed: {$dwoo.parent}{/block}
 
 {block breadcrumbs}
-    <li><a href="/site-admin/migrations">Migrations</a></li>
-    <li><a href="/site-admin/migrations/{$migration.key}">{$migration.key}</a></li>
-    <li class="active">Results</li>
+    <li class="breadcrumb-item"><a href="/site-admin/migrations">Migrations</a></li>
+    <li class="breadcrumb-item"><a href="/site-admin/migrations/{$migration.key}">{$migration.key}</a></li>
+    <li class="breadcrumb-item active">Results</li>
 {/block}
 
 {block content}
@@ -18,16 +18,16 @@
 
     {$dwoo.parent}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Script output</div>
-        <div class="panel-body">
-            <samp class="panel-body" style="white-space: pre">{$output|escape}</samp>
+    <div class="card mb-3">
+        <div class="card-header">Script output</div>
+        <div class="card-body">
+            <samp style="white-space: pre; display: block" class="p-2">{$output|escape}</samp>
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Query Log</div>
-        <table class="panel-body table table-striped">
+    <div class="card">
+        <div class="card-header">Query Log</div>
+        <table class="card-body table table-striped">
             <thead>
                 <tr>
                     <th scope="col">Query</th>

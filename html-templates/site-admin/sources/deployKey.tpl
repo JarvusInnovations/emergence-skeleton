@@ -4,12 +4,12 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="active"><i class="glyphicon glyphicon-lock"></i> Configure Deploy Key</li>
+    <li class="breadcrumb-item active"><i class="fa fa-lock" aria-hidden="true"></i> Configure Deploy Key</li>
 {/block}
 
 {block "content"}
     <div class="page-header">
-        <h1><i class="glyphicon glyphicon-lock"></i> Configure Deploy Key</h1>
+        <h1><i class="fa fa-lock" aria-hidden="true"></i> Configure Deploy Key</h1>
     </div>
 
     {if $.get.source == generated}
@@ -36,7 +36,7 @@
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Set Deploy Key</button>
-            <a href="?source=generated" class="btn btn-default">Generate New Keypair</a>
+            <a href="?source=generated" class="btn btn-secondary">Generate New Keypair</a>
         </div>
     </form>
 {/block}

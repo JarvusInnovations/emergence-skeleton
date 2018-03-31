@@ -31,7 +31,7 @@
         			<td>{$source->getCommitDescription()|escape}</td>
         			<td>{$source->getWorkingBranch()|escape}</td>
         			<td>{$source->getUpstreamBranch()|escape}</td>
-        			<td><span class="label label-{sourceStatusCls $status}">{$status}</span></td>
+        			<td><span class="badge badge-pill badge-{sourceStatusCls $status}">{$status}</span></td>
         		</tr>
         	{/foreach}
         </tbody>

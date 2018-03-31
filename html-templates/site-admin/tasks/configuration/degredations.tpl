@@ -12,10 +12,10 @@
         </div>
     {/if}
 
-    <form method="POST" class="panel panel-default">
-        <div class="panel-heading">Configured degredations</div>
+    <form method="POST" class="card">
+        <div class="card-header">Configured degredations</div>
 
-        <div class="panel-body">
+        <div class="card-body">
             {foreach item=value key=key from=$degredations}
                 <input type="hidden" name="degredations[{$key|escape}]" value="off">
                 <div class="checkbox">

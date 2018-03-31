@@ -2,6 +2,6 @@
 
 Emergence\SiteAdmin\Navigation::$items['dashboard'] = [
     'label' => 'Dashboard',
-    'url' => '/site-admin/',
+    'url' => '/site-admin',
     'before' => 'all'
 ];

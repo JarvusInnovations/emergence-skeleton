@@ -11,7 +11,8 @@
         <title>{block title}{Site::getConfig(handle)}{/block}</title>
 
         {block css}
-            {cssmin "bootstrap3/bootstrap.css+bootstrap3/bootstrap-theme.css+site-admin.css"}
+            {cssmin "bootstrap.css+site-admin.css"}
+            {cssmin fonts/font-awesome.css}
         {/block}
     </head>
 
@@ -21,22 +22,22 @@
                 {$activeSection = tasks}
             {/if}
 
-            <nav class="navbar navbar-inverse navbar-fixed-top">
+            <nav class="navbar navbar-dark navbar-expand-lg fixed-top bg-dark">
                 <div class="container">
-                    <div class="navbar-header">
-                        <a href="#" class="navbar-left emr-logo"><img src="/img/emergence/logo.png"></a>
-                        <a class="navbar-brand" href="/site-admin/">Emergence Site Administrator</a>
-                    </div>
-                    <div id="navbar" class="collapse navbar-collapse">
+                    <a class="navbar-brand" href="/site-admin"><img src="{versioned_url img/emergence/logo.png}" height="32"> Emergence Site Administrator</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                        <ul class="nav navbar-nav">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
                             {foreach item=item key=key from=Emergence\SiteAdmin\Navigation::getItems()}
-                                <li class="{tif $activeSection == $key ? active}">
-                                    <a href="{$item.url|escape}">
+                                <li class="nav-item {tif $activeSection == $key ? active}">
+                                    <a class="nav-link" href="{$item.url|escape}">
                                         {$item.label|escape}
 
                                         {if $item.badge}
-                                            <span class="badge">{$item.badge|number_format}</span>
+                                            <span class="badge badge-primary">{$item.badge|number_format}</span>
                                         {/if}
                                     </a>
                                 </li>
@@ -56,28 +57,29 @@
             </nav>
         {/block}
 
-        <div class="container main-content">
+        <main role="main" class="container">
             {strip}
-            <ol class="breadcrumb">
-                {block breadcrumbs}
-                    {if $.task}
-                        <li><a href="/site-admin/tasks">Tasks</a></li>
-                        <li class="active">
-                            <span class="glyphicon glyphicon-{$.task.icon}" aria-hidden="true"></span>
-                            &nbsp;
-                            {$.task.title|escape}
-                        </li>
-                    {/if}
-                {/block}
-            </ol>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {block breadcrumbs}
+                        {if $.task}
+                            <li class="breadcrumb-item"><a href="/site-admin/tasks">Tasks</a></li>
+                            <li class="breadcrumb-item active">
+                                <i class="fa fa-{$task.icon}" aria-hidden="true"></i>
+                                &nbsp;
+                                {$.task.title|escape}
+                            </li>
+                        {/if}
+                    {/block}
+                </ol>
+            </nav>
             {/strip}
 
             {block content}{/block}
         </div>
 
         {block js-bottom}
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-            {jsmin "bootstrap3/bootstrap.js+bootbox.js"}
+            {jsmin "jquery.js+popper.js+bootstrap.js"}
         {/block}
   </body>
 </html>

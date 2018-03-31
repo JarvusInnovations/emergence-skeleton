@@ -3,7 +3,7 @@
 return [
     'title' => 'Clear compiled templates cache',
     'description' => 'Erase the entire compiled templates cache, forcing all templates to be recompiled on their next use',
-    'icon' => 'file',
+    'icon' => 'eraser',
     'handler' => function () {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $templateDir = Emergence\Dwoo\Engine::$pathCompile.'/'.Site::getConfig('handle');

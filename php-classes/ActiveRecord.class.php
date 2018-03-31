@@ -614,37 +614,42 @@ class ActiveRecord
 
                 if ($options['type'] == 'one-one') {
                     if ($this->_relatedObjects[$relationship]->isDirty) {
-                        $this->_relatedObjects[$relationship]->validate();
-                        $this->_isValid = $this->_isValid && $this->_relatedObjects[$relationship]->isValid;
-                        $validationErrors = $this->_relatedObjects[$relationship]->validationErrors;
+                        if ($this->_relatedObjects[$relationship]->validate() !== null) {
+                            $validationErrors = $this->_relatedObjects[$relationship]->validationErrors;
 
-                        if (count($validationErrors)) {
-                            $this->_validationErrors[$relationship] = $validationErrors;
+                            if (count($validationErrors)) {
+                                $this->_validationErrors[$relationship] = $validationErrors;
+                            }
                         }
+
+                        $this->_isValid = $this->_isValid && $this->_relatedObjects[$relationship]->isValid;
                     }
                 } elseif ($options['type'] == 'one-many') {
                     foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
                         if ($object->isDirty) {
-                            $object->validate();
-                            $this->_isValid = $this->_isValid && $object->isValid;
-                            $validationErrors = $object->validationErrors;
+                            if ($object->validate() !== null) {
+                                $validationErrors = $object->validationErrors;
 
-                            if (count($validationErrors)) {
-                                $this->_validationErrors[$relationship][$i] = $validationErrors;
+                                if (count($validationErrors)) {
+                                    $this->_validationErrors[$relationship][$i] = $validationErrors;
+                                }
                             }
+
+                            $this->_isValid = $this->_isValid && $object->isValid;
                         }
                     }
                 } elseif ($options['type'] == 'context-children') {
                     foreach ($this->_relatedObjects[$relationship] AS $i => $object) {
                         if ($object->isDirty) {
-                            $object->validate();
-                            $this->_isValid = $this->_isValid && $object->isValid;
+                            if ($object->validate() !== null) {
+                                $validationErrors = $object->validationErrors;
 
-                            $validationErrors = $object->validationErrors;
-
-                            if (count($validationErrors)) {
-                                $this->_validationErrors[$relationship][$i] = $validationErrors;
+                                if (count($validationErrors)) {
+                                    $this->_validationErrors[$relationship][$i] = $validationErrors;
+                                }
                             }
+
+                            $this->_isValid = $this->_isValid && $object->isValid;
                         }
                     }
                 }
@@ -1033,20 +1038,18 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
 
-                if (isset($options['prune'])) {
-                    if ($options['prune'] == 'delete') {
-                        DB::nonQuery(
-                            'DELETE FROM `%s` '.
-                            ' WHERE %s = "%s" '.
-                            '   AND ID NOT IN (%s) ',
-                            [
-                                $relatedObjectClass::$tableName,
-                                $options['foreign'],
-                                $this->ID,
-                                join(', ', array_keys($relatedObjects))
-                            ]
-                        );
-                    }
+                if (isset($options['prune']) && $options['prune'] == 'delete') {
+                    DB::nonQuery(
+                        'DELETE FROM `%s` '.
+                        ' WHERE %s = "%s" '.
+                        '   AND ID NOT IN (%s) ',
+                        [
+                            $relatedObjectClass::$tableName,
+                            $options['foreign'],
+                            $this->ID,
+                            count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
+                        ]
+                    );
                 }
             } elseif ($options['type'] == 'context-children') {
                 $relatedObjectClass = $options['class'];
@@ -1069,7 +1072,7 @@ class ActiveRecord
                                 [
                                     $relatedObjectClass::$tableName,
                                     $relatedObjectClass::getTableAlias(),
-                                    join(', ', array_keys($relatedObjects))
+                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
                                 ]
                             );
 
@@ -1085,7 +1088,7 @@ class ActiveRecord
                                     $relatedObjectClass::$tableName,
                                     DB::escape($this->getRootClass()),
                                     $this->ID,
-                                    join(', ', array_keys($relatedObjects))
+                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
                                 ]
                             );
 
@@ -2556,7 +2559,7 @@ class ActiveRecord
             if (array_key_exists($columnName, $this->_record)) {
                 $value = $this->_record[$columnName];
 
-                if (!$value && !empty($options['blankisnull'])) {
+                if ($value === '' && !empty($options['blankisnull'])) {
                     $value = null;
                 }
             } elseif (isset($options['default'])) {

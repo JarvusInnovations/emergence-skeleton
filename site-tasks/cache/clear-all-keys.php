@@ -4,7 +4,7 @@ return [
     'title' => 'Clear all application cache keys',
     'description' => 'Clear all in-memory cache keys for the current site',
     'warning' => 'This operation could render the site unresponsive if executed during high load',
-    'icon' => 'refresh',
+    'icon' => 'eraser',
     'requireAccountLevel' => 'Administrator',
     'handler' => function () {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {

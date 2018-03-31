@@ -7,9 +7,9 @@
 
 {block content}
     <div class="page-header">
-        <div class="btn-toolbar pull-right">
+        <div class="btn-toolbar float-right">
             <form method="POST" action="/site-admin/migrations/refresh" class="btn-group">
-                <button type="submit" class="btn btn-default">Refresh Inherited Migrations</button>
+                <button type="submit" class="btn btn-secondary">Refresh Inherited Migrations</button>
             </form>
         </div>
 
@@ -28,8 +28,8 @@
 
         <tbody>
             {foreach item=migration from=$migrations}
-                <tr class="{tif $migration.status == executed ? success} {tif $migration.status == skipped ? info} {tif $migration.status == started ? warning} {tif $migration.status == failed ? danger}">
-                    <td class="migration-id"><a href="/site-admin/migrations/{$migration.key|escape}">{$migration.key|escape}</a><br><small>SHA1: {$migration.sha1}</td>
+                <tr class="{tif $migration.status == executed ? 'bg-success text-white'} {tif $migration.status == skipped ? 'bg-light text-muted'} {tif $migration.status == started ? 'bg-warning text-white'} {tif $migration.status == failed ? 'bg-danger text-white'}">
+                    <td class="migration-id"><a href="/site-admin/migrations/{$migration.key|escape}" class="{tif $migration.status != new && $migration.status != skipped ? 'text-light'}">{$migration.key|escape}</a><br><small>SHA1: {$migration.sha1}</td>
                     <td class="migration-status">{$migration.status}</td>
                     <td class="migration-timestamp">{$migration.executed}</td>
                     <td class="migration-action">

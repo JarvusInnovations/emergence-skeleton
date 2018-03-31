@@ -25,7 +25,7 @@
         {/if}
 
         {if $showAll}
-            <a class="paging-link show-all" href="?{refill_query limit=0}">Show All ({$total|number_format})</a>
+            <a class="paging-link show-all" href="?{refill_query limit=0 offset=null}">Show All ({$total|number_format})</a>
         {/if}
     {/if}
 </div>

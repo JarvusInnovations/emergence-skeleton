@@ -4,7 +4,7 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="active">VFS Updated from Working Tree</li>
+    <li class="breadcrumb-item active">VFS Updated from Working Tree</li>
 {/block}
 
 {block css}
@@ -40,7 +40,7 @@
         </thead>
         <tbody>
             {foreach key=path item=result from=$results}
-                <tr class="{tif $result.collectionsDeleted || $result.filesUpdated || $result.filesDeleted ? info}">
+                <tr class="{tif $result.collectionsDeleted || $result.filesUpdated || $result.filesDeleted ? 'bg-info text-white'}">
                     <td>{$path|escape}</td>
                     <td class="text-center column-group-first">{$result.collectionsAnalyzed|number_format}</td>
                     <td class="text-center">{$result.collectionsDeleted|number_format}</td>
@@ -53,5 +53,5 @@
         </tbody>
     </table>
 
-    <a href="/site-admin/sources/{$source->getId()|escape}" class="btn btn-default">Return to {$source->getId()|escape}</a>
+    <a href="/site-admin/sources/{$source->getId()|escape}" class="btn btn-secondary">Return to {$source->getId()|escape}</a>
 {/block}

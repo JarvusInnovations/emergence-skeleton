@@ -3,7 +3,7 @@
 return [
     'title' => 'Generate Ext JS model',
     'description' => 'Generate Ext JS model definition for a given ActiveRecord class',
-    'icon' => 'hdd',
+    'icon' => 'table',
     'handler' => function () {
         if (empty($_GET['class'])) {
             return static::respond('classes', [

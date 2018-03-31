@@ -3,27 +3,27 @@
 {block title}{$migration.key} &mdash; {$dwoo.parent}{/block}
 
 {block breadcrumbs}
-    <li><a href="/site-admin/migrations">Migrations</a></li>
-    <li class="active">{$migration.key}</li>
+    <li class="breadcrumb-item"><a href="/site-admin/migrations">Migrations</a></li>
+    <li class="breadcrumb-item active">{$migration.key}</li>
 {/block}
 
 {block content}
-    <div class="panel panel-default {tif $migration.status == executed ? 'panel-success'} {tif $migration.status == skipped ? 'panel-info'} {tif $migration.status == started ? 'panel-warning'} {tif $migration.status == failed ? 'panel-danger'}">
-        <div class="panel-heading">
+    <div class="card mb-3 {tif $migration.status == executed ? 'bg-success text-white'} {tif $migration.status == skipped ? 'bg-info text-white'} {tif $migration.status == started ? 'bg-warning text-white'} {tif $migration.status == failed ? 'bg-danger text-white'}">
+        <div class="card-header">
             {if $migration.status == new}
-                <form action="/site-admin/migrations/{$migration.key|escape}" method="POST" class="btn-group btn-group-xs pull-right">
+                <form action="/site-admin/migrations/{$migration.key|escape}" method="POST" class="btn-group btn-group-sm float-right">
                     <button type="submit" class="btn btn-primary">Execute</button>
                 </form>
             {/if}
 
-            <h1 class="panel-title">Migration {$migration.key|escape}</h1>
+            Migration {$migration.key|escape}
         </div>
 
-        <div class="panel-body">
-            <dl class="dl-horizontal">
+        <div class="card-body">
+            <dl class="row">
                 {foreach item=value key=key from=$migration}
-                    <dt>{$key|escape}</dt>
-                    <dd>{$value|escape}</dd>
+                    <dt class="col-2 text-right">{$key|escape}</dt>
+                    <dd class="col-10">{$value|escape}</dd>
                 {/foreach}
             </dl>
         </div>

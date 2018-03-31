@@ -8,8 +8,8 @@
 {/block}
 
 {block breadcrumbs}
-    <li><a href="/site-admin/sources">Sources</a></li>
-    <li class="active"><a href="/site-admin/sources/{$source->getId()}">{$source->getId()}</a></li>
+    <li class="breadcrumb-item"><a href="/site-admin/sources">Sources</a></li>
+    <li class="breadcrumb-item active"><a href="/site-admin/sources/{$source->getId()}">{$source->getId()}</a></li>
 {/block}
 
 {block css}
@@ -20,6 +20,7 @@
         }
         .worktree-file label {
             display: block;
+            margin: 0;
         }
         .worktree-file.added {
             background-color: #dbffdb;
@@ -50,11 +51,11 @@
     {$status = $source->getStatus()}
 
     <div class="page-header">
-        <div class="btn-toolbar pull-right">
+        <div class="btn-toolbar float-right">
             <div class="btn-group">
                 {if !$source->isInitialized()}
                     <a href="/site-admin/sources/{$source->getId()}/initialize" class='btn btn-primary'>
-                        <i class="glyphicon glyphicon-play-circle"></i>
+                        <i class="fa fa-play-circle" aria-hidden="true"></i>
                         Initialize Repository
                     </a>
                 {/if}
@@ -69,7 +70,7 @@
         {strip}
             {$status = tif($group == staged ? $file.indexStatus : $file.workTreeStatus)}
             <li class="worktree-file {tif $file.staged ? staged} {tif $file.unstaged ? unstaged} {tif $file.tracked ? tracked : untracked} {tif $file.ignored ? ignored} {tif $status == 'A' ? added} {tif $status == 'M' || $status == 'R' || $status == 'C' ? modified} {tif $status == 'D' ? deleted}">
-                <a class="pull-right" href="/site-admin/sources/{$source->getId()}/diff/{$group}/{$file.currentPath|escape}">diff</a>
+                <a class="float-right" href="/site-admin/sources/{$source->getId()}/diff/{$group}/{$file.currentPath|escape}">diff</a>
                 <label>
                     <input type="checkbox" name="paths[]" value="{$file.path|escape}">
                     &nbsp;
@@ -87,23 +88,23 @@
 
     {if $source->isInitialized()}
         {$upstreamDiff = $source->getUpstreamDiff()}
-        <div class="panel panel-{tif $upstreamDiff.error ? danger : default}">
-            <div class="panel-heading">
-                <small class="pull-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
-                <h2 class="panel-title">Branch Status</h2>
+        <div class="card mb-3">
+            <div class="card-header {tif $upstreamDiff.error ? 'bg-danger text-white'}">
+                <small class="float-right">{$source->getWorkingBranch()|escape}&harr;{$source->getUpstreamBranch()|escape}</small>
+                Branch Status
             </div>
 
             {if $upstreamDiff.error}
-                <pre class="panel-body" role="alert">{$upstreamDiff.error|escape}</pre>
+                <pre class="card-body" role="alert">{$upstreamDiff.error|escape}</pre>
             {else}
-                <table class="table panel-body">
+                <table class="table card-body">
                     <thead>
                         <tr>
                             <th width="50%">
                                 <form method="POST" action="/site-admin/sources/{$source->getId()}/push" onsubmit="return confirm('Are you sure?')">
                                     {$upstreamDiff.ahead|number_format} commit{tif $upstreamDiff != 1 ? s} ahead
                                     {if $upstreamDiff.ahead && !$upstreamDiff.behind}
-                                        <button type="submit" class="btn btn-default btn-xs">Push</button>
+                                        <button type="submit" class="btn btn-secondary btn-sm">Push</button>
                                     {/if}
                                 </form>
                             </th>
@@ -111,7 +112,7 @@
                                 <form method="POST" action="/site-admin/sources/{$source->getId()}/pull" onsubmit="return confirm('Are you sure?')">
                                     {$upstreamDiff.behind|number_format} commit{tif $upstreamDiff != 1 ? s} behind
                                     {if $upstreamDiff.behind && !$upstreamDiff.ahead}
-                                        <button type="submit" class="btn btn-default btn-xs">Pull (fast fwd)</button>
+                                        <button type="submit" class="btn btn-secondary btn-sm">Pull (fast fwd)</button>
                                     {/if}
                                 </form>
                             </th>
@@ -142,15 +143,15 @@
 
         {$workTreeStatus = $source->getWorkTreeStatus(array(groupByStatus=yes))}
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="btn-group btn-group-xs pull-right">
-                    <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/staged">Diff</a>
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="btn-group btn-group-sm float-right">
+                    <a class="btn btn-secondary" href="/site-admin/sources/{$source->getId()}/diff/staged">Diff</a>
                 </div>
-                <h2 class="panel-title">Staged Commit</h2>
+                Staged Commit
             </div>
 
-            <div class="panel-body">
+            <div class="card-body">
                 {if !$workTreeStatus.staged}
                     <div class="alert alert-info" role="alert">Stage some changes from the git working tree below to start building a commit</div>
                 {else}
@@ -162,13 +163,13 @@
                         </ul>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
-                                <span class="glyphicon glyphicon-minus"></span> Untage Selected
+                                <i class="fa fa-minus" aria-hidden="true"></i> Untage Selected
                             </button>
-                            <button type="button" class="btn btn-default worktree-select-all">
-                                <span class="glyphicon glyphicon-check"></span> Select All
+                            <button type="button" class="btn btn-secondary worktree-select-all">
+                                <i class="fa fa-check-square" aria-hidden="true"></i> Select All
                             </button>
-                            <button type="button" class="btn btn-default worktree-select-none">
-                                <span class="glyphicon glyphicon-unchecked"></span> Select None
+                            <button type="button" class="btn btn-secondary worktree-select-none">
+                                <i class="fa fa-square" aria-hidden="true"></i> Select None
                             </button>
                         </div>
                     </form>
@@ -200,7 +201,7 @@
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
                                 <button type="submit" class="btn btn-primary">Commit</button>
-                                <button type="submit" class="btn btn-default" name="action" value="save-draft">Save Message Draft</button>
+                                <button type="submit" class="btn btn-secondary" name="action" value="save-draft">Save Message Draft</button>
                             </div>
                         </div>
                     </form>
@@ -208,21 +209,21 @@
             </div>
         </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="btn-group btn-group-xs pull-right">
-                    <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/diff/unstaged">Diff</a>
-                    <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/clean">Clean</a>
-                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sync <span class="caret"></span></button>
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="btn-group btn-group-sm float-right">
+                    <a class="btn btn-secondary" href="/site-admin/sources/{$source->getId()}/diff/unstaged">Diff</a>
+                    <a class="btn btn-secondary" href="/site-admin/sources/{$source->getId()}/clean">Clean</a>
+                    <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sync</button>
                     <ul class="dropdown-menu">
-                        <li><a href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>git working tree</strong> <div class="small">from emergence VFS</div></a></li>
-                        <li><a href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>emergence VFS</strong> <div class="small">from git working tree</div></a></li>
+                        <li><a class="dropdown-item" href="/site-admin/sources/{$source->getId()}/sync-from-vfs">Update <strong>git working tree</strong> <div class="small">from emergence VFS</div></a></li>
+                        <li><a class="dropdown-item" href="/site-admin/sources/{$source->getId()}/sync-to-vfs">Update <strong>emergence VFS</strong> <div class="small">from git working tree</div></a></li>
                     </ul>
                 </div>
-                <h2 class="panel-title">Git Working Tree</h2>
+                Git Working Tree
             </div>
 
-            <div class="panel-body checkbox">
+            <div class="card-body checkbox">
                 {if $workTreeStatus.unstaged}
                     <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/stage">
                         <h3>Unstaged</h3>
@@ -233,13 +234,13 @@
                         </ul>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
-                                <span class="glyphicon glyphicon-plus"></span> Stage Selected
+                                <i class="fa fa-plus" aria-hidden="true"></i> Stage Selected
                             </button>
-                            <button type="button" class="btn btn-default worktree-select-all">
-                                <span class="glyphicon glyphicon-check"></span> Select All
+                            <button type="button" class="btn btn-secondary worktree-select-all">
+                                <i class="fa fa-check-square" aria-hidden="true"></i> Select All
                             </button>
-                            <button type="button" class="btn btn-default worktree-select-none">
-                                <span class="glyphicon glyphicon-unchecked"></span> Select None
+                            <button type="button" class="btn btn-secondary worktree-select-none">
+                                <i class="fa fa-square" aria-hidden="true"></i> Select None
                             </button>
                         </div>
                     </form>
@@ -249,15 +250,15 @@
             </div>
         </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="btn-group btn-group-xs pull-right">
-                    <a class="btn btn-default" href="/site-admin/sources/{$source->getId()}/erase">Erase from VFS</a>
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="btn-group btn-group-sm float-right">
+                    <a class="btn btn-secondary" href="/site-admin/sources/{$source->getId()}/erase">Erase from VFS</a>
                 </div>
-                <h2 class="panel-title">VFS Mappings</h2>
+                VFS Mappings
             </div>
 
-            <table class="table table-striped panel-body">
+            <table class="table table-striped card-body">
                 <thead>
                     <tr>
                         <th>Repository Path</th>
@@ -276,29 +277,29 @@
         </div>
     {/if}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
+    <div class="card mb-3">
+        <div class="card-header">
             {if $source->isInitialized()}
-                <small class="pull-right"><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></small>
+                <small class="float-right"><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></small>
             {/if}
-            <h2 class="panel-title">Repository Configuration</h2>
+            Repository Configuration
         </div>
 
-        <dl class="panel-body dl-horizontal">
-            <dt>status</dt>
-            <dd><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
+        <dl class="card-body row">
+            <dt class="col-2 text-right">status</dt>
+            <dd class="col-10"><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
 
             {if $source->isInitialized()}
-                <dt>clone url</dt>
-                <dd><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></dd>
+                <dt class="col-2 text-right">clone url</dt>
+                <dd class="col-10"><a href="{$source->getCloneUrl()|escape}">{$source->getCloneUrl()|escape}</a></dd>
             {/if}
 
-            <dt>commit</dt>
-            <dd>{$source->getCommitDescription()|escape}</dd>
+            <dt class="col-2 text-right">commit</dt>
+            <dd class="col-10">{$source->getCommitDescription()|escape}</dd>
 
-            <dt>working branch</dt>
+            <dt class="col-2 text-right">working branch</dt>
             {$workingBranch = $source->getWorkingBranch()}
-            <dd>
+            <dd class="col-10">
                 {if $status == 'clean'}
                     <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/checkout">
                         <select name="ref">
@@ -313,8 +314,8 @@
                                 </optgroup>
                             {/foreach}
                         </select>
-                        <button type="submit" class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-play"></span> Checkout
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-play" aria-hidden="true"></i> Checkout
                         </button>
                     </form>
                 {else}
@@ -322,23 +323,23 @@
                 {/if}
             </dd>
 
-            <dt>upstream branch</dt>
-            <dd>{$source->getUpstreamBranch()|escape}</dd>
+            <dt class="col-2 text-right">upstream branch</dt>
+            <dd class="col-10">{$source->getUpstreamBranch()|escape}</dd>
 
-            <dt>remote</dt>
-            <dd>{$source->getRemoteUrl()|escape}</dd>
+            <dt class="col-2 text-right">remote</dt>
+            <dd class="col-10">{$source->getRemoteUrl()|escape}</dd>
 
             {if $source->getRemoteProtocol() == 'ssh'}
-                <dt>ssh deploy key</dt>
-                <dd>
+                <dt class="col-2 text-right">ssh deploy key</dt>
+                <dd class="col-10">
                     {$deployKey = $source->getDeployKey()}
                     {if $deployKey}
                         Fingerprint: {$deployKey->getFingerprint()}
                     {else}
                         <em>None configured</em>
                     {/if}
-                    <a class="btn btn-default btn-xs" href="/site-admin/sources/{$source->getId()}/deploy-key">
-                        <span class="glyphicon glyphicon-lock"></span> Manage Deploy Key
+                    <a class="btn btn-secondary btn-sm" href="/site-admin/sources/{$source->getId()}/deploy-key">
+                        <i class="fa fa-lock" aria-hidden="true"></i> Manage Deploy Key
                     </a>
                 </dd>
             {/if}

@@ -5,10 +5,10 @@
         <pre class="alert alert-info" role="alert">{$message|escape|markdown}</pre>
     {/if}
 
-    <form method="POST" class="panel panel-default">
-        <div class="panel-heading">Repair options</div>
+    <form method="POST" class="card">
+        <div class="card-header">Repair options</div>
 
-        <div class="panel-body">
+        <div class="card-body">
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="ops[]" value="erase-unused" {refill field=ops checked=erase-unused default=erase-unused}>

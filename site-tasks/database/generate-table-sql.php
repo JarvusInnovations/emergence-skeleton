@@ -3,7 +3,7 @@
 return [
     'title' => 'Generate table SQL',
     'description' => 'Generate and optionally execute `CREATE TABLE` SQL for a given ActiveRecord class',
-    'icon' => 'hdd',
+    'icon' => 'table',
     'handler' => function () {
         if (empty($_GET['class'])) {
             return static::respond('classes', [
