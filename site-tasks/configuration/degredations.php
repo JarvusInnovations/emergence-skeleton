@@ -3,7 +3,7 @@
 return [
     'title' => 'Manage Degredations',
     'description' => 'Enable or disable degredation flags that can be used to reduce the functionality of sites live while under failure or high load',
-    'icon' => 'remove',
+    'icon' => 'power-off',
     'handler' => function () {
         $config = Site::getConfig();
         $degredations = !empty($config['degredations']) ? $config['degredations'] : [];

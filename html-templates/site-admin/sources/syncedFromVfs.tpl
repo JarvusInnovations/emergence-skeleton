@@ -4,7 +4,7 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="active">Working Tree Updated from VFS</li>
+    <li class="breadcrumb-item active">Working Tree Updated from VFS</li>
 {/block}
 
 {block css}
@@ -53,5 +53,5 @@
         </tbody>
     </table>
 
-    <a href="/site-admin/sources/{$source->getId()|escape}" class="btn btn-default">Return to {$source->getId()|escape}</a>
+    <a href="/site-admin/sources/{$source->getId()|escape}" class="btn btn-secondary">Return to {$source->getId()|escape}</a>
 {/block}

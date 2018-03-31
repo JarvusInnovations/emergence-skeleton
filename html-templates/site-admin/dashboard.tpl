@@ -10,10 +10,10 @@
         <h1>Site Dashboard</h1>
     </div>
 
-    <dl class="dl-horizontal">
+    <dl class="row">
         {foreach item=metric from=$metrics}
-            <dt>{$metric.label|escape}</dt>
-            <dd>
+            <dt class="col-3 text-right">{$metric.label|escape}</dt>
+            <dd class="col-9">
                 {if $metric.link}
                     <a href="{$metric.link|escape}">
                 {/if}

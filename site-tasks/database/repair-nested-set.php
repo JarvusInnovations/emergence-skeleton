@@ -3,7 +3,7 @@
 return [
     'title' => 'Repair nested set',
     'description' => 'Recalculate the left/right node positioning for a table using NestingBehavior. Useful after manually editing the table.',
-    'icon' => 'tree-conifer',
+    'icon' => 'sitemap',
     'handler' => function () {
         if (empty($_GET['class'])) {
             return static::respond('classes', [

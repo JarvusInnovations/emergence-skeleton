@@ -22,11 +22,11 @@
         <pre class="alert alert-info" role="alert">{$message|escape}</pre>
     {/if}
 
-    <form method="POST" class="panel panel-default">
-        <div class="panel-heading">Select trees to precache</div>
+    <form method="POST" class="card">
+        <div class="card-header">Select trees to precache</div>
 
-        <div class="panel-body">
-            <button type="button" onclick="selectAllCollections()" class="btn btn-default btn-sm">Select all</button>
+        <div class="card-body">
+            <button type="button" onclick="selectAllCollections()" class="btn btn-secondary btn-sm">Select all</button>
 
             {foreach item=Collection from=SiteCollection::getAllRootCollections()}
                 <div class="checkbox">

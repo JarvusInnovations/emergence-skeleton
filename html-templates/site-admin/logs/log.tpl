@@ -8,16 +8,16 @@
 {/block}
 
 {block breadcrumbs}
-    <li><a href="/site-admin/logs">Logs</a></li>
-    <li class="active">{$path|escape}</li>
+    <li class="breadcrumb-item"><a href="/site-admin/logs">Logs</a></li>
+    <li class="breadcrumb-item active">{$path|escape}</li>
 {/block}
 
 {block "content"}
     <div class="page-header">
-        <div class="btn-toolbar pull-right">
+        <div class="btn-toolbar float-right">
             <div class="btn-group">
                 <a href="?{refill_query download=raw}" class='btn btn-primary'>
-                    <i class="glyphicon glyphicon-download"></i>
+                    <i class="fa fa-download" aria-hidden="true"></i>
                     Download
                 </a>
             </div>
@@ -26,5 +26,5 @@
     </div>
 
     <em>Showing last {$lines|number_format} lines (<a href="?lines={$lines * 10}">more&hellip;</a>):</em>
-    <pre>{$tail|escape}</pre>
+    <pre class="bg-light border rounded p-2">{$tail|escape}</pre>
 {/block}

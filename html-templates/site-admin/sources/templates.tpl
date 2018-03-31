@@ -1,6 +1,6 @@
 {template sourceStatusCls status}{strip}
     {if $status == 'uninitialized'}
-        default
+        secondary
     {elseif $status == 'clean'}
         success
     {elseif $status == 'commit-staged'}
@@ -12,6 +12,6 @@
     {elseif $status == 'ahead'}
         success
     {else}
-        default
+        secondary
     {/if}
 {/strip}{/template}

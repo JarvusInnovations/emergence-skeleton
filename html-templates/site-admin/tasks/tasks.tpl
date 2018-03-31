@@ -20,21 +20,21 @@
         {$lastTaskGroup = $taskGroup}
         *}
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                    <span class="glyphicon glyphicon-{$task.icon}" aria-hidden="true"></span>
+        <div class="card mb-3">
+            <div class="card-header">
+                    <i class="fa fa-{$task.icon}" aria-hidden="true"></i>
                     {$task.title|escape}
-                    <small class="pull-right">{$taskPath}</small>
+                    <small class="float-right">{$taskPath}</small>
             </div>
     
-            <div class="panel-body">
+            <div class="card-body">
                 {$task.description|escape|markdown}
         
                 {if $task.warning}
                     <div class="alert alert-warning" role="alert">{$task.warning|escape|markdown}</div>
                 {/if}
         
-                <p><a class="btn btn-{tif $task.warning ? warning : default}" href="/site-admin/tasks/{$taskPath}" role="button">{$task.title|escape} &raquo;</a></p>
+                <a class="btn btn-{tif $task.warning ? warning : secondary}" href="/site-admin/tasks/{$taskPath}" role="button">{$task.title|escape} &raquo;</a>
             </div>
         </div>
     {foreachelse}

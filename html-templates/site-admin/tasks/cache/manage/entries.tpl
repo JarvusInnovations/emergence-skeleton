@@ -2,8 +2,8 @@
 
 {block content}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Application Cache Contents</div>
+    <div class="card">
+        <div class="card-header">Application Cache Contents</div>
 
         <table class="table table-striped">
             <thead>
@@ -27,9 +27,9 @@
                         <td><time datetime="{html_time $entry.createTime}">{fuzzy_time $entry.createTime}</time></td>
                         <td><time datetime="{html_time $entry.modifyTime}">{fuzzy_time $entry.modifyTime}</time></td>
                         <td width="70">
-                            <div class="btn-group btn-group-xs" role="group">
-                                <a href="{$.task.baseUrl}/{$key|escape:url}" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
-                                <a href="{$.task.baseUrl}/{$key|escape:url}/delete" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{$.task.baseUrl}/{$key|escape:url}" class="btn btn-secondary"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
+                                <a href="{$.task.baseUrl}/{$key|escape:url}/delete" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
                             </div>
                         </td>
                     </tr>

@@ -3,7 +3,7 @@
 return [
     'title' => 'Precache parent tree',
     'description' => 'Scan parent site for new files and cache them locally',
-    'icon' => 'transfer',
+    'icon' => 'cloud-download',
     'handler' => function () {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {

@@ -1,13 +1,27 @@
-.emr-logo img {
-    width: 42px;
-    margin-top: 3px;
-    margin-right: 10px;
+/* layout */
+body {
+    min-height: 75rem;
+    padding-top: 4.5rem;
+}
+
+
+/* bootstrap fixes */
+.alert > :last-child, .card-body > :last-child {
+    margin-bottom: 0;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    font-size: .875rem;
+    line-height: .5;
+    border-radius: .2rem;
 }
 
 .breadcrumb:empty {
     display: none;
 }
 
+
+/* site-admin styles */
 .notfound {
      background-image: url('/img/emergence/logo.png');
      background-size: 300px; 
@@ -19,11 +33,6 @@
 .navbar-right .load-red a { color: #a94442 !important; }
 .navbar-right .load-yellow a  { color: #8a6d3b !important; }
 .navbar-right .load-green a { color: #18cd00 !important; }
-
-.main-content {
-    position: relative;
-    top: 50px;
-}
 
 .mounts .bar {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -68,128 +77,36 @@ table pre {
 }
 
 .form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-#advancedStatus .tab-content {
-    height: 600px;
-    overflow-y: scroll;
-}
-
-#advancedStatus .tab-content > div {
-    width: 99%;
-}
-
-.git-file-buttons {
-    margin-top: 20px;
     margin-bottom: 10px;
 }
-
-.emr-git-diskio {
-    
+.form-signin .checkbox {
+    font-weight: normal;
 }
-
-.emr-git-remoteio {
-    top: 15px;
+.form-signin .form-control {
     position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
 }
-
-
-.emr-git-files {
-    padding-left: 0px;
-    padding-right: 0px;
+.form-signin .form-control:focus {
+    z-index: 2;
 }
-
-.emr-git-files ul {
-    list-style:none;
-    padding-left:0;
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
 }
-
-.emr-git-files .row:nth-child(even){
-  background-color: #f5f5f5;
-}
-.emr-git-files .row:nth-child(odd){
-  background-color: #FFF;
-}
-
-.emr-tools div p:nth-child(2) {
-    height: 60px;    
-}
-.emr-tools div p:nth-child(3) {
-    text-align: right;
-    margin-right: 20px;
-}
-
-.emr-git-files fieldset.form-group > ul > :nth-child(even){
-    background-color: #f5f5f5;
-}
-
-
-.emr-git-files fieldset.form-group > ul > div.checkbox {
-    margin-left: 10px;
-}
-
-.emr-git-files label.file {
-    width: 100%;
-    height: 22px;
-    margin-top: 5px;
-    margin-left: 0px;
-    font-size: 13px;
-}
-
-.emr-git-files span.path {
-    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-    margin-left: 8px;
-}
-
-.emr-git-files label.file div.btn-group {
-    float: right;
-    position: relative;
-    top: -17px;
-}
-
-.emr-git-files span.code {
-    width: 20px;
-    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-}
-
-.diff-dropdown {
-    left: -153px;
-    top: 35px;
-}
-
-.file-staged span.path {
-    color: #18cd00;
-    font-weight: bold;
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
