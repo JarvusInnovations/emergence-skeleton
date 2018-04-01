@@ -126,13 +126,23 @@
                                         <img src="{$Photo->getThumbnailRequest(96, 96, null, true)}" width=48 height=48 alt="">
                                     {if $Photo->ID != $.Session->Person->PrimaryPhotoID}</a>{/if}
 
-                                    {* <div class="buttons">
-                                        <span> alt="Make Default" title="Make Default"><img src="/img/icons/fugue/user-silhouette.png" alt="Make Default" /></a>
-                                        {else}
-                                            <img src="/img/icons/fugue/user-silhouette.png" alt="Default Photo" class="nofade" />Default
-                                        {/if}</span>
-                                        <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" alt="Delete Photo" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');"><img src="/img/icons/fugue/slash.png" alt="Delete Photo" /></a>
-                                    </div> *}
+                                    {*
+                                    <div class="buttons">
+                                        <span>
+                                            {if $Photo->ID != $User->PrimaryPhotoID}
+                                                <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">
+                                                    {icon 'user-circle-o'} Make Default
+                                                </a>
+                                            {else}
+                                                {icon 'user-circle-o'} Default
+                                            {/if}
+                                        </span>
+                                        &emsp;
+                                        <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');">
+                                            {icon 'times-circle'} Delete
+                                        </a>
+                                    </div>
+                                    *}
                                 </li>
                             {/foreach}
                             </ul>

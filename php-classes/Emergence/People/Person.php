@@ -55,7 +55,7 @@ class Person extends VersionedRecord implements IPerson
         )
         ,'Phone' => array(
             'type' => 'decimal'
-            ,'length' => '10,0'
+            ,'length' => '15,0'
             ,'unsigned' => true
             ,'notnull' => false
             ,'accountLevelEnumerate' => 'User'
