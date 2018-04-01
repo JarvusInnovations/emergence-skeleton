@@ -125,7 +125,7 @@
                                     <td width="50%"></td>
                                 {/if}
                                 <td width="50%">
-                                    <small class="label label-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
+                                    <small class="badge badge-pill badge-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
                                     <div class="small">
                                         by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
                                         on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
@@ -287,7 +287,7 @@
 
         <dl class="card-body row">
             <dt class="col-2 text-right">status</dt>
-            <dd class="col-10"><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
+            <dd class="col-10"><span class="badge badge-pill badge-{sourceStatusCls $status}">{$status}</span></dd>
 
             {if $source->isInitialized()}
                 <dt class="col-2 text-right">clone url</dt>
