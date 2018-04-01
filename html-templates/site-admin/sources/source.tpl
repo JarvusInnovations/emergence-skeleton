@@ -125,7 +125,7 @@
                                     <td width="50%"></td>
                                 {/if}
                                 <td width="50%">
-                                    <small class="label label-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
+                                    <small class="badge badge-pill badge-{tif $commit.position == ahead ? success : info}">{$commit.hash|substr:0:8}</small> {$commit.subject|escape}
                                     <div class="small">
                                         by <a href="mailto:{$commit.authorEmail|escape}">{$commit.authorName|escape}</a>
                                         on {$commit.timestamp|date_format:"%b %e, %Y %l:%M%P"}
@@ -176,8 +176,8 @@
 
                     <hr>
 
-                    <form class="form-horizontal" method="POST" action="/site-admin/sources/{$source->getId()|escape}/commit">
-                        <div class="form-group">
+                    <form method="POST" action="/site-admin/sources/{$source->getId()|escape}/commit">
+                        <div class="form-group row">
                             <label for="inputCommitAuthor" class="col-sm-2 control-label">Author</label>
                             <div class="col-sm-10">
                                 <input class="form-control" id="inputCommitAuthor" name="author" value="{$.User->FullName|escape} <{$.User->Email|escape}>">
@@ -185,20 +185,20 @@
                         </div>
 
                         {$draftCommitMessage = explode("\n\n", $source->getDraftCommitMessage(), 2)}
-                        <div class="form-group">
+                        <div class="form-group row">
                             <label for="inputCommitSubject" class="col-sm-2 control-label">Subject</label>
                             <div class="col-sm-10">
                                 <input class="form-control" id="inputCommitSubject" name="subject" placeholder="Update &hellip;" value="{$draftCommitMessage[0]|escape}">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group row">
                             <label for="inputCommitExtended" class="col-sm-2 control-label">Extended Description</label>
                             <div class="col-sm-10">
                                 <textarea class="form-control" rows="3" id="inputCommitExtended" name="extended" placeholder="Add an optional extended description&hellip;">{$draftCommitMessage[1]|escape}</textarea>
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group row">
                             <div class="col-sm-offset-2 col-sm-10">
                                 <button type="submit" class="btn btn-primary">Commit</button>
                                 <button type="submit" class="btn btn-secondary" name="action" value="save-draft">Save Message Draft</button>
@@ -287,7 +287,7 @@
 
         <dl class="card-body row">
             <dt class="col-2 text-right">status</dt>
-            <dd class="col-10"><span class="label label-{sourceStatusCls $status}">{$status}</span></dd>
+            <dd class="col-10"><span class="badge badge-pill badge-{sourceStatusCls $status}">{$status}</span></dd>
 
             {if $source->isInitialized()}
                 <dt class="col-2 text-right">clone url</dt>

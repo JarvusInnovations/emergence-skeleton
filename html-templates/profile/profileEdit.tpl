@@ -2,12 +2,6 @@
 
 {block "title"}Edit Profile &mdash; {$dwoo.parent}{/block}
 
-{block "css"}
-    <link rel="stylesheet" type="text/css" href="/css/dog/photos.css" />
-    <link rel="stylesheet" type="text/css" href="/css/forms.css">
-    {$dwoo.parent}
-{/block}
-
 {block "app-menu"}
     <a href="/{MICS::getApp()}" class="page open">Edit My Profile</a>
     <a href="/{MICS::getApp()}/view" class="page">View Profile</a>
@@ -44,12 +38,19 @@
                         <div class="photothumb"><img src="{$Photo->getThumbnailRequest(100,100)}"></div>
                         {*<input type="text" name="Caption[{$Photo->ID}]" class="caption" value="{$Photo->Caption|escape}">*}
                         <div class="buttons">
-                            <span>{if $Photo->ID != $.Session->Person->PrimaryPhotoID}
-                                <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" alt="Make Default" title="Make Default"><img src="/img/icons/fugue/user-silhouette.png" alt="Make Default" /></a>
-                            {else}
-                                <img src="/img/icons/fugue/user-silhouette.png" alt="Default Photo" class="nofade" />Default
-                            {/if}</span>
-                            <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" alt="Delete Photo" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');"><img src="/img/icons/fugue/slash.png" alt="Delete Photo" /></a>
+                            <span>
+                                {if $Photo->ID != $User->PrimaryPhotoID}
+                                    <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">
+                                        {icon 'user-circle-o'} Make Default
+                                    </a>
+                                {else}
+                                    {icon 'user-circle-o'} Default
+                                {/if}
+                            </span>
+                            &emsp;
+                            <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');">
+                                {icon 'times-circle'} Delete
+                            </a>
                         </div>
                     </div>
                 {/foreach}
