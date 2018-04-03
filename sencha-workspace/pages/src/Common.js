@@ -19,7 +19,7 @@ Ext.define('Site.Common', {
 
         // site search
         me.siteSearch = Ext.create('Site.widget.Search', {
-            searchForm: body.down('.search-form.site-search')
+            searchForm: body.down('.js-site-search')
         });
     }
 });
