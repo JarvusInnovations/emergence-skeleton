@@ -11,8 +11,8 @@
         <title>{block title}{Site::getConfig(handle)}{/block}</title>
 
         {block css}
-            {cssmin "bootstrap.css+site-admin.css"}
-            {cssmin fonts/font-awesome.css}
+            {cssmin "lib/bootstrap.css+site-admin.css"}
+            {cssmin "fonts/font-awesome.css"}
         {/block}
     </head>
 
@@ -79,7 +79,7 @@
         </div>
 
         {block js-bottom}
-            {jsmin "jquery.js+popper.js+bootstrap.js"}
+            {jsmin "lib/jquery.js+lib/popper.js+lib/bootstrap.js"}
         {/block}
   </body>
 </html>
