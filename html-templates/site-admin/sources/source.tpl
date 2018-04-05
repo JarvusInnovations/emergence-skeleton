@@ -55,7 +55,7 @@
             <div class="btn-group">
                 {if !$source->isInitialized()}
                     <a href="/site-admin/sources/{$source->getId()}/initialize" class='btn btn-primary'>
-                        <i class="fa fa-play-circle" aria-hidden="true"></i>
+                        {icon "play-circle"}
                         Initialize Repository
                     </a>
                 {/if}
@@ -163,13 +163,13 @@
                         </ul>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-minus" aria-hidden="true"></i> Untage Selected
+                                {icon "minus"} Untage Selected
                             </button>
                             <button type="button" class="btn btn-secondary worktree-select-all">
-                                <i class="fa fa-check-square" aria-hidden="true"></i> Select All
+                                {icon "check-square"} Select All
                             </button>
                             <button type="button" class="btn btn-secondary worktree-select-none">
-                                <i class="fa fa-square" aria-hidden="true"></i> Select None
+                                {icon "square"} Select None
                             </button>
                         </div>
                     </form>
@@ -234,13 +234,13 @@
                         </ul>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-plus" aria-hidden="true"></i> Stage Selected
+                                {icon "plus"} Stage Selected
                             </button>
                             <button type="button" class="btn btn-secondary worktree-select-all">
-                                <i class="fa fa-check-square" aria-hidden="true"></i> Select All
+                                {icon "check-square"} Select All
                             </button>
                             <button type="button" class="btn btn-secondary worktree-select-none">
-                                <i class="fa fa-square" aria-hidden="true"></i> Select None
+                                {icon "square"} Select None
                             </button>
                         </div>
                     </form>
@@ -315,7 +315,7 @@
                             {/foreach}
                         </select>
                         <button type="submit" class="btn btn-secondary btn-sm">
-                            <i class="fa fa-play" aria-hidden="true"></i> Checkout
+                            {icon "play"} Checkout
                         </button>
                     </form>
                 {else}
@@ -339,7 +339,7 @@
                         <em>None configured</em>
                     {/if}
                     <a class="btn btn-secondary btn-sm" href="/site-admin/sources/{$source->getId()}/deploy-key">
-                        <i class="fa fa-lock" aria-hidden="true"></i> Manage Deploy Key
+                        {icon "lock"} Manage Deploy Key
                     </a>
                 </dd>
             {/if}

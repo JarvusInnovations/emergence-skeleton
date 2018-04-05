@@ -4,7 +4,7 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="breadcrumb-item active"><i class="fa fa-play-circle" aria-hidden="true"></i> Initialize Repository</li>
+    <li class="breadcrumb-item active">{icon "play-circle"} Initialize Repository</li>
 {/block}
 
 {block "content"}
@@ -46,7 +46,7 @@
         {/if}
 
         <div class="form-group">
-            <button type="submit" class="btn btn-primary"><i class="fa fa-play-circle" aria-hidden="true"></i> Initialize Repository</button>
+            <button type="submit" class="btn btn-primary">{icon "play-circle"} Initialize Repository</button>
         </div>
     </form>
 {/block}

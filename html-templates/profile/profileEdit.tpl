@@ -41,15 +41,15 @@
                             <span>
                                 {if $Photo->ID != $User->PrimaryPhotoID}
                                     <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">
-                                        {icon 'user-circle-o'} Make Default
+                                        {icon "user-circle-o"} Make Default
                                     </a>
                                 {else}
-                                    {icon 'user-circle-o'} Default
+                                    {icon "user-circle-o"} Default
                                 {/if}
                             </span>
                             &emsp;
                             <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');">
-                                {icon 'times-circle'} Delete
+                                {icon "times-circle"} Delete
                             </a>
                         </div>
                     </div>

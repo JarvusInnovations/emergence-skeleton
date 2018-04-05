@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+{template icon name}<i class="fa fa-{$name}" aria-hidden="true"></i>{/template}
+
 <html lang="en">
     <head>
         {block meta}
@@ -65,7 +68,7 @@
                         {if $.task}
                             <li class="breadcrumb-item"><a href="/site-admin/tasks">Tasks</a></li>
                             <li class="breadcrumb-item active">
-                                <i class="fa fa-{$task.icon}" aria-hidden="true"></i>
+                                {icon $task.icon}
                                 &nbsp;
                                 {$.task.title|escape}
                             </li>

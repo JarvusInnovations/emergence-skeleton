@@ -22,7 +22,7 @@
 
         <div class="card mb-3">
             <div class="card-header">
-                    <i class="fa fa-{$task.icon}" aria-hidden="true"></i>
+                    {icon $task.icon}
                     {$task.title|escape}
                     <small class="float-right">{$taskPath}</small>
             </div>
