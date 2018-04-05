@@ -41,7 +41,7 @@ class RegistrationRequestHandler extends \RequestHandler
             case false:
                 return static::handleRegistrationRequest();
             default:
-                return static::throwNotFoundException();
+                return static::throwNotFoundError();
         }
     }
 
