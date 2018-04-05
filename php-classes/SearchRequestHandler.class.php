@@ -27,7 +27,7 @@ class SearchRequestHandler extends RequestHandler
 
         if (!empty($_REQUEST['tag'])) {
             if (!$Tag = Tag::getByHandle($_REQUEST['tag'])) {
-                return static::throwNotFoundException('Tag does not exist');
+                return static::throwNotFoundError('Tag does not exist');
             }
         }
 
