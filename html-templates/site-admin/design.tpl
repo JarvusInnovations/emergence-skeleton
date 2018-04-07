@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+{template icon name}<i class="fa fa-{$name}" aria-hidden="true"></i>{/template}
+
 <html lang="en">
     <head>
         {block meta}
@@ -11,8 +14,8 @@
         <title>{block title}{Site::getConfig(handle)}{/block}</title>
 
         {block css}
-            {cssmin "bootstrap.css+site-admin.css"}
-            {cssmin fonts/font-awesome.css}
+            {cssmin "lib/bootstrap.css+site-admin.css"}
+            {cssmin "fonts/font-awesome.css"}
         {/block}
     </head>
 
@@ -65,7 +68,7 @@
                         {if $.task}
                             <li class="breadcrumb-item"><a href="/site-admin/tasks">Tasks</a></li>
                             <li class="breadcrumb-item active">
-                                <i class="fa fa-{$task.icon}" aria-hidden="true"></i>
+                                {icon $task.icon}
                                 &nbsp;
                                 {$.task.title|escape}
                             </li>
@@ -79,7 +82,7 @@
         </div>
 
         {block js-bottom}
-            {jsmin "jquery.js+popper.js+bootstrap.js"}
+            {jsmin "lib/jquery.js+lib/popper.js+lib/bootstrap.js"}
         {/block}
   </body>
 </html>

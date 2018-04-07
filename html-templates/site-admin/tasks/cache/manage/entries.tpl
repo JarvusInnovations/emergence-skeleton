@@ -28,8 +28,8 @@
                         <td><time datetime="{html_time $entry.modifyTime}">{fuzzy_time $entry.modifyTime}</time></td>
                         <td width="70">
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="{$.task.baseUrl}/{$key|escape:url}" class="btn btn-secondary"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
-                                <a href="{$.task.baseUrl}/{$key|escape:url}/delete" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                <a href="{$.task.baseUrl}/{$key|escape:url}" class="btn btn-secondary">{icon "search-plus"}</a>
+                                <a href="{$.task.baseUrl}/{$key|escape:url}/delete" class="btn btn-danger">{icon "trash"}</a>
                             </div>
                         </td>
                     </tr>

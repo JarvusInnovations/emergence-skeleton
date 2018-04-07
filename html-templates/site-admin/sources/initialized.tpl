@@ -4,7 +4,7 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="breadcrumb-item active"><i class="fa fa-play-circle" aria-hidden="true"></i> Repository Initialized</li>
+    <li class="breadcrumb-item active">{icon "play-circle"} Repository Initialized</li>
 {/block}
 
 {block "content"}

@@ -4,12 +4,12 @@
 
 {block breadcrumbs}
     {$dwoo.parent}
-    <li class="breadcrumb-item active"><i class="fa fa-lock" aria-hidden="true"></i> Configure Deploy Key</li>
+    <li class="breadcrumb-item active">{icon "lock"} Configure Deploy Key</li>
 {/block}
 
 {block "content"}
     <div class="page-header">
-        <h1><i class="fa fa-lock" aria-hidden="true"></i> Configure Deploy Key</h1>
+        <h1>{icon "lock"} Configure Deploy Key</h1>
     </div>
 
     {if $.get.source == generated}

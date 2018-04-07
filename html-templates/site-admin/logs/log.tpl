@@ -17,7 +17,7 @@
         <div class="btn-toolbar float-right">
             <div class="btn-group">
                 <a href="?{refill_query download=raw}" class='btn btn-primary'>
-                    <i class="fa fa-download" aria-hidden="true"></i>
+                    {icon "download"}
                     Download
                 </a>
             </div>
