@@ -38,13 +38,13 @@
         }
     }
     
-    &.waiting {
+    &.is-waiting {
         .results-group {
             opacity: .5;
         }
     }
     
-    &.loading {
+    &.is-loading {
         .search-results {
             background-image: image-url('loaders/spinner.gif');
             background-position: center .75em;

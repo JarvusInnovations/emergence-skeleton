@@ -172,7 +172,7 @@ Ext.define('Site.widget.Search', {
         me.lastTypedQuery = query;
 
         if (t.value.length >= me.getMinChars()) {
-            me.getSearchForm().addCls('waiting');
+            me.getSearchForm().addCls('is-waiting');
             resultsCt.show();
             me.searchTask.delay(me.getSearchDelay());
         } else {
@@ -202,7 +202,7 @@ Ext.define('Site.widget.Search', {
             resultsTpl = me.getResultsTpl(),
             searchForm = me.getSearchForm();
 
-        searchForm.removeCls('loading');
+        searchForm.removeCls('is-loading');
 
         if (responseData.totalResults) {
             searchForm.removeCls(noResultsCls);
@@ -223,7 +223,7 @@ Ext.define('Site.widget.Search', {
             searchForm = me.getSearchForm(),
             query = fieldEl && fieldEl.getValue();
 
-        searchForm.removeCls('waiting');
+        searchForm.removeCls('is-waiting');
 
         // abort any existing search
         me.searchConnection.abort();
@@ -232,7 +232,7 @@ Ext.define('Site.widget.Search', {
             return;
         }
 
-        searchForm.addCls('loading');
+        searchForm.addCls('is-loading');
         me.searchConnection.request({
             params: {
                 q: query
