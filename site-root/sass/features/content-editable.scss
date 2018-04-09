@@ -2,20 +2,16 @@ $text-color: #1b4e61; // #143947;
 $muted-color: #919297;
 $header-color: #204350;
 $jarvus-color: #f47f20;
-
-// ptw palette
-$ptw-blue:  #05b3c1;
-$ptw-red:   #d15d44;
-$ptw-gray:  #919297;
-$ptw-gold:  #deb600;
-$ptw-green: #81c734;
+$highlight-color: #deb600;
+$drop-color: #81c734;
+$uploading-color: #05b3c1;
 
 .content-editable {
-	border: 2px dashed rgba($ptw-gold, .8) !important;
+	border: 2px dashed rgba($highlight-color, .8) !important;
     min-height: 1em;
 	
 	&:hover {
-	    background: rgba($ptw-gold, .3);
+	    background: rgba($highlight-color, .3);
         cursor: pointer;
 	}
 }
@@ -26,11 +22,11 @@ $ptw-green: #81c734;
 	padding: 1em;
 	
 	&.drag-over {
-    	background: $ptw-green;
+    	background: $drop-color;
 	}
 	
 	&.uploading {
-    	background: $ptw-blue;
+    	background: $uploading-color;
 	}
 	
 	.hint {
