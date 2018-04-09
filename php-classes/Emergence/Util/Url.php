@@ -12,6 +12,10 @@ class Url
         $url = Site::getConfig('ssl') ? 'https' : 'http';
         $url .= '://' . Site::getConfig('primary_hostname');
 
+        if (is_array($path)) {
+            $path = implode($path, '/');
+        }
+
         if ($path = ltrim($path, '/')) {
             $url .= '/' . $path;
         }
