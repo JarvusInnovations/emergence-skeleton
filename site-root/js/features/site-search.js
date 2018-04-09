@@ -168,13 +168,13 @@
                         }
 
                         var $section = $('<section />').addClass('results-group');
-                        $('<h6 />').appendTo($section).addClass('group-title').text(
+                        $('<h6 />').appendTo($section).addClass('group-title dropdown-header').text(
                             key in resultRenderers ? resultRenderers[key].groupTitle : key
                         );
 
                         $.each(value.slice(0, 5), function(index, result) {
                             $('<li />').addClass('search-result').append(
-                                (resultRenderers[result.Class] || _defaultResultRenderer)(result)
+                                (resultRenderers[result.Class] || _defaultResultRenderer)(result).addClass('dropdown-item')
                             ).appendTo($section);
                         });
     
