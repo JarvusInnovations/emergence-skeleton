@@ -168,7 +168,7 @@
                         }
 
                         var $section = $('<section />').addClass('results-group');
-                        $('<h1 />').appendTo($section).addClass('group-title').text(
+                        $('<h6 />').appendTo($section).addClass('group-title').text(
                             key in resultRenderers ? resultRenderers[key].groupTitle : key
                         );
 
