@@ -156,7 +156,7 @@ class MinifiedRequestHandler extends RequestHandler
 
         return array_map(function($path) {
             return array_filter(explode('/', $path));
-        }, preg_split('/(\+|%2B|%20)/', $paths));
+        }, preg_split('/(\+|%2B|%20|\s+)/', $paths));
     }
 
     public static function getFilesHash($files)
