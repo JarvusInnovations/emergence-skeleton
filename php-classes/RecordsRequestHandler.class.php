@@ -122,6 +122,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         $joins = array();
         $having = array();
         $matchers = array();
+        $termsConditions = array();
 
         $parsedQuery = \Emergence\SearchStringParser::parseString($query);
         foreach ($parsedQuery AS $queryPart) {
@@ -148,42 +149,32 @@ abstract class RecordsRequestHandler extends RequestHandler
             if ($sqlSearchConditions['joins']) {
                 $joins = array_unique(array_merge($joins, $sqlSearchConditions['joins']));
             }
+
+            $termsConditions["$qualifier:$term"] = $sqlSearchConditions['conditions'];
         }
 
         if (empty($matchers)) {
             return static::throwError('Query was empty');
         }
 
+        $select[] = join('+', array_map(function($c) {
+            return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
+        }, $matchers)).' AS searchScore';
+
         if ($mode == 'OR') {
             // OR mode, object can match any term and results are sorted by score
-
-            $select[] = join('+', array_map(function($c) {
-                return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
-            }, $matchers)).' AS searchScore';
-
             $having[] = 'searchScore > 1';
-
-            if (empty($options['order'])) {
-                $options['order'] = array('searchScore DESC');
-            }
         } else {
             // AND mode, all terms must match
-
-            // group by qualifier
-            $qualifierConditions = array();
-            foreach ($matchers AS $matcher) {
-                $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
-                //$conditions[] = $matcher['condition'];
+            foreach ($termsConditions as $termConditions) {
+                $conditions[] = '( ('.join(') OR (', array_map(function ($termCondition) {
+                    return $termCondition['condition'];
+                }, $termConditions)).') )';
             }
+        }
 
-            // compile conditions
-            foreach ($qualifierConditions AS $newConditions) {
-                $conditions[] = '( ('.join(') OR (', $newConditions).') )';
-            }
-
-            if (static::$browseOrder && empty($options['order'])) {
-                $options['order'] = static::$browseOrder;
-            }
+        if (static::$browseOrder && empty($options['order'])) {
+            $options['order'] = static::$browseOrder;
         }
 
         return static::respond(
@@ -191,7 +182,7 @@ abstract class RecordsRequestHandler extends RequestHandler
             ,array_merge($responseData, array(
                 'success' => true
                 ,'data' => $className::getAllByQuery(
-                    'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
+                    'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s ORDER BY %s %s'
                     ,array(
                         !empty($options['calcFoundRows']) ? 'SQL_CALC_FOUND_ROWS' : ''
                         ,join(',',$select)
@@ -200,7 +191,7 @@ abstract class RecordsRequestHandler extends RequestHandler
                         ,!empty($joins) ? implode(' ', $joins) : ''
                         ,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
                         ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-                        ,!empty($options['order']) ? 'ORDER BY '.join(',', $className::mapFieldOrder($options['order'])) : ''
+                        ,!empty($options['order']) ? 'searchScore DESC, '.join(',', $className::mapFieldOrder($options['order'])) : 'searchScore DESC'
                         ,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
                     )
                 )
