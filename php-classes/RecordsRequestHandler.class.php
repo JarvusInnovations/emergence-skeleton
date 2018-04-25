@@ -731,7 +731,7 @@ abstract class RecordsRequestHandler extends RequestHandler
     }
 
     // access control template functions
-    public static function checkBrowseAccess($arguments)
+    public static function checkBrowseAccess()
     {
         if (static::$accountLevelBrowse) {
             $GLOBALS['Session']->requireAuthentication();
@@ -741,7 +741,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         return true;
     }
 
-    public static function checkReadAccess(ActiveRecord $Record, $suppressLogin=false)
+    public static function checkReadAccess(ActiveRecord $Record = null, $suppressLogin = false)
     {
         if (static::$accountLevelRead) {
             if (!$suppressLogin) {
@@ -754,7 +754,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         return true;
     }
 
-    public static function checkWriteAccess(ActiveRecord $Record, $suppressLogin=false)
+    public static function checkWriteAccess(ActiveRecord $Record = null, $suppressLogin = false)
     {
         if (static::$accountLevelWrite) {
             if (!$suppressLogin) {
@@ -767,7 +767,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         return true;
     }
 
-    public static function checkCommentAccess(ActiveRecord $Record)
+    public static function checkCommentAccess(ActiveRecord $Record = null)
     {
         if (static::$accountLevelComment) {
             return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelComment);

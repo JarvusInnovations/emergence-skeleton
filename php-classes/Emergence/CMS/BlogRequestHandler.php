@@ -36,7 +36,7 @@ class BlogRequestHandler extends AbstractRequestHandler
         return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
 
-    public static function checkReadAccess(ActiveRecord $BlogPost, $suppressLogin = false)
+    public static function checkReadAccess(ActiveRecord $BlogPost = null, $suppressLogin = false)
     {
         if ($BlogPost->Visibility == 'Private' && !$GLOBALS['Session']->Person) {
             return false;
@@ -45,10 +45,11 @@ class BlogRequestHandler extends AbstractRequestHandler
         return parent::checkReadAccess($BlogPost, $suppressLogin);
     }
 
-    public static function checkWriteAccess(ActiveRecord $BlogPost, $suppressLogin = false)
+    public static function checkWriteAccess(ActiveRecord $BlogPost = null, $suppressLogin = false)
     {
         // only allow creating, editing your own, and staff editing
         if (
+            $BlogPost &&
             !$BlogPost->isPhantom &&
             $BlogPost->AuthorID != $GLOBALS['Session']->PersonID &&
             !$GLOBALS['Session']->hasAccountLevel(static::$accountLevelWriteAll)

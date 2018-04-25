@@ -680,7 +680,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
     }
 
     // access control template functions
-    public static function checkBrowseAccess($arguments)
+    public static function checkBrowseAccess()
     {
         if (static::$accountLevelBrowse) {
             $GLOBALS['Session']->requireAuthentication();
@@ -690,7 +690,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         return true;
     }
 
-    public static function checkReadAccess(ActiveRecordInterface $Record, $suppressLogin = false)
+    public static function checkReadAccess(ActiveRecordInterface $Record = null, $suppressLogin = false)
     {
         if (static::$accountLevelRead) {
             if (!$suppressLogin) {
@@ -703,7 +703,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         return true;
     }
 
-    public static function checkWriteAccess(ActiveRecordInterface $Record, $suppressLogin = false)
+    public static function checkWriteAccess(ActiveRecordInterface $Record = null, $suppressLogin = false)
     {
         if (static::$accountLevelWrite) {
             if (!$suppressLogin) {
@@ -716,7 +716,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         return true;
     }
 
-    public static function checkCommentAccess(ActiveRecordInterface $Record)
+    public static function checkCommentAccess(ActiveRecordInterface $Record = null)
     {
         if (static::$accountLevelComment) {
             return $GLOBALS['Session']->hasAccountLevel(static::$accountLevelComment);
