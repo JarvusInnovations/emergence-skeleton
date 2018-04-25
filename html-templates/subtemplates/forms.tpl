@@ -1,12 +1,22 @@
-{template validationErrors errors}
+{template validationErrors errors itemsOnly=no}
     {if count($errors) > 0}
-        <div class="error notify">
-            <ul class="validation-errors">
+        {if !$itemsOnly}
+            <div class="error notify">
+                <ul class="validation-errors">
+        {/if}
+
                 {foreach $errors error}
-                    <li>{$error}</li>
+                    {if is_array($error)}
+                        {validationErrors $error itemsOnly=yes}
+                    {else}
+                        <li>{$error}</li>
+                    {/if}
                 {/foreach}
-            </ul>
-        </div>
+
+        {if !$itemsOnly}
+                </ul>
+            </div>
+        {/if}
     {/if}
 {/template}
 
