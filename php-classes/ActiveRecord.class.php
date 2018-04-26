@@ -597,8 +597,8 @@ class ActiveRecord
                             $fieldId,
                             !empty($options['duplicateMessage']) ? _($options['duplicateMessage']) : sprintf(_('%s matches another existing record.'), Inflector::spacifyCaps($fieldId))
                         );
+                    }
                 }
-            }
             }
 
             $this->finishValidation();
@@ -1006,6 +1006,10 @@ class ActiveRecord
                         $related->save();
                     }
                 }
+            } elseif ($options['type'] == 'context-children') {
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->save();
+                }
             } elseif ($options['type'] == 'handle') {
                 $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->Handle);
             } else {
@@ -1026,9 +1030,20 @@ class ActiveRecord
             if ($options['type'] == 'handle') {
                 $this->_relatedObjects[$relationship]->Context = $this;
                 $this->_relatedObjects[$relationship]->save();
-            } elseif ($options['type'] == 'one-one' && $options['local'] == 'ID') {
-                $this->_relatedObjects[$relationship]->setField($options['foreign'], $this->getValue($options['local']));
-                $this->_relatedObjects[$relationship]->save();
+            } elseif ($options['type'] == 'one-one') {
+                $related = $this->_relatedObjects[$relationship];
+
+                if ($options['local'] == 'ID') {
+                    $related->setField($options['foreign'], $this->getValue($options['local']));
+                }
+
+                if ($related::relationshipExists('Context') && $related->Context === $this) {
+                    $related->setField('ContextID', $this->ID);
+                }
+
+                if ($related->isDirty) {
+                    $related->save();
+                }
             } elseif ($options['type'] == 'one-many' && $options['local'] == 'ID') {
                 $relatedObjectClass = $options['class'];
                 $relatedObjects = [];
