@@ -97,8 +97,8 @@ class Logger extends \Psr\Log\AbstractLogger
                     $frame['file'] == 'emergence:_parent/php-classes/Psr/Log/AbstractLogger.php' ||
                     $frame['file'] == 'emergence:_parent/php-classes/Emergence/Logger.php'
                 ) ||
-                (empty($frame['file']) && $frame['class'] == 'Psr\Log\AbstractLogger') ||
-                (!empty($frame['class']) && $frame['class'] == 'Emergence\Logger' && $frame['function'] == '__callStatic')
+                (empty($frame['file']) && !empty($frame['class']) && $frame['class'] == 'Psr\Log\AbstractLogger') ||
+                (!empty($frame['class']) && $frame['class'] == 'Emergence\Logger' && !empty($frame['function']) && $frame['function'] == '__callStatic')
             ) {
                 continue;
             }
