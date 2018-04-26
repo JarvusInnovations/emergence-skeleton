@@ -2535,6 +2535,7 @@ class ActiveRecord
 
             // so any invalid values are removed
             $value = $set;
+            $this->_isDirty = true;
         } elseif ($rel['type'] ==  'handle') {
             if ($value !== null && !is_a($value, __CLASS__)) {
                 return false;
@@ -2561,6 +2562,7 @@ class ActiveRecord
             }
 
             $value = $set;
+            $this->_isDirty = true;
         } else {
             return false;
         }
