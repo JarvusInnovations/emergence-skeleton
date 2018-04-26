@@ -378,18 +378,7 @@ class ActiveRecord
 
     public function setValue($name, $value)
     {
-        // handle field
-        if (static::_fieldExists($name)) {
-            $this->_setFieldValue($name, $value);
-        }
-        // handle relationship
-        elseif (static::_relationshipExists($name)) {
-            $this->_setRelationshipValue($name, $value);
-        }
-        // undefined
-        else {
-            return false;
-        }
+        return $this->_setFieldValue($name, $value);
     }
 
 
@@ -597,8 +586,8 @@ class ActiveRecord
                             $fieldId,
                             !empty($options['duplicateMessage']) ? _($options['duplicateMessage']) : sprintf(_('%s matches another existing record.'), Inflector::spacifyCaps($fieldId))
                         );
+                    }
                 }
-            }
             }
 
             $this->finishValidation();
@@ -1006,6 +995,10 @@ class ActiveRecord
                         $related->save();
                     }
                 }
+            } elseif ($options['type'] == 'context-children') {
+                foreach ($this->_relatedObjects[$relationship] as $related) {
+                    $related->save();
+                }
             } elseif ($options['type'] == 'handle') {
                 $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->Handle);
             } else {
@@ -1024,12 +1017,28 @@ class ActiveRecord
             }
 
             if ($options['type'] == 'handle') {
+
                 $this->_relatedObjects[$relationship]->Context = $this;
                 $this->_relatedObjects[$relationship]->save();
-            } elseif ($options['type'] == 'one-one' && $options['local'] == 'ID') {
-                $this->_relatedObjects[$relationship]->setField($options['foreign'], $this->getValue($options['local']));
-                $this->_relatedObjects[$relationship]->save();
+
+            } elseif ($options['type'] == 'one-one') {
+
+                $related = $this->_relatedObjects[$relationship];
+
+                if ($options['local'] == 'ID') {
+                    $related->setField($options['foreign'], $this->getValue($options['local']));
+                }
+
+                if ($related::relationshipExists('Context') && $related->Context === $this) {
+                    $related->setField('ContextID', $this->ID);
+                }
+
+                if ($related->isDirty) {
+                    $related->save();
+                }
+
             } elseif ($options['type'] == 'one-many' && $options['local'] == 'ID') {
+
                 $relatedObjectClass = $options['class'];
                 $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] AS $related) {
@@ -1039,19 +1048,21 @@ class ActiveRecord
                 }
 
                 if (isset($options['prune']) && $options['prune'] == 'delete') {
-                    DB::nonQuery(
-                        'DELETE FROM `%s` '.
-                        ' WHERE %s = "%s" '.
-                        '   AND ID NOT IN (%s) ',
-                        [
-                            $relatedObjectClass::$tableName,
-                            $options['foreign'],
-                            $this->ID,
-                            count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
+                    $orphans = $relatedObjectClass::getAllByWhere([
+                        $options['foreign'] => $this->ID,
+                        'ID' => [
+                            'operator' => 'NOT IN',
+                            'values' => array_keys($relatedObjects)
                         ]
-                    );
+                    ]);
+
+                    foreach ($orphans as $orphan) {
+                        $orphan->destroy();
+                    }
                 }
+
             } elseif ($options['type'] == 'context-children') {
+
                 $relatedObjectClass = $options['class'];
                 $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] as $related) {
@@ -1060,41 +1071,57 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
                 if (isset($options['prune'])) {
+                    $orphans = $relatedObjectClass::getAllByWhere([
+                        $options['foreign'] => $this->ID,
+                        'ID' => [
+                            'operator' => 'NOT IN',
+                            'values' => array_keys($relatedObjects)
+                        ]
+                    ]);
+
                     switch ($options['prune']) {
                         case 'unlink':
-                            DB::nonQuery(
-                                'UPDATE `%s` %s '.
-                                '   SET '.
-                                'ContextID = NULL, '.
-                                'ContextClass = NULL '.
-
-                                ' WHERE ID NOT IN (%s)',
-                                [
-                                    $relatedObjectClass::$tableName,
-                                    $relatedObjectClass::getTableAlias(),
-                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
-                                ]
-                            );
+                            foreach ($orphans as $orphan) {
+                                $orphan->Context = null;
+                                $orphan->save();
+                            }
 
                             break;
 
                         case 'delete':
-                            DB::nonQuery(
-                                'DELETE FROM `%s` '.
-                                ' WHERE ContextClass = "%s" '.
-                                '   AND ContextID = %u '.
-                                '   AND ID NOT IN (%s) ',
-                                [
-                                    $relatedObjectClass::$tableName,
-                                    DB::escape($this->getRootClass()),
-                                    $this->ID,
-                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
-                                ]
-                            );
+                            foreach ($orphans as $orphan) {
+                                $orphan->destroy();
+                            }
 
                             break;
+
+                        default:
+                            throw new Exception('Unhandled prune option');
                     }
                 }
+
+            } elseif ($options['type'] == 'many-many') {
+
+                $relatedObjectClass = $options['linkClass'];
+                $relatedObjects = [];
+                foreach ($this->_relatedObjects[$relationship] AS $related) {
+                    $related->setValue($options['relationshipLocal'], $this);
+                    $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+
+                $orphans = $relatedObjectClass::getAllByWhere([
+                    $options['linkLocal'] => $this->ID,
+                    'ID' => [
+                        'operator' => 'NOT IN',
+                        'values' => array_keys($relatedObjects)
+                    ]
+                ]);
+
+                foreach ($orphans as $orphan) {
+                    $orphan->destroy();
+                }
+
             }
         }
     }
@@ -1785,8 +1812,16 @@ class ActiveRecord
                 $options['linkLocal'] = static::getDefaultForeignIdentifierColumnName();
             }
 
+            if (empty($options['relationshipForeign'])) {
+                $options['relationshipForeign'] = static::getDefaultForeignRelationshipName();
+            }
+
             if (empty($options['linkForeign'])) {
                 $options['linkForeign'] = $options['class']::getDefaultForeignIdentifierColumnName();
+            }
+
+            if (empty($options['relationshipForeign'])) {
+                $options['relationshipForeign'] = $options['class']::getDefaultForeignRelationshipName();
             }
 
             if (empty($options['local'])) {
@@ -2275,14 +2310,19 @@ class ActiveRecord
             }
 
         }
+
         $columnName = static::_cn($field);
 
         if ($forceDirty || !array_key_exists($columnName, $this->_record) || $this->_record[$columnName] !== $value) {
-            if (array_key_exists($columnName, $this->_record)) {
-                $this->_originalValues[$field] = $originalValue;
-            }
             $this->_record[$columnName] = $value;
-            $this->_isDirty = true;
+
+            if (!$this->isPhantom) {
+                if (array_key_exists($field, $this->_originalValues) && $this->_originalValues[$field] === $this->_getFieldValue($field)) { // the value was reverted back to it's original value
+                    unset($this->_originalValues[$field]);
+                } else {
+                    $this->_originalValues[$field] = $originalValue;
+                }
+            }
 
             // unset invalidated relationships
             if (!empty($fieldOptions['relationships'])) {
@@ -2292,12 +2332,12 @@ class ActiveRecord
                     }
                 }
             }
-
-
-            return true;
-        } else {
-            return false;
         }
+
+        // set record dirty if there are still dirty fields remaining
+        $this->_isDirty = !empty($this->_originalValues) || $forceDirty || $this->isPhantom;
+
+        return $this->_isDirty;
     }
 
     /**
@@ -2492,6 +2532,7 @@ class ActiveRecord
 
             // so any invalid values are removed
             $value = $set;
+            $this->_isDirty = true;
         } elseif ($rel['type'] ==  'handle') {
             if ($value !== null && !is_a($value, __CLASS__)) {
                 return false;
@@ -2518,6 +2559,40 @@ class ActiveRecord
             }
 
             $value = $set;
+            $this->_isDirty = true;
+
+        } elseif ($rel['type'] == 'many-many') {
+            $set = [];
+
+            if (!is_array($value)) {
+                if (!empty($value)) {
+                    $value = [$value];
+                } else {
+                    $value = [];
+                }
+            }
+
+            foreach ($value as $related) {
+                if (empty($related) || !is_a($related, __CLASS__)) {
+                    continue;
+                }
+
+                if ($related->isA($rel['class'])) {
+                    if ($existing = $rel['linkClass']::getByWhere([$rel['linkLocal'] => $this->getValue($rel['local']), $rel['linkForeign'] => $related->getValue($rel['foreign'])])) {
+                        $set[] = $existing;
+                    } else {
+                        $set[] = $rel['linkClass']::create([
+                            $rel['relationshipLocal'] => $this,
+                            $rel['relationshipForeign'] => $related
+                        ]);
+                    }
+                } elseif ($related->isA($rel['linkClass'])) {
+                    $set[] = $related;
+                }
+            }
+
+            $value = $set;
+            $this->_isDirty = true;
         } else {
             return false;
         }

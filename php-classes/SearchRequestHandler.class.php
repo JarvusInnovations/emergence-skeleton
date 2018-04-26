@@ -93,7 +93,8 @@ class SearchRequestHandler extends RequestHandler
             }
 
             // add match conditions
-            $escapedQuery = DB::escape($_REQUEST['q']);
+            $query = $_REQUEST['q'];
+            $escapedQuery = DB::escape($query);
             $matchConditions = array();
 
             if ($columns['fulltext']) {
@@ -121,12 +122,11 @@ class SearchRequestHandler extends RequestHandler
             if ($columns['sql']) {
                 $matchConditions[] =
                     '('
-                    .join(') OR (', array_map(function($sql) use ($escapedQuery) {
-                        return sprintf($sql, $escapedQuery);
+                    .join(') OR (', array_map(function($sql) use ($query, $escapedQuery) {
+                        return is_callable($sql) ? call_user_func($sql, $query) : sprintf($sql, $escapedQuery);
                     }, $columns['sql']))
                     .')';
             }
-
 
 
             $options['conditions'][] = join(' OR ', $matchConditions);
