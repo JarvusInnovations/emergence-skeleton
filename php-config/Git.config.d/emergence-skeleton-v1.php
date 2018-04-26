@@ -33,6 +33,7 @@ if (Site::getConfig('parent_hostname') == null) {
                 ,'exclude' => [
                     '#\\.gitignore$#'
                     ,'#^/Tests#'
+                    ,'#^/Command#'
                     ,'#\\.md$#'
                     ,'#composer\\.json#'
                     ,'#phpunit\\.xml\\.dist#'
