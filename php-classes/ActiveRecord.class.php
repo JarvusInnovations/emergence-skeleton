@@ -2313,14 +2313,19 @@ class ActiveRecord
             }
 
         }
+
         $columnName = static::_cn($field);
 
         if ($forceDirty || !array_key_exists($columnName, $this->_record) || $this->_record[$columnName] !== $value) {
-            if (array_key_exists($columnName, $this->_record)) {
-                $this->_originalValues[$field] = $originalValue;
-            }
             $this->_record[$columnName] = $value;
-            $this->_isDirty = true;
+
+            if (!$this->isPhantom) {
+                if (array_key_exists($field, $this->_originalValues) && $this->_originalValues[$field] === $this->_getFieldValue($field)) { // the value was reverted back to it's original value
+                    unset($this->_originalValues[$field]);
+                } else {
+                    $this->_originalValues[$field] = $originalValue;
+                }
+            }
 
             // unset invalidated relationships
             if (!empty($fieldOptions['relationships'])) {
@@ -2330,12 +2335,12 @@ class ActiveRecord
                     }
                 }
             }
-
-
-            return true;
-        } else {
-            return false;
         }
+
+        // set record dirty if there are still dirty fields remaining
+        $this->_isDirty = !empty($this->_originalValues) || $forceDirty || $this->isPhantom;
+
+        return $this->_isDirty;
     }
 
     /**
