@@ -1108,7 +1108,7 @@ class ActiveRecord
 #                $relatedObjects = [];
 #                foreach ($this->_relatedObjects[$relationship] AS $related) {
 #                    // TODO: don't use setField to set a relationship
-#                    $related->setField($options['localRelationship'], $this); // cpm->child
+#                    $related->setField($options['relationshipLocal'], $this); // cpm->child
 #                    $related->save();
 #                    $relatedObjects[$related->ID] = $related;
 #                }
@@ -1815,8 +1815,16 @@ class ActiveRecord
                 $options['linkLocal'] = static::getDefaultForeignIdentifierColumnName();
             }
 
+            if (empty($options['relationshipForeign'])) {
+                $options['relationshipForeign'] = static::getDefaultForeignRelationshipName();
+            }
+
             if (empty($options['linkForeign'])) {
                 $options['linkForeign'] = $options['class']::getDefaultForeignIdentifierColumnName();
+            }
+
+            if (empty($options['relationshipForeign'])) {
+                $options['relationshipForeign'] = $options['class']::getDefaultForeignRelationshipName();
             }
 
             if (empty($options['local'])) {
