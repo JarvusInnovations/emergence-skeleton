@@ -378,18 +378,7 @@ class ActiveRecord
 
     public function setValue($name, $value)
     {
-        // handle field
-        if (static::_fieldExists($name)) {
-            $this->_setFieldValue($name, $value);
-        }
-        // handle relationship
-        elseif (static::_relationshipExists($name)) {
-            $this->_setRelationshipValue($name, $value);
-        }
-        // undefined
-        else {
-            return false;
-        }
+        return $this->_setFieldValue($name, $value);
     }
 
 
