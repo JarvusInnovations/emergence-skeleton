@@ -1,6 +1,6 @@
 <?php
 
-if ($GLOBALS['Session']->hasAccountLevel('User')) {
+if (!empty($GLOBALS['Session']) && $GLOBALS['Session']->hasAccountLevel('User')) {
     SearchRequestHandler::$searchClasses[Emergence\People\User::class] = [
         'fields' => [
             [
