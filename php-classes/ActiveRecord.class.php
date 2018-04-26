@@ -1100,30 +1100,27 @@ class ActiveRecord
                     }
                 }
 
-#            } elseif ($options['type'] == 'many-many') {
-#
-#                // TODO: finish this implementation
-#
-#                $relatedObjectClass = $options['linkClass'];
-#                $relatedObjects = [];
-#                foreach ($this->_relatedObjects[$relationship] AS $related) {
-#                    // TODO: don't use setField to set a relationship
-#                    $related->setField($options['relationshipLocal'], $this); // cpm->child
-#                    $related->save();
-#                    $relatedObjects[$related->ID] = $related;
-#                }
-#
-#                $relatedConditions = [
-#                    $options['linkLocal'] => $this->ID,
-#                    'ID' => [
-#                        'operator' => 'NOT IN',
-#                        'values' => array_keys($relatedObjects)
-#                    ]
-#                ];
-#
-#                foreach ($relatedObjectClass::getAllByWhere($relatedConditions) as $oldRelationship) {
-#                    $oldRelationship->destroy();
-#                }
+            } elseif ($options['type'] == 'many-many') {
+
+                $relatedObjectClass = $options['linkClass'];
+                $relatedObjects = [];
+                foreach ($this->_relatedObjects[$relationship] AS $related) {
+                    $related->setValue($options['relationshipLocal'], $this);
+                    $related->save();
+                    $relatedObjects[$related->ID] = $related;
+                }
+
+                $orphans = $relatedObjectClass::getAllByWhere([
+                    $options['linkLocal'] => $this->ID,
+                    'ID' => [
+                        'operator' => 'NOT IN',
+                        'values' => array_keys($relatedObjects)
+                    ]
+                ]);
+
+                foreach ($orphans as $orphan) {
+                    $orphan->destroy();
+                }
 
             }
         }
@@ -2559,6 +2556,39 @@ class ActiveRecord
 
                 $related->Context = $this;
                 $set[] = $related;
+            }
+
+            $value = $set;
+            $this->_isDirty = true;
+
+        } elseif ($rel['type'] == 'many-many') {
+            $set = [];
+
+            if (!is_array($value)) {
+                if (!empty($value)) {
+                    $value = [$value];
+                } else {
+                    $value = [];
+                }
+            }
+
+            foreach ($value as $related) {
+                if (empty($related) || !is_a($related, __CLASS__)) {
+                    continue;
+                }
+
+                if ($related->isA($rel['class'])) {
+                    if ($existing = $rel['linkClass']::getByWhere([$rel['linkLocal'] => $this->getValue($rel['local']), $rel['linkForeign'] => $related->getValue($rel['foreign'])])) {
+                        $set[] = $existing;
+                    } else {
+                        $set[] = $rel['linkClass']::create([
+                            $rel['relationshipLocal'] => $this,
+                            $rel['relationshipForeign'] => $related
+                        ]);
+                    }
+                } elseif ($related->isA($rel['linkClass'])) {
+                    $set[] = $related;
+                }
             }
 
             $value = $set;
