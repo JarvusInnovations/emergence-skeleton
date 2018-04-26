@@ -1054,17 +1054,17 @@ class ActiveRecord
                 }
 
                 if (isset($options['prune']) && $options['prune'] == 'delete') {
-                    DB::nonQuery(
-                        'DELETE FROM `%s` '.
-                        ' WHERE %s = "%s" '.
-                        '   AND ID NOT IN (%s) ',
-                        [
-                            $relatedObjectClass::$tableName,
-                            $options['foreign'],
-                            $this->ID,
-                            count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
+                    $orphans = $relatedObjectClass::getAllByWhere([
+                        $options['foreign'] => $this->ID,
+                        'ID' => [
+                            'operator' => 'NOT IN',
+                            'values' => array_keys($relatedObjects)
                         ]
-                    );
+                    ]);
+
+                    foreach ($orphans as $orphan) {
+                        $orphan->destroy();
+                    }
                 }
             } elseif ($options['type'] == 'context-children') {
                 $relatedObjectClass = $options['class'];
@@ -1075,39 +1075,32 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
                 if (isset($options['prune'])) {
+                    $orphans = $relatedObjectClass::getAllByWhere([
+                        $options['foreign'] => $this->ID,
+                        'ID' => [
+                            'operator' => 'NOT IN',
+                            'values' => array_keys($relatedObjects)
+                        ]
+                    ]);
+
                     switch ($options['prune']) {
                         case 'unlink':
-                            DB::nonQuery(
-                                'UPDATE `%s` %s '.
-                                '   SET '.
-                                'ContextID = NULL, '.
-                                'ContextClass = NULL '.
-
-                                ' WHERE ID NOT IN (%s)',
-                                [
-                                    $relatedObjectClass::$tableName,
-                                    $relatedObjectClass::getTableAlias(),
-                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
-                                ]
-                            );
+                            foreach ($orphans as $orphan) {
+                                $orphan->Context = null;
+                                $orphan->save();
+                            }
 
                             break;
 
                         case 'delete':
-                            DB::nonQuery(
-                                'DELETE FROM `%s` '.
-                                ' WHERE ContextClass = "%s" '.
-                                '   AND ContextID = %u '.
-                                '   AND ID NOT IN (%s) ',
-                                [
-                                    $relatedObjectClass::$tableName,
-                                    DB::escape($this->getRootClass()),
-                                    $this->ID,
-                                    count($relatedObjects) ? join(',', array_keys($relatedObjects)) : '0'
-                                ]
-                            );
+                            foreach ($orphans as $orphan) {
+                                $orphan->destroy();
+                            }
 
                             break;
+
+                        default:
+                            throw new Exception('Unhandled prune option');
                     }
                 }
             }
