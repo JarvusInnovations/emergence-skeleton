@@ -1017,9 +1017,12 @@ class ActiveRecord
             }
 
             if ($options['type'] == 'handle') {
+
                 $this->_relatedObjects[$relationship]->Context = $this;
                 $this->_relatedObjects[$relationship]->save();
+
             } elseif ($options['type'] == 'one-one') {
+
                 $related = $this->_relatedObjects[$relationship];
 
                 if ($options['local'] == 'ID') {
@@ -1033,7 +1036,9 @@ class ActiveRecord
                 if ($related->isDirty) {
                     $related->save();
                 }
+
             } elseif ($options['type'] == 'one-many' && $options['local'] == 'ID') {
+
                 $relatedObjectClass = $options['class'];
                 $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] AS $related) {
@@ -1055,7 +1060,9 @@ class ActiveRecord
                         $orphan->destroy();
                     }
                 }
+
             } elseif ($options['type'] == 'context-children') {
+
                 $relatedObjectClass = $options['class'];
                 $relatedObjects = [];
                 foreach ($this->_relatedObjects[$relationship] as $related) {
@@ -1092,6 +1099,32 @@ class ActiveRecord
                             throw new Exception('Unhandled prune option');
                     }
                 }
+
+#            } elseif ($options['type'] == 'many-many') {
+#
+#                // TODO: finish this implementation
+#
+#                $relatedObjectClass = $options['linkClass'];
+#                $relatedObjects = [];
+#                foreach ($this->_relatedObjects[$relationship] AS $related) {
+#                    // TODO: don't use setField to set a relationship
+#                    $related->setField($options['localRelationship'], $this); // cpm->child
+#                    $related->save();
+#                    $relatedObjects[$related->ID] = $related;
+#                }
+#
+#                $relatedConditions = [
+#                    $options['linkLocal'] => $this->ID,
+#                    'ID' => [
+#                        'operator' => 'NOT IN',
+#                        'values' => array_keys($relatedObjects)
+#                    ]
+#                ];
+#
+#                foreach ($relatedObjectClass::getAllByWhere($relatedConditions) as $oldRelationship) {
+#                    $oldRelationship->destroy();
+#                }
+
             }
         }
     }
