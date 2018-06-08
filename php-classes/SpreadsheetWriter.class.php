@@ -44,21 +44,23 @@ class SpreadsheetWriter
 
     public function writeHeaders()
     {
-        header('Content-Type: text/csv; charset=utf-8');
+        if (!$this->_options['fileHandle']) {
+            header('Content-Type: text/csv; charset=utf-8');
 
-        $contentDisposition = 'attachment';
-        if ($this->_options['filename']) {
-            $contentDisposition .= '; filename="'.str_replace('"', '', $this->_options['filename']).'.csv"';
+            $contentDisposition = 'attachment';
+            if ($this->_options['filename']) {
+                $contentDisposition .= '; filename="'.str_replace('"', '', $this->_options['filename']).'.csv"';
+            }
+
+            header('Content-Disposition: '.$contentDisposition);
         }
-
-        header('Content-Disposition: '.$contentDisposition);
 
         return $this->_headersWritten = true;
     }
 
     public function writeRow($data)
     {
-        if (!$this->_headersWritten && !$this->_options['fileHandle']) {
+        if (!$this->_headersWritten) {
             $this->writeHeaders();
 
             if ($this->_options['autoHeader']) {
