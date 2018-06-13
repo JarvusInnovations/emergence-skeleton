@@ -7,6 +7,7 @@ if (Site::getConfig('parent_hostname') == null) {
         'workingBranch' => 'master',
         'trees' => [
             'api-docs',
+            'data-exporters',
             'dwoo-plugins',
             'event-handlers',
             'ext-library',
