@@ -20,7 +20,7 @@
         SiteEnvironment.mediaSupportedTypes = {Media::getSupportedTypes()|json_encode};
     </script>
 
-    {jsmin "markdown.js"}
+    {jsmin "lib/markdown.js"}
 
     <script>
 	    window.Ext = window.Ext || { };
