@@ -49,6 +49,8 @@ class SenchaApp extends App
 
     public function buildCssMarkup()
     {
+        $baseUrl = $this->getUrl();
+
         $html = [];
 
         foreach ($this->manifest['css'] as $css) {
@@ -58,7 +60,7 @@ class SenchaApp extends App
                 throw new \Exception('sencha app css asset not found: '.$css['path']);
             }
 
-            $html[] = "<link rel=\"stylesheet\" href=\"{$css['path']}?_sha1={$node->SHA1}\"/>";
+            $html[] = "<link rel=\"stylesheet\" href=\"{$baseUrl}/{$css['path']}?_sha1={$node->SHA1}\"/>";
         }
 
         return implode(PHP_EOL, $html);
@@ -66,6 +68,8 @@ class SenchaApp extends App
 
     public function buildJsMarkup()
     {
+        $baseUrl = $this->getUrl();
+
         $html = [];
 
         foreach ($this->manifest['js'] as $js) {
@@ -75,7 +79,7 @@ class SenchaApp extends App
                 throw new \Exception('sencha app js asset not found: '.$js['path']);
             }
 
-            $html[] = "<script type=\"text/javascript\" src=\"{$js['path']}?_sha1={$node->SHA1}\"></script>";
+            $html[] = "<script type=\"text/javascript\" src=\"{$baseUrl}/{$js['path']}?_sha1={$node->SHA1}\"></script>";
         }
 
         return implode(PHP_EOL, $html);

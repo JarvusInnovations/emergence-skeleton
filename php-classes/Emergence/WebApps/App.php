@@ -8,6 +8,7 @@ use Site;
 abstract class App implements IApp
 {
     public static $buildsRoot = 'webapp-builds';
+    public static $webappsRoute = '/webapps';
     public static $types = [
         SenchaApp::class
     ];
@@ -40,6 +41,11 @@ abstract class App implements IApp
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getUrl()
+    {
+        return static::$webappsRoute . '/' . $this->getName();
     }
 
     public function getAsset($path)
