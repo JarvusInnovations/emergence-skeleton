@@ -38,7 +38,7 @@
             
             <div class="submit-area">
                 <button type="submit">Log In</button>
-                {if RegistrationRequestHandler::$enableRegistration}
+                {if Emergence\People\RegistrationRequestHandler::$enableRegistration}
                     <span class="submit-text">or <a href="/register{tif $.request.return || $.server.SCRIPT_NAME != '/login' ? cat('?return=', escape(default($.request.return, $.server.REQUEST_URI), url))}">Register</a></span>
                 {/if}
             </div>
