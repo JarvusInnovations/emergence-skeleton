@@ -7,8 +7,6 @@
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
             <title>{if $title}{$title}{else}{$app->getName()}{/if}</title>
-
-            <base href="/webapps/{$app->getName()}/" />
         {/block}
 
         {block "css-head"}{/block}
