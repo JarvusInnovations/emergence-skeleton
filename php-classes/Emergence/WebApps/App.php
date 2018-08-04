@@ -2,6 +2,8 @@
 
 namespace Emergence\WebApps;
 
+use Exception;
+
 use Site;
 
 
@@ -21,7 +23,7 @@ abstract class App implements IApp
     {
         foreach (static::$types as $type) {
             if (!is_a($type, IApp::class, true)) {
-                throw new \Exception("app type $type does not implement IApp interface");
+                throw new Exception("app type $type does not implement IApp interface");
             }
 
             if ($app = $type::load($name)) {
@@ -57,6 +59,17 @@ abstract class App implements IApp
         array_unshift($path, static::$buildsRoot, $this->name);
 
         return Site::resolvePath($path);
+    }
+
+    public function getAssetUrl($path)
+    {
+        $node = $this->getAsset($path);
+
+        if (!$node) {
+            throw new Exception('asset not found: '.$path);
+        }
+
+        return $this->getUrl()."/{$path}?_sha1={$node->SHA1}";
     }
 
     public function renderAsset($path)
