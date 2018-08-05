@@ -2,6 +2,8 @@
 
 namespace Emergence\WebApps;
 
+use Exception;
+
 use Site;
 use Cache;
 use Emergence\Site\Response;
@@ -9,6 +11,9 @@ use Emergence\Site\Response;
 
 class SenchaApp extends App
 {
+    public static $plugins = [];
+
+
     protected $manifest;
 
 
@@ -40,6 +45,11 @@ class SenchaApp extends App
         $this->manifest = $manifest;
     }
 
+    protected static function getPlugins()
+    {
+        return static::$plugins;
+    }
+
     public function render()
     {
         return new Response('sencha', [
@@ -54,13 +64,7 @@ class SenchaApp extends App
         $html = [];
 
         foreach ($this->manifest['css'] as $css) {
-            $node = $this->getAsset($css['path']);
-
-            if (!$node) {
-                throw new \Exception('sencha app css asset not found: '.$css['path']);
-            }
-
-            $html[] = "<link rel=\"stylesheet\" href=\"{$baseUrl}/{$css['path']}?_sha1={$node->SHA1}\"/>";
+            $html[] = '<link rel="stylesheet" href="'.$this->getAssetUrl($css['path']).'"/>';
         }
 
         return implode(PHP_EOL, $html);
@@ -73,13 +77,18 @@ class SenchaApp extends App
         $html = [];
 
         foreach ($this->manifest['js'] as $js) {
-            $node = $this->getAsset($js['path']);
+            $html[] = '<script type="text/javascript" src="'.$this->getAssetUrl($js['path']).'"></script>';
+        }
+
+        // TODO: migrate away from /app request handler
+        foreach ($this->getPlugins() as $packageName) {
+            $node = Site::resolvePath(['sencha-workspace', 'packages', $packageName, 'build', "{$packageName}.json"]);
 
             if (!$node) {
-                throw new \Exception('sencha app js asset not found: '.$js['path']);
+                throw new Exception("build for sencha plugin {$packageName} not found");
             }
 
-            $html[] = "<script type=\"text/javascript\" src=\"{$baseUrl}/{$js['path']}?_sha1={$node->SHA1}\"></script>";
+            $html[] = "<script type=\"text/javascript\" src=\"/app/packages/{$packageName}/build/{$packageName}.json?_sha1={$node->SHA1}\"></script>";
         }
 
         return implode(PHP_EOL, $html);
