@@ -50,7 +50,7 @@ abstract class App implements IApp
         return static::$webappsRoute . '/' . $this->getName();
     }
 
-    public function getAsset($path)
+    protected function getAsset($path)
     {
         if (is_string($path)) {
             $path = Site::splitPath($path);
@@ -61,7 +61,7 @@ abstract class App implements IApp
         return Site::resolvePath($path);
     }
 
-    public function getAssetUrl($path)
+    protected function getAssetUrl($path)
     {
         $node = $this->getAsset($path);
 

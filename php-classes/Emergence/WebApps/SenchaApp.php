@@ -45,7 +45,7 @@ class SenchaApp extends App
         $this->manifest = $manifest;
     }
 
-    public static function getPlugins()
+    protected static function getPlugins()
     {
         return static::$plugins;
     }
