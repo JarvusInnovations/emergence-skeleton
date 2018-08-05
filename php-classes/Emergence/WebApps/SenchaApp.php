@@ -77,7 +77,7 @@ class SenchaApp extends App
         $html = [];
 
         foreach ($this->manifest['js'] as $js) {
-            $html[] = '<script type="text/javascript\" src="'.$this->getAssetUrl($js['path']).'"></script>';
+            $html[] = '<script type="text/javascript" src="'.$this->getAssetUrl($js['path']).'"></script>';
         }
 
         // TODO: migrate away from /app request handler
