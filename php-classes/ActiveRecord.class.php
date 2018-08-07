@@ -1110,18 +1110,19 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
 
-                $orphans = $relatedObjectClass::getAllByWhere([
-                    $options['linkLocal'] => $this->ID,
-                    'ID' => [
-                        'operator' => 'NOT IN',
-                        'values' => array_keys($relatedObjects)
-                    ]
-                ]);
+                if (isset($options['prune']) && $options['prune'] == 'delete') {
+                    $orphans = $relatedObjectClass::getAllByWhere([
+                        $options['linkLocal'] => $this->ID,
+                        'ID' => [
+                            'operator' => 'NOT IN',
+                            'values' => array_keys($relatedObjects)
+                        ]
+                    ]);
 
-                foreach ($orphans as $orphan) {
-                    $orphan->destroy();
+                    foreach ($orphans as $orphan) {
+                        $orphan->destroy();
+                    }
                 }
-
             }
         }
     }
