@@ -10,6 +10,10 @@
         {/block}
 
         {block "css-head"}{/block}
+
+        {block "css-app"}
+            {$app->buildCssMarkup()}
+        {/block}
     </head>
 
     <body class="{block "body-class"}loading{/block}">
@@ -22,10 +26,6 @@
                 SiteEnvironment.appName = {$app->getName()|json_encode};
                 SiteEnvironment.appBaseUrl = {$app->getUrl()|json_encode};
             </script>
-        {/block}
-
-        {block "css-app"}
-            {$app->buildCssMarkup()}
         {/block}
 
         {block "js-app"}
