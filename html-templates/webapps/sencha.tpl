@@ -10,6 +10,10 @@
         {/block}
 
         {block "css-head"}{/block}
+
+        {block "css-app"}
+            {$app->buildCssMarkup()}
+        {/block}
     </head>
 
     <body class="{block "body-class"}loading{/block}">
@@ -20,12 +24,8 @@
                 var SiteEnvironment = SiteEnvironment || { };
                 SiteEnvironment.user = {JSON::translateObjects($.User)|json_encode};
                 SiteEnvironment.appName = {$app->getName()|json_encode};
-                SiteEnvironment.appBaseUrl = '/webapps/{$app->getName()}';
+                SiteEnvironment.appBaseUrl = {$app->getUrl()|json_encode};
             </script>
-        {/block}
-
-        {block "css-app"}
-            {$app->buildCssMarkup()}
         {/block}
 
         {block "js-app"}
