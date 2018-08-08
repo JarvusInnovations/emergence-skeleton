@@ -80,6 +80,11 @@ class SenchaApp extends App
             $html[] = '<script type="text/javascript" src="'.$this->getAssetUrl($js['path']).'"></script>';
         }
 
+        // patch manifest paths
+        $html[] = '<script type="text/javascript">';
+        $html[] = 'Ext.manifest.resources.path = '.json_encode($this->getUrl().'/resources');
+        $html[] = '</script>';
+
         // TODO: migrate away from /app request handler
         foreach ($this->getPlugins() as $packageName) {
             $node = Site::resolvePath(['sencha-workspace', 'packages', $packageName, 'build', "{$packageName}.json"]);
