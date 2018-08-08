@@ -20,7 +20,7 @@
                 var SiteEnvironment = SiteEnvironment || { };
                 SiteEnvironment.user = {JSON::translateObjects($.User)|json_encode};
                 SiteEnvironment.appName = {$app->getName()|json_encode};
-                SiteEnvironment.appBaseUrl = '/webapps/{$app->getName()}';
+                SiteEnvironment.appBaseUrl = {$app->getUrl()|json_encode};
             </script>
         {/block}
 
