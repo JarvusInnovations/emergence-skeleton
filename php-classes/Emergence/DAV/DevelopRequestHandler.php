@@ -4,6 +4,7 @@ namespace Emergence\DAV;
 
 use Site;
 use User;
+use UserSession;
 use RequestHandler;
 use Sencha_App;
 
@@ -33,10 +34,17 @@ class DevelopRequestHandler extends \RequestHandler
             $authEngine->setRealm('Develop '.\Site::$title);
             $authUserPass = $authEngine->getUserPass();
 
-            // try to get user
-            $userClass = static::$userClass;
-            $userClass = $userClass::getDefaultClass();
-            $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
+            // try to get session
+            if ($authUserPass[0] == '$session') {
+                if ($Session = UserSession::getByHandle($authUserPass[1])) {
+                    $User = $Session->Person;
+                }
+            } else {
+                // try to get user
+                $userClass = static::$userClass;
+                $userClass = $userClass::getDefaultClass();
+                $User = $userClass::getByLogin($authUserPass[0], $authUserPass[1]);
+            }
 
             // send auth request if login is inadiquate
             if (!$User || !$User->hasAccountLevel('Developer')) {
