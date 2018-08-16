@@ -213,7 +213,7 @@ abstract class RecordsRequestHandler extends RequestHandler
             return static::throwUnauthorizedError();
         }
 
-        $conditions = static::buildBrowseConditions($conditions);
+        $conditions = static::buildBrowseConditions($conditions, $responseData);
 
         $limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
         $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? (integer)$_REQUEST['offset'] : false;
@@ -686,7 +686,7 @@ abstract class RecordsRequestHandler extends RequestHandler
         }
     }
 
-    protected static function buildBrowseConditions(array $conditions = array())
+    protected static function buildBrowseConditions(array $conditions = array(), array &$filterObjects = [])
     {
         if (static::$browseConditions) {
             if (is_array(static::$browseConditions)) {
