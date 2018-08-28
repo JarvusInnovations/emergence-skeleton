@@ -213,7 +213,11 @@ abstract class RecordsRequestHandler extends RequestHandler
             return static::throwUnauthorizedError();
         }
 
-        $conditions = static::buildBrowseConditions($conditions, $responseData);
+        try {
+            $conditions = static::buildBrowseConditions($conditions, $responseData);
+        } catch (OutOfBoundsException $e) {
+            return static::throwNotFoundError($e->getMessage());
+        }
 
         $limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
         $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? (integer)$_REQUEST['offset'] : false;
