@@ -1,5 +1,7 @@
 <?php
 
+use Emergence\People\IPerson;
+
 class ActiveRecord
 {
     // configurables
@@ -114,6 +116,9 @@ class ActiveRecord
         ),
         'recordURL' => array(
             'getter' => 'getURL'
+        ),
+        'availableActions' => array(
+            'getter' => 'getAvailableActions'
         )
     );
 
@@ -219,7 +224,7 @@ class ActiveRecord
 
         // authorize read access
         if (!$this->userCanReadRecord()) {
-            throw new UserUnauthorizedException('Read authorization denied');
+            throw new UserUnauthorizedException('read authorization denied');
         }
 
         // set Class
@@ -435,7 +440,34 @@ class ActiveRecord
         return null;
     }
 
-    public function userCanReadRecord(Emergence\People\IPerson $User = null)
+    public function getAvailableActions(IPerson $User = null)
+    {
+        $User = $User ?: $this->getUserFromEnvironment();
+
+        return array(
+            'create' => $this->userCanCreateRecord($User),
+            'read' => $this->userCanReadRecord($User),
+            'update' => $this->userCanUpdateRecord($User),
+            'delete' => $this->userCanDeleteRecord($User),
+        );
+    }
+
+    public function userCanCreateRecord(IPerson $User = null)
+    {
+        return true;
+    }
+
+    public function userCanReadRecord(IPerson $User = null)
+    {
+        return true;
+    }
+
+    public function userCanUpdateRecord(IPerson $User = null)
+    {
+        return true;
+    }
+
+    public function userCanDeleteRecord(IPerson $User = null)
     {
         return true;
     }
@@ -780,6 +812,14 @@ class ActiveRecord
     protected $_isSaving = false;
     public function save($deep = true)
     {
+        // authorize create/update access
+        if ($this->_isPhantom && !$this->userCanCreateRecord()) {
+            throw new UserUnauthorizedException('create authorization denied');
+        } elseif (!$this->_isPhantom && !$this->userCanUpdateRecord()) {
+            throw new UserUnauthorizedException('update authorization denied');
+        }
+
+        // prevent concurrent operations
         if ($this->_isSaving) {
             return null;
         }
@@ -1135,6 +1175,11 @@ class ActiveRecord
 
     public static function delete($id)
     {
+        // authorize delete access
+        if (!$this->userCanDeleteRecord()) {
+            throw new UserUnauthorizedException('delete authorization denied');
+        }
+
         DB::nonQuery('DELETE FROM `%s` WHERE `%s` = %u', array(
             static::$tableName
             ,static::_cn('ID')
