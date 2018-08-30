@@ -812,13 +812,6 @@ class ActiveRecord
     protected $_isSaving = false;
     public function save($deep = true)
     {
-        // authorize create/update access
-        if ($this->_isPhantom && !$this->userCanCreateRecord()) {
-            throw new UserUnauthorizedException('create authorization denied');
-        } elseif (!$this->_isPhantom && !$this->userCanUpdateRecord()) {
-            throw new UserUnauthorizedException('update authorization denied');
-        }
-
         // prevent concurrent operations
         if ($this->_isSaving) {
             return null;
@@ -869,6 +862,13 @@ class ActiveRecord
 
         $wasDirty = $this->isDirty;
         if ($wasDirty) {
+            // authorize create/update access
+            if ($this->_isPhantom && !$this->userCanCreateRecord()) {
+                throw new UserUnauthorizedException('create authorization denied');
+            } elseif (!$this->_isPhantom && !$this->userCanUpdateRecord()) {
+                throw new UserUnauthorizedException('update authorization denied');
+            }
+
             if (!$this->_isPhantom && static::$trackModified) {
                 $this->Modified = time();
 
@@ -1175,8 +1175,12 @@ class ActiveRecord
 
     public static function delete($id)
     {
+        if (!$Record = static::getByID($id)) {
+            return false;
+        }
+
         // authorize delete access
-        if (!$this->userCanDeleteRecord()) {
+        if (!$Record->userCanDeleteRecord()) {
             throw new UserUnauthorizedException('delete authorization denied');
         }
 
