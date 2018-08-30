@@ -385,11 +385,27 @@ abstract class RecordsRequestHandler extends RequestHandler
                     'record' => $datum
                     ,'errors' => 'Write access denied'
                 );
+
+                if (!$message) {
+                    $message = 'Write access denied';
+                }
                 continue;
             }
 
             // apply delta
-            static::applyRecordDelta($Record, $datum);
+            try {
+                static::applyRecordDelta($Record, $datum);
+            } catch (UserUnauthorizedException $e) {
+                $failed[] = array(
+                    'record' => $datum
+                    ,'errors' => $e->getMessage()
+                );
+
+                if (!$message) {
+                    $message = $e->getMessage();
+                }
+                continue;
+            }
 
             // call template function
             static::onBeforeRecordValidated($Record, $datum);
@@ -410,6 +426,15 @@ abstract class RecordsRequestHandler extends RequestHandler
                     'Record' => $Record,
                     'data' => $datum
                 ));
+            } catch (UserUnauthorizedException $e) {
+                $failed[] = array(
+                    'record' => $Record->getData()
+                    ,'errors' => $e->getMessage()
+                );
+
+                if (!$message) {
+                    $message = $e->getMessage();
+                }
             } catch (RecordValidationException $e) {
                 $failed[] = array(
                     'record' => $Record->getData()
@@ -498,8 +523,16 @@ abstract class RecordsRequestHandler extends RequestHandler
             static::onBeforeRecordDestroyed($Record);
 
             // destroy record
-            if ($Record->destroy()) {
-                $results[] = $Record;
+            try {
+                if ($Record->destroy()) {
+                    $results[] = $Record;
+                }
+            } catch (UserUnauthorizedException $e) {
+                $failed[] = array(
+                    'record' => $datum
+                    ,'errors' => $e->getMessage()
+                );
+                continue;
             }
         }
 
@@ -556,7 +589,11 @@ abstract class RecordsRequestHandler extends RequestHandler
                 static::onBeforeRecordSaved($Record, $_REQUEST);
 
                 // save record
-                $Record->save();
+                try {
+                    $Record->save();
+                } catch (UserUnauthorizedException $e) {
+                    return static::throwUnauthorizedError($e->getMessage());
+                }
 
                 // call template function
                 static::onRecordSaved($Record, $_REQUEST);
@@ -602,7 +639,11 @@ abstract class RecordsRequestHandler extends RequestHandler
             static::onBeforeRecordDestroyed($Record);
 
             // destroy record
-            $Record->destroy();
+            try {
+                $Record->destroy();
+            } catch (UserUnauthorizedException $e) {
+                return static::throwUnauthorizedError($e->getMessage());
+            }
 
             // fire created response
             return static::respond(static::getTemplateName($className::$singularNoun).'Deleted', array(
