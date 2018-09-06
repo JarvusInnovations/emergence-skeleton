@@ -4,6 +4,7 @@ namespace Emergence\Exports;
 
 use Exception;
 
+use DB;
 use Site;
 use SiteFile;
 use Emergence_FS;
@@ -62,7 +63,7 @@ class ExportsRequestHandler extends \RequestHandler
             'scripts' => static::getScripts()
         ]);
     }
-    
+
     public static function handleScriptRequest(array $scriptPath)
     {
         // load script
@@ -101,6 +102,9 @@ class ExportsRequestHandler extends \RequestHandler
 
         // begin reading results
         try {
+            DB::suspendQueryLogging();
+            set_time_limit(0);
+
             $results = call_user_func($config['buildRows'], $query, $config);
 
             // write each row
@@ -140,6 +144,8 @@ class ExportsRequestHandler extends \RequestHandler
             if ($spreadsheetWriter) {
                 $spreadsheetWriter->close();
             }
+
+             DB::resumeQueryLogging();
         }
 
         // finish output
