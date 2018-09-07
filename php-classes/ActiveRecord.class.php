@@ -2788,7 +2788,9 @@ class ActiveRecord
                 if ($condition === null || ($condition == '' && !empty($fieldOptions['blankisnull']))) {
                     $condition = sprintf('`%s` IS NULL', static::_cn($field));
                 } elseif (is_array($condition)) {
-                    if (is_array($condition['values'])) {
+                    if ($condition['operator'] == 'BETWEEN') {
+                        $condition = sprintf('`%s` BETWEEN "%s" AND "%s"', static::_cn($field), DB::escape($condition['min']), DB::escape($condition['max']));
+                    } elseif (is_array($condition['values'])) {
                         $condition = sprintf('`%s` %s ("%s")' ,static::_cn($field), ($condition['operator'] ? $condition['operator'] : 'IN'), implode('", "', DB::escape($condition['values'])));
                     } else {
                         $condition = sprintf('`%s` %s "%s"', static::_cn($field), $condition['operator'], DB::escape($condition['value']));
