@@ -111,13 +111,7 @@ class ExportsRequestHandler extends \RequestHandler
             foreach ($results as $i => $result) {
                 // begin output
                 if ($i == 0) {
-                    header('X-Accel-Buffering: no');
-                    $spreadsheetWriter = new SpreadsheetWriter([
-                        'filename' => !empty($config['filename']) ? $config['filename'] : HandleBehavior::transformText($config['title'])
-                    ]);
-                    $spreadsheetWriter->writeRow(array_values($columns));
-                    ob_end_flush();
-                    flush();
+                    $spreadsheetWriter = static::initializeWriter($config, $columns);
                 }
 
                 // build row
@@ -136,6 +130,11 @@ class ExportsRequestHandler extends \RequestHandler
                     flush();
                 }
             }
+
+            // output empty spreadsheet with headers
+            if (!$i) {
+                $spreadsheetWriter = static::initializeWriter($config, $columns);
+            }
         } catch (\Exception $e) {
             header('HTTP/1.0 500 Internal Server Error');
             header('Content-Type: text/plain');
@@ -150,5 +149,25 @@ class ExportsRequestHandler extends \RequestHandler
 
         // finish output
         exit();
+    }
+
+    protected static function initializeWriter(array $config, array $columns)
+    {
+        // disable upstream output buffering
+        header('X-Accel-Buffering: no');
+
+        // configure writer
+        $spreadsheetWriter = new SpreadsheetWriter([
+            'filename' => !empty($config['filename']) ? $config['filename'] : HandleBehavior::transformText($config['title'])
+        ]);
+
+        // write column headers row
+        $spreadsheetWriter->writeRow(array_values($columns));
+
+        // flush first row immediately
+        ob_end_flush();
+        flush();
+
+        return $spreadsheetWriter;
     }
 }
