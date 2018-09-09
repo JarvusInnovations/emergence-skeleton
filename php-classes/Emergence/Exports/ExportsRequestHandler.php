@@ -134,7 +134,7 @@ class ExportsRequestHandler extends \RequestHandler
             }
 
             // output empty spreadsheet with headers
-            if (!$i) {
+            if (!isset($i)) {
                 $spreadsheetWriter = static::initializeWriter($config, $columns);
             }
         } catch (\Exception $e) {
