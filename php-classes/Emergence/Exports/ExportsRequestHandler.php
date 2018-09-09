@@ -8,6 +8,7 @@ use DB;
 use Site;
 use SiteFile;
 use Emergence_FS;
+use ActiveRecord;
 use SpreadsheetWriter;
 
 
@@ -103,6 +104,7 @@ class ExportsRequestHandler extends \RequestHandler
         // begin reading results
         try {
             DB::suspendQueryLogging();
+            ActiveRecord::$useCache = true;
             set_time_limit(0);
 
             $results = call_user_func($config['buildRows'], $query, $config);
@@ -132,7 +134,7 @@ class ExportsRequestHandler extends \RequestHandler
             }
 
             // output empty spreadsheet with headers
-            if (!$i) {
+            if (!isset($i)) {
                 $spreadsheetWriter = static::initializeWriter($config, $columns);
             }
         } catch (\Exception $e) {
