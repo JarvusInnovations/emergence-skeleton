@@ -1,0 +1,9 @@
+[hololens]
+root = "html-templates"
+files = "**/*.tpl"
+package = "emergence/hololens-dwoo-templates" # expanded to absolute ident in holospec
+command = "lens-tree {{ input.hash }}" # GIT_DIR provided in environment -- should be an isolated git-repo with core as alternates? pull/copy result upstream after if it works? use manual copy that decends tree lazily? if no plumbing commands get it done
+
+# only present in holospec:
+[input]
+hash = "abcde"
