@@ -4,6 +4,7 @@ command = "lens-tree {{ input.hash }}" # GIT_DIR provided in environment -- shou
 # pipe job config as JSON into lens by default?
 
 [input]
+before = "dwoo-templates" # TODO: delete mockup
 root = "site-root"
 files = [
     "sass/**",
