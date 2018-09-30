@@ -3,7 +3,7 @@ package = "jarvus/hololens-extjs-pages" # expanded to absolute ident in holospec
 command = "lens-tree {{ input.hash }}" # GIT_DIR provided in environment -- should be an isolated git-repo with core as alternates? pull/copy result upstream after if it works? use manual copy that decends tree lazily? if no plumbing commands get it done
 
 [input]
-after = ["php-classes", "sass", "dwoo-templates"] # TODO: delete mockup
+after = ["php-classes", "compass", "dwoo-templates"] # TODO: delete mockup
 root = "sencha-workspace"
 files = [
     "pages/**",
