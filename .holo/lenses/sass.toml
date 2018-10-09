@@ -2,7 +2,6 @@
 package = "emergence/hololens-sass" # expanded to absolute ident in holospec
 
 [input]
-before = "dwoo-templates" # TODO: delete mockup
 root = "site-root"
 files = [
     "sass/**",

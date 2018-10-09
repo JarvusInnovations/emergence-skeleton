@@ -1,6 +1,0 @@
-[hololens]
-package = "emergence/hololens-dwoo-templates" # expanded to absolute ident in holospec
-
-[input]
-root = "html-templates"
-files = "**/*.tpl"
