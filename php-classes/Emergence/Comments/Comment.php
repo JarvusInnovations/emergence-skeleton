@@ -43,10 +43,14 @@ class Comment extends \VersionedRecord
         )
     );
 
-    public static $validations = array(
+    public static $validators = array(
+        'Context' => array(
+            'validator' => 'require-relationship',
+            'required' => true
+        ),
         'Message' => array(
-            'validator' => 'string_multiline'
-            ,'errorMessage' => 'You must provide a message.'
+            'validator' => 'string_multiline',
+            'errorMessage' => 'You must provide a message.'
         )
     );
 
