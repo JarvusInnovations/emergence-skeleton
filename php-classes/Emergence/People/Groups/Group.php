@@ -85,7 +85,7 @@ class Group extends ActiveRecord
         )
     );
 
-    public static $validations = array(
+    public static $validators = array(
         'Name' => array(
             'errorMessage' => 'A name is required'
         )

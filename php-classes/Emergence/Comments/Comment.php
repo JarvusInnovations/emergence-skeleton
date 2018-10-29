@@ -2,7 +2,9 @@
 
 namespace Emergence\Comments;
 
+use ActiveRecord;
 use HandleBehavior;
+
 
 class Comment extends \VersionedRecord
 {
@@ -43,10 +45,14 @@ class Comment extends \VersionedRecord
         )
     );
 
-    public static $validations = array(
+    public static $validators = array(
+        'Context' => array(
+            'validator' => 'require-relationship',
+            'required' => true
+        ),
         'Message' => array(
-            'validator' => 'string_multiline'
-            ,'errorMessage' => 'You must provide a message.'
+            'validator' => 'string_multiline',
+            'errorMessage' => 'You must provide a message.'
         )
     );
 
@@ -76,5 +82,44 @@ class Comment extends \VersionedRecord
         }
 
         parent::save();
+    }
+
+    /**
+     * Differentially apply a complete array of new comments data to a given context
+     */
+    public static function applyCommentsData(ActiveRecord $Context, array $commentsData)
+    {
+        // index existing comment records by ID
+        $existingComments = [];
+
+        foreach ($Context->Comments as $Comment) {
+            $existingComments[$Comment->ID] = $Comment;
+        }
+
+
+        // create new and update existing comment
+        $comments = [];
+        foreach ($commentsData as $commentData) {
+            if (empty($commentData['Message'])) {
+                throw new Exception('Comment data must have Message set');
+            }
+
+            if (
+                !empty($commentData['ID'])
+                && ($Comment = $existingComments[$commentData['ID']])
+            ) {
+                $Comment->Message = $commentData['Message'];
+            } else {
+                $Comment = static::create([
+                    'Message' => $commentData['Message']
+                ]);
+            }
+
+            $comments[] = $Comment;
+        }
+
+
+        // write new list to relationship
+        $Context->Comments = array_merge($existingComments, $comments);
     }
 }
