@@ -2774,29 +2774,34 @@ class ActiveRecord
         }
     }
 
-    public static function mapConditions($conditions)
+    public static function mapConditions($conditions, $useTableAliases = false)
     {
-        return static::_mapConditions($conditions);
+        return static::_mapConditions($conditions, $useTableAliases);
     }
 
-    protected static function _mapConditions($conditions)
+    protected static function _mapConditions($conditions, $useTableAliases = false)
     {
         foreach ($conditions AS $field => &$condition) {
             if (is_string($field)) {
                 $fieldOptions = static::getFieldOptions($field);
+                $columnName = '`'.static::_cn($field, $useTableAliases).'`';
+
+                if ($useTableAliases) {
+                    $columnName = '`'.(is_string($useTableAliases) ? $useTableAliases : static::getTableAlias()).'`.'.$columnName;
+                }
 
                 if ($condition === null || ($condition == '' && !empty($fieldOptions['blankisnull']))) {
-                    $condition = sprintf('`%s` IS NULL', static::_cn($field));
+                    $condition = sprintf('%s IS NULL', $columnName);
                 } elseif (is_array($condition)) {
                     if ($condition['operator'] == 'BETWEEN') {
-                        $condition = sprintf('`%s` BETWEEN "%s" AND "%s"', static::_cn($field), DB::escape($condition['min']), DB::escape($condition['max']));
+                        $condition = sprintf('%s BETWEEN "%s" AND "%s"', $columnName, DB::escape($condition['min']), DB::escape($condition['max']));
                     } elseif (is_array($condition['values'])) {
-                        $condition = sprintf('`%s` %s ("%s")' ,static::_cn($field), ($condition['operator'] ? $condition['operator'] : 'IN'), implode('", "', DB::escape($condition['values'])));
+                        $condition = sprintf('%s %s ("%s")' , $columnName, ($condition['operator'] ? $condition['operator'] : 'IN'), implode('", "', DB::escape($condition['values'])));
                     } else {
-                        $condition = sprintf('`%s` %s "%s"', static::_cn($field), $condition['operator'], DB::escape($condition['value']));
+                        $condition = sprintf('%s %s "%s"', $columnName, $condition['operator'], DB::escape($condition['value']));
                     }
                 } else {
-                    $condition = sprintf('`%s` = "%s"', static::_cn($field), DB::escape($condition));
+                    $condition = sprintf('%s = "%s"', $columnName, DB::escape($condition));
                 }
             }
         }
