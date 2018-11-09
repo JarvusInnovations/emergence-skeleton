@@ -598,6 +598,22 @@ class Source
             $results[$treeOptions['vfsPath']] = $result;
         }
 
+        // analyze mode changes
+        $diff = $this->getRepository()->run('diff', ['--summary']);
+        $diff = explode(PHP_EOL, $diff);
+
+        foreach ($diff as $diffLine) {
+            $diffLine = trim($diffLine);
+
+            if (!preg_match('/^mode change (?<modeFrom>\d+) => (?<modeTo>\d+) (?<path>.+?)$/', $diffLine, $matches)) {
+                continue;
+            }
+
+            if ($matches['modeFrom'] == '100755') {
+                chmod($matches['path'], 0755);
+            }
+        }
+
         return $results;
     }
 
