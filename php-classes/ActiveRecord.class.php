@@ -1238,11 +1238,11 @@ class ActiveRecord
 
     public static function getRecordByField($field, $value)
     {
-        $query = 'SELECT * FROM `%s` WHERE `%s` = "%s" LIMIT 1';
+        $query = 'SELECT * FROM `%s` WHERE `%s` = %s LIMIT 1';
         $params = array(
             static::$tableName
             , static::_cn($field)
-            , DB::escape($value)
+            , static::quoteValue($value)
         );
 
         try {
@@ -2735,11 +2735,11 @@ class ActiveRecord
             } elseif ($fieldConfig['type'] == 'timestamp' && $value == 'CURRENT_TIMESTAMP') {
                 $set[] = sprintf('`%s` = CURRENT_TIMESTAMP', $fieldConfig['columnName']);
             } elseif ($fieldConfig['type'] == 'set' && is_array($value)) {
-                $set[] = sprintf('`%s` = "%s"', $fieldConfig['columnName'], DB::escape(join(',', $value)));
+                $set[] = sprintf('`%s` = %s', $fieldConfig['columnName'], static::quoteValue(join(',', $value)));
             } elseif ($fieldConfig['type'] == 'boolean') {
                 $set[] = sprintf('`%s` = %u', $fieldConfig['columnName'], $value ? 1 : 0);
             } else {
-                $set[] = sprintf('`%s` = "%s"', $fieldConfig['columnName'], DB::escape($value));
+                $set[] = sprintf('`%s` = %s', $fieldConfig['columnName'], static::quoteValue($value));
             }
         }
 
@@ -2787,26 +2787,56 @@ class ActiveRecord
                 $columnName = '`'.static::_cn($field, $useTableAliases).'`';
 
                 if ($useTableAliases) {
-                    $columnName = '`'.(is_string($useTableAliases) ? $useTableAliases : static::getTableAlias()).'`.'.$columnName;
+                    if (!is_string($useTableAliases)) {
+                        $useTableAliases = static::getTableAlias();
+                    }
+
+                    $columnName = '`'.$useTableAliases.'`.'.$columnName;
                 }
 
                 if ($condition === null || ($condition == '' && !empty($fieldOptions['blankisnull']))) {
                     $condition = sprintf('%s IS NULL', $columnName);
                 } elseif (is_array($condition)) {
                     if ($condition['operator'] == 'BETWEEN') {
-                        $condition = sprintf('%s BETWEEN "%s" AND "%s"', $columnName, DB::escape($condition['min']), DB::escape($condition['max']));
-                    } elseif (is_array($condition['values'])) {
-                        $condition = sprintf('%s %s ("%s")' , $columnName, ($condition['operator'] ? $condition['operator'] : 'IN'), implode('", "', DB::escape($condition['values'])));
+                        $condition = sprintf(
+                            '%s BETWEEN %s AND %s',
+                            $columnName,
+                            static::quoteValue($condition['min']),
+                            static::quoteValue($condition['max'])
+                        );
                     } else {
-                        $condition = sprintf('%s %s "%s"', $columnName, $condition['operator'], DB::escape($condition['value']));
+                        $isArray = isset($condition['values']) && is_array($condition['values']);
+
+                        $operator = !empty($condition['operator'])
+                            ? $condition['operator']
+                            : ($isArray ? 'IN' : '=');
+
+                        $value = $isArray
+                            ? static::quoteValue($condition['values'])
+                            : static::quoteValue($condition['value']);
+
+                        $condition = "$columnName $operator $value";
                     }
                 } else {
-                    $condition = sprintf('%s = "%s"', $columnName, DB::escape($condition));
+                    $condition = sprintf('%s = %s', $columnName, static::quoteValue($condition));
                 }
             }
         }
 
         return $conditions;
+    }
+
+    protected static function quoteValue($value)
+    {
+        if (is_bool($value)) {
+            return $value ? 'TRUE' : 'FALSE';
+        } elseif (is_int($value) || is_float($value)) {
+            return $value;
+        } elseif (is_array($value)) {
+            return '('.implode(',', array_map([__CLASS__, 'quoteValue'], $value)).')';
+        }
+
+        return '"'.DB::escape($value).'"';
     }
 
 
