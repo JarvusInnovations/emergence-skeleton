@@ -217,6 +217,8 @@ abstract class RecordsRequestHandler extends RequestHandler
             $conditions = static::buildBrowseConditions($conditions, $responseData);
         } catch (OutOfBoundsException $e) {
             return static::throwNotFoundError($e->getMessage());
+        } catch (UserUnauthorizedException $e) {
+            return static::throwUnauthorizedError($e->getMessage());
         }
 
         $limit = isset($_REQUEST['limit']) && ctype_digit($_REQUEST['limit']) ? (integer)$_REQUEST['limit'] : static::$browseLimitDefault;
