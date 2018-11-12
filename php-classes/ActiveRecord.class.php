@@ -2805,11 +2805,13 @@ class ActiveRecord
                             static::quoteValue($condition['max'])
                         );
                     } else {
+                        $isArray = isset($condition['values']) && is_array($condition['values']);
+
                         $operator = !empty($condition['operator'])
                             ? $condition['operator']
-                            : is_array($condition['values']) ? 'IN' : '=';
+                            : ($isArray ? 'IN' : '=');
 
-                        $value = isset($condition['values']) && is_array($condition['values'])
+                        $value = $isArray
                             ? static::quoteValue($condition['values'])
                             : static::quoteValue($condition['value']);
 
