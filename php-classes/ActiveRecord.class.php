@@ -2811,11 +2811,19 @@ class ActiveRecord
                             ? $condition['operator']
                             : ($isArray ? 'IN' : '=');
 
-                        $value = $isArray
-                            ? static::quoteValue($condition['values'])
-                            : static::quoteValue($condition['value']);
+                        if ($isArray && $operator != 'IN' && $operator != 'NOT IN') {
+                            throw new Exception('operator not compatible with array of values');
+                        }
 
-                        $condition = "$columnName $operator $value";
+                        if ($isArray && !count($condition['values'])) {
+                            $condition = $operator == 'IN' ? 'FALSE' : 'TRUE';
+                        } else {
+                            $value = $isArray
+                                ? static::quoteValue($condition['values'])
+                                : static::quoteValue($condition['value']);
+
+                            $condition = "$columnName $operator $value";
+                        }
                     }
                 } else {
                     $condition = sprintf('%s = %s', $columnName, static::quoteValue($condition));
