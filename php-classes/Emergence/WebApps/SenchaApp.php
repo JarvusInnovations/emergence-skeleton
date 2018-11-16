@@ -87,13 +87,19 @@ class SenchaApp extends App
 
         // TODO: migrate away from /app request handler
         foreach ($this->getPlugins() as $packageName) {
-            $node = Site::resolvePath(['sencha-workspace', 'packages', $packageName, 'build', "{$packageName}.js"]);
+            $jsNode = Site::resolvePath(['sencha-workspace', 'packages', $packageName, 'build', "{$packageName}.js"]);
 
-            if (!$node) {
+            if (!$jsNode) {
                 throw new Exception("build for sencha plugin {$packageName} not found");
             }
 
-            $html[] = "<script type=\"text/javascript\" src=\"/app/packages/{$packageName}/build/{$packageName}.js?_sha1={$node->SHA1}\"></script>";
+            $html[] = "<script type=\"text/javascript\" src=\"/app/packages/{$packageName}/build/{$jsNode->Handle}?_sha1={$jsNode->SHA1}\"></script>";
+
+            $cssNode = Site::resolvePath(['sencha-workspace', 'packages', $packageName, 'build', 'resources', "{$packageName}-all.css"]);
+
+            if ($cssNode) {
+                $html[] = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/app/packages/{$packageName}/build/resources/{$cssNode->Handle}?_sha1={$cssNode->SHA1}\">";
+            }
         }
 
         return implode(PHP_EOL, $html);
