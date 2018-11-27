@@ -140,8 +140,9 @@ class SQL
                 return sprintf(!$field['length'] || $field['type'] == 'varchar' ? 'varchar(%u)' : 'char(%u)', $field['length'] ? $field['length'] : 255);
             case 'clob':
             case 'serialized':
-            case 'json':
                 return 'text';
+            case 'json':
+                return 'json';
             case 'blob':
                 return 'blob';
 
