@@ -166,22 +166,25 @@ abstract class RequestHandler
             $tmpPath = tempnam('/tmp', 'e_pdf_');
     
             file_put_contents($tmpPath.'.html', $html);
-    
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
-    
-            exec(implode(' ', [
+
+            $command = implode(' ', [
                 static::$wkhtmltopdfPath,
                 static::$wkhtmltopdfArguments,
                 escapeshellarg($tmpPath.'.html'),
                 escapeshellarg($tmpPath.'.pdf')
-            ]));
-    
+            ]);
+
+            $output = exec($command);
+
             if (!file_exists("$tmpPath.pdf")) {
                 header('HTTP/1.0 501 Not Implemented');
-                die('Unable to generate PDF, check that this system has wkhtmltopdf installed');
+                header('Content-Type: text/plain');
+                die("Unable to generate PDF, see command/output below and check that this system has wkhtmltopdf installed.\n\ncommand: {$command}\n\noutput: {$output}");
             }
-    
+
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="'.str_replace('"', '', $responseID).'.pdf"');
+
             readfile($tmpPath.'.pdf');
             exit();
         } elseif ($format == 'html') {
