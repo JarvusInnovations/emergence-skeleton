@@ -303,7 +303,7 @@ class Media extends ActiveRecord
         $thumbWidth = $maxWidth;
         $thumbHeight = $maxHeight;
 
-        if ($cropped && extension_loaded('imagick')) {
+        if ($cropped && extension_loaded('imagick') && $this->FilesystemPath) {
             $originalTimeLimit = ini_get('max_execution_time');
 
             // check for existing facedetect job
