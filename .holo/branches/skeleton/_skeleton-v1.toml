@@ -1,0 +1,13 @@
+[holomapping]
+files = [
+    "**",
+
+    # filter out legacy asset pools
+    "!ext-library/**",
+    "!js-library/**",
+    "!php-classes/Sabre/**",
+    "!sencha-build/EmergenceContentEditor/production/resources/images/**",
+    "!sencha-build/EmergenceEditor/**",
+    "!sencha-build/EmergencePullTool/**",
+    "!site-root/img/icons/**"
+]
