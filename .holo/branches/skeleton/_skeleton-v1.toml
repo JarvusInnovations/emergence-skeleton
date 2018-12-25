@@ -1,2 +1,2 @@
-[holospec]
-src = "**"
+[holomapping]
+files = "*/**"
