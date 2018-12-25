@@ -1,7 +1,7 @@
 [hololens]
 package = "emergence/hololens-sass" # expanded to absolute ident in holospec
 
-[input]
+[hololens.input]
 root = "site-root"
 files = [
     "sass/**",
@@ -10,6 +10,6 @@ files = [
 ]
 
 # optional and stripped from holospec:
-[output]
+[hololens.output]
 root = "site-root/css" # defaults to hololens.root
 merge = "overlay" # overlay / underlay / replace, defaults to overlay
