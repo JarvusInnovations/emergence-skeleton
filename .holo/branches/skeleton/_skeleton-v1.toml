@@ -9,5 +9,6 @@ files = [
     "!sencha-build/EmergenceContentEditor/production/resources/images/**",
     "!sencha-build/EmergenceEditor/**",
     "!sencha-build/EmergencePullTool/**",
-    "!site-root/img/icons/**"
+    "!site-root/img/icons/**",
+    "!site-root/css/**"
 ]
