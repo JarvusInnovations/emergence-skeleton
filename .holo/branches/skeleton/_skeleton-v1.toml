@@ -4,7 +4,12 @@ files = [
 
     # filter out legacy asset pools
     "!ext-library/**",
+    "!html-templates/app/**",
+    "!html-templates/git/**",
+    "!html-templates/editor/**",
+    "!html-templates/manage/**",
     "!js-library/**",
+    "!php-classes/Chaki/**",
     "!php-classes/Sabre/**",
     "!sencha-build/EmergenceContentEditor/production/resources/images/**",
     "!sencha-build/EmergenceEditor/**",
