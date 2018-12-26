@@ -1,5 +1,5 @@
 [hololens]
-package = "emergence/hololens-sass" # expanded to absolute ident in holospec
+package = "holo/lens-compass" # expanded to absolute ident in holospec
 
 [hololens.input]
 root = "site-root"
