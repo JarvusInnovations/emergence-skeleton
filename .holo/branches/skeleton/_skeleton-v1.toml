@@ -8,6 +8,7 @@ files = [
     "!php-classes/Michelf/**",
     "!php-classes/MP4Info.*",
     "!php-classes/MP4Info/**",
+    "!php-classes/Patchwork/**",
     "!php-classes/Psr/**",
     "!php-classes/stojg/**",
     "!php-classes/Symfony/**",
