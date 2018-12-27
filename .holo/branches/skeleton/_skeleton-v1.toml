@@ -12,6 +12,9 @@ files = [
     "!php-classes/stojg/**",
     "!php-classes/Symfony/**",
 
+    # filter out legacy git configuration
+    "!php-config/Git.config.d/emergence-skeleton-v1.php",
+
     # filter out legacy content
     "!**/.sencha/app/**",
     "!**/ext-watermark/**",
