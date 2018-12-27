@@ -1,0 +1,3 @@
+[holosource]
+url = "https://github.com/symfony/process.git"
+ref = "refs/heads/3.4"
