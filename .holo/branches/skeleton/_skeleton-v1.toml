@@ -3,6 +3,7 @@ files = [
     "**",
 
     # filter out 3rd-party libraries
+    "!dwoo-plugins/builtin/**",
     "!php-classes/Dwoo/**",
     "!php-classes/Gitonomy/**",
     "!php-classes/Michelf/**",
