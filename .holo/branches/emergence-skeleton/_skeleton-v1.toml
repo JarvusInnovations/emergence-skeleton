@@ -1,6 +1,6 @@
 [holomapping]
 files = [
-    "**",
+    "*/**",
 
     # filter out 3rd-party libraries
     "!dwoo-plugins/builtin/**",
