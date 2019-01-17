@@ -1,5 +1,5 @@
 [holosource]
-url = "/src/emergence-skeleton-v1"
+url = "/src/skeleton-v1"
 ref = "refs/heads/develop"
 
 [holosource.project]
