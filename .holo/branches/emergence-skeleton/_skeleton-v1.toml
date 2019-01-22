@@ -1,2 +1,5 @@
 [holomapping]
-files = "*/**"
+files = [
+    "*/**",
+    "!event-handlers/RegistrationRequestHandler/**"
+]

@@ -1,6 +1,3 @@
 [holomapping]
-files = [
-    "*/**",
-    "!event-handlers/RegistrationRequestHandler/**"
-]
+files = "*/**"
 after = "skeleton-v1"
