@@ -4,21 +4,29 @@
 
 {block "user-tools"}{/block} {* redundant *}
 
+{block "js-top"}
+    {$dwoo.parent}
+
+    {if RemoteSystems\ReCaptcha::$siteKey}
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+    {/if}
+{/block}
+
 {block "content"}
     {$User = $data}
     {$errors = $User->validationErrors}
-    
+
     <header class="page-header">
         <h1 class="header-title title-1">Register a New Account</h1>
     </header>
-    
+
     <form method="POST" class="register-form">
         {if $errors}
             <div class="notify error">
                 <strong>Please double-check the fields highlighted below.</strong>
             </div>
         {/if}
-    
+
         <fieldset class="shrink">
             <div class="inline-fields">
                 {* field name label='' error='' type=text placeholder='' hint='' required=false attribs='' default=null class=null *}
@@ -33,6 +41,14 @@
                 {field Password        'Password'  $errors.Password        password '' '' true}
                 {field PasswordConfirm '(Confirm)' $errors.PasswordConfirm password '' '' true}
             </div>
+
+            {if RemoteSystems\ReCaptcha::$siteKey}
+                <div class="form-group g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
+            {/if}
+
+            {if $errors.ReCaptcha}
+                <p class="text-danger">{$errors.ReCaptcha|escape}</p>
+            {/if}
 
             <div class="submit-area">
                 <button class="submit" type="submit">Create Account</button>
