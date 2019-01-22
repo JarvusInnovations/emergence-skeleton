@@ -12,7 +12,7 @@
 
 {block "content"}
     <header class="page-header">
-	    <h2 class="header-title">Contact Us</h2>
+	    <h1 class="header-title title-1">Contact Us</h1>
 	</header>
 
 	<form action="/contact" method="POST" class="contact-form">
@@ -33,11 +33,13 @@
             {textarea inputName=Message label=Message error=$validationErrors.Message required=true}
 
 			{if RemoteSystems\ReCaptcha::$siteKey}
-				<div class="form-group g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
-			{/if}
-
-			{if $validationErrors.ReCaptcha}
-				<p class="text-danger">{$validationErrors.ReCaptcha}</p>
+				<div class="field {tif $validationErrors.ReCaptcha ? 'has-error'}">
+					<span class="field-label"></span>
+					<div class="field-control g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
+				</div>
+				{if $validationErrors.ReCaptcha}
+					<p class="error-text">{$validationErrors.ReCaptcha|escape}</p>
+				{/if}
 			{/if}
 
             <div class="submit-area">

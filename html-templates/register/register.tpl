@@ -43,11 +43,13 @@
             </div>
 
             {if RemoteSystems\ReCaptcha::$siteKey}
-                <div class="form-group g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
-            {/if}
-
-            {if $errors.ReCaptcha}
-                <p class="text-danger">{$errors.ReCaptcha|escape}</p>
+                <div class="field {tif $errors.ReCaptcha ? 'has-error'}">
+                    <span class="field-label"></span>
+                    <div class="field-control g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
+                    {if $errors.ReCaptcha}
+                        <p class="error-text">{$errors.ReCaptcha|escape}</p>
+                    {/if}
+                </div>
             {/if}
 
             <div class="submit-area">
