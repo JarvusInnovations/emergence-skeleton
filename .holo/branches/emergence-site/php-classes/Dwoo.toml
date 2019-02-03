@@ -1,0 +1,9 @@
+[holomapping]
+holosource = "dwoo"
+root = "lib/Dwoo"
+files = [
+    "**/*.php",
+    "!Adapters/**",
+    "!Smarty/**"
+]
+after = [ "skeleton-v1" ]

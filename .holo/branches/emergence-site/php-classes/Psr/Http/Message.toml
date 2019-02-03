@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "psr-http-message"
+root = "src"
+files = [
+    "**/*.php"
+]
+after = [ "skeleton-v1" ]

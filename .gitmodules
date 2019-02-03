@@ -1,0 +1,5 @@
+[submodule ".holo/sources/dwoo"]
+	path = .holo/sources/dwoo
+	url = https://github.com/JarvusInnovations/dwoo.git
+	shallow = true
+	branch = 1.2

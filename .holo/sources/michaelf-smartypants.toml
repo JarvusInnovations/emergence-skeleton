@@ -1,0 +1,3 @@
+[holosource]
+url = "https://github.com/michelf/php-smartypants.git"
+ref = "refs/heads/lib"

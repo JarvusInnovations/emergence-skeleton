@@ -10,7 +10,7 @@ class Url
     public static function buildAbsolute($path = null, $params = null)
     {
         $url = Site::getConfig('ssl') ? 'https' : 'http';
-        $url .= '://' . Site::getConfig('primary_hostname');
+        $url .= '://' . ($_SERVER['HTTP_HOST'] ?: Site::getConfig('primary_hostname'));
 
         if (is_array($path)) {
             $path = implode($path, '/');

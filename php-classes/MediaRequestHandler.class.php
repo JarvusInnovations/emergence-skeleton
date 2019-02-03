@@ -541,25 +541,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 
 
         // fetch thumbnail
-        try {
-            // get thumbnail
-            $thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
-        } catch (Exception $e) {
-            \Emergence\Logger::general_warning('Caught exception while creating thumbnail for media, returning server error', array(
-                'exceptionClass' => get_class($e)
-                ,'exceptionMessage' => $e->getMessage()
-                ,'exceptionCode' => $e->getCode()
-                ,'recordData' => $Media->getData()
-                ,'thumbFormat' => array(
-                    'maxWidth' => $maxWidth
-                    ,'maxHeight' => $maxHeight
-                    ,'fillColor' => $fillColor
-                    ,'cropped' => $cropped
-                )
-            ));
-
-            return static::throwServerError('Thumbnail unavailable');
-        }
+        $thumbPath = $Media->getThumbnail($maxWidth, $maxHeight, $fillColor, $cropped);
 
 
         // dump it out

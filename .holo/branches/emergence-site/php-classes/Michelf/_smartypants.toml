@@ -1,0 +1,8 @@
+[holomapping]
+holosource = "michaelf-smartypants"
+root = "Michelf"
+files = [
+    "*.php",
+    "!*.inc.php"
+]
+after = [ "skeleton-v1" ]

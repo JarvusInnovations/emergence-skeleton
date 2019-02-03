@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "gitonomy-gitlib"
+root = "src/Gitonomy/Git"
+files = [
+    "**/*.php"
+]
+after = [ "skeleton-v1" ]
