@@ -192,7 +192,7 @@ $(function() {
 	function _renderContent(value) {
 		switch (currentEditingEl.data('content-renderer')) {
 			case 'markdown':
-				currentEditingEl.html(markdown.toHTML(value));
+				currentEditingEl.html(value ? markdown.toHTML(value) : '');
 				break;
 			case 'html':
 				currentEditingEl.html(value);
