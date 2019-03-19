@@ -1,0 +1,8 @@
+[holomapping]
+holosource = "symfony-process"
+files = [
+    "**/*.php",
+    "LICENSE",
+    "!Tests/**"
+]
+after = [ "skeleton-v1" ]
