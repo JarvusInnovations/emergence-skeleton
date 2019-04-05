@@ -14,8 +14,12 @@ class FrameworkPackage extends Package
 
 
     // factories
-    public static function load($name, Framework $framework)
+    public static function load($name, Framework $framework = null)
     {
+        if (!$framework) {
+            return null;
+        }
+
         $frameworkPackages = static::getFrameworkPackages($framework);
 
         if (empty($frameworkPackages[$name])) {
