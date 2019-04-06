@@ -24,7 +24,7 @@ class Package extends \Jarvus\Sencha\Package
 
 
     // factories
-    public static function load($name, Framework $framework)
+    public static function load($name, Framework $framework = null)
     {
         $cacheKey = "chaki/packages/$framework/$name";
 
@@ -51,22 +51,27 @@ class Package extends \Jarvus\Sencha\Package
 
 
             // choose best branch
-            $references = $repo->getReferences();
-
             $branchName = null;
-            $frameworkVersionStack = explode('.', $framework->getVersion());
-
-            while (
-                count($frameworkVersionStack) &&
-                ($branchName = $framework->getName() . '/' . implode('/', $frameworkVersionStack)) &&
-                !$references->hasBranch($branchName)
-            ) {
-                array_pop($frameworkVersionStack);
-                $branchName = null;
+            $references = $repo->getReferences();
+            if ($name == 'jarvus-apikit' && !$framework) {
+                debug_print_backtrace();
             }
 
-            if (!$branchName && $references->hasBranch($framework->getName())) {
-                $branchName = $framework->getName();
+            if ($framework) {
+                $frameworkVersionStack = explode('.', $framework->getVersion());
+
+                while (
+                    count($frameworkVersionStack) &&
+                    ($branchName = $framework->getName() . '/' . implode('/', $frameworkVersionStack)) &&
+                    !$references->hasBranch($branchName)
+                ) {
+                    array_pop($frameworkVersionStack);
+                    $branchName = null;
+                }
+
+                if (!$branchName && $references->hasBranch($framework->getName())) {
+                    $branchName = $framework->getName();
+                }
             }
 
             if (!$branchName) {
@@ -98,16 +103,17 @@ class Package extends \Jarvus\Sencha\Package
         }
 
 
-        return $packageData ? new static($packageData['name'], $packageData['config'], $packageData['path'], $packageData['branch']) : null;
+        return $packageData ? new static($packageData['name'], $packageData['config'], $packageData['path'], $packageData['branch'], $framework) : null;
     }
 
 
     // magic methods and property getters
-    public function __construct($name, $config, $path, $branch)
+    public function __construct($name, $config, $path, $branch, Framework $framework = null)
     {
         parent::__construct($name, $config);
         $this->path = $path;
         $this->branch = $branch;
+        $this->framework = null;
     }
 
 

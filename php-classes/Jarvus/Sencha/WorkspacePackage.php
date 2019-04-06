@@ -12,7 +12,7 @@ class WorkspacePackage extends Package
 
 
     // factories
-    public static function load($name, Framework $framework)
+    public static function load($name, Framework $framework = null)
     {
         // try to load package from VFS
         $workspacePackages = static::getWorkspacePackages();
@@ -25,19 +25,22 @@ class WorkspacePackage extends Package
 
         // find the best version
         $matchedVersion = null;
-        $versionStack = explode('.', $framework->getVersion());
+    
+        if ($framework) {
+            $versionStack = explode('.', $framework->getVersion());
 
-        while (
-            count($versionStack) &&
-            ($matchedVersion = $framework->getName().'-'.implode('.', $versionStack)) &&
-            empty($workspacePackageVersions[$matchedVersion])
-        ) {
-            array_pop($versionStack);
-            $matchedVersion = null;
-        }
+            while (
+                count($versionStack) &&
+                ($matchedVersion = $framework->getName().'-'.implode('.', $versionStack)) &&
+                empty($workspacePackageVersions[$matchedVersion])
+            ) {
+                array_pop($versionStack);
+                $matchedVersion = null;
+            }
 
-        if (!$matchedVersion && !empty($workspacePackageVersions[$framework->getName()])) {
-            $matchedVersion = $framework->getName();
+            if ($framework && !$matchedVersion && !empty($workspacePackageVersions[$framework->getName()])) {
+                $matchedVersion = $framework->getName();
+            }
         }
 
         if (!$matchedVersion && !empty($workspacePackageVersions['*'])) {
@@ -50,7 +53,7 @@ class WorkspacePackage extends Package
 
         $packageData = $workspacePackageVersions[$matchedVersion];
 
-        return new static($packageData['name'], $packageData['config'], $packageData['path']);
+        return new static($packageData['name'], $packageData['config'], $packageData['path'], $framework);
     }
 
 

@@ -14,12 +14,16 @@ abstract class Package implements IPackage
     protected $name;
     protected $config;
 
+    protected $framework;
+    protected $cmd;
+
     protected $antConfig;
     protected $packageAntConfig;
+    protected $allRequiredPackages;
     protected $classPaths;
 
     // factories
-    final public static function get($name, Framework $framework)
+    final public static function get($name, Framework $framework = null)
     {
         foreach (static::$sources AS $source) {
             if (!is_a($source, IPackage::Class, true)) {
@@ -36,10 +40,11 @@ abstract class Package implements IPackage
 
 
     // magic methods and property getters
-    public function __construct($name, $config)
+    public function __construct($name, $config, Framework $framework = null)
     {
         $this->name = $name;
         $this->config = $config;
+        $this->framework = $framework;
     }
 
     public function __toString()
@@ -59,6 +64,24 @@ abstract class Package implements IPackage
 
 
     // member methods
+    public function getFramework()
+    {
+        if (!$this->framework) {
+            $this->framework = Framework::get($this->getAntConfig('package.framework'), $this->getAntConfig('package.framework.version'));
+        }
+
+        return $this->framework;
+    }
+
+    public function getCmd()
+    {
+        if ($this->cmd === null) {
+            $cmdVersion = $this->getAntConfig('package.cmd.version');
+            $this->cmd = $cmdVersion ? Cmd::get($cmdVersion) : null;
+        }
+
+        return $this->cmd;
+    }
 
     /**
      * Gets aggregate ant config of workspace/sencha.cfg + app/sencha.cfg + app.json
@@ -105,6 +128,15 @@ abstract class Package implements IPackage
         }
 
         return $packages;
+    }
+
+    public function getAllRequiredPackages()
+    {
+        if (!$this->allRequiredPackages) {
+            $this->allRequiredPackages = Package::aggregatePackageDependencies($this->getRequiredPackageNames(), $this->getFramework());
+        }
+
+        return $this->allRequiredPackages;
     }
 
     public function getClassPaths()
