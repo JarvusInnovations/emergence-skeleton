@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "dwoo"
+root = "lib/plugins/builtin"
+files = [
+    "**/*.php"
+]
+after = [ "skeleton-v1" ]

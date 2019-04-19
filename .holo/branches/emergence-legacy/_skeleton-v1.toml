@@ -1,0 +1,14 @@
+[holomapping]
+files = [
+    "*/**",
+
+    # filter out 3rd-party libraries
+    "!dwoo-plugins/builtin/**",
+    "!php-classes/Dwoo/**",
+    "!php-classes/Gitonomy/**",
+    "!php-classes/Michelf/**",
+    "!php-classes/Patchwork/**",
+    "!php-classes/Psr/**",
+    "!php-classes/stojg/**",
+    "!php-classes/Symfony/**"
+]
