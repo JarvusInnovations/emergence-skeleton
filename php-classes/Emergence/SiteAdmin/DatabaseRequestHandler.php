@@ -7,6 +7,8 @@ use Ifsnop\Mysqldump\Mysqldump;
 
 class DatabaseRequestHandler extends \RequestHandler
 {
+    public static $excludeTables = ['sessions', '_e_files', '_e_file_collections'];
+
     public static $userResponseModes = [
         'application/json' => 'json'
     ];
@@ -49,6 +51,11 @@ class DatabaseRequestHandler extends \RequestHandler
         ];
     }
 
+    public static function getExcludeTables()
+    {
+        return static::$excludeTables;
+    }
+
     public static function handleDumpRequest()
     {
         $connectionConfig = static::getConnectionConfig();
@@ -59,7 +66,7 @@ class DatabaseRequestHandler extends \RequestHandler
             $connectionConfig['username'],
             $connectionConfig['password'],
             [
-                'exclude-tables' => ['sessions', '_e_files', '_e_file_collections'],
+                'exclude-tables' => static::getExcludeTables(),
                 'skip-comments' => !isset($_GET['comments']),
                 'skip-definer' => !isset($_GET['definer'])
             ]
