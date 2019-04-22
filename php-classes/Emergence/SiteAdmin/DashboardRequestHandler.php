@@ -2,11 +2,11 @@
 
 namespace Emergence\SiteAdmin;
 
+use DB;
 use Site;
 use Person;
 use User;
 use Emergence\Util\ByteSize;
-
 
 class DashboardRequestHandler extends \RequestHandler
 {
@@ -105,6 +105,18 @@ class DashboardRequestHandler extends \RequestHandler
                 [
                     'label' => 'Host Load Average',
                     'value' => implode(' ', array_map(function ($n) { return number_format($n, 2); }, sys_getloadavg()))
+                ],
+                [
+                    'label' => 'Database tables',
+                    'value' => DB::oneValue(
+                        '
+                            SELECT COUNT(*)
+                              FROM information_schema.tables
+                             WHERE TABLE_SCHEMA = SCHEMA()
+                               AND TABLE_NAME NOT IN ("%s")
+                        ',
+                        implode('","', DatabaseRequestHandler::getExcludeTables())
+                    )
                 ]
             ]
         ]);
