@@ -1,33 +1,29 @@
 <?php
 
-
-
- abstract class Authenticator
- {
-     // abstract functions
+abstract class Authenticator
+{
+    // abstract functions
     abstract public function requireAuthentication();
-     abstract public function checkAuthentication();
-     abstract protected function getAuthenticatedPerson();
+    abstract public function checkAuthentication();
+    abstract protected function getAuthenticatedPerson();
 
-    // protected 
+    // protected
     protected $_session;
-     protected $_authenticatedPerson;
+    protected $_authenticatedPerson;
 
-     public function __construct(Session $Session)
-     {
-         // store session
+    public function __construct(Session $Session)
+    {
+        // store session
         $this->_session = $Session;
-     }
+    }
 
-
-     public function __get($name)
-     {
-         switch ($name) {
+    public function __get($name)
+    {
+        switch ($name) {
             case 'Session':
                 return $this->_session;
 
             case 'AuthenticatedPerson':
-
                 if (!isset($this->_authenticatedPerson)) {
                     $this->_authenticatedPerson = $this->getAuthenticatedPerson();
                 }
@@ -37,5 +33,5 @@
             default:
                 return null;
         }
-     }
- }
+    }
+}

@@ -1,6 +1,5 @@
 <?php
 
-
 class PasswordAuthenticator extends Authenticator
 {
     // configurable settings
@@ -30,7 +29,7 @@ class PasswordAuthenticator extends Authenticator
             if (isset($_REQUEST[static::$requestContainer])) {
                 $requestData = &$_REQUEST[static::$requestContainer];
             } else {
-                $requestData = array();
+                $requestData = [];
             }
         } else {
             $requestData = &$_POST;
@@ -41,11 +40,11 @@ class PasswordAuthenticator extends Authenticator
             $this->_authenticatedPerson = $this->attemptAuthentication($requestData['username'], $requestData['password']);
 
             if ($this->_authenticatedPerson) {
-                Emergence\EventBus::fireEvent('personAuthenticate', 'Emergence/People', array(
+                Emergence\EventBus::fireEvent('personAuthenticate', 'Emergence/People', [
                     'Person' => $this->_authenticatedPerson,
                     'requestData' => $requestData,
                     'authenticatorClass' => get_called_class()
-                ));
+                ]);
 
                 // redirect if original request was GET
                 if ($requestData['returnMethod'] != 'POST' && $_SERVER['REQUEST_METHOD'] != 'GET') {
@@ -70,8 +69,8 @@ class PasswordAuthenticator extends Authenticator
     protected function getAuthenticatedPerson()
     {
         // check if session is already authenticated
-        if (isset($this->$_authenticatedPerson)) {
-            return $this->$_authenticatedPerson;
+        if (isset($this->_authenticatedPerson)) {
+            return $this->_authenticatedPerson;
         } elseif ($this->_session->PersonID) {
             return Person::getByID($this->_session->PersonID);
         } else {
@@ -93,9 +92,9 @@ class PasswordAuthenticator extends Authenticator
             return null;
         }
 
-        $this->_session = $this->_session->changeClass('UserSession', array(
+        $this->_session = $this->_session->changeClass(UserSession::class, [
             'PersonID' => $User->ID
-        ));
+        ]);
 
         return $User;
     }
@@ -122,11 +121,9 @@ class PasswordAuthenticator extends Authenticator
             return false;
         }
 
-
         if (!$success) {
             $this->respondLoginPrompt();
         }
-
 
         return $success;
     }
@@ -152,12 +149,12 @@ class PasswordAuthenticator extends Authenticator
         $postVars = $_POST;
         unset($postVars[static::$requestContainer]);
 
-        RequestHandler::respond('login/login', array(
-            'success' => false
-            ,'loginRequired' => true
-            ,'requestContainer' => static::$requestContainer
-            ,'error' => $authException ? $authException->getMessage() : false
-            ,'postVars' => $postVars
-        ));
+        RequestHandler::respond('login/login', [
+            'success' => false,
+            'loginRequired' => true,
+            'requestContainer' => static::$requestContainer,
+            'error' => $authException ? $authException->getMessage() : false,
+            'postVars' => $postVars
+        ]);
     }
 }

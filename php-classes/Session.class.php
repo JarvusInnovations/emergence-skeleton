@@ -13,30 +13,29 @@ class Session extends ActiveRecord
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
 
     // ActiveRecord configuration
     public static $tableName = 'sessions';
     public static $singularNoun = 'session';
     public static $pluralNoun = 'sessions';
 
-    public static $fields = array(
-        'ContextClass' => null
-        ,'ContextID' => null
-        ,'Handle' => array(
+    public static $fields = [
+        'ContextClass' => null,
+        'ContextID' => null,
+        'Handle' => [
             'unique' => true
-        )
-        ,'LastRequest' => array(
-            'type' => 'timestamp'
-            ,'default' => null
-        )
-        ,'LastIP' => array(
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
-        )
-        ,'CreatorID' => null
-    );
+        ],
+        'LastRequest' => [
+            'type' => 'timestamp',
+            'default' => null
+        ],
+        'LastIP' => [
+            'type' => 'uint',
+            'default' => null
+        ],
+        'CreatorID' => null
+    ];
 
 
     // Session
@@ -56,7 +55,6 @@ class Session extends ActiveRecord
         }
     }
 
-
     public static function getFromRequest($create = true)
     {
         $sessionData = array(
@@ -64,64 +62,72 @@ class Session extends ActiveRecord
             ,'LastRequest' => time()
         );
 
+        $Session = null;
 
         // try to load from authorization header
-        if (!empty($_SERVER['HTTP_AUTHORIZATION']) && 0 === strpos($_SERVER['HTTP_AUTHORIZATION'], 'Token ')) {
-            if ($Session = static::getByHandle(substr($_SERVER['HTTP_AUTHORIZATION'], 6))) {
-                $Session = static::updateSession($Session, $sessionData);
-            }
+        if (
+            !empty($_SERVER['HTTP_AUTHORIZATION'])
+            && 0 === strpos($_SERVER['HTTP_AUTHORIZATION'], 'Token ')
+            && ($Session = static::getByHandle(substr($_SERVER['HTTP_AUTHORIZATION'], 6)))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
         }
 
         // try to load from POST data
-        if (empty($Session) && !empty($_POST[static::$cookieName])) {
-            if ($Session = static::getByHandle($_POST[static::$cookieName])) {
-                $Session = static::updateSession($Session, $sessionData);
-            }
+        if (
+            !$Session
+            && !empty($_POST[static::$cookieName])
+            && ($Session = static::getByHandle($_POST[static::$cookieName]))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
         }
 
         // try to load from GET data
-        if (empty($Session) && !empty($_GET[static::$cookieName])) {
-            if ($Session = static::getByHandle($_GET[static::$cookieName])) {
-                $Session = static::updateSession($Session, $sessionData);
-            }
+        if (
+            !$Session
+            && !empty($_GET[static::$cookieName])
+            && ($Session = static::getByHandle($_GET[static::$cookieName]))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
         }
 
         // try to load from cookie data
-        if (empty($Session) && !empty($_COOKIE[static::$cookieName])) {
-            if ($Session = static::getByHandle($_COOKIE[static::$cookieName])) {
-                $Session = static::updateSession($Session, $sessionData);
-            }
+        if (
+            !$Session
+            && !empty($_COOKIE[static::$cookieName])
+            && ($Session = static::getByHandle($_COOKIE[static::$cookieName]))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
         }
 
 
         // return found or create new session
-        if (!empty($Session)) {
+        if ($Session) {
             // session found
             return $Session;
         } elseif ($create) {
             // create session
             return static::create($sessionData, true);
-        } else {
-            // no session available
-            return false;
         }
+
+        // no session available
+        return false;
     }
 
     public static function updateSession(Session $Session, $sessionData)
     {
-
         // check timestamp
         if (static::$timeout && $Session->LastRequest < (time() - static::$timeout)) {
             $Session->terminate();
 
             return false;
-        } else {
-            // update session
-            $Session->setFields($sessionData);
-            $Session->save();
-
-            return $Session;
         }
+
+        // update session
+        $Session->setFields($sessionData);
+        $Session->save();
+
+        return $Session;
     }
 
     public function save($deep = true)
@@ -136,12 +142,12 @@ class Session extends ActiveRecord
 
         // set cookie
         setcookie(
-            static::$cookieName
-            , $this->Handle
-            , static::$cookieExpires ? (time() + static::$cookieExpires) : 0
-            , static::$cookiePath
-            , static::$cookieDomain
-            , static::$cookieSecure
+            static::$cookieName,
+            $this->Handle,
+            static::$cookieExpires ? (time() + static::$cookieExpires) : 0,
+            static::$cookiePath,
+            static::$cookieDomain,
+            static::$cookieSecure
         );
     }
 
