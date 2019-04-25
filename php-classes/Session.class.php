@@ -76,19 +76,39 @@ class Session extends ActiveRecord
         // try to load from POST data
         if (
             !$Session
-            && !empty($_POST[static::$cookieName])
-            && ($Session = static::getByHandle($_POST[static::$cookieName]))
+            && !empty($_POST['$session'])
+            && ($Session = static::getByHandle($_POST['$session']))
         ) {
             $Session = static::updateSession($Session, $sessionData);
         }
 
+        if (
+            !$Session
+            && !empty($_POST[static::$cookieName])
+            && ($Session = static::getByHandle($_POST[static::$cookieName]))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
+
+            Emergence\Logger::general_warning('Deprecated use of cookieName via POST');
+        }
+
         // try to load from GET data
+        if (
+            !$Session
+            && !empty($_GET['$session'])
+            && ($Session = static::getByHandle($_GET['$session']))
+        ) {
+            $Session = static::updateSession($Session, $sessionData);
+        }
+
         if (
             !$Session
             && !empty($_GET[static::$cookieName])
             && ($Session = static::getByHandle($_GET[static::$cookieName]))
         ) {
             $Session = static::updateSession($Session, $sessionData);
+
+            Emergence\Logger::general_warning('Deprecated use of cookieName via GET');
         }
 
         // try to load from cookie data
