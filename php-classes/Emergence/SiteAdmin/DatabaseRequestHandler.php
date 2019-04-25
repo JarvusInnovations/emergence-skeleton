@@ -3,6 +3,7 @@
 namespace Emergence\SiteAdmin;
 
 use Site;
+use User;
 use Ifsnop\Mysqldump\Mysqldump;
 
 class DatabaseRequestHandler extends \RequestHandler
@@ -15,16 +16,34 @@ class DatabaseRequestHandler extends \RequestHandler
 
     public static function handleRequest()
     {
-        $GLOBALS['Session']->requireAccountLevel('Developer');
-
         switch (static::peekPath()) {
             case 'dump.sql':
                 return static::handleDumpRequest();
             default:
                 return static::throwInvalidRequestError();
         }
+    }
 
-        return static::handleBrowseRequest();
+    protected static function requireDeveloperAuthentication()
+    {
+        global $Session;
+
+        if ($Session && $Session->hasAccountLevel('Developer')) {
+            return true;
+        }
+
+        if (
+            !empty($_SERVER['PHP_AUTH_USER'])
+            && !empty($_SERVER['PHP_AUTH_PW'])
+            && ($User = User::getByLogin($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
+            && $User->hasAccountLevel('Developer')
+        ) {
+            return true;
+        }
+
+        header('WWW-Authenticate: Basic realm="Private"');
+        header('HTTP/1.0 401 Unauthorized');
+        exit();
     }
 
     protected static function getConnectionConfig()
@@ -58,6 +77,8 @@ class DatabaseRequestHandler extends \RequestHandler
 
     public static function handleDumpRequest()
     {
+        static::requireDeveloperAuthentication();
+
         $connectionConfig = static::getConnectionConfig();
 
         // initialize dumper
