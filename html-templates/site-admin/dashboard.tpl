@@ -38,7 +38,7 @@
     <dl class="row">
         <dt class="col-3 text-right">Database</dt>
         <dd class="col-9">
-            <a href="/site-admin/database/dump.sql" class="btn btn-sm btn-outline-info">Download .sql dump</a>
+            <a href="/site-admin/database/dump.sql?$session={$.Session->Handle}" class="btn btn-sm btn-outline-info">Download .sql dump</a>
         </dd>
     </dl>
 {/block}
