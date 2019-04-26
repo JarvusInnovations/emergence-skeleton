@@ -21,9 +21,7 @@ class JSON
 
         if (
             (
-                !empty($_GET['$profile']) // TODO: deprecate
-                || !empty($_COOKIE['$profile']) // TODO: deprecate
-                || !empty($_GET['_profile'])
+                !empty($_GET['_profile'])
                 || !empty($_COOKIE['_profile'])
                 || !empty($_SERVER['HTTP_X_PROFILE'])
             )
@@ -34,7 +32,7 @@ class JSON
             $siteDataPrefix = Site::$rootPath.'/'.SiteFile::$dataPath.'/';
             $siteDataPrefixLength = strlen($siteDataPrefix);
 
-            $data['$profile'] = array(
+            $data['_profile'] = array(
                 'log' => Debug::$log,
                 'time' => array(
                     'initialized' => Site::$initializeTime,
