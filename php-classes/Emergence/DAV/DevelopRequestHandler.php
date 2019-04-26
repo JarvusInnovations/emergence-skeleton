@@ -35,7 +35,7 @@ class DevelopRequestHandler extends \RequestHandler
             $authUserPass = $authEngine->getUserPass();
 
             // try to get session
-            if ($authUserPass[0] == '$session') {
+            if ($authUserPass[0] == '$session' || $authUserPass[0] == '_session') {
                 if ($Session = UserSession::getByHandle($authUserPass[1])) {
                     $User = $Session->Person;
                 }

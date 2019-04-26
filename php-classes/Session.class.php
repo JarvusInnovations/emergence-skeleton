@@ -76,8 +76,8 @@ class Session extends ActiveRecord
         // try to load from POST data
         if (
             !$Session
-            && !empty($_POST['$session'])
-            && ($Session = static::getByHandle($_POST['$session']))
+            && !empty($_POST['_session'])
+            && ($Session = static::getByHandle($_POST['_session']))
         ) {
             $Session = static::updateSession($Session, $sessionData);
         }
@@ -95,8 +95,8 @@ class Session extends ActiveRecord
         // try to load from GET data
         if (
             !$Session
-            && !empty($_GET['$session'])
-            && ($Session = static::getByHandle($_GET['$session']))
+            && !empty($_GET['_session'])
+            && ($Session = static::getByHandle($_GET['_session']))
         ) {
             $Session = static::updateSession($Session, $sessionData);
         }
