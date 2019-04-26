@@ -20,7 +20,13 @@ class JSON
         }
 
         if (
-            (!empty($_GET['$profile']) || !empty($_COOKIE['$profile']) || !empty($_SERVER['HTTP_X_PROFILE']))
+            (
+                !empty($_GET['$profile']) // TODO: deprecate
+                || !empty($_COOKIE['$profile']) // TODO: deprecate
+                || !empty($_GET['_profile'])
+                || !empty($_COOKIE['_profile'])
+                || !empty($_SERVER['HTTP_X_PROFILE'])
+            )
             && !empty($GLOBALS['Session'])
             && $GLOBALS['Session']->hasAccountLevel('Developer')
         ) {
@@ -101,7 +107,7 @@ class JSON
     {
         if (is_object($input)) {
             if (
-                !empty($include) && 
+                !empty($include) &&
                 $summary ? method_exists($input, 'getSummary') : method_exists($input, 'getDetails')
             ) {
                 $includeThisLevel = array();
