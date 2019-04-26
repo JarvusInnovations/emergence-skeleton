@@ -89,7 +89,8 @@ class DatabaseRequestHandler extends \RequestHandler
             [
                 'exclude-tables' => static::getExcludeTables(),
                 'skip-comments' => !isset($_GET['comments']),
-                'skip-definer' => !isset($_GET['definer'])
+                'skip-definer' => !isset($_GET['definer']),
+                'add-drop-table' => true
             ]
         );
 
