@@ -2,6 +2,7 @@
 
 if (!empty($GLOBALS['Session']) && $GLOBALS['Session']->hasAccountLevel('User')) {
     SearchRequestHandler::$searchClasses[Emergence\People\User::class] = [
+        'weight' => -1000,
         'fields' => [
             [
                 'field' => 'FirstName',

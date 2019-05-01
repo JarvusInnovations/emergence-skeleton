@@ -1,6 +1,7 @@
 <?php
 
 SearchRequestHandler::$searchClasses[Emergence\CMS\Page::class] = [
+    'weight' => -5000,
     'fields' => [
         'Title',
         [
@@ -16,6 +17,7 @@ SearchRequestHandler::$searchClasses[Emergence\CMS\Page::class] = [
 ];
 
 SearchRequestHandler::$searchClasses[Emergence\CMS\BlogPost::class] = [
+    'weight' => -100,
     'fields' => [
         'Title',
         [

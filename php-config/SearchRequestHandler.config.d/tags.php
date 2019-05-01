@@ -1,6 +1,7 @@
 <?php
 
 SearchRequestHandler::$searchClasses[Tag::class] = [
+    'weight' => 1000,
     'fields' => [
         'Title',
         [
