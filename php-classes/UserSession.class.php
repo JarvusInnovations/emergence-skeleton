@@ -1,76 +1,72 @@
 <?php
 
-
-
- class UserSession extends Session
- {
+class UserSession extends Session
+{
      // ActiveRecord configuration
-    public static $subClasses = array('Session','UserSession');
+    public static $subClasses = [
+        Session::class,
+        __CLASS__
+    ];
 
-     public static $fields = array(
-        'PersonID' => array(
-            'type' => 'integer'
-            ,'unsigned' => true
-        )
-    );
+    public static $fields = [
+        'PersonID' => 'uint'
+    ];
 
-     public static $relationships = array(
-        'Person' => array(
-            'type' => 'one-one'
-            ,'class' => 'Person'
-            ,'local' => 'PersonID'
-        )
-    );
+    public static $relationships = [
+        'Person' => [
+            'type' => 'one-one',
+            'class' => Person::class
+        ]
+    ];
 
-     public static $dynamicFields = array(
+    public static $dynamicFields = [
         'Person'
-    );
+    ];
 
 
     // UserSession
     public static $requireAuthentication = false;
-     public static $defaultAuthenticator = 'PasswordAuthenticator';
-     public $authenticator;
+    public static $defaultAuthenticator = PasswordAuthenticator::class;
 
-     public function __construct($record = array())
-     {
+    public $authenticator;
+
+    public function __construct(array $record = [])
+    {
          parent::__construct($record);
 
-         if (!isset($this->authenticator)) {
-             $this->authenticator = new static::$defaultAuthenticator($this);
-         }
+        if (!isset($this->authenticator)) {
+            $this->authenticator = new static::$defaultAuthenticator($this);
+        }
 
         // check authentication
         $this->authenticator->checkAuthentication();
 
         // require authentication ?
-        if (static::$requireAuthentication) {
-            if (!$this->requireAuthentication()) {
-                throw new AuthenticationFailedException();
-            }
+        if (static::$requireAuthentication && !$this->requireAuthentication()) {
+            throw new AuthenticationFailedException();
         }
 
         // export data to _SESSION superglobal
         $_SESSION['User'] = $this->Person ? $this->Person : false;
-     }
+    }
 
-     public function requireAuthentication()
-     {
-         return $this->authenticator->requireAuthentication();
-     }
+    public function requireAuthentication()
+    {
+        return $this->authenticator->requireAuthentication();
+    }
 
-     public function requireAccountLevel($accountLevel)
-     {
-         $this->requireAuthentication();
+    public function requireAccountLevel($accountLevel)
+    {
+        $this->requireAuthentication();
 
-         if (!is_a($this->Person, 'User') || !$this->Person->hasAccountLevel($accountLevel)) {
-             ErrorHandler::handleInadaquateAccess($accountLevel);
-             exit();
-         }
-     }
+        if (!is_a($this->Person, User::class) || !$this->Person->hasAccountLevel($accountLevel)) {
+            ErrorHandler::handleInadaquateAccess($accountLevel);
+            exit();
+        }
+    }
 
-     public function hasAccountLevel($accountLevel)
-     {
-         return $this->Person && $this->Person->hasAccountLevel($accountLevel);
-     }
- }
+    public function hasAccountLevel($accountLevel)
+    {
+        return $this->Person && $this->Person->hasAccountLevel($accountLevel);
+    }
+}

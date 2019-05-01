@@ -20,7 +20,11 @@ class JSON
         }
 
         if (
-            (!empty($_GET['$profile']) || !empty($_COOKIE['$profile']) || !empty($_SERVER['HTTP_X_PROFILE']))
+            (
+                !empty($_GET['_profile'])
+                || !empty($_COOKIE['_profile'])
+                || !empty($_SERVER['HTTP_X_PROFILE'])
+            )
             && !empty($GLOBALS['Session'])
             && $GLOBALS['Session']->hasAccountLevel('Developer')
         ) {
@@ -28,7 +32,7 @@ class JSON
             $siteDataPrefix = Site::$rootPath.'/'.SiteFile::$dataPath.'/';
             $siteDataPrefixLength = strlen($siteDataPrefix);
 
-            $data['$profile'] = array(
+            $data['_profile'] = array(
                 'log' => Debug::$log,
                 'time' => array(
                     'initialized' => Site::$initializeTime,
@@ -101,7 +105,7 @@ class JSON
     {
         if (is_object($input)) {
             if (
-                !empty($include) && 
+                !empty($include) &&
                 $summary ? method_exists($input, 'getSummary') : method_exists($input, 'getDetails')
             ) {
                 $includeThisLevel = array();

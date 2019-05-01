@@ -6,9 +6,9 @@
 {/block}
 
 {block content}
-    <div class="page-header">
+    <header class="row">
         <h1>Site Dashboard</h1>
-    </div>
+    </header>
 
     <dl class="row">
         {foreach item=metric from=$metrics}
@@ -29,5 +29,16 @@
                 {/if}
             </dd>
         {/foreach}
+    </dl>
+
+    <header class="row">
+        <h2>Exports</h2>
+    </header>
+
+    <dl class="row">
+        <dt class="col-3 text-right">Database</dt>
+        <dd class="col-9">
+            <a href="/site-admin/database/dump.sql?_session={$.Session->Handle}" class="btn btn-sm btn-outline-info">Download .sql dump</a>
+        </dd>
     </dl>
 {/block}
