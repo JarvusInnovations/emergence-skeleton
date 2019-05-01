@@ -10,6 +10,20 @@ class SearchRequestHandler extends RequestHandler
         ,'text/csv' => 'csv'
     );
 
+    public static function __classLoaded()
+    {
+        uasort(static::$searchClasses, function ($a, $b) {
+            $a = !empty($a['weight']) ? $a['weight'] : 0;
+            $b = !empty($b['weight']) ? $b['weight'] : 0;
+
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        });
+    }
+
     public static function handleRequest()
     {
         if (static::peekPath() == 'json') {

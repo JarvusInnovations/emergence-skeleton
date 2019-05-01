@@ -2,6 +2,7 @@
 
 if (!empty($GLOBALS['Session']) && $GLOBALS['Session']->hasAccountLevel('User')) {
     SearchRequestHandler::$searchClasses['User'] = array(
+        'weight' => -1000,
         'fields' => array(
             array(
                 'field' => 'FirstName'
@@ -23,6 +24,7 @@ if (!empty($GLOBALS['Session']) && $GLOBALS['Session']->hasAccountLevel('User'))
 }
 
 SearchRequestHandler::$searchClasses['Tag'] = array(
+    'weight' => 1000,
     'fields' => array(
         'Title'
         ,array(
@@ -33,6 +35,7 @@ SearchRequestHandler::$searchClasses['Tag'] = array(
 );
 
 SearchRequestHandler::$searchClasses['Emergence\CMS\Page'] = array(
+    'weight' => -5000,
     'fields' => array(
         'Title'
         ,array(
@@ -44,6 +47,7 @@ SearchRequestHandler::$searchClasses['Emergence\CMS\Page'] = array(
 );
 
 SearchRequestHandler::$searchClasses['Emergence\CMS\BlogPost'] = array(
+    'weight' => -100,
     'fields' => array(
         'Title'
         ,array(
