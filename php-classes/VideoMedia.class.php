@@ -41,20 +41,13 @@ class VideoMedia extends Media
         )
     );
 
+    public static $mimeHandlers = [
+        'video/x-flv',
+        'video/mp4',
+        'video/quicktime'
+    ];
 
     // magic methods
-    public static function __classLoaded()
-    {
-        $className = get_called_class();
-
-        Media::$mimeHandlers['video/x-flv'] = $className;
-        Media::$mimeHandlers['video/mp4'] = $className;
-        Media::$mimeHandlers['video/quicktime'] = $className;
-
-        parent::__classLoaded();
-    }
-
-
     public function getValue($name)
     {
         switch ($name) {
@@ -82,7 +75,6 @@ class VideoMedia extends Media
         }
     }
 
-
     // public methods
     public function getImage($sourceFile = null)
     {
@@ -102,31 +94,27 @@ class VideoMedia extends Media
     }
 
     // static methods
-    public static function analyzeFile($filename, $mediaInfo = array())
+    public static function analyzeFile($filename, $mediaInfo = [])
     {
+        $mediaInfo = parent::analyzeFile($filename, $mediaInfo);
         // examine media with avprobe
         $output = shell_exec("avprobe -of json -show_streams -v quiet $filename");
 
-        if (!$output || !($output = json_decode($output, true)) || empty($output['streams'])) {
-            throw new MediaTypeException('Unable to examine video with avprobe, ensure lib-avtools is installed on the host system');
+        if (!empty($output['streams'])) {
+            // extract video streams
+            $videoStreams = array_filter($output['streams'], function($streamInfo) {
+                return $streamInfo['codec_type'] == 'video';
+            });
+
+            // convert and write interesting information to mediaInfo
+            $mediaInfo['streams'] = $output['streams'];
+            $mediaInfo['videoStream'] = array_shift($videoStreams);
+
+            $mediaInfo['width'] = (int)$mediaInfo['videoStream']['width'];
+            $mediaInfo['height'] = (int)$mediaInfo['videoStream']['height'];
+            $mediaInfo['duration'] = (double)$mediaInfo['videoStream']['duration'];
         }
 
-        // extract video streams
-        $videoStreams = array_filter($output['streams'], function($streamInfo) {
-            return $streamInfo['codec_type'] == 'video';
-        });
-
-        if (!count($videoStreams)) {
-            throw new MediaTypeException('avprobe did not detect any video streams');
-        }
-
-        // convert and write interesting information to mediaInfo
-        $mediaInfo['streams'] = $output['streams'];
-        $mediaInfo['videoStream'] = array_shift($videoStreams);
-
-        $mediaInfo['width'] = (int)$mediaInfo['videoStream']['width'];
-        $mediaInfo['height'] = (int)$mediaInfo['videoStream']['height'];
-        $mediaInfo['duration'] = (double)$mediaInfo['videoStream']['duration'];
 
         return $mediaInfo;
     }
@@ -134,7 +122,6 @@ class VideoMedia extends Media
     public function writeFile($sourceFile)
     {
         parent::writeFile($sourceFile);
-
 
         // determine rotation metadata with exiftool
         $exifToolOutput = exec("exiftool -S -Rotation $this->FilesystemPath");
