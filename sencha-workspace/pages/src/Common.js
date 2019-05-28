@@ -1,4 +1,3 @@
-/*jslint browser: true, undef: true *//*global Ext*/
 Ext.define('Site.Common', {
     singleton: true,
     requires: [
@@ -13,6 +12,6 @@ Ext.define('Site.Common', {
         var me = this,
             body = Ext.getBody();
 
-        
+        console.info('Site.Common.onDocReady(%o)', body);
     }
 });
