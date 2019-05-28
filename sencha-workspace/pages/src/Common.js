@@ -2,6 +2,8 @@
 Ext.define('Site.Common', {
     singleton: true,
     requires: [
+        'Ext.dom.Element',
+
         //'Site.widget.ContentBlocks',
         'Site.widget.Search',
         'Site.widget.model.Person',
