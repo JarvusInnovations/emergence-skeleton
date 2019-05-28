@@ -2,6 +2,8 @@
 Ext.define('Site.widget.Search', {
     extend: 'Ext.util.Observable',
     requires: [
+        'Ext.DomHelper',
+        'Ext.JSON',
         'Ext.XTemplate',
         'Ext.data.Connection',
         'Ext.util.DelayedTask'
@@ -9,6 +11,7 @@ Ext.define('Site.widget.Search', {
 
     config: {
         searchForm: null,
+        resultsVisible: false,
         url: '/search/json',
         searchFieldSelector: 'input[type=search]',
         searchDelay: 300,
@@ -76,6 +79,10 @@ Ext.define('Site.widget.Search', {
         return Ext.get(searchForm);
     },
 
+    applyResultsVisible: function(visible) {
+        this.resultsCt && this.resultsCt.setStyle('display', visible ? '' : 'none');
+    },
+
     applyResultsTpl: function(resultsTpl) {
         return (Ext.isObject(resultsTpl) && resultsTpl.isTemplate) ? resultsTpl : new Ext.XTemplate(resultsTpl);
     },
@@ -94,8 +101,11 @@ Ext.define('Site.widget.Search', {
 
         me.resultsCt = searchForm.createChild({
             tag: 'ul',
-            cls: 'search-results'
-        }).enableDisplayMode().hide();
+            cls: 'search-results',
+            style: {
+                display: 'none'
+            }
+        });
 
 //      searchForm.on('submit', 'onFormSubmit', me);
         searchForm.on('keydown', 'onFormKeyDown', me);
@@ -138,7 +148,7 @@ Ext.define('Site.widget.Search', {
 
         ev.stopEvent();
 
-        if (!resultsCt.isVisible()) {
+        if (!this.getResultsVisible()) {
             return;
         }
 
@@ -173,24 +183,25 @@ Ext.define('Site.widget.Search', {
 
         if (t.value.length >= me.getMinChars()) {
             me.getSearchForm().addCls('is-waiting');
-            resultsCt.show();
+            me.setResultsVisible(true);
             me.searchTask.delay(me.getSearchDelay());
         } else {
             me.searchConnection.abort();
-            resultsCt.hide().update('');
+            me.setResultsVisible(false);
+            me.resultsCt.update('');
             me.lastRequestedQuery = null;
         }
     },
 
     onFieldFocus: function(ev, t) {
         if (this.lastRequestedQuery) {
-            this.resultsCt.show();
+            this.setResultsVisible(true);
         }
     },
 
     onBodyClick: function(ev, t) {
         if (!ev.within(this.searchForm)) {
-            this.resultsCt.hide();
+            this.setResultsVisible(false);
         }
     },
 
