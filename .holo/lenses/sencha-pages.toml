@@ -12,4 +12,4 @@ files = [
 # optional and stripped from holospec:
 [hololens.output]
 root = "site-root/js/pages" # defaults to hololens.root
-merge = "replace" # overlay / underlay / replace, defaults to overlay
+merge = "overlay" # overlay / underlay / replace, defaults to overlay
