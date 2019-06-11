@@ -70,28 +70,52 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
     {
         $output = array();
 
-        foreach ($columnsMap as $externalKey => $internalKey) {
-            if (array_key_exists($externalKey, $row)) {
-                if ($internalKey) {
-                    if (substr($internalKey, -2) == '[]') {
-                        $internalKey = substr($internalKey, 0, -2);
+        // extract columns via alias mappings
+        foreach ($columnsMap as $alias => $key) {
+            // a falsey-value indicates a disabled mapping
+            if (!$key) {
+                continue;
+            }
 
-                        if (!array_key_exists($internalKey, $output)) {
-                            $output[$internalKey] = [$row[$externalKey]];
-                        } elseif (is_array($output[$internalKey])) {
-                            $output[$internalKey][] = $row[$externalKey];
-                        } else {
-                            $output[$internalKey] = [$output[$internalKey], $row[$externalKey]];
-                        }
-                    } else {
-                        $output[$internalKey] = $row[$externalKey];
-                    }
+            // a suffix of [] indicates a value that should be read into an array
+            if (substr($key, -2) == '[]') {
+                $key = substr($key, 0, -2);
+                $arrayValue = true;
+            } else {
+                $arrayValue = false;
+            }
+
+            // read under alias, then native key
+            foreach ([$alias, $key] as $column) {
+                if (array_key_exists($column, $row)) {
+                    $value = $row[$column];
+                    unset($row[$column]);
+                } else {
+                    continue;
                 }
 
-                unset($row[$externalKey]);
+                if ($arrayValue) {
+                    if (!array_key_exists($key, $output)) {
+                        $output[$key] = is_array($value) ? $value : [$value];
+                    } elseif (is_array($output[$key])) {
+                        if (is_array($value)) {
+                            $output[$key] = array_merge($output[$key], $value);
+                        } else {
+                            $output[$key][] = $value;
+                        }
+                    } else {
+                        $output[$key] = array_merge(
+                            is_array($output[$key]) ? $output[$key] : [ $output[$key] ],
+                            is_array($value) ? $value : [ $value ]
+                        );
+                    }
+                } else {
+                    $output[$key] = $value;
+                }
             }
         }
 
+        // filter out any empty cells in multi-value arrays
         foreach ($output as $key => &$value) {
             if (is_array($value)) {
                 $value = array_filter($value);
