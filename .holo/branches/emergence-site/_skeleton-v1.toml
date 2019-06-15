@@ -16,7 +16,6 @@ files = [
     "!php-config/Git.config.d/emergence-skeleton-v1.php",
 
     # filter out legacy content
-    "!**/.sencha/app/**",
     "!**/ext-watermark/**",
     "!ext-library/**",
     "!html-templates/app/*.tpl",
