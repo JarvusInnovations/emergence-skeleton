@@ -1,6 +1,3 @@
-# framework sources
-/ext-*/
-
 # derived files produced by sencha-cmd
 /build/
 /*/bootstrap.*
