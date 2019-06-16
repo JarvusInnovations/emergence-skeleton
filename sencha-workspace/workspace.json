@@ -1,14 +1,5 @@
 {
     /**
-     *  An array of the paths to all the applications present in this workspace
-     */
-    "apps": [
-        "EmergencePullTool",
-        "EmergenceContentEditor",
-        "EmergenceEditor"
-    ],
-
-    /**
      * An object containing key value pair framework descriptors.
      *
      * The value should be an object containing "path" the path inside the workspace where the framework
