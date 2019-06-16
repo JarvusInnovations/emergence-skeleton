@@ -3,19 +3,3 @@
 	url = https://github.com/JarvusInnovations/dwoo.git
 	shallow = true
 	branch = 1.2
-[submodule "jarvus-hotfixes"]
-	path = sencha-workspace/packages/jarvus-hotfixes
-	url = https://github.com/JarvusInnovations/sencha-hotfixes.git
-	branch = ext/6/2/0/981
-[submodule "jarvus-lazydata"]
-	path = sencha-workspace/packages/jarvus-lazydata
-	url = https://github.com/JarvusInnovations/jarvus-lazydata.git
-	branch = ext/6/2/0/981
-[submodule "jarvus-hash"]
-	path = sencha-workspace/packages/jarvus-hash
-	url = https://github.com/JarvusInnovations/jarvus-hash.git
-	branch = master
-[submodule "jarvus-ace"]
-	path = sencha-workspace/packages/jarvus-ace
-	url = https://github.com/JarvusInnovations/jarvus-ace.git
-	branch = master
