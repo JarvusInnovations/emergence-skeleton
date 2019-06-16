@@ -1,0 +1,16 @@
+[hololens]
+package = "holo/lens-sencha-app"
+app = "EmergenceEditor"
+
+[hololens.input]
+root = "sencha-workspace"
+files = [
+    "workspace.json",
+    "ext/**",
+    "packages/**",
+    "EmergenceEditor/**",
+]
+
+[hololens.output]
+root = "webapp-builds/EmergenceEditor"
+merge = "replace"
