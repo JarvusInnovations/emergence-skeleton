@@ -1,5 +1,7 @@
 [hololens]
 package = "holo/lens-sencha-app"
+
+[hololens.sencha]
 app = "EmergencePullTool"
 
 [hololens.input]
