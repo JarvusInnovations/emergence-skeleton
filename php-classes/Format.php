@@ -257,10 +257,4 @@ class Format
             return $text;
         }
     }
-
-    public static function twitterText($text)
-    {
-        $autoLink = new Twitter_Autolink();
-        return $autoLink->autoLink($text);
-    }
 }

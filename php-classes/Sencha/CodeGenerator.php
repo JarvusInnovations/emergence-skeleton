@@ -350,7 +350,7 @@ class CodeGenerator
                 throw new \Exception("getExtTypeConfig: unhandled type $fieldOptions[type]");
         }
 
-        if ($field == 'Class' && $recordClass && ($defaultClass = $recordClass::getStaticDefaultClass())) {
+        if ($field == 'Class' && $recordClass && ($defaultClass = $recordClass::getDefaultClass())) {
             $fieldConfig['defaultValue'] = $defaultClass;
         } elseif (isset($fieldOptions['default'])) {
             if ($fieldOptions['type'] == 'timestamp' && $fieldOptions['default'] == 'CURRENT_TIMESTAMP') {

@@ -30,7 +30,7 @@ class SQL
         }
 
         // compile fields
-        $rootClass = $recordClass::getStaticRootClass();
+        $rootClass = $recordClass::getRootClass();
         foreach (static::getAggregateFieldOptions($recordClass) as $fieldId => $field) {
             if ($field['columnName'] == 'RevisionID') {
                 continue;
@@ -172,7 +172,7 @@ class SQL
     public static function getFieldDefinition($recordClass, $fieldName, $historyVariant = false)
     {
         $field = static::getAggregateFieldOptions($recordClass, $fieldName);
-        $rootClass = $recordClass::getStaticRootClass();
+        $rootClass = $recordClass::getRootClass();
 
         // force notnull=false on non-rootclass fields
         if ($rootClass && !$rootClass::fieldExists($fieldName)) {
@@ -180,7 +180,7 @@ class SQL
         }
 
         // auto-prepend class type
-        if ($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getStaticSubClasses())) {
+        if ($field['columnName'] == 'Class' && $field['type'] == 'enum' && !in_array($rootClass, $field['values']) && !count($rootClass::getSubClasses())) {
             array_unshift($field['values'], $rootClass);
         }
 

@@ -216,7 +216,7 @@ class MediaRequestHandler extends RecordsRequestHandler
         // assign context
         if (!empty($_REQUEST['ContextClass']) && !empty($_REQUEST['ContextID'])) {
             if (!is_subclass_of($_REQUEST['ContextClass'], 'ActiveRecord')
-                || !in_array($_REQUEST['ContextClass']::getStaticRootClass(), Media::$fields['ContextClass']['values'])
+                || !in_array($_REQUEST['ContextClass']::getRootClass(), Media::$fields['ContextClass']['values'])
                 || !is_numeric($_REQUEST['ContextID'])) {
                 return static::throwError('Context is invalid');
             } elseif (!$Media->Context = $_REQUEST['ContextClass']::getByID($_REQUEST['ContextID'])) {

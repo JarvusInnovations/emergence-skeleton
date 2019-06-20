@@ -2880,24 +2880,6 @@ class ActiveRecord
         return array_unique([static::getRootClass(), get_called_class()]);
     }
 
-    // @deprecated
-    public static function getStaticRootClass($boundingParentClass = __CLASS__)
-    {
-        return static::getRootClass($boundingParentClass);
-    }
-
-    // @deprecated
-    public static function getStaticDefaultClass()
-    {
-        return static::getDefaultClass();
-    }
-
-    // @deprecated
-    public static function getStaticSubClasses()
-    {
-        return static::getSubClasses();
-    }
-
     public static function sorterExists($name)
     {
         $sorters = static::getStackedConfig('sorters');

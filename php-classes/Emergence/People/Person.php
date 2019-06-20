@@ -201,7 +201,7 @@ class Person extends VersionedRecord implements IPerson
             self::$validators['Gender']['choices'] = self::$fields['Gender']['values'];
         }
 
-        self::$validators['Class']['choices'] = static::getStaticSubClasses();
+        self::$validators['Class']['choices'] = static::getSubClasses();
 
         parent::__classLoaded();
     }

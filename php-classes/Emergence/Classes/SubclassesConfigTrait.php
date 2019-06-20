@@ -31,7 +31,7 @@ trait SubclassesConfigTrait
             return static::$defaultClass;
         }
 
-        return static::getStaticRootClass();
+        return static::getRootClass();
     }
 
     public static function getStaticSubClasses()
@@ -40,23 +40,23 @@ trait SubclassesConfigTrait
             return static::$subClasses;
         }
 
-        return array_unique([static::getStaticRootClass(), get_called_class()]);
+        return array_unique([static::getRootClass(), get_called_class()]);
     }
 
 
     // instance wrappers
     public function getRootClass($boundingParentClass = __CLASS__)
     {
-        return static::getStaticRootClass($boundingParentClass);
+        return static::getRootClass($boundingParentClass);
     }
 
     public function getDefaultClass()
     {
-        return static::getStaticDefaultClass();
+        return static::getDefaultClass();
     }
 
     public function getSubClasses()
     {
-        return static::getStaticSubClasses();
+        return static::getSubClasses();
     }
 }

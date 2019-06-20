@@ -370,12 +370,12 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         foreach ($_REQUEST['data'] as $datum) {
             // get record
             if (empty($datum['ID']) || !is_numeric($datum['ID']) || $datum['ID'] <= 0) {
-                $subClasses = $className::getStaticSubClasses();
+                $subClasses = $className::getSubClasses();
 
                 if (!empty($datum['Class']) && in_array($datum['Class'], $subClasses)) {
                     $defaultClass = $datum['Class'];
                 } else {
-                    $defaultClass = $className::getStaticDefaultClass();
+                    $defaultClass = $className::getDefaultClass();
                 }
 
                 $Record = new $defaultClass();
@@ -498,12 +498,12 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         $className = static::$recordClass;
 
         if (!$Record) {
-            $subClasses = $className::getStaticSubClasses();
+            $subClasses = $className::getSubClasses();
 
             if (!empty($_REQUEST['Class']) && in_array($_REQUEST['Class'], $subClasses)) {
                 $defaultClass = $_REQUEST['Class'];
             } else {
-                $defaultClass = $className::getStaticDefaultClass();
+                $defaultClass = $className::getDefaultClass();
             }
 
             $Record = new $defaultClass();

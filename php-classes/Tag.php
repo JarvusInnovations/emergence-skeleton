@@ -336,7 +336,7 @@ class Tag extends ActiveRecord
         // build TagItem query
         $tagWhere = [];
         $tagWhere[] = sprintf('`%s` = %u', TagItem::getColumnName('TagID'), $this->ID);
-        $tagWhere[] = sprintf('`%s` = "%s"', TagItem::getColumnName('ContextClass'), DB::escape($class::getStaticRootClass()));
+        $tagWhere[] = sprintf('`%s` = "%s"', TagItem::getColumnName('ContextClass'), DB::escape($class::getRootClass()));
 
         $tagQuery = sprintf(
             'SELECT ContextID FROM `%s` TagItem WHERE (%s)',

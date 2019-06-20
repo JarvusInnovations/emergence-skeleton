@@ -61,7 +61,7 @@ class RegistrationRequestHandler extends \RequestHandler
         if (is_callable(static::$createUser)) {
             $User = call_user_func_array(static::$createUser, [&$filteredRequestFields, &$additionalErrors]);
         } else {
-            $className = User::getStaticDefaultClass();
+            $className = User::getDefaultClass();
             $User = new $className();
         }
 
@@ -142,7 +142,7 @@ class RegistrationRequestHandler extends \RequestHandler
     public static function handleRecoverPasswordRequest()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $userClass = User::getStaticDefaultClass();
+            $userClass = User::getDefaultClass();
 
             if (empty($_REQUEST['username'])) {
                 $error = 'Please provide either your username or email address to reset your password.';

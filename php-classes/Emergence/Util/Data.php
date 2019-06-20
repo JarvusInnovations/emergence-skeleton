@@ -7,9 +7,6 @@ use Exception;
 use SiteFile;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * TODO: use this in Sencha_App
- */
 class Data
 {
     public static function expandDottedKeysToTree($input, &$output = [])

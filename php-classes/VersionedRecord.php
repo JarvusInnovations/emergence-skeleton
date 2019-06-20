@@ -173,7 +173,7 @@ abstract class VersionedRecord extends ActiveRecord
 
     public static function getStaticRootClass($boundingParentClass = __CLASS__)
     {
-        return parent::getStaticRootClass($boundingParentClass);
+        return parent::getRootClass($boundingParentClass);
     }
 
     public static function getHistoryTableName()

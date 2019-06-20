@@ -223,7 +223,7 @@ abstract class AbstractActiveRecord implements ActiveRecordInterface
 
         if ($field == 'class') {
             // apply Class enum values
-            $options['values'] = static::getStaticSubClasses();
+            $options['values'] = static::getSubClasses();
         }
 
         if ($options['autoincrement']) {
