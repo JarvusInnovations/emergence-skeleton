@@ -1,5 +1,41 @@
 [holomapping]
 files = [
     "*/**",
-    "!event-handlers/RegistrationRequestHandler/**"
+
+    # filter out 3rd-party libraries
+    "!dwoo-plugins/builtin/**",
+    "!php-classes/Dwoo/**",
+    "!php-classes/Gitonomy/**",
+    "!php-classes/Michelf/**",
+    "!php-classes/Patchwork/**",
+    "!php-classes/Psr/**",
+    "!php-classes/stojg/**",
+    "!php-classes/Symfony/**",
+
+    # filter out legacy git configuration
+    "!php-config/Git.config.d/emergence-skeleton-v1.php",
+
+    # filter out legacy content
+    "!**/ext-watermark/**",
+    "!ext-library/**",
+    "!html-templates/app/*.tpl",
+    "!html-templates/app/ContentEditor/**",
+    "!html-templates/git/**",
+    "!html-templates/manage/**",
+    "!js-library/**",
+    "!php-classes/Chaki/**",
+    "!php-classes/MP4Info.*",
+    "!php-classes/MP4Info/**",
+    "!php-classes/PHPGit_*",
+    "!php-classes/Sabre/**",
+    "!sencha-build/EmergenceContentEditor/production/resources/images/**",
+    "!site-root/app.php",
+    "!site-root/css/**",
+    "!site-root/git.php",
+    "!site-root/img/icons/**",
+    "!site-root/jslib.php",
+    "!site-root/manage.php",
+    "!site-root/sencha-cmd/**",
+    "!site-root/table_manager.php",
+    "!site-root/x.php"
 ]

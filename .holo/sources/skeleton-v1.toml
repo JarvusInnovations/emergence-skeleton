@@ -1,6 +1,0 @@
-[holosource]
-url = "https://github.com/JarvusInnovations/emergence-skeleton.git"
-ref = "refs/heads/master"
-
-[holosource.project]
-holobranch = "emergence-skeleton"
