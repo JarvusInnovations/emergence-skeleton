@@ -17,7 +17,8 @@ if (Site::getConfig('parent_hostname') == null) {
             'phpunit-tests',
             'sencha-workspace',
             'site-root',
-            'site-tasks'
+            'site-tasks',
+            'webapp-builds'
         ]
     ];
 }
