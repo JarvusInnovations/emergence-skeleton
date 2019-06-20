@@ -2,23 +2,23 @@
 
 class SpreadsheetReader
 {
-    protected $_options = array(
+    protected $_options = [
         'parseHeader' => true
         ,'autoTrim' => true
         ,'packedColumn' => false // set to an integer index to pack extra columns into given column by comma
         ,'arrayValues' => false
-    );
+    ];
     protected $_fh;
     protected $_columnNames;
     protected $_bomFound;
 
 
-    public static function createFromFile($filename, $options = array())
+    public static function createFromFile($filename, $options = [])
     {
         return static::createFromStream(fopen($filename, 'r'), File::getMIMEType($filename), $options);
     }
 
-    public static function createFromStream($stream, $mimeType = 'text/csv', $options = array())
+    public static function createFromStream($stream, $mimeType = 'text/csv', $options = [])
     {
         switch ($mimeType) {
             case 'text/plain':
@@ -42,7 +42,7 @@ class SpreadsheetReader
     }
 
 
-    public function __construct($fileHandle, $options = array())
+    public function __construct($fileHandle, $options = [])
     {
         $this->_fh = $fileHandle;
         $this->_options = array_merge($this->_options, $options);
@@ -91,7 +91,7 @@ class SpreadsheetReader
                         if (is_array($row[$key])) {
                             $row[$key][] = $values[$i];
                         } else {
-                            $row[$key] = [ $row[$key], $values[$i] ];
+                            $row[$key] = [$row[$key], $values[$i]];
                         }
                     } else {
                         $row[$key] = $values[$i];
@@ -125,7 +125,7 @@ class SpreadsheetReader
 
     public function writeToTable($tableName, $type = 'MyISAM', $temporary = false)
     {
-        $fieldDefs = array_map(function($cn) {
+        $fieldDefs = array_map(function ($cn) {
             return sprintf('`%s` varchar(255) default NULL', $cn);
         }, $this->_columnNames);
 
@@ -138,12 +138,12 @@ class SpreadsheetReader
 
         // create table
         DB::nonQuery(
-            'CREATE TABLE `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8;'
-            ,array(
+            'CREATE TABLE `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8;',
+            [
                 $tableName
                 ,join(',', $fieldDefs)
                 ,$type
-            )
+            ]
         );
 
         // write rows
@@ -154,11 +154,11 @@ class SpreadsheetReader
             }
 
             DB::nonQuery(
-                'INSERT INTO `%s` VALUES ("%s")'
-                ,array(
+                'INSERT INTO `%s` VALUES ("%s")',
+                [
                     $tableName
-                    ,implode('","', array_map(array('DB', 'escape'), $row))
-                )
+                    ,implode('","', array_map(['DB', 'escape'], $row))
+                ]
             );
             $count++;
         }

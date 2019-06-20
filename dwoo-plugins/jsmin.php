@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_jsmin(Dwoo_Core $dwoo, $files, $root = array('site-root','js'), $embed = false, $debug = false)
+function Dwoo_Plugin_jsmin(Dwoo_Core $dwoo, $files, $root = ['site-root','js'], $embed = false, $debug = false)
 {
     if (is_array($files)) {
         $files = implode('+', $files);
@@ -11,7 +11,7 @@ function Dwoo_Plugin_jsmin(Dwoo_Core $dwoo, $files, $root = array('site-root','j
 
     if ($debug || !empty($_GET['js-debug']) || !empty($_GET['jsdebug'])) {
         $html = '';
-        foreach ($sourceReport['files'] AS $filename => $fileData) {
+        foreach ($sourceReport['files'] as $filename => $fileData) {
             $html .= "<script src='".preg_replace('/^site-root/', '', $filename)."?_sha1=$fileData[SHA1]'></script>\n";
         }
 

@@ -3,10 +3,9 @@
 namespace Emergence\SiteAdmin;
 
 use DB;
-use Site;
 use Emergence_FS;
+use Site;
 use TableNotFoundException;
-
 
 class MigrationsRequestHandler extends \RequestHandler
 {
@@ -37,7 +36,7 @@ class MigrationsRequestHandler extends \RequestHandler
 
     public static function handleBrowseRequest()
     {
-        return static::respond('migrations',[
+        return static::respond('migrations', [
             'migrations' => static::getMigrations()
         ]);
     }
@@ -101,12 +100,12 @@ class MigrationsRequestHandler extends \RequestHandler
             $debugLogStartIndex = count(\Debug::$log);
 
 
-            $resetMigrationStatus = function() use ($migrationKey) {
+            $resetMigrationStatus = function () use ($migrationKey) {
                 static::resetMigrationStatus($migrationKey);
             };
 
             ob_start();
-            $migration['status'] = call_user_func(function() use ($migration, $migrationNode, $resetMigrationStatus) {
+            $migration['status'] = call_user_func(function () use ($migration, $migrationNode, $resetMigrationStatus) {
                 return include($migrationNode->RealPath);
             });
             $output = ob_get_clean();
@@ -161,7 +160,7 @@ class MigrationsRequestHandler extends \RequestHandler
 
         // append sequence to each node
         $migrations = [];
-        foreach (Emergence_FS::getTreeFiles('php-migrations') AS $migrationPath => $migrationNodeData) {
+        foreach (Emergence_FS::getTreeFiles('php-migrations') as $migrationPath => $migrationNodeData) {
             $migrationKey = preg_replace('#^php-migrations/(.*)\.php$#i', '$1', $migrationPath);
             $migrationRecord = array_key_exists($migrationKey, $migrationRecords) ? $migrationRecords[$migrationKey] : null;
             preg_match('#^(\d{8})(\d*)#', basename($migrationKey), $matches);
@@ -178,7 +177,7 @@ class MigrationsRequestHandler extends \RequestHandler
         }
 
         // sort migrations by sequence
-        uasort($migrations, function($a, $b) {
+        uasort($migrations, function ($a, $b) {
             if ($a['sequence'] == $b['sequence']) {
                 if ($a['sequenceTime'] == $b['sequenceTime']) {
                     return 0;

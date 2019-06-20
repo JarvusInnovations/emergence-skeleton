@@ -9,29 +9,29 @@ use Tag;
 abstract class AbstractRequestHandler extends \RecordsRequestHandler
 {
     #    public static $contentTypes = array(
-#        'Emergence\CMS\Page' => array(
-#            'handler' => '/pages'
-#            ,'editor' => 'CMS.PageEditor'
-#        )
-#        ,'Emergence\CMS\BlogPost' => array(
-#            'handler' => '/blog'
-#            ,'editor' => 'CMS.BlogPostEditor'
-#        )
-#    );
-#
-#    public static $contentItemTypes = array(
-#        'Emergence\CMS\Item\RichText' => array(
-#            'composer' => 'CMS.Composer.RichTextComposer'
-#            //'composer' => 'CMS.Composer.WYMTextComposer'
-#        )
-#        ,'Emergence\CMS\Item\Media' => array(
-#            'composer' => 'CMS.Composer.MediaComposer'
-#        )
-#    );
-#
-#    public static $defaultItems = array(
-#        'Emergence\CMS\RichTextContent'
-#    );
+    #        'Emergence\CMS\Page' => array(
+    #            'handler' => '/pages'
+    #            ,'editor' => 'CMS.PageEditor'
+    #        )
+    #        ,'Emergence\CMS\BlogPost' => array(
+    #            'handler' => '/blog'
+    #            ,'editor' => 'CMS.BlogPostEditor'
+    #        )
+    #    );
+    #
+    #    public static $contentItemTypes = array(
+    #        'Emergence\CMS\Item\RichText' => array(
+    #            'composer' => 'CMS.Composer.RichTextComposer'
+    #            //'composer' => 'CMS.Composer.WYMTextComposer'
+    #        )
+    #        ,'Emergence\CMS\Item\Media' => array(
+    #            'composer' => 'CMS.Composer.MediaComposer'
+    #        )
+    #    );
+    #
+    #    public static $defaultItems = array(
+    #        'Emergence\CMS\RichTextContent'
+    #    );
 
     // RecordsRequestHandler config
     public static $recordClass = 'Emergence\CMS\AbstractContent';
@@ -39,9 +39,9 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
     public static $accountLevelBrowse = false;
     public static $accountLevelWrite = 'Staff';
     public static $accountLevelAPI = 'Staff';
-    public static $browseOrder = array('Published' => 'DESC');
+    public static $browseOrder = ['Published' => 'DESC'];
 
-    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
+    public static function handleBrowseRequest($options = [], $conditions = [], $responseID = null, $responseData = [])
     {
         if (!$GLOBALS['Session']->hasAccountLevel('Staff') || empty($_GET['showall'])) {
             $conditions['Status'] = 'Published';
@@ -86,18 +86,18 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
     // TODO: migrate most of this to applyRecordDelta
     protected static function onRecordSaved(ActiveRecord $Content, $requestData)
     {
-        $responseData = array();
+        $responseData = [];
 
         // save items
         if (is_array($requestData['items'])) {
-            $responseData['changedItems'] = array();
-            $responseData['newItems'] = array();
-            $responseData['deletedItems'] = array();
-            $responseData['invalidItems'] = array();
-            $responseData['phantomsMap'] = array();
+            $responseData['changedItems'] = [];
+            $responseData['newItems'] = [];
+            $responseData['deletedItems'] = [];
+            $responseData['invalidItems'] = [];
+            $responseData['phantomsMap'] = [];
 
             // sort and save items
-            foreach ($requestData['items'] AS $itemData) {
+            foreach ($requestData['items'] as $itemData) {
                 if (!empty($itemData['ID']) && is_numeric($itemData['ID'])) {
                     // modify an existing item
                     $Item = Item\AbstractItem::getByID($itemData['ID']);
@@ -136,29 +136,29 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
             // remove deleted items
             $currentItemIDs = array_merge(array_keys($responseData['changedItems']), array_keys($responseData['newItems']));
 
-            $responseData['deletedItems'] = array_filter($Content->Items, function($Item) use ($currentItemIDs) {
+            $responseData['deletedItems'] = array_filter($Content->Items, function ($Item) use ($currentItemIDs) {
                 return !in_array($Item->ID, $currentItemIDs);
             });
 
             if ($responseData['deletedItems']) {
-                foreach ($responseData['deletedItems'] AS $Item) {
+                foreach ($responseData['deletedItems'] as $Item) {
                     $Item->Status = 'Deleted';
                     $Item->save();
                 }
 
-                $Content->Items = array_filter($Content->Items, function($Item) {
+                $Content->Items = array_filter($Content->Items, function ($Item) {
                     return $Item->Status != 'Deleted';
                 });
             }
 
             // update layout if there were phantoms
             if (is_array($requestData['LayoutConfig']['itemOrder'])) {
-                foreach ($requestData['LayoutConfig']['itemOrder'] AS &$column) {
+                foreach ($requestData['LayoutConfig']['itemOrder'] as &$column) {
                     if (!is_array($column)) {
                         continue;
                     }
 
-                    foreach ($column AS &$itemID) {
+                    foreach ($column as &$itemID) {
                         if (array_key_exists($itemID, $responseData['phantomsMap'])) {
                             $itemID = $responseData['phantomsMap'][$itemID];
                         } else {
@@ -173,7 +173,7 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
 
         // assign context to media
         if (is_array($requestData['contextMedia'])) {
-            foreach ($requestData['contextMedia'] AS $mediaID) {
+            foreach ($requestData['contextMedia'] as $mediaID) {
                 if (!is_numeric($mediaID)) {
                     continue;
                 }
@@ -201,7 +201,7 @@ abstract class AbstractRequestHandler extends \RecordsRequestHandler
     }
 
 
-#    protected static function getEditResponse($responseID, $responseData)
+    #    protected static function getEditResponse($responseID, $responseData)
 #    {
 #        $responseData['contentTypes'] = static::$contentTypes;
 #        foreach ($responseData['contentTypes'] AS $contentClass => &$cfg) {

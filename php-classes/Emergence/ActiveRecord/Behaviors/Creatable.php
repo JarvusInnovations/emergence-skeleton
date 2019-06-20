@@ -29,7 +29,7 @@ class Creatable implements BehaviorInterface
                 'default' => 'CURRENT_TIMESTAMP'
             ];
         }
-        
+
         if (empty($arguments['config'][$fieldNames['creator_id']])) {
             $arguments['config'][$fieldNames['creator_id']] = [
                 'type' => 'uint',

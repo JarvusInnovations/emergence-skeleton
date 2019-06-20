@@ -4,7 +4,6 @@ namespace Emergence\WebApps;
 
 use Site;
 
-
 class RequestHandler extends \Emergence\Site\RequestHandler
 {
     public static function handleRequest()

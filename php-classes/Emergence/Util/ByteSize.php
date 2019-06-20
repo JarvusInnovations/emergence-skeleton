@@ -2,7 +2,6 @@
 
 namespace Emergence\Util;
 
-
 class ByteSize
 {
     public static $suffixes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
@@ -16,9 +15,9 @@ class ByteSize
             $options['precision'] = 2;
         }
 
-        $bytes = max($bytes, 0); 
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
-        $pow = min($pow, count(static::$suffixes) - 1); 
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count(static::$suffixes) - 1);
 
         $bytes /= pow(1024, $pow);
 

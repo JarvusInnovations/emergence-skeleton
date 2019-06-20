@@ -2,11 +2,10 @@
 
 namespace Emergence\Git;
 
+use Gitonomy\Git\Repository;
+use Sabre\HTTP\BasicAuth;
 use Site;
 use User;
-use Sabre\HTTP\BasicAuth;
-use Gitonomy\Git\Repository;
-
 
 class HttpBackend extends \RequestHandler
 {
@@ -84,9 +83,9 @@ class HttpBackend extends \RequestHandler
         $process = proc_open(
             exec('which git') . ' http-backend',
             [
-            	0 => ['pipe', 'rb'], // STDIN
-        		1 => ['pipe', 'wb'], // STDOUT
-        		2 => ['pipe', 'w']  // STDERR
+                0 => ['pipe', 'rb'], // STDIN
+                1 => ['pipe', 'wb'], // STDOUT
+                2 => ['pipe', 'w']  // STDERR
             ],
             $pipes,
             null,

@@ -45,7 +45,7 @@ class CSV
             $columnNames = array_merge(array_keys($fields), array_keys($dynamicFields));
             $columnNames = array_combine($columnNames, $columnNames);
 
-            foreach ($columnNames AS &$columnName) {
+            foreach ($columnNames as &$columnName) {
                 $dynamicField = $dynamicFields[$columnName];
                 $field = $fields[$columnName];
 
@@ -59,7 +59,7 @@ class CSV
 
         fputcsv($stream, static::getColumns($columnNames, $columns));
 
-        foreach ($records AS $record) {
+        foreach ($records as $record) {
             fputcsv(
                 $stream,
                 static::getColumns(
@@ -73,8 +73,8 @@ class CSV
     public static function getColumns($array, $columns = null)
     {
         if (is_array($columns)) {
-            $newArray = array();
-            foreach ($columns AS $key) {
+            $newArray = [];
+            foreach ($columns as $key) {
                 $newArray[$key] = $array[$key];
             }
             $array = $newArray;

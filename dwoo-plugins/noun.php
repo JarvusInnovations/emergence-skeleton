@@ -12,7 +12,3 @@ function Dwoo_Plugin_noun(Dwoo_Core $dwoo, $object, $mode = 'singular')
         default: die('noun(): unknown mode');
     }
 }
-
-
-
-?>

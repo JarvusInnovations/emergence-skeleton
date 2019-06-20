@@ -58,39 +58,40 @@ class JSMin
     protected $lookAhead   = null;
     protected $output      = '';
 
-  // -- Public Static Methods --------------------------------------------------
+    // -- Public Static Methods --------------------------------------------------
 
-  public static function minify($js)
-  {
-      $jsmin = new JSMin($js);
-      return $jsmin->min();
-  }
+    public static function minify($js)
+    {
+        $jsmin = new JSMin($js);
+        return $jsmin->min();
+    }
 
-  // -- Public Instance Methods ------------------------------------------------
+    // -- Public Instance Methods ------------------------------------------------
 
-  public function __construct($input)
-  {
-      $this->input       = str_replace("\r\n", "\n", $input);
-      $this->inputLength = strlen($this->input);
-  }
+    public function __construct($input)
+    {
+        $this->input       = str_replace("\r\n", "\n", $input);
+        $this->inputLength = strlen($this->input);
+    }
 
-  // -- Protected Instance Methods ---------------------------------------------
+    // -- Protected Instance Methods ---------------------------------------------
 
 
 
-  /* action -- do something! What you do is determined by the argument:
-          1   Output A. Copy B to A. Get the next B.
-          2   Copy B to A. Get the next B. (Delete A).
-          3   Get the next B. (Delete B).
-     action treats a string as a single character. Wow!
-     action recognizes a regular expression if it is preceded by ( or , or =.
-  */
-  protected function action($d)
-  {
-      switch ($d) {
+    /* action -- do something! What you do is determined by the argument:
+            1   Output A. Copy B to A. Get the next B.
+            2   Copy B to A. Get the next B. (Delete A).
+            3   Get the next B. (Delete B).
+       action treats a string as a single character. Wow!
+       action recognizes a regular expression if it is preceded by ( or , or =.
+    */
+    protected function action($d)
+    {
+        switch ($d) {
       case 1:
         $this->output .= $this->a;
 
+        // no break
       case 2:
         $this->a = $this->b;
 
@@ -114,6 +115,7 @@ class JSMin
             }
         }
 
+        // no break
       case 3:
         $this->b = $this->next();
 
@@ -122,7 +124,8 @@ class JSMin
             $this->a === ':' || $this->a === '[' || $this->a === '!' ||
             $this->a === '&' || $this->a === '|' || $this->a === '?' ||
             $this->a === '{' || $this->a === '}' || $this->a === ';' ||
-            $this->a === "\n")) {
+            $this->a === "\n"
+        )) {
             $this->output .= $this->a.$this->b;
 
             for (;;) {
@@ -133,19 +136,19 @@ class JSMin
                 inside a regex [...] set, which MAY contain a '/' itself. Example: mootools Form.Validator near line 460:
                   return Form.Validator.getValidator('IsEmpty').test(element) || (/^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]\.?){0,63}[a-z0-9!#$%&'*+/=?^_`{|}~-]@(?:(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\])$/i).test(element.get('value'));
               */
-              for (;;) {
-                  $this->output .= $this->a;
-                  $this->a = $this->get();
+                    for (;;) {
+                        $this->output .= $this->a;
+                        $this->a = $this->get();
 
-                  if ($this->a === ']') {
-                      break;
-                  } elseif ($this->a === '\\') {
-                      $this->output .= $this->a;
-                      $this->a       = $this->get();
-                  } elseif (ord($this->a) <= self::ORD_LF) {
-                      throw new JSMinException('Unterminated regular expression set in regex literal.');
-                  }
-              }
+                        if ($this->a === ']') {
+                            break;
+                        } elseif ($this->a === '\\') {
+                            $this->output .= $this->a;
+                            $this->a       = $this->get();
+                        } elseif (ord($this->a) <= self::ORD_LF) {
+                            throw new JSMinException('Unterminated regular expression set in regex literal.');
+                        }
+                    }
                 } elseif ($this->a === '/') {
                     break;
                 } elseif ($this->a === '\\') {
@@ -161,7 +164,7 @@ class JSMin
             $this->b = $this->next();
         }
     }
-  }
+    }
 
     protected function get()
     {
@@ -188,13 +191,13 @@ class JSMin
         return ' ';
     }
 
-  /* isAlphanum -- return true if the character is a letter, digit, underscore,
-        dollar sign, or non-ASCII character.
-  */
-  protected function isAlphaNum($c)
-  {
-      return ord($c) > 126 || $c === '\\' || preg_match('/^[\w\$]$/', $c) === 1;
-  }
+    /* isAlphanum -- return true if the character is a letter, digit, underscore,
+          dollar sign, or non-ASCII character.
+    */
+    protected function isAlphaNum($c)
+    {
+        return ord($c) > 126 || $c === '\\' || preg_match('/^[\w\$]$/', $c) === 1;
+    }
 
     protected function min()
     {
@@ -276,15 +279,15 @@ class JSMin
         return $this->output;
     }
 
-  /* next -- get the next character, excluding comments. peek() is used to see
-             if a '/' is followed by a '/' or '*'.
-  */
-  protected function next()
-  {
-      $c = $this->get();
+    /* next -- get the next character, excluding comments. peek() is used to see
+               if a '/' is followed by a '/' or '*'.
+    */
+    protected function next()
+    {
+        $c = $this->get();
 
-      if ($c === '/') {
-          switch ($this->peek()) {
+        if ($c === '/') {
+            switch ($this->peek()) {
         case '/':
           for (;;) {
               $c = $this->get();
@@ -294,6 +297,7 @@ class JSMin
               }
           }
 
+          // no break
         case '*':
           $this->get();
 
@@ -311,13 +315,14 @@ class JSMin
             }
           }
 
+          // no break
         default:
           return $c;
       }
-      }
+        }
 
-      return $c;
-  }
+        return $c;
+    }
 
     protected function peek()
     {

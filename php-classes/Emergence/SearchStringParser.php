@@ -10,7 +10,7 @@ class SearchStringParser
     // parser state
     protected $string;
     protected $cursorMax;
-    protected $terms = array();
+    protected $terms = [];
 
     // scanning state
     protected $qualifier = '';
@@ -24,7 +24,7 @@ class SearchStringParser
     const STATE_TERM = 2;
 
 
-    function __construct($string)
+    public function __construct($string)
     {
         $this->string = $string;
         $this->cursorMax = strlen($string) - 1;
@@ -78,6 +78,7 @@ class SearchStringParser
 
                     // continue into qualifier mode and continue scan without advancing cursor
 
+                    // no break
                 case self::STATE_QUALIFIER:
 
                     $this->qualifier = $this->readSubstring();
@@ -93,6 +94,7 @@ class SearchStringParser
                     // skip delimeter and continue into term parsing
                     $this->cursor++;
 
+                    // no break
                 case self::STATE_TERM:
                     $this->term = $this->readSubstring(false);
                     $this->flushTerm();
@@ -142,13 +144,13 @@ class SearchStringParser
         return $string;
     }
 
-     protected function flushTerm()
-     {
+    protected function flushTerm()
+    {
         if ($this->term || $this->qualifier) {
-            $this->terms[] = array(
+            $this->terms[] = [
                 'qualifier' => $this->qualifier ?: null,
                 'term' => $this->term ?: null
-            );
+            ];
 
             $this->qualifier = '';
             $this->term = '';
@@ -157,5 +159,5 @@ class SearchStringParser
         }
 
         $this->state = self::STATE_READY;
-     }
+    }
 }

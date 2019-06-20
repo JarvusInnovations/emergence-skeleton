@@ -19,61 +19,61 @@ interface ActiveRecordInterface
 
     // static configuration modifiers
     public static function addField($name, $config);
-        
+
 
     // instance methods for managing record values
     public function getValue($name, array $options = null);
-#    public function setValue($name, $value);
-#
+    #    public function setValue($name, $value);
+    #
     public function getValues(array $options = []);
-#    public function setValues(array $values);
-#
-#    public function changeClass($className = null, $setValues = null);
-    
+    #    public function setValues(array $values);
+    #
+    #    public function changeClass($className = null, $setValues = null);
+
     // getData/getSummary/getDetails ( -> getValues($options) ?)
 
 
     // getters for instance key properties
-#    public function getHandle();
-#    public function getTitle();
-#    public function getID();
+    #    public function getHandle();
+    #    public function getTitle();
+    #    public function getID();
 
 
     // getters for instance lifecycle state
-#    public function isDirty();
-#    public function isFieldDirty($fieldName);
-#    public function getOriginalValue($fieldName);
-#    public function getOriginalValues();
-#
-#    public function isPhantom();
-#    public function isValid();
-#    public function isNew();
-#    public function isUpdated();
-#    public function isDestroyed();
+    #    public function isDirty();
+    #    public function isFieldDirty($fieldName);
+    #    public function getOriginalValue($fieldName);
+    #    public function getOriginalValues();
+    #
+    #    public function isPhantom();
+    #    public function isValid();
+    #    public function isNew();
+    #    public function isUpdated();
+    #    public function isDestroyed();
 
 
     // template methods for instance lifecycle
-#    public function validate();
-#    public function validateShallow();
-#    public function getValidationErrors();
-#
-#    public function save();
-#    public function saveShallow();
-#
-#    public function destroy(array $options = []); 
+    #    public function validate();
+    #    public function validateShallow();
+    #    public function getValidationErrors();
+    #
+    #    public function save();
+    #    public function saveShallow();
+    #
+    #    public function destroy(array $options = []);
 
 
     // static methods for fetching instances
     public static function getById($id, array $options = []);
     public static function getByHandle($handle, array $options = []);
     public static function getByField($field, $value, array $options = []);
-#    public static function getCount();
-#    public static function getAll(array $options = []);
-#    public static function getCountByWhere(array $conditions = []);
+    #    public static function getCount();
+    #    public static function getAll(array $options = []);
+    #    public static function getCountByWhere(array $conditions = []);
     public static function getAllByWhere(array $conditions = [], array $options = []);
-#    public static function getCountByField($field, $value);
+    #    public static function getCountByField($field, $value);
 #    public static function getAllByField($field, $value);
-    
+
 
 
 

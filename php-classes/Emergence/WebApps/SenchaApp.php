@@ -2,12 +2,11 @@
 
 namespace Emergence\WebApps;
 
-use Exception;
-
-use Site;
 use Cache;
-use Emergence\Site\Response;
 
+use Emergence\Site\Response;
+use Exception;
+use Site;
 
 class SenchaApp extends App
 {

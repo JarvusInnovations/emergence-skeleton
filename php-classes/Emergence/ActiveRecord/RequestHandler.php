@@ -114,7 +114,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         $having = [];
         $matchers = [];
 
-        foreach ($terms AS $term) {
+        foreach ($terms as $term) {
             $n = 0;
             $qualifier = 'any';
             $split = explode(':', $term, 2);
@@ -154,7 +154,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         if ($mode == 'OR') {
             // OR mode, object can match any term and results are sorted by score
 
-            $select[] = join('+', array_map(function($c) {
+            $select[] = join('+', array_map(function ($c) {
                 return sprintf('IF(%s, %u, 0)', $c['condition'], $c['points']);
             }, $matchers)).' AS searchScore';
 
@@ -164,17 +164,17 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
                 $options['order'] = ['searchScore DESC'];
             }
         } else {
-            // AND mode, all terms must match 
+            // AND mode, all terms must match
 
             // group by qualifier
             $qualifierConditions = [];
-            foreach ($matchers AS $matcher) {
+            foreach ($matchers as $matcher) {
                 $qualifierConditions[$matcher['qualifier']][] = $matcher['condition'];
                 //$conditions[] = $matcher['condition'];
             }
 
             // compile conditions
-            foreach ($qualifierConditions AS $newConditions) {
+            foreach ($qualifierConditions as $newConditions) {
                 $conditions[] = '( ('.join(') OR (', $newConditions).') )';
             }
 
@@ -184,21 +184,21 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         }
 
         return static::respond(
-            isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun)
-            ,array_merge($responseData, [
+            isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun),
+            array_merge($responseData, [
                 'success' => true
                 ,'data' => $className::getAllByQuery(
-                    'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s'
-                    ,[
+                    'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s',
+                    [
                         static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
-                        ,join(',',$select)
+                        ,join(',', $select)
                         ,$className::$tableName
                         ,$tableAlias
                         ,!empty($joins) ? implode(' ', $joins) : ''
-                        ,$conditions ? join(') AND (',$className::mapConditions($conditions)) : '1'
+                        ,$conditions ? join(') AND (', $className::mapConditions($conditions)) : '1'
                         ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
                         ,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
-                        ,$options['limit'] ? sprintf('LIMIT %u,%u',$options['offset'],$options['limit']) : ''
+                        ,$options['limit'] ? sprintf('LIMIT %u,%u', $options['offset'], $options['limit']) : ''
                     ]
                 )
                 ,'query' => $query
@@ -268,8 +268,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
             $relatedTables = is_array($_GET['relatedTable']) ? $_GET['relatedTable'] : explode(',', $_GET['relatedTable']);
 
             $related = [];
-            foreach ($results AS $result) {
-                foreach ($relatedTables AS $relName) {
+            foreach ($results as $result) {
+                foreach ($relatedTables as $relName) {
                     if (!$result::relationshipExists($relName)) {
                         continue;
                     }
@@ -296,8 +296,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
         // generate response
         return static::respond(
-            isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun)
-            ,array_merge($responseData, [
+            isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun),
+            array_merge($responseData, [
                 'success' => true
                 ,'data' => $results
                 ,'conditions' => $conditions
@@ -354,7 +354,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
     public static function handleMultiSaveRequest()
     {
-        if (0===strpos($_SERVER['CONTENT_TYPE'],'application/json')) {
+        if (0===strpos($_SERVER['CONTENT_TYPE'], 'application/json')) {
             $_REQUEST = JSON::getRequestData();
         }
 
@@ -367,7 +367,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         $failed = [];
         $message = null;
 
-        foreach ($_REQUEST['data'] AS $datum) {
+        foreach ($_REQUEST['data'] as $datum) {
             // get record
             if (empty($datum['ID']) || !is_numeric($datum['ID']) || $datum['ID'] <= 0) {
                 $subClasses = $className::getStaticSubClasses();
@@ -434,7 +434,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
     public static function handleMultiDestroyRequest()
     {
-        if (0===strpos($_SERVER['CONTENT_TYPE'],'application/json')) {
+        if (0===strpos($_SERVER['CONTENT_TYPE'], 'application/json')) {
             $_REQUEST = JSON::getRequestData();
         }
 
@@ -446,7 +446,7 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         $results = [];
         $failed = [];
 
-        foreach ($_REQUEST['data'] AS $datum) {
+        foreach ($_REQUEST['data'] as $datum) {
             // get record
             if (is_numeric($datum)) {
                 $recordID = $datum;
@@ -621,7 +621,9 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
     protected static function getTemplateName($noun)
     {
-        return preg_replace_callback('/\s+([a-zA-Z])/', function($matches) { return strtoupper($matches[1]); }, $noun);
+        return preg_replace_callback('/\s+([a-zA-Z])/', function ($matches) {
+            return strtoupper($matches[1]);
+        }, $noun);
     }
 
     public static function respondJson($responseId, array $responseData = [])

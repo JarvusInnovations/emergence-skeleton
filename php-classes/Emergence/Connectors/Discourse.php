@@ -2,8 +2,8 @@
 
 namespace Emergence\Connectors;
 
-use Site;
 use Emergence\People\IPerson;
+use Site;
 
 class Discourse extends \Emergence\Connectors\AbstractConnector implements \Emergence\Connectors\IIdentityConsumer
 {

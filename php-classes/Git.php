@@ -2,5 +2,5 @@
 
 class Git
 {
-    public static $repositories = array();
+    public static $repositories = [];
 }

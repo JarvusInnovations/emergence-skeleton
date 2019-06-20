@@ -4,7 +4,6 @@ namespace Emergence\OpenAPI;
 
 use Symfony\Component\Yaml\Yaml;
 
-
 class Writer
 {
     public static $order = [
@@ -28,7 +27,7 @@ class Writer
 
     public static function sort(array $data)
     {
-        uksort($data, function($a, $b) {
+        uksort($data, function ($a, $b) {
             $aPos = array_search($a, static::$order);
             $bPos = array_search($b, static::$order);
 

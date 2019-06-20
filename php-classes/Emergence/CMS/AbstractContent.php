@@ -17,95 +17,95 @@ abstract class AbstractContent extends \VersionedRecord
     // required for shared-table subclassing support
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array('Emergence\CMS\Page', 'Emergence\CMS\BlogPost');
+    public static $subClasses = ['Emergence\CMS\Page', 'Emergence\CMS\BlogPost'];
 
-    public static $searchConditions = array(
-        'Title' => array(
-            'qualifiers' => array('any', 'title')
+    public static $searchConditions = [
+        'Title' => [
+            'qualifiers' => ['any', 'title']
             ,'points' => 2
             ,'sql' => 'Title Like "%%%s%%"'
-        )
-        ,'Handle' => array(
-            'qualifiers' => array('any', 'handle')
+        ]
+        ,'Handle' => [
+            'qualifiers' => ['any', 'handle']
             ,'points' => 2
             ,'sql' => 'Handle Like "%%%s%%"'
-        )
-    );
+        ]
+    ];
 
-    public static $fields = array(
-        'ContextClass' => array(
+    public static $fields = [
+        'ContextClass' => [
             'type' => 'string'
             ,'notnull' => false
-        )
-        ,'ContextID' => array(
+        ]
+        ,'ContextID' => [
             'type' => 'uint'
             ,'notnull' => false
-        )
+        ]
         ,'Title'
-        ,'Handle' => array(
+        ,'Handle' => [
             'unique' => true
-        )
-        ,'AuthorID' => array(
+        ]
+        ,'AuthorID' => [
             'type'  =>  'integer'
             ,'unsigned' => true
-        )
-        ,'Status' => array(
+        ]
+        ,'Status' => [
             'type' => 'enum'
-            ,'values' => array('Draft','Published','Hidden','Deleted')
+            ,'values' => ['Draft','Published','Hidden','Deleted']
             ,'default' => 'Published'
-        )
-        ,'Published' => array(
+        ]
+        ,'Published' => [
             'type'  =>  'timestamp'
             ,'notnull' => false
             ,'index' => true
-        )
-        ,'Visibility' => array(
+        ]
+        ,'Visibility' => [
             'type' => 'enum'
-            ,'values' => array('Public','Private')
+            ,'values' => ['Public','Private']
             ,'default' => 'Public'
-        )
-        ,'Summary' => array(
+        ]
+        ,'Summary' => [
             'type' => 'clob'
             ,'notnull' => false
-        )
-    );
+        ]
+    ];
 
 
-    public static $relationships = array(
-        'Context' => array(
+    public static $relationships = [
+        'Context' => [
             'type' => 'context-parent'
-        )
-        ,'Author' =>  array(
+        ]
+        ,'Author' =>  [
             'type' =>  'one-one'
             ,'class' => 'Person'
-        )
-        ,'Items' => array(
+        ]
+        ,'Items' => [
             'type' => 'one-many'
             ,'class' => 'Emergence\CMS\Item\AbstractItem'
             ,'foreign' => 'ContentID'
             ,'conditions' => 'Status != "Deleted"'
-            ,'order' => array('Order','ID')
-        )
-        ,'Tags' => array(
+            ,'order' => ['Order','ID']
+        ]
+        ,'Tags' => [
             'type' => 'many-many'
             ,'class' => 'Tag'
             ,'linkClass' => 'TagItem'
             ,'linkLocal' => 'ContextID'
-            ,'conditions' => array('Link.ContextClass = "Emergence\\\\CMS\\\\AbstractContent"')
-        )
-        ,'Comments' => array(
+            ,'conditions' => ['Link.ContextClass = "Emergence\\\\CMS\\\\AbstractContent"']
+        ]
+        ,'Comments' => [
             'type' => 'context-children'
             ,'class' => 'Emergence\Comments\Comment'
-            ,'order' => array('ID' => 'DESC')
-        )
-    );
+            ,'order' => ['ID' => 'DESC']
+        ]
+    ];
 
-    public static $dynamicFields = array(
+    public static $dynamicFields = [
         'tags' => 'Tags'
         ,'items' => 'Items'
         ,'Author'
         ,'Context'
-    );
+    ];
 
 
     public function userCanReadRecord(IPerson $User = null)
@@ -130,12 +130,12 @@ abstract class AbstractContent extends \VersionedRecord
         return true;
     }
 
-    public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = array())
+    public static function getAllPublishedByContextObject(ActiveRecord $Context, $options = [])
     {
-        $options = array_merge(array(
-            'conditions' => array(),
-            'order' => array('Published' => 'DESC')
-        ), $options);
+        $options = array_merge([
+            'conditions' => [],
+            'order' => ['Published' => 'DESC']
+        ], $options);
 
         if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
             $options['conditions']['Visibility'] = 'Public';
@@ -151,12 +151,12 @@ abstract class AbstractContent extends \VersionedRecord
         return static::getAllByContextObject($Context, $options);
     }
 
-    public static function getAllPublishedByAuthor(IPerson $Author, $options = array())
+    public static function getAllPublishedByAuthor(IPerson $Author, $options = [])
     {
-        $options = array_merge(array(
-            'conditions' => array(),
-            'order' => array('Published' => 'DESC')
-        ), $options);
+        $options = array_merge([
+            'conditions' => [],
+            'order' => ['Published' => 'DESC']
+        ], $options);
 
         if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
             $options['conditions']['Visibility'] = 'Public';
@@ -178,10 +178,10 @@ abstract class AbstractContent extends \VersionedRecord
         // call parent
         parent::validate();
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Title'
             ,'errorMessage' => 'A title is required'
-        ));
+        ]);
 
         // implement handles
         HandleBehavior::onValidate($this, $this->_validator);
@@ -211,7 +211,7 @@ abstract class AbstractContent extends \VersionedRecord
 
     public function renderBody()
     {
-        return join('', array_map(function($Item) {
+        return join('', array_map(function ($Item) {
             return $Item->renderBody();
         }, $this->Items));
     }

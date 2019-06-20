@@ -2,8 +2,8 @@
 
 namespace Jarvus\Sencha;
 
-use Site;
 use Emergence_FS;
+use Site;
 
 class Framework
 {
@@ -29,9 +29,9 @@ class Framework
             '5.1.1'     => '5.1.1.451'
 
             // version-specific config
-//			'5.1.1.451' => [
-//				'class' => Framework\Ext511451::class
-//			]
+            //			'5.1.1.451' => [
+            //				'class' => Framework\Ext511451::class
+            //			]
         ],
         'touch' => [
             // default config for all framework versions
@@ -271,7 +271,7 @@ class Framework
         // extract minimum files
         $extractPaths = $this->getExtractPaths();
 
-        foreach ($extractPaths AS $extractPath => $extractConfig) {
+        foreach ($extractPaths as $extractPath => $extractConfig) {
             if (is_string($extractConfig)) {
                 $extractPath = $extractConfig;
             }
@@ -289,7 +289,7 @@ class Framework
                     implode(
                         ' ',
                         array_map(
-                            function($excludePath) use ($archiveRootDirectory) {
+                            function ($excludePath) use ($archiveRootDirectory) {
                                 return '-x '.escapeshellarg($archiveRootDirectory.'/'.$excludePath);
                             },
                             is_string($extractConfig['exclude']) ? [$extractConfig['exclude']] : $extractConfig['exclude']

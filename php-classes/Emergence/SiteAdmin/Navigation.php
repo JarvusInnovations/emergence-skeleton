@@ -13,7 +13,7 @@ class Navigation
         });
 
         // decorate array items with keys
-        foreach ($items AS $key => &$value) {
+        foreach ($items as $key => &$value) {
             $value['key'] = $key;
         }
 

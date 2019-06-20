@@ -32,17 +32,17 @@ class JSON
             $siteDataPrefix = Site::$rootPath.'/'.SiteFile::$dataPath.'/';
             $siteDataPrefixLength = strlen($siteDataPrefix);
 
-            $data['_profile'] = array(
+            $data['_profile'] = [
                 'log' => Debug::$log,
-                'time' => array(
+                'time' => [
                     'initialized' => Site::$initializeTime,
                     'finished' => $now,
                     'elapsed' => $now - Site::$initializeTime
-                ),
-                'memory' => array(
+                ],
+                'memory' => [
                     'finished' => memory_get_usage(),
                     'peak' => memory_get_peak_usage()
-                ),
+                ],
                 'included' => array_map(function ($path) use ($siteDataPrefix, $siteDataPrefixLength) {
                     if (substr($path, 0, $siteDataPrefixLength) == $siteDataPrefix) {
                         return 'site://'.SiteFile::getByID(substr($path, $siteDataPrefixLength))->FullPath;
@@ -50,7 +50,7 @@ class JSON
 
                     return 'file://'.$path;
                 }, get_included_files())
-            );
+            ];
         }
 
         $text = json_encode($data);
@@ -95,10 +95,10 @@ class JSON
 
         $args = func_get_args();
 
-        self::respond(array(
+        self::respond([
             'success' => false
             ,'message' => vsprintf($message, array_slice($args, 1))
-        ));
+        ]);
     }
 
     public static function translateObjects($input, $summary = null, $include = null, $stringsOnly = false)
@@ -108,15 +108,15 @@ class JSON
                 !empty($include) &&
                 $summary ? method_exists($input, 'getSummary') : method_exists($input, 'getDetails')
             ) {
-                $includeThisLevel = array();
-                $includeLater = array();
+                $includeThisLevel = [];
+                $includeLater = [];
 
                 if (!empty($include)) {
                     if (is_string($include)) {
                         $include = explode(',', $include);
                     }
 
-                    foreach ($include AS $value) {
+                    foreach ($include as $value) {
                         if ($value == '*') {
                             $includeThisLevel = '*';
                             continue;
@@ -152,9 +152,9 @@ class JSON
         }
 
         if (is_array($input)) {
-            foreach ($input AS $key => &$item) {
+            foreach ($input as $key => &$item) {
                 if (isset($includeLater)) {
-                    $includeNext = array_key_exists('*', $includeLater) ? $includeLater['*'] : array();
+                    $includeNext = array_key_exists('*', $includeLater) ? $includeLater['*'] : [];
 
                     if (array_key_exists($key, $includeLater)) {
                         $includeNext = array_merge($includeNext, $includeLater[$key]);
@@ -172,7 +172,7 @@ class JSON
         }
     }
 
-#    public static function mapArrayToRecords($array)
+    #    public static function mapArrayToRecords($array)
 #    {
 #		return array_map(create_function('$value', 'return array($value);'), $array);
 #	}

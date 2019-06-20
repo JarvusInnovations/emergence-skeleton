@@ -2,14 +2,13 @@
 
 namespace Emergence\SiteAdmin;
 
-use Site;
-use SiteFile;
+use Emergence\Dwoo\Engine as DwooEngine;
 use Emergence_FS;
-use RequestHandler;
-use Emergence\Dwoo\Engine AS DwooEngine;
-
 use Exception;
+use RequestHandler;
+use Site;
 
+use SiteFile;
 
 class TasksRequestHandler extends RequestHandler
 {
@@ -40,7 +39,7 @@ class TasksRequestHandler extends RequestHandler
         Emergence_FS::cacheTree($rootCollection);
         $taskNodes = Emergence_FS::getTreeFiles($rootCollection);
 
-        foreach ($taskNodes AS $taskNodePath => $taskNode) {
+        foreach ($taskNodes as $taskNodePath => $taskNode) {
             $taskPath = substr($taskNodePath, $prefixLength, -4);
 
             $taskConfig = include(SiteFile::getRealPathByID($taskNode['ID']));
@@ -50,7 +49,7 @@ class TasksRequestHandler extends RequestHandler
             }
 
             $taskConfig = array_merge(static::$taskDefaults, $taskConfig);
-            
+
             if (!empty($taskConfig['requireAccountLevel']) && (empty($GLOBALS['Session']) || !$GLOBALS['Session']->hasAccountLevel($taskConfig['requireAccountLevel']))) {
                 continue;
             }
@@ -105,6 +104,6 @@ class TasksRequestHandler extends RequestHandler
             throw new Exception("Task $taskPath has a handler configured that can't be invoked");
         }
 
-#        \Debug::dumpVar($taskData, true, 'handling task');
+        #        \Debug::dumpVar($taskData, true, 'handling task');
     }
 }

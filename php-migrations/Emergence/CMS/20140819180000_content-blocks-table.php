@@ -22,46 +22,46 @@ if (static::getColumnType($oldTableName, $columnName) != $oldColumnType) {
 
 // migration
 printf("Renaming table `%s` to `%s`\n", $oldTableName, $newTableName);
-DB::nonQuery('RENAME TABLE `%s` TO `%s`', array($oldTableName, $newTableName));
+DB::nonQuery('RENAME TABLE `%s` TO `%s`', [$oldTableName, $newTableName]);
 
 printf("Renaming table `history_%s` to `history_%s`\n", $oldTableName, $newTableName);
-DB::nonQuery('RENAME TABLE `history_%s` TO `history_%s`', array($oldTableName, $newTableName));
+DB::nonQuery('RENAME TABLE `history_%s` TO `history_%s`', [$oldTableName, $newTableName]);
 
 printf("Changing column `%s`.`%s` to type %s\n", $newTableName, $columnName, $newColumnType);
 DB::nonQuery(
     'ALTER TABLE `%1$s` CHANGE `%2$s` `%2$s` %3$s NOT NULL',
-    array(
+    [
         $newTableName,
         $columnName,
         $newColumnType
-    )
+    ]
 );
 
 DB::nonQuery(
     'UPDATE `%s` SET `%s` = "Emergence\\\\CMS\\\\ContentBlock"',
-    array(
+    [
         $newTableName,
         $columnName
-    )
+    ]
 );
 
 
 printf("Changing column `history_%s`.`%s` to type %s\n", $newTableName, $columnName, $newColumnType);
 DB::nonQuery(
     'ALTER TABLE `history_%1$s` CHANGE `%2$s` `%2$s` %3$s NOT NULL',
-    array(
+    [
         $newTableName,
         $columnName,
         $newColumnType
-    )
+    ]
 );
 
 DB::nonQuery(
     'UPDATE `history_%s` SET `%s` = "Emergence\\\\CMS\\\\ContentBlock"',
-    array(
+    [
         $newTableName,
         $columnName
-    )
+    ]
 );
 
 

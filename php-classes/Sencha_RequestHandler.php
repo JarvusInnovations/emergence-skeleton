@@ -4,27 +4,27 @@ class Sencha_RequestHandler extends RequestHandler
 {
     public static $externalRoot = '/app';
 
-    public static $validModes = array(
+    public static $validModes = [
         'development'
         ,'develop' => 'development'
         ,'testing'
         ,'production'
         ,'package'
-    );
+    ];
     public static $defaultMode = 'production';
 
-    public static $defaultAccountLevels = array(
+    public static $defaultAccountLevels = [
         'development' => 'Developer'
         ,'testing' => 'User'
         ,'production' => 'User'
         ,'package' => 'User'
         ,'docs' => 'Developer'
-    );
+    ];
 
-    public static $appAccountLevels = array(
+    public static $appAccountLevels = [
         'EmergenceEditor' => 'Developer'
         ,'EmergencePullTool' => 'Developer'
-    );
+    ];
 
     public static function handleRequest()
     {
@@ -148,10 +148,10 @@ class Sencha_RequestHandler extends RequestHandler
 
         // render bootstrap HTML
         static::_forceTrailingSlash();
-        return static::respond($App->getFramework(), array(
+        return static::respond($App->getFramework(), [
             'App' => $App
             ,'mode' => $mode
-        ));
+        ]);
     }
 
     public static function handleDocsRequest(Sencha_App $App)
@@ -186,7 +186,7 @@ class Sencha_RequestHandler extends RequestHandler
         echo "# $templateNode->SHA1\n";
 
         if (!empty($cacheConfig['cache']) && is_array($cacheConfig['cache'])) {
-            foreach ($cacheConfig['cache'] AS $path) {
+            foreach ($cacheConfig['cache'] as $path) {
                 if ($path != 'index.html') {
                     $path = "build/production/$path";
                     echo "$path\n";
@@ -204,7 +204,7 @@ class Sencha_RequestHandler extends RequestHandler
             && is_array($cacheConfig['platformCache'][$_GET['platform']])
         ) {
             echo "\n# $_GET[platform]:\n";
-            foreach ($cacheConfig['platformCache'][$_GET['platform']] AS $path) {
+            foreach ($cacheConfig['platformCache'][$_GET['platform']] as $path) {
                 $path = "build/production/$path";
                 if ($assetNode = $App->getAsset($path)) {
                     echo "$path\n";
@@ -216,7 +216,7 @@ class Sencha_RequestHandler extends RequestHandler
         echo "\nFALLBACK:\n";
 
         if (!empty($cacheConfig['fallback']) && is_array($cacheConfig['fallback'])) {
-            foreach ($cacheConfig['fallback'] AS $path) {
+            foreach ($cacheConfig['fallback'] as $path) {
                 echo "$path\n";
             }
         }
@@ -224,7 +224,7 @@ class Sencha_RequestHandler extends RequestHandler
         echo "\nNETWORK:\n";
 
         if (!empty($cacheConfig['network']) && is_array($cacheConfig['network'])) {
-            foreach ($cacheConfig['network'] AS $path) {
+            foreach ($cacheConfig['network'] as $path) {
                 echo "$path\n";
             }
         }
@@ -235,7 +235,7 @@ class Sencha_RequestHandler extends RequestHandler
         echo "#template: $templateNode->SHA1\n";
 
         if (!empty($cacheConfig['triggers']) && is_array($cacheConfig['triggers'])) {
-            foreach ($cacheConfig['triggers'] AS $path) {
+            foreach ($cacheConfig['triggers'] as $path) {
                 $assetNode = $path[0] == '/' ? Site::resolvePath($path) : $App->getAsset($path);
                 if ($assetNode) {
                     echo "#$assetNode->SHA1\n";

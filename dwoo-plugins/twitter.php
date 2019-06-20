@@ -20,10 +20,9 @@ function Dwoo_Plugin_twitter(Dwoo_Core $dwoo, $username = false, $query = false,
     if (!empty($results) && is_array($results)) {
         $dwoo->assignInScope(array_slice($results, 0, $count), $assign);
     } else {
-        $dwoo->assignInScope(array(), $assign);
+        $dwoo->assignInScope([], $assign);
     }
 
 
     return '';
 }
-

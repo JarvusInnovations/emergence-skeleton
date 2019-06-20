@@ -19,9 +19,9 @@ class SQL
 
     public static function getCreateTable($recordClass, $historyVariant = false)
     {
-        $queryFields = array();
-        $indexes = $historyVariant ? array() : $recordClass::aggregateStackedConfig('indexes');
-        $fulltextColumns = array();
+        $queryFields = [];
+        $indexes = $historyVariant ? [] : $recordClass::aggregateStackedConfig('indexes');
+        $fulltextColumns = [];
 
         // history table revisionID field
         if ($historyVariant) {
@@ -31,7 +31,7 @@ class SQL
 
         // compile fields
         $rootClass = $recordClass::getStaticRootClass();
-        foreach (static::getAggregateFieldOptions($recordClass) AS $fieldId => $field) {
+        foreach (static::getAggregateFieldOptions($recordClass) as $fieldId => $field) {
             if ($field['columnName'] == 'RevisionID') {
                 continue;
             }
@@ -65,17 +65,17 @@ class SQL
         }
 
         // compile indexes
-        foreach ($indexes AS $indexName => $index) {
+        foreach ($indexes as $indexName => $index) {
             if (is_array($index['fields'])) {
                 $indexFields = $index['fields'];
             } elseif ($index['fields']) {
-                $indexFields = array($index['fields']);
+                $indexFields = [$index['fields']];
             } else {
                 continue;
             }
 
             // translate field names
-            foreach ($index['fields'] AS &$indexField) {
+            foreach ($index['fields'] as &$indexField) {
                 $indexField = $recordClass::getColumnName($indexField);
             }
 
@@ -85,10 +85,10 @@ class SQL
             }
 
             $queryFields[] = sprintf(
-                '%s KEY `%s` (`%s`)'
-                , !empty($index['unique']) ? 'UNIQUE' : ''
-                , $indexName
-                , join('`,`', $index['fields'])
+                '%s KEY `%s` (`%s`)',
+                !empty($index['unique']) ? 'UNIQUE' : '',
+                $indexName,
+                join('`,`', $index['fields'])
             );
         }
 
@@ -98,9 +98,9 @@ class SQL
 
 
         $createSQL = sprintf(
-            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=utf8;"
-            , $historyVariant ? $recordClass::getHistoryTableName() : $recordClass::$tableName
-            , join("\n\t,", $queryFields)
+            "CREATE TABLE IF NOT EXISTS `%s` (\n\t%s\n) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            $historyVariant ? $recordClass::getHistoryTableName() : $recordClass::$tableName,
+            join("\n\t,", $queryFields)
         );
 
         // append history table SQL
@@ -123,6 +123,7 @@ class SQL
                 return $field['type'].($field['unsigned'] ? ' unsigned' : '').($field['zerofill'] ? ' zerofill' : '');
             case 'uint':
                 $field['unsigned'] = true;
+                // no break
             case 'int':
             case 'integer':
                 return 'int'.($field['unsigned'] ? ' unsigned' : '').(!empty($field['zerofill']) ? ' zerofill' : '');
@@ -158,10 +159,10 @@ class SQL
                 return 'year';
 
             case 'enum':
-                return sprintf('enum("%s")', join('","', array_map(array('DB', 'escape'), $field['values'])));
+                return sprintf('enum("%s")', join('","', array_map(['DB', 'escape'], $field['values'])));
 
             case 'set':
-                return sprintf('set("%s")', join('","', array_map(array('DB', 'escape'), $field['values'])));
+                return sprintf('set("%s")', join('","', array_map(['DB', 'escape'], $field['values'])));
 
             default:
                 die("getSQLType: unhandled type $field[type]");

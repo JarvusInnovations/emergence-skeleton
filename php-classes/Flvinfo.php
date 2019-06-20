@@ -2,27 +2,27 @@
 
 
 
- class Flvinfo
- {
-     // {{{ Audio codec types
+class Flvinfo
+{
+    // {{{ Audio codec types
     const FLV_AUDIO_CODEC_UNCOMPRESSED = 0x00;
-     const FLV_AUDIO_CODEC_ADPCM = 0x01;
-     const FLV_AUDIO_CODEC_MP3 = 0x02;
-     const FLV_AUDIO_CODEC_NELLYMOSER_8K = 0x05;
-     const FLV_AUDIO_CODEC_NELLYMOSER = 0x06;
+    const FLV_AUDIO_CODEC_ADPCM = 0x01;
+    const FLV_AUDIO_CODEC_MP3 = 0x02;
+    const FLV_AUDIO_CODEC_NELLYMOSER_8K = 0x05;
+    const FLV_AUDIO_CODEC_NELLYMOSER = 0x06;
     // }}}
 
     // {{{ Video codec types
     const FLV_VIDEO_CODEC_SORENSON_H263 = 0x02;
-     const FLV_VIDEO_CODEC_SORENSON = 0x03;
-     const FLV_VIDEO_CODEC_ON2_VP6 = 0x04;
-     const FLV_VIDEO_CODEC_ON2_VP6ALPHA = 0x05;
-     const FLV_VIDEO_CODEC_SCREENVIDEO_2 = 0x06;
+    const FLV_VIDEO_CODEC_SORENSON = 0x03;
+    const FLV_VIDEO_CODEC_ON2_VP6 = 0x04;
+    const FLV_VIDEO_CODEC_ON2_VP6ALPHA = 0x05;
+    const FLV_VIDEO_CODEC_SCREENVIDEO_2 = 0x06;
     // }}}
 
     /**
      * Constructor
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @return 	FLVInfo2
@@ -33,18 +33,18 @@
 
     /**
      * Get information about the FLV file
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
-     * 
+     *
      * <code>
      * $flvinfo = new FLVInfo2();
      * $info = $flvinfo->getInfo('demo.flv',true);
      * var_export($info);
      * </code>
-     * 
+     *
      * Demo output:
-     * 
+     *
      * <code>
      * 	(
      * 		[signature] => 1
@@ -60,7 +60,7 @@
      *	            [fps] => 15
      *	            [codecStr] => On2 VP6
      *	        )
-     *	
+     *
      *	    [audio] => stdClass Object (
      *	            [codec] => 2
      *	            [frequency] => 44
@@ -72,7 +72,7 @@
      *
      *	)
      * </code>
-     * 
+     *
      * @param	string      $filename
      * @param   bool		$extended	Get extended information about the FLV file
      * @return  stdClass
@@ -87,14 +87,14 @@
         $tagParsed = 0;
 
         // Frames types
-        $vFrames = array();
-        $aFrames = array();
+        $vFrames = [];
+        $aFrames = [];
 
         // Max tags
         $maxTags = $extended ? false : 20;
 
         // Open file
-        $f = fopen($filename,'rb');
+        $f = fopen($filename, 'rb');
 
         // Read header
         $buf = fread($f, 9);
@@ -131,13 +131,13 @@
 
                 // Validate previous offset
                 //if ($tagInfo['prevsize'] != $prevTagSize) {
-                    // Do nothing
+                // Do nothing
                 //}
 
                 // Read tag body
                 $nextOffset = ftell($f) + $tagInfo['size'];
                 if ($tagInfo['size'] > 0) {
-                    $body = fread($f, min($tagInfo['size'],16384));
+                    $body = fread($f, min($tagInfo['size'], 16384));
                 } else {
                     $body = '';
                 }
@@ -162,7 +162,7 @@
 
                         // Get frame type and store it
                         $frameType = ($bodyInfo['flags'] >> 4) & 15;
-                        $vFrames[] = array('type'=>$frameType, 'timestamp'=>$tagInfo['timestamp'], 'size'=>$tagInfo['size']);
+                        $vFrames[] = ['type'=>$frameType, 'timestamp'=>$tagInfo['timestamp'], 'size'=>$tagInfo['size']];
 
                         if (((!isset($frameWidth)) && (!isset($frameHeight))) && ($frameType == 0x01)) {
                             switch ($bodyInfo['flags'] & 15) {
@@ -185,17 +185,17 @@
                                     //$startCode = substr($bin,0,17);
 
                                     // Size type
-                                    $size = bindec(substr($bin,30,3));
+                                    $size = bindec(substr($bin, 30, 3));
 
                                     // Get width/height
                                     switch ($size) {
                                         case 0:        // Custom, 8 bit
-                                            $frameWidth = bindec(substr($bin,33,8));
-                                            $frameHeight = bindec(substr($bin,41,8));
+                                            $frameWidth = bindec(substr($bin, 33, 8));
+                                            $frameHeight = bindec(substr($bin, 41, 8));
                                             break;
                                         case 1:        // Custom, 16 bit
-                                            $frameWidth = bindec(substr($bin,33,16));
-                                            $frameHeight = bindec(substr($bin,49,16));
+                                            $frameWidth = bindec(substr($bin, 33, 16));
+                                            $frameHeight = bindec(substr($bin, 49, 16));
                                             break;
                                         case 2:
                                             $frameWidth = 352;
@@ -248,7 +248,7 @@
                         $info->audioChannels = (($bodyInfo['flags'] & 1) == 1) ? 2 : 1;
 
                         // Get frame type and store it
-                        $aFrames[] = array('timestamp'=>$tagInfo['timestamp'], 'size'=>$tagInfo['size']);
+                        $aFrames[] = ['timestamp'=>$tagInfo['timestamp'], 'size'=>$tagInfo['size']];
                         break;
                     case 0x12:    // Meta tag
                         // Skip if already found
@@ -275,8 +275,8 @@
                 // Increase parsed tag count
                 $tagParsed++;
             } while (
-            /*	(feof($f) == false) && 
-                (($gotVideo == false) || ($gotAudio == false) || ($gotMeta == false) && (count($vFrames) < 1000)) && 
+            /*	(feof($f) == false) &&
+                (($gotVideo == false) || ($gotAudio == false) || ($gotMeta == false) && (count($vFrames) < 1000)) &&
                 ($tagParsed <= $maxTags)*/
                 (!feof($f)) && (($maxTags === false) || ($maxTags < $tagParsed))
             );
@@ -382,7 +382,7 @@
         if ($ret->hasAudio) {
             $ret->audio = new stdClass();
 
-            // Trust the parsed audio tag 
+            // Trust the parsed audio tag
             if ($gotAudio) {
                 // Got one, use it
                 $ret->audio->codec = $info->audioCodec;
@@ -474,7 +474,7 @@
 
     /**
      * Get a files meta data and cuepoints
-     * 
+     *
      * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param	string       $filename
@@ -483,7 +483,7 @@
     public function getMeta($filename)
     {
         // Open file
-        $f = fopen($filename,'rb');
+        $f = fopen($filename, 'rb');
 
         // Read header
         $buf = fread($f, 9);
@@ -493,7 +493,7 @@
         $signature = (($header['signature1'] == 70) && ($header['signature2'] == 76) && ($header['signature3'] == 86));
 
         // If signature is valid, go on
-        $cuepoints = $metas = array();
+        $cuepoints = $metas = [];
         if ($signature) {
             // Read tags
             fseek($f, $header['offset']);
@@ -513,12 +513,12 @@
 
                 // Validate previous offset
                 //if ($tagInfo['prevsize'] != $prevTagSize) {
-                    // Do nothing
+                // Do nothing
                 //}
 
                 // Read tag body (max 16k)
                 $nextOffset = ftell($f) + $tagInfo['size'];
-                $body = fread($f, min($tagInfo['size'],16384));
+                $body = fread($f, min($tagInfo['size'], 16384));
 
                 // Seek
                 fseek($f, $nextOffset);
@@ -556,7 +556,7 @@
         // Close file
         fclose($f);
 
-        return array('metas'=>$metas,'cuepoints'=>$cuepoints);
+        return ['metas'=>$metas,'cuepoints'=>$cuepoints];
     } // getMeta method
 
     /**
@@ -575,7 +575,7 @@
         $tagParsed = 0;
 
         // Open input file
-        $f = fopen($in,'rb');
+        $f = fopen($in, 'rb');
 
         // Read header
         $buf = fread($f, 9);
@@ -587,7 +587,7 @@
         // If signature is valid, go on
         if ($signature) {
             // Open output file, and write header
-            $o = fopen($out,'w');
+            $o = fopen($out, 'w');
             if (!$o) {
                 throw new Exception('Cannot open output file!');
             }
@@ -601,13 +601,13 @@
                 $parser = new AMF0Parser();
                 $metadata = $parser->writeString('onMetaData');
                 $metadata .= $parser->writeMixedArray($meta);
-                $metadataSize = substr(pack('N',strlen($metadata)),1);
+                $metadataSize = substr(pack('N', strlen($metadata)), 1);
 
-                // Write 
-                $metadataHead = pack('N',0).
+                // Write
+                $metadataHead = pack('N', 0).
                     chr(18).
                     $metadataSize.
-                    pack('N',0).
+                    pack('N', 0).
                     chr(0).chr(0).chr(0);
                 fwrite($o, $metadataHead);
                 fwrite($o, $metadata);
@@ -637,13 +637,13 @@
                             $parser = new AMF0Parser();
                             $metadata = $parser->writeString('onCuePoint');
                             $metadata .= $parser->writeMixedArray($cuepoint);
-                            $metadataSize = substr(pack('N',strlen($metadata)),1);
+                            $metadataSize = substr(pack('N', strlen($metadata)), 1);
 
                             // Write first
-                            $metadataHead = pack('N',$tagInfo['prevsize']).
+                            $metadataHead = pack('N', $tagInfo['prevsize']).
                                 chr(18).
                                 $metadataSize.
-                                pack('N',0).
+                                pack('N', 0).
                                 chr(0).chr(0).chr(0);
                             fwrite($o, $metadataHead);
                             fwrite($o, $metadata);
@@ -659,7 +659,7 @@
 
                 // Validate previous offset
                 //if ($tagInfo['prevsize'] != $prevTagSize) {
-                    // Do nothing
+                // Do nothing
                 //}
 
                 // Read tag body
@@ -669,13 +669,13 @@
                 switch ($tagInfo['type']) {
                     case 0x09:    // Video tag
                         // Write to output file
-                        fwrite($o,$buf,15);
-                        fwrite($o,$body,$tagInfo['size']);
+                        fwrite($o, $buf, 15);
+                        fwrite($o, $body, $tagInfo['size']);
                         break;
                     case 0x08:        // Audio tag
                         // Write to output file
-                        fwrite($o,$buf,15);
-                        fwrite($o,$body,$tagInfo['size']);
+                        fwrite($o, $buf, 15);
+                        fwrite($o, $body, $tagInfo['size']);
                         break;
                     case 0x12:    // Meta tag
                         // Skip
@@ -693,4 +693,4 @@
         fclose($f);
         fclose($o);
     } // rewriteMeta method
- }
+}

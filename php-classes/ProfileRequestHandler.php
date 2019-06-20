@@ -4,16 +4,16 @@ use Emergence\People\Person;
 
 class ProfileRequestHandler extends RequestHandler
 {
-    public static $profileFields = array('Location','About','Phone','Email');
+    public static $profileFields = ['Location','About','Phone','Email'];
     public static $accountLevelEditOthers = 'Staff';
 
     public static $onBeforeProfileValidated = false;
     public static $onBeforeProfileSaved = false;
     public static $onProfileSaved = false;
 
-    public static $userResponseModes = array(
+    public static $userResponseModes = [
         'application/json' => 'json'
-    );
+    ];
 
     public static function handleRequest()
     {
@@ -82,18 +82,18 @@ class ProfileRequestHandler extends RequestHandler
                 }
 
                 // fire created response
-                return static::respond('profileSaved', array(
+                return static::respond('profileSaved', [
                     'success' => true
                     ,'data' => $User
-                ));
+                ]);
             }
 
             // fall through back to form if validation failed
         }
 
-        return static::respond('profileEdit', array(
+        return static::respond('profileEdit', [
             'data' => $User
-        ));
+        ]);
     }
 
     public static function handlePhotoUploadRequest()
@@ -102,11 +102,11 @@ class ProfileRequestHandler extends RequestHandler
         $User = static::_getRequestedUser();
 
         // process photo upload with MediaRequestHandler
-        $Photo = \Media::createFromUpload($_FILES['photoFile'], array(
+        $Photo = \Media::createFromUpload($_FILES['photoFile'], [
             'ContextClass' => $User->getRootClass()
             ,'ContextID' => $User->ID
             ,'Caption' => $User->FullName
-        ));
+        ]);
 
         // set primary if none set
         if ($Photo && (!$User->PrimaryPhoto || !empty($_POST['primary']))) {
@@ -114,10 +114,10 @@ class ProfileRequestHandler extends RequestHandler
             $User->save();
         }
 
-        return static::respond('profilePhotoUploaded', array(
+        return static::respond('profilePhotoUploaded', [
             'success' => (boolean)$Photo
             ,'data' => $Photo
-        ));
+        ]);
     }
 
     public static function handlePhotoPrimaryRequest()
@@ -140,10 +140,10 @@ class ProfileRequestHandler extends RequestHandler
         $User->PrimaryPhoto = $Media;
         $User->save();
 
-        return static::respond('profilePhotoPrimaried', array(
+        return static::respond('profilePhotoPrimaried', [
             'success' => true
             ,'data' => $Media
-        ));
+        ]);
     }
 
     public static function handlePhotoDeleteRequest()
@@ -170,10 +170,10 @@ class ProfileRequestHandler extends RequestHandler
 
         $Media->destroy();
 
-        return static::respond('profilePhotoDeleted', array(
+        return static::respond('profilePhotoDeleted', [
             'success' => true
             ,'data' => $Media
-        ));
+        ]);
     }
 
     public static function handlePasswordRequest()
@@ -194,10 +194,10 @@ class ProfileRequestHandler extends RequestHandler
         $User->setClearPassword($_REQUEST['Password']);
         $User->save();
 
-        return static::respond('passwordChanged', array(
+        return static::respond('passwordChanged', [
             'success' => true
             ,'data' => $User
-        ));
+        ]);
     }
 
     protected static function _getRequestedUser()

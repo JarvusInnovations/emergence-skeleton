@@ -13,14 +13,14 @@ class CommentsRequestHandler extends \RecordsRequestHandler
     public static $accountLevelRead = false;
     public static $accountLevelBrowse = false;
     public static $accountLevelWrite = 'User';
-    public static $browseOrder = array('ID' => 'DESC');
-    public static $userResponseModes = array(
+    public static $browseOrder = ['ID' => 'DESC'];
+    public static $userResponseModes = [
         'application/json' => 'json'
         ,'text/csv' => 'csv'
         ,'application/rss+xml' => 'rss'
-    );
+    ];
 
-    public static function respond($responseID, $responseData = array(), $responseMode = false)
+    public static function respond($responseID, $responseData = [], $responseMode = false)
     {
         if (static::$responseMode == 'rss') {
             static::$responseMode = 'xml';

@@ -54,7 +54,7 @@ trait StackedConfigTrait
     {
         $config = [];
 
-        foreach ($classes AS $class) {
+        foreach ($classes as $class) {
             $config = array_merge($config, $class::getStackedConfig($propertyName));
         }
 

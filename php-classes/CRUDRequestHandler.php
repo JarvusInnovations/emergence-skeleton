@@ -114,17 +114,17 @@ abstract class CRUDRequestHandler extends RequestHandler
     }
 
 
-    public static function getAllRecords($conditions = array(), $options = array())
+    public static function getAllRecords($conditions = [], $options = [])
     {
         $class = static::$recordClass;
 
-        $queryOptions = array_merge(array(
+        $queryOptions = array_merge([
             'limit' => false
-        ), $options);
+        ], $options);
 
         // process sorter
         if (!empty($_REQUEST['sort'])) {
-            $sort = json_decode($_REQUEST['sort'],true);
+            $sort = json_decode($_REQUEST['sort'], true);
             if (!$sort || !is_array($sort)) {
                 throw new Exception('Invalid sorter');
             }
@@ -142,12 +142,12 @@ abstract class CRUDRequestHandler extends RequestHandler
                 throw new Exception('Invalid filter');
             }
 
-            foreach ($filter AS $field) {
+            foreach ($filter as $field) {
                 if ($_GET['anyMatch']) {
-                    $conditions[$field['property']] = array(
+                    $conditions[$field['property']] = [
                         'value'    =>    '%'.$field['value'].'%'
                         ,'operator' => 'LIKE'
-                    );
+                    ];
                 } else {
                     $conditions[$field['property']] = $field['value'];
                 }
@@ -180,28 +180,28 @@ abstract class CRUDRequestHandler extends RequestHandler
         return $Record;
     }
 
-    public static function respondCRUD($payload, $count = 'singular', $verb = '', $additional = array(), $responseID = false)
+    public static function respondCRUD($payload, $count = 'singular', $verb = '', $additional = [], $responseID = false)
     {
         // auto-generate response ID from noun and verb
         if (!$responseID) {
             $responseID = static::getResponseID($count, $verb);
         }
 
-        return static::respond($responseID, array_merge(array(
+        return static::respond($responseID, array_merge([
             'success' => true
             ,'data' => $payload
             ,'total' => DB::foundRows()
-        )), $additional);
+        ]), $additional);
     }
 
 
     public static function throwRecordInvalidError(ActiveRecord $Record, $data = null)
     {
-        return static::respond(static::getResponseID('singular','invalid'), array(
+        return static::respond(static::getResponseID('singular', 'invalid'), [
             'success' => false
             ,'data' => $Record
             ,'errors' => $Record->validationErrors
-        ));
+        ]);
     }
 
 
@@ -209,21 +209,23 @@ abstract class CRUDRequestHandler extends RequestHandler
     {
         $class = static::$recordClass;
         $noun = $count == 'singular' ? $class::$singularNoun : $class::$pluralNoun;
-        return preg_replace_callback('/\s+([a-zA-Z])/', function($matches) { return strtoupper($matches[1]); }, $noun).ucfirst($verb);
+        return preg_replace_callback('/\s+([a-zA-Z])/', function ($matches) {
+            return strtoupper($matches[1]);
+        }, $noun).ucfirst($verb);
     }
 
 
     public static function getRequestData()
     {
-        if (0===strpos($_SERVER['CONTENT_TYPE'],'application/x-www-form-urlencoded')) {
+        if (0===strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded')) {
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return $_POST;
             } else {
-                $data = array();
+                $data = [];
                 parse_str(file_get_contents('php://input'), $data);
                 return $data;
             }
-        } elseif (0===strpos($_SERVER['CONTENT_TYPE'],'application/json')) {
+        } elseif (0===strpos($_SERVER['CONTENT_TYPE'], 'application/json')) {
             return JSON::getRequestData();
         } else {
             throw new Exception('Incoming content type must be application/json or application/x-www-form-urlencoded');

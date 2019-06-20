@@ -10,6 +10,6 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase
     public function testFields()
     {
         $fields = TestRecord::getClassFields();
-        $this->assertEquals(array_keys($fields), array('ID', 'Class', 'Created', 'CreatorID', 'Field1', 'Field2'));
+        $this->assertEquals(array_keys($fields), ['ID', 'Class', 'Created', 'CreatorID', 'Field1', 'Field2']);
     }
 }

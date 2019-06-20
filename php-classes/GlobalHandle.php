@@ -11,32 +11,32 @@ class GlobalHandle extends ActiveRecord
     // required for shared-table subclassing support
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
 
-    public static $fields = array(
-        'ContextClass' => array(
+    public static $fields = [
+        'ContextClass' => [
             'type' => 'string'
             ,'notnull' => false
-        )
-        ,'ContextID' => array(
+        ]
+        ,'ContextID' => [
             'type' => 'integer'
             ,'notnull' => false
-        )
-        ,'Handle' => array(
+        ]
+        ,'Handle' => [
             'unique' => true
-        )
-        ,'Type' => array(
+        ]
+        ,'Type' => [
             'type' => 'enum'
-            ,'values' => array('Alias', 'Reserve')
+            ,'values' => ['Alias', 'Reserve']
             ,'default' => 'Alias'
-        )
-    );
+        ]
+    ];
 
-    public static $relationships = array(
-        'Context' => array(
+    public static $relationships = [
+        'Context' => [
             'type' => 'context-parent'
-        )
-    );
+        ]
+    ];
 
     public static function createAlias(ActiveRecord $Context, $handle = false)
     {
@@ -46,11 +46,11 @@ class GlobalHandle extends ActiveRecord
             $handle = HandleBehavior::generateRandomHandle(__CLASS__, 4);
         }
 
-        return static::create(array(
+        return static::create([
             'Handle' => $handle
             ,'Type' => 'Alias'
             ,'Context' => $Context
-        ), !$Context->isPhantom);
+        ], !$Context->isPhantom);
     }
 
     public function validate($deep = true)
@@ -58,19 +58,19 @@ class GlobalHandle extends ActiveRecord
         // call parent
         parent::validate($deep);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Type'
             ,'validator' => 'selection'
             ,'choices' => self::$fields['Type']['values']
             ,'required' => false
-        ));
+        ]);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Handle'
             ,'required' => false
             ,'validator' => 'handle'
             ,'errorMessage' => 'URL handle can only contain letters, numbers, hyphens, and underscores'
-        ));
+        ]);
 
         if ($this->Type == 'Alias' && (!$this->Context || !is_a($this->Context, 'ActiveRecord'))) {
             $this->_validator->addError('Context', 'Context required to create alias handle');

@@ -18,4 +18,3 @@ function Dwoo_Plugin_rss(Dwoo_Core $dwoo, $feed, $assign = 'rss_items', $limit =
 
     return '';
 }
-

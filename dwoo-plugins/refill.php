@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_refill(Dwoo_Core $dwoo, $field = null, $assign = null, $modifier = null, $default = null, $selected = NULL, $checked = NULL, $escape = 'html', $value = null)
+function Dwoo_Plugin_refill(Dwoo_Core $dwoo, $field = null, $assign = null, $modifier = null, $default = null, $selected = null, $checked = null, $escape = 'html', $value = null)
 {
 
     // determine refill value

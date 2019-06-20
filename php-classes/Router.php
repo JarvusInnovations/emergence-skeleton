@@ -6,7 +6,7 @@
  */
 class Router
 {
-    public static $classPaths = array(
+    public static $classPaths = [
         'Person' => 'users'
         ,'Media' => 'media'
         ,'Event' => 'events'
@@ -15,7 +15,7 @@ class Router
         ,'CMS_Page' => 'pages'
         ,'CMS_BlogPost' => 'blog'
         ,'CMS_Feature' => 'features'
-    );
+    ];
 
     public static function __classLoaded()
     {
@@ -36,7 +36,7 @@ class Router
             return static::$classPaths[$className];
         }
 
-        foreach (class_parents($className) AS $parentName) {
+        foreach (class_parents($className) as $parentName) {
             if (!empty(static::$classPaths[$parentName])) {
                 return static::$classPaths[$parentName];
             }
@@ -45,7 +45,7 @@ class Router
         return false;
     }
 
-    public static function redirectViewRecord(ActiveRecord $Record, $path = array(), $permanent = false)
+    public static function redirectViewRecord(ActiveRecord $Record, $path = [], $permanent = false)
     {
         if (is_array($path)) {
             $path = implode('/', $path);

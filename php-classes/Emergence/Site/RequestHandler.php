@@ -2,7 +2,6 @@
 
 namespace Emergence\Site;
 
-
 abstract class RequestHandler extends \RequestHandler implements IRequestHandler
 {
     public static function sendResponse(IResponse $response, $templatePrefix = null)

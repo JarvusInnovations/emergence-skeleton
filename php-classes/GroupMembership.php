@@ -2,45 +2,45 @@
 
 
 
- class GroupMembership extends ActiveRecord
- {
-     // ActiveRecord configuration
+class GroupMembership extends ActiveRecord
+{
+    // ActiveRecord configuration
     public static $tableName = 'group_memberships';
 
-     public static $fields = array(
-        'PersonID' => array(
+    public static $fields = [
+        'PersonID' => [
             'type' => 'integer'
             ,'unsigned' => true
-        )
-        ,'GroupID' => array(
+        ]
+        ,'GroupID' => [
             'type' => 'integer'
             ,'unsigned' => true
-        )
-        ,'Expires' => array(
+        ]
+        ,'Expires' => [
             'type' => 'timestamp'
             ,'notnull' => false
-        )
-        ,'Type' => array(
+        ]
+        ,'Type' => [
             'type' => 'enum'
-            ,'values' => array('Member','Administrator','Owner')
-        )
-        ,'Rank' => array(
+            ,'values' => ['Member','Administrator','Owner']
+        ]
+        ,'Rank' => [
             'type' => 'integer'
             ,'unsigned' => true
             ,'notnull' => false
-        )
-    );
+        ]
+    ];
 
-     public static $relationships = array(
-        'Person' => array(
+    public static $relationships = [
+        'Person' => [
             'type' => 'one-one'
             ,'class' => 'Person'
             ,'local' => 'PersonID'
-        )
-        ,'Group' => array(
+        ]
+        ,'Group' => [
             'type' => 'one-one'
             ,'class' => 'Person'
             ,'local' => 'PersonID'
-        )
-    );
- }
+        ]
+    ];
+}

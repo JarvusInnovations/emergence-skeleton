@@ -22,7 +22,7 @@ class MobileDetector
     protected $isWindows = null;
     protected $isWindowsphone = null;
     protected $isGeneric = null;
-    protected $devices = array(
+    protected $devices = [
         "android" => "android.*mobile",
         "androidtablet" => "android(?!.*mobile)",
         "blackberry" => "blackberry",
@@ -33,7 +33,7 @@ class MobileDetector
         "windows" => "windows ce; (iemobile|ppc|smartphone)",
         "windowsphone" => "windows phone os",
         "generic" => "(kindle|mobile|mmp|midp|pocket|psp|symbian|smartphone|treo|up.browser|up.link|vodafone|wap|opera mini)"
-    );
+    ];
 
     public function __construct()
     {

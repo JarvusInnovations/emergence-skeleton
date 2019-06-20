@@ -2,22 +2,22 @@
 
 namespace Emergence\People\Groups;
 
-use DB;
 use ActiveRecord;
+use DB;
 use RecordsRequestHandler;
 
 class GroupsRequestHandler extends RecordsRequestHandler
 {
     public static $recordClass = 'Emergence\People\Groups\Group';
     public static $accountLevelRead = 'User';
-    public static $browseOrder = array('Left' => 'ASC');
+    public static $browseOrder = ['Left' => 'ASC'];
 
-    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
+    public static function handleBrowseRequest($options = [], $conditions = [], $responseID = null, $responseData = [])
     {
         if (!empty($_REQUEST['parentGroup']) && $_REQUEST['parentGroup'] != 'any') {
             $conditions['ParentID'] = $_REQUEST['parentGroup'];
         } elseif ($_REQUEST['parentGroup'] != 'any') {
-            $conditions['ParentID'] = NULL;
+            $conditions['ParentID'] = null;
         }
 
         if ($_REQUEST['query']) {
@@ -43,10 +43,10 @@ class GroupsRequestHandler extends RecordsRequestHandler
 
     public static function handleMembersRequest(Group $Group)
     {
-        return static::respond('members', array(
+        return static::respond('members', [
             'success' => true
             ,'data' => $Group->getAllPeople()
             ,'group' => $Group
-        ));
+        ]);
     }
 }

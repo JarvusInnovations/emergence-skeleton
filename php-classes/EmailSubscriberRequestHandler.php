@@ -26,9 +26,9 @@ class EmailSubscriberRequestHandler extends RequestHandler
 
             if (!$Submission->validate()) {
                 // respond invalid
-                return static::respond('emailSubscriberInvalid', array(
+                return static::respond('emailSubscriberInvalid', [
                     'success' => false
-                ));
+                ]);
             } else {
                 try {
                     $Submission->save();
@@ -38,14 +38,14 @@ class EmailSubscriberRequestHandler extends RequestHandler
                     }
 
                     // respond success
-                    return static::respond('emailSubscriberSubmitted', array(
+                    return static::respond('emailSubscriberSubmitted', [
                         'success' => true
-                    ));
+                    ]);
                 } catch (DuplicateKeyException $e) {
                     // respond invalid
-                    return static::respond('emailSubscriberExisting', array(
+                    return static::respond('emailSubscriberExisting', [
                         'success' => false
-                    ));
+                    ]);
                 }
             }
         }

@@ -2,10 +2,9 @@
 
 namespace Emergence\Docs;
 
+use Emergence\OpenAPI\Reader as OpenAPIReader;
+use Emergence\OpenAPI\Writer as OpenAPIWriter;
 use Site;
-use Emergence\OpenAPI\Reader AS OpenAPIReader;
-use Emergence\OpenAPI\Writer AS OpenAPIWriter;
-
 
 class ApiDocsRequestHandler extends \RequestHandler
 {

@@ -39,7 +39,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
             $packageRequirers = [$packageRequirers];
         }
 
-        foreach ($packageRequirers AS $packageRequirer) {
+        foreach ($packageRequirers as $packageRequirer) {
             if ($sourceNode = Site::resolvePath($packageRequirer)) {
                 $packages = array_merge($packages, Sencha::getRequiredPackagesForSourceFile($sourceNode->RealPath));
             }
@@ -66,7 +66,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     // add paths for packages
     $packages = array_unique(Sencha::crawlRequiredPackages(array_unique($packages), $framework, $frameworkVersion));
 
-    foreach ($packages AS $packageName) {
+    foreach ($packages as $packageName) {
         // check workspace and framework package dirs
         $packagePath = "sencha-workspace/packages/$packageName";
 
@@ -89,7 +89,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
 
     // build list of all source trees, resolving CMD variables and children
     $sources = [];
-    foreach ($classPaths AS $classPath) {
+    foreach ($classPaths as $classPath) {
         if (strpos($classPath, '${app.dir}/') === 0) {
             $classPath = $appPath.substr($classPath, 10);
         } elseif (strpos($classPath, '${ext.dir}/') === 0) {
@@ -108,7 +108,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
     }
 
     // process all source files and build manifest and list of classes to automatically load
-    foreach ($sources AS $path => &$source) {
+    foreach ($sources as $path => &$source) {
         $autoLoad = false;
         $addToManifest = true;
 
@@ -220,7 +220,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
                 .'};'
             .'}';
 
-#        if (Sencha::isVersionNewer('5', $frameworkVersion)) {
+        #        if (Sencha::isVersionNewer('5', $frameworkVersion)) {
         if ($framework == 'ext') {
             $loaderPatch .=
                 '_overrideMethod(Ext.Loader, "loadScript", function(parent, options) {'
@@ -255,7 +255,7 @@ function Dwoo_Plugin_sencha_bootstrap(Dwoo_Core $dwoo, $App = null, $classPaths 
                 implode(
                     '',
                     array_map(
-                        function($url) {
+                        function ($url) {
                             return '<script type="text/javascript" src="'.$url.'"></script>';
                         },
                         $autoLoadPaths

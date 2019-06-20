@@ -12,19 +12,19 @@ class BlogPost extends AbstractContent
 
     public static function getRecentlyPublished($limit = 5)
     {
-        $conditions = array(
+        $conditions = [
             'Class' => 'Emergence\CMS\BlogPost',
             'Status' => 'Published',
             'Published IS NULL OR Published <= CURRENT_TIMESTAMP'
-        );
+        ];
 
         if (empty($GLOBALS['Session']) || !$GLOBALS['Session']->Person) {
             $conditions['Visibility'] = 'Public';
         }
 
-        return static::getAllByWhere($conditions, array(
-            'order' => array('Published' => 'DESC')
+        return static::getAllByWhere($conditions, [
+            'order' => ['Published' => 'DESC']
             ,'limit' => $limit
-        ));
+        ]);
     }
 }

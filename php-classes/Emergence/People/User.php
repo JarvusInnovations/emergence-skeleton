@@ -14,52 +14,52 @@ class User extends Person implements IUser
     public static $classLabel = 'User';
 
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
     public static $singularNoun = 'user';
     public static $pluralNoun = 'users';
 
     // ActiveRecord configuration
-    public static $fields = array(
-        'Username' => array(
+    public static $fields = [
+        'Username' => [
             'unique' => true
             ,'includeInSummary' => true
-        )
-        ,'Password' => array(
+        ]
+        ,'Password' => [
             'type' => 'string'
             ,'excludeFromData' => true
-        )
-        ,'AccountLevel' => array(
+        ]
+        ,'AccountLevel' => [
             'type' => 'enum'
-            ,'values' => array('Disabled','Contact','User','Staff','Administrator','Developer')
+            ,'values' => ['Disabled','Contact','User','Staff','Administrator','Developer']
             ,'default' => 'User'
-        )
-    );
+        ]
+    ];
 
-    public static $searchConditions = array(
-        'Username' => array(
-            'qualifiers' => array('any','username','uname','user')
+    public static $searchConditions = [
+        'Username' => [
+            'qualifiers' => ['any','username','uname','user']
             ,'points' => 3
             ,'sql' => 'Username LIKE "%%%s%%"'
-        )
-        ,'AccountLevel' => array(
-            'qualifiers' => array('accountlevel')
+        ]
+        ,'AccountLevel' => [
+            'qualifiers' => ['accountlevel']
             ,'points' => 2
             ,'sql' => 'AccountLevel LIKE "%%%s%%"'
-        )
-    );
+        ]
+    ];
 
-    public static $validators = array(
-        'Username' => array(
+    public static $validators = [
+        'Username' => [
             'validator' => 'handle'
             ,'required' => true
             ,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores.'
-        )
-        ,'AccountLevel' => array(
+        ]
+        ,'AccountLevel' => [
             'validator' => 'selection'
-            ,'choices' => array() // filled dynamically in __classLoaded
+            ,'choices' => [] // filled dynamically in __classLoaded
             ,'required' => false
-        )
-    );
+        ]
+    ];
 
     public static $dynamicFields = [];
 
@@ -75,7 +75,7 @@ class User extends Person implements IUser
         parent::__classLoaded();
     }
 
-    function getValue($name)
+    public function getValue($name)
     {
         switch ($name) {
             case 'AccountLevelNumeric':
@@ -150,9 +150,9 @@ class User extends Person implements IUser
     public static function getByUsername($username)
     {
         if (static::fieldExists('Email')) {
-            return static::getByWhere(array(
+            return static::getByWhere([
                 sprintf('`%2$s` = "%1$s" OR `%3$s` = "%1$s"', DB::escape($username), static::_cn('Username'), static::_cn('Email'))
-            ));
+            ]);
         } else {
             return static::getByField('Username', $username);
         }
@@ -196,14 +196,14 @@ class User extends Person implements IUser
         }
     }
 
-    public static function getUniqueUsername($firstName, $lastName, $options = array())
+    public static function getUniqueUsername($firstName, $lastName, $options = [])
     {
         // apply default options
         $options = array_merge(
-            array('suffixFormat' => '%s%u'),
-            is_string(static::$usernameGenerator) || is_callable(static::$usernameGenerator) ? array('format' => static::$usernameGenerator) : static::$usernameGenerator,
+            ['suffixFormat' => '%s%u'],
+            is_string(static::$usernameGenerator) || is_callable(static::$usernameGenerator) ? ['format' => static::$usernameGenerator] : static::$usernameGenerator,
             $options,
-            array('handleField' => 'Username')
+            ['handleField' => 'Username']
         );
 
         // create seed username
@@ -221,7 +221,7 @@ class User extends Person implements IUser
                 if (is_callable($options['format'])) {
                     $username = call_user_func($options['format'], $firstName, $lastName, $options);
                 } else {
-                    throw new Exception ('Unknown format format.');
+                    throw new Exception('Unknown format format.');
                 }
         }
 
@@ -236,11 +236,11 @@ class User extends Person implements IUser
 
     protected static function generatePassword($length = 8)
     {
-        $chars = array('2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's' ,'t', 'u', 'v', 'w', 'x', 'y', 'z');
+        $chars = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's' ,'t', 'u', 'v', 'w', 'x', 'y', 'z'];
         $password = '';
 
         for ($i=0; $i<$length; $i++) {
-           $password .= $chars[mt_rand(0, count($chars)-1)];
+            $password .= $chars[mt_rand(0, count($chars)-1)];
         }
 
         return $password;

@@ -2,26 +2,26 @@
 
 
 
- class PersonSession extends Session
- {
-     // configurable settings
+class PersonSession extends Session
+{
+    // configurable settings
     public static $DefaultAuthenticator = 'PasswordAuthenticator';
-     public static $DefaultRequireAuthentication = false;
-     public static $PersonIDColumn = 'person_id';
+    public static $DefaultRequireAuthentication = false;
+    public static $PersonIDColumn = 'person_id';
 
     // private variables
     protected $_authenticator;
-     protected $_person;
+    protected $_person;
 
-     public function __construct($options = array())
-     {
+    public function __construct($options = [])
+    {
 
         // call parent and apply additional default options
-        parent::__construct(array_merge(array(
+        parent::__construct(array_merge([
             'Authenticator' => self::$DefaultAuthenticator
             ,'RequireAuthentication' => self::$DefaultRequireAuthentication
             ,'PersonClass' => Person::$StandardClass
-        ), $options));
+        ], $options));
 
         // initialize authenticator
         $this->_authenticator = new $this->_options['Authenticator']($this);
@@ -35,11 +35,11 @@
                 throw new AuthenticationFailedException();
             }
         }
-     }
+    }
 
-     public function __get($name)
-     {
-         switch ($name) {
+    public function __get($name)
+    {
+        switch ($name) {
             case 'PersonID':
                 return $this->_record['person_id'];
 
@@ -55,7 +55,7 @@
             default:
                 return parent::__get($name);
         }
-     }
+    }
 
 
 
@@ -64,19 +64,19 @@
      */
     public function afterLoadUser()
     {
-        //Update last login 
+        //Update last login
         db_n(sprintf(
-            'UPDATE %s SET last_login = CURRENT_TIMESTAMP WHERE %s = %u'
-            ,USER_TABLE
-            ,UID_COLUMN
-            ,$this->UserData[UID_COLUMN]
+            'UPDATE %s SET last_login = CURRENT_TIMESTAMP WHERE %s = %u',
+            USER_TABLE,
+            UID_COLUMN,
+            $this->UserData[UID_COLUMN]
         ));
     }
 
-     public function requireAuthentication()
-     {
-         return $this->_authenticator->requireAuthentication($this->_options);
-     }
+    public function requireAuthentication()
+    {
+        return $this->_authenticator->requireAuthentication($this->_options);
+    }
 
 
     /*
@@ -91,4 +91,4 @@
             exit();
         }
     }
- }
+}

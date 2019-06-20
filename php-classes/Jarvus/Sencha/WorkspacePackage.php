@@ -2,9 +2,9 @@
 
 namespace Jarvus\Sencha;
 
-use Site;
 use Cache;
 use Emergence_FS;
+use Site;
 
 class WorkspacePackage extends Package
 {
@@ -25,7 +25,7 @@ class WorkspacePackage extends Package
 
         // find the best version
         $matchedVersion = null;
-    
+
         if ($framework) {
             $versionStack = explode('.', $framework->getVersion());
 
@@ -112,7 +112,7 @@ class WorkspacePackage extends Package
 
             $packageNodes = Emergence_FS::getAggregateChildren('sencha-workspace/packages');
 
-            foreach ($packageNodes AS $packageDir => $packageNode) {
+            foreach ($packageNodes as $packageDir => $packageNode) {
                 $packagePath = "sencha-workspace/packages/$packageDir";
                 $packageJsonNode = Site::resolvePath("$packagePath/package.json");
 

@@ -8,9 +8,9 @@ class LoginRequestHandler extends RequestHandler
     public static $onLoginComplete = false;
     public static $onLogoutComplete = false;
 
-    public static $userResponseModes = array(
+    public static $userResponseModes = [
         'application/json' => 'json'
-    );
+    ];
 
     // event templates
     protected static function onLoginComplete(Session $Session, $returnURL)
@@ -45,11 +45,11 @@ class LoginRequestHandler extends RequestHandler
         static::onLoginComplete($GLOBALS['Session'], $returnURL);
 
         // respond
-        return static::respond('login/loginComplete', array(
+        return static::respond('login/loginComplete', [
             'success' => true
             ,'data' => $GLOBALS['Session']
             ,'returnURL' => $returnURL
-        ));
+        ]);
     }
 
     public static function handleLogoutRequest($returnURL = null)
@@ -69,10 +69,10 @@ class LoginRequestHandler extends RequestHandler
 
         // send redirect header
         // respond
-        return static::respond('login/logoutComplete', array(
+        return static::respond('login/logoutComplete', [
             'success' => true
             ,'returnURL' => static::getReturnURL($returnURL)
-        ));
+        ]);
     }
 
     public static function getReturnURL($returnURL = null)

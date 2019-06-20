@@ -2,9 +2,9 @@
 
 namespace Emergence\Dwoo;
 
-use Site;
 use Dwoo_Core;
 use Exception;
+use Site;
 
 class Template extends \Dwoo_Template_String
 {
@@ -76,7 +76,7 @@ class Template extends \Dwoo_Template_String
             array_push($searchStack, basename($searchScriptname, '.php'));
         }
 
-        $searchHistory = array();
+        $searchHistory = [];
 
         while (true) {
             $searchPath = array_merge($searchStack, $path);
@@ -97,7 +97,7 @@ class Template extends \Dwoo_Template_String
         if (!$templateNode && $throwExceptionOnNotFound) {
             throw new Exception(
                 "Could not find template match for \"".implode('/', $path)."\", checked paths:\n\n"
-                .implode(PHP_EOL, array_map(function($a) {
+                .implode(PHP_EOL, array_map(function ($a) {
                     return implode('/', $a);
                 }, $searchHistory))
             );

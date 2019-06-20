@@ -9,6 +9,6 @@ class Mailer
 
     public static function __callStatic($name, $args)
     {
-        return call_user_func_array(array(static::$defaultImplementation, $name), $args);
+        return call_user_func_array([static::$defaultImplementation, $name], $args);
     }
 }

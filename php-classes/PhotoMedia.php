@@ -33,6 +33,7 @@ class PhotoMedia extends Media
                         return $this->MIMEType;
                 }
 
+                // no break
             case 'Extension':
 
                 switch ($this->MIMEType) {
@@ -55,6 +56,7 @@ class PhotoMedia extends Media
                         throw new Exception('Unable to find photo extension for mime-type: '.$this->MIMEType);
                 }
 
+                // no break
             default:
                 return parent::getValue($name);
         }
@@ -65,7 +67,7 @@ class PhotoMedia extends Media
 
 
     // static methods
-    public static function analyzeFile($filename, $mediaInfo = array())
+    public static function analyzeFile($filename, $mediaInfo = [])
     {
         if (!$mediaInfo['imageInfo'] = @getimagesize($filename)) {
             throw new Exception('Failed to read image file information');

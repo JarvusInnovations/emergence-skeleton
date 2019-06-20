@@ -12,12 +12,12 @@ class DraftsRequestHandler extends \RequestHandler
             static::$responseMode = static::shiftPath();
         }
 
-        return static::respond('drafts', array(
+        return static::respond('drafts', [
             'success' => true
-            ,'data' => AbstractContent::getAllByWhere(array(
+            ,'data' => AbstractContent::getAllByWhere([
                 'AuthorID' => $GLOBALS['Session']->PersonID
                 ,'Status = "Draft" OR Published > CURRENT_TIMESTAMP'
-            ))
-        ));
+            ])
+        ]);
     }
 }

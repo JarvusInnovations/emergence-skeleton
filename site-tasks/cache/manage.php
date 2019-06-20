@@ -6,7 +6,6 @@ return [
     'icon' => 'pencil',
     'requireAccountLevel' => 'Developer',
     'handler' => function ($taskConfig) {
-
         $getEntryData = function ($entry, $includeValue = false) {
             return [
                 'hits' => $entry['num_hits'],
@@ -49,7 +48,7 @@ return [
         $prefixLength = strlen(Cache::getKeyPrefix());
         $entries = [];
 
-        foreach (Cache::getIterator('/.*/') AS $key => $entry) {
+        foreach (Cache::getIterator('/.*/') as $key => $entry) {
             $key = substr($key, $prefixLength);
             $entries[$key] = $getEntryData($entry);
         }

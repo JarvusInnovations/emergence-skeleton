@@ -13,7 +13,7 @@ return [
 
             // parse degredation changes from request input
             if (!empty($_POST['degredations']) && is_array($_POST['degredations'])) {
-                foreach ($_POST['degredations'] AS $key => $value) {
+                foreach ($_POST['degredations'] as $key => $value) {
                     if ($key && is_string($key)) {
                         $changes[$key] = $value == 'on';
                     }
@@ -21,7 +21,7 @@ return [
             }
 
             if (!empty($_POST['enable'])) {
-                foreach (is_array($_POST['enable']) ? $_POST['enable'] : [$_POST['enable']] AS $key) {
+                foreach (is_array($_POST['enable']) ? $_POST['enable'] : [$_POST['enable']] as $key) {
                     if ($key && is_string($key)) {
                         $changes[$key] = true;
                     }
@@ -29,7 +29,7 @@ return [
             }
 
             if (!empty($_POST['disable'])) {
-                foreach (is_array($_POST['disable']) ? $_POST['disable'] : [$_POST['disable']] AS $key) {
+                foreach (is_array($_POST['disable']) ? $_POST['disable'] : [$_POST['disable']] as $key) {
                     if ($key && is_string($key)) {
                         $changes[$key] = false;
                     }
@@ -39,7 +39,7 @@ return [
 
             // apply degredations
             if (count($changes)) {
-                foreach ($changes AS $key => $value) {
+                foreach ($changes as $key => $value) {
                     if (isset($degredations[$key]) && $degredations[$key] == $value) {
                         unset($changes[$key]);
                         continue;
@@ -54,7 +54,7 @@ return [
                 Cache::rawStore(Site::$rootPath, $config);
             }
         }
-        
+
         return static::respond('degredations', [
             'degredations' => $degredations,
             'changes' => $changes

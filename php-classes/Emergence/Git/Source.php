@@ -2,15 +2,14 @@
 
 namespace Emergence\Git;
 
+use Emergence\SSH\KeyPair;
+use Emergence_FS;
+use Gitonomy\Git\Admin as GitAdmin;
+
+use Gitonomy\Git\Exception\ProcessException as GitProcessException;
+use Gitonomy\Git\Repository;
 use Site;
 use SiteFile;
-use Emergence_FS;
-
-use Gitonomy\Git\Admin AS GitAdmin;
-use Gitonomy\Git\Repository;
-use Gitonomy\Git\Exception\ProcessException AS GitProcessException;
-use Emergence\SSH\KeyPair;
-
 
 class Source
 {
@@ -30,7 +29,7 @@ class Source
             $sources = \Git::$repositories;
 
             // instantiate sources
-            foreach ($sources AS $id => &$source) {
+            foreach ($sources as $id => &$source) {
                 if (is_array($source)) {
                     $source = new static($id, $source);
                 }
@@ -247,7 +246,7 @@ class Source
         if (!$this->trees) {
             $this->trees = [];
 
-            foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+            foreach ($this->getConfig('trees') as $treeKey => $treeValue) {
                 $this->trees[] = $this->getTreeOptions($treeKey, $treeValue);
             }
         }
@@ -406,13 +405,13 @@ class Source
             return false;
         }
 
-        list ($status, $commits) = explode(' ', $output[0]);
+        list($status, $commits) = explode(' ', $output[0]);
 
         if ($status != 'Updating') {
             throw new \Exception('Unexpected merge status output: ' . $status);
         }
 
-        list ($from, $to) = explode('..', $commits);
+        list($from, $to) = explode('..', $commits);
 
         return ['from' => $from, 'to' => $to];
     }
@@ -422,13 +421,13 @@ class Source
         $output = trim($this->getRepository()->run('push', ['--porcelain', 'origin', 'HEAD']));
         $output = explode(PHP_EOL, $output);
 
-        list ($symbol, $refs, $status) = explode("\t", $output[1]);
+        list($symbol, $refs, $status) = explode("\t", $output[1]);
 
         if ($status == '[up to date]') {
             return false;
         }
 
-        list ($from, $to) = explode('..', $status);
+        list($from, $to) = explode('..', $status);
 
         return ['from' => $from, 'to' => $to];
     }
@@ -450,7 +449,7 @@ class Source
 
         while (($header = array_shift($output)) && ($details = array_shift($output))) {
             // parse header
-            list ($objectType, $hash) = explode(' ', $header);
+            list($objectType, $hash) = explode(' ', $header);
 
             if ($objectType != 'commit') {
                 throw new \Exception('unexpected object type in rev-list output: ' . $objectType);
@@ -461,7 +460,7 @@ class Source
             ${$position}++;
 
             // parse details
-            list ($authorName, $authorEmail, $timestamp, $subject) = explode("\t", $details);
+            list($authorName, $authorEmail, $timestamp, $subject) = explode("\t", $details);
 
             $commit = [
                 'hash' => $hash,
@@ -493,7 +492,7 @@ class Source
 
         $files = [];
 
-        foreach ($output AS $line) {
+        foreach ($output as $line) {
             if ($line[0] == '#') {
                 continue; // skip comment lines
             }
@@ -541,7 +540,6 @@ class Source
             } else {
                 $files[$file['currentPath']] = $file;
             }
-
         }
 
         return $files;
@@ -560,7 +558,7 @@ class Source
 
         chdir($this->getRepositoryPath());
 
-        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+        foreach ($this->getConfig('trees') as $treeKey => $treeValue) {
             $treeOptions = array_merge(
                 $exportOptions,
                 static::getTreeOptions($treeKey, $treeValue),
@@ -623,7 +621,7 @@ class Source
 
         chdir($this->getRepositoryPath());
 
-        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+        foreach ($this->getConfig('trees') as $treeKey => $treeValue) {
             $treeOptions = array_merge(
                 static::getTreeOptions($treeKey, $treeValue),
                 [
@@ -667,7 +665,7 @@ class Source
     {
         $results = [];
 
-        foreach ($this->getConfig('trees') AS $treeKey => $treeValue) {
+        foreach ($this->getConfig('trees') as $treeKey => $treeValue) {
             $treeOptions = static::getTreeOptions($treeKey, $treeValue);
 
             $result = [];
@@ -675,11 +673,11 @@ class Source
             try {
                 if ($srcFileNode = Site::resolvePath($treeOptions['vfsPath'])) {
                     if ($srcFileNode instanceof SiteFile) {
-#                        \Debug::dumpVar($srcFileNode, false, "Found file at path: $treeOptions[vfsPath]");
+                        #                        \Debug::dumpVar($srcFileNode, false, "Found file at path: $treeOptions[vfsPath]");
                         $srcFileNode->delete();
                         $result = ['filesDeleted' => 1];
                     } else {
-#                        \Debug::dumpVar($treeOptions, false, "Found tree at path: $treeOptions[vfsPath]");
+                        #                        \Debug::dumpVar($treeOptions, false, "Found tree at path: $treeOptions[vfsPath]");
                         $result = static::eraseTree($treeOptions['vfsPath'], $treeOptions);
                     }
 
@@ -806,7 +804,7 @@ class Source
         unset($treeOptions['path']);
 
         if (is_string($treeOptions['exclude'])) {
-            $treeOptions['exclude'] = array($treeOptions['exclude']);
+            $treeOptions['exclude'] = [$treeOptions['exclude']];
         }
 
         if (!empty($_REQUEST['minId']) && ctype_digit($_REQUEST['minId'])) {
@@ -857,8 +855,7 @@ class Source
         $prefixLen = strlen($path);
         $tree = Emergence_FS::getTree($path, true);
 
-        foreach ($tree AS $collectionId => &$node) {
-
+        foreach ($tree as $collectionId => &$node) {
             if ($node['ParentID'] && $tree[$node['ParentID']]) {
                 $node['_path'] = $tree[$node['ParentID']]['_path'] . '/' . $node['Handle'];
             } else {
@@ -941,7 +938,7 @@ class Source
 
 
         // erase empty trees
-        foreach (array_reverse($tree, true) AS $collectionId => $collection) {
+        foreach (array_reverse($tree, true) as $collectionId => $collection) {
             if (in_array($collectionId, $collectionsNotEmptied)) {
                 if (!empty($collection['ParentID'])) {
                     $collectionsNotEmptied[] = $collection['ParentID'];

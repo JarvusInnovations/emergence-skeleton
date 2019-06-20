@@ -4,7 +4,7 @@ namespace Emergence\Classes;
 
 trait SubclassesConfigTrait
 {
-	public static $rootClass = null;
+    public static $rootClass = null;
     public static $defaultClass = null;
     public static $subClasses = null;
 
@@ -17,7 +17,6 @@ trait SubclassesConfigTrait
         // detect root class by crawling up the inheritence tree until an abstract parent is found
         $class = new \ReflectionClass(get_called_class());
         while ($parentClass = $class->getParentClass()) {
-            
             if ($parentClass->isAbstract()) {
                 return $class->getName();
             }

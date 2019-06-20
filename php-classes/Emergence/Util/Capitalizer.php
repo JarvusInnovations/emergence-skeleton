@@ -4,19 +4,19 @@ namespace Emergence\Util;
 
 class Capitalizer
 {
-    public static $familyNamePrefixes = array(
+    public static $familyNamePrefixes = [
         'Mc',
         'Mac',
         'Van',
         // these don't work consistently:
-#        'De',
-#        'Di',
-    );
+        #        'De',
+        #        'Di',
+    ];
 
     public static function capitalizePronoun($word, $familyName = false)
     {
         $me = get_called_class();
-        $_recurse = function($word) use ($me, $familyName) {
+        $_recurse = function ($word) use ($me, $familyName) {
             return $me::capitalizePronoun($word, $familyName);
         };
 
@@ -56,7 +56,7 @@ class Capitalizer
 
         // handly family name prefixes
         if ($familyName) {
-            foreach (static::$familyNamePrefixes AS $prefix) {
+            foreach (static::$familyNamePrefixes as $prefix) {
                 if (strpos($word, $prefix) === 0) {
                     $prefixLen = strlen($prefix);
 

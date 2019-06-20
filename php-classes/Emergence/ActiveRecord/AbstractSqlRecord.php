@@ -2,9 +2,9 @@
 
 namespace Emergence\ActiveRecord;
 
-use PDO;
-use Emergence\Database\SqlConnectionInterface;
 use Emergence\Database\ConnectionSingletonInterface;
+use Emergence\Database\SqlConnectionInterface;
+use PDO;
 
 abstract class AbstractSqlRecord extends AbstractActiveRecord
 {
@@ -75,7 +75,7 @@ abstract class AbstractSqlRecord extends AbstractActiveRecord
 
         $rows = $connection->selectAll($options);
 
-        foreach ($rows AS $row) {
+        foreach ($rows as $row) {
             if ($instanceOptions) {
                 $className = $row['Class'] ?: $defaultClass;
                 $row = new $className($row, $instanceOptions);

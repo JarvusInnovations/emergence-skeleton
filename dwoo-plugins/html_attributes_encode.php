@@ -1,14 +1,14 @@
 <?php
 
-function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = 'data-', $exclude = array(), $deep = true)
+function Dwoo_Plugin_html_attributes_encode(Dwoo_Core $dwoo, $array, $prefix = 'data-', $exclude = [], $deep = true)
 {
-    $attributes = array();
+    $attributes = [];
 
     if (is_string($exclude)) {
         $exclude = explode(',', $exclude);
     }
 
-    foreach ($array AS $key => $value) {
+    foreach ($array as $key => $value) {
         if ($value === false || $value === null || in_array($key, $exclude)) {
             continue;
         }

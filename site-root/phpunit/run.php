@@ -38,7 +38,9 @@ $timezone = date_default_timezone_get();
 // bootstrap path
 $bootstrapPath = dirname($_SERVER['SCRIPT_FILENAME']).'/phpunit.php';
 
-file_put_contents($configTmpPath, <<<EOT
+file_put_contents(
+    $configTmpPath,
+    <<<EOT
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit bootstrap="$bootstrapPath"
          convertErrorsToExceptions="false"

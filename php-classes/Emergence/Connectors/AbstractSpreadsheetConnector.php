@@ -3,8 +3,8 @@
 namespace Emergence\Connectors;
 
 use ActiveRecord;
-use SpreadsheetReader;
 use Psr\Log\LogLevel;
+use SpreadsheetReader;
 
 class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnector
 {
@@ -22,7 +22,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
     {
         $requiredColumns = [];
 
-        foreach ($config AS $key => $value) {
+        foreach ($config as $key => $value) {
             if (!$value) {
                 if (is_string($key) && array_key_exists($key, $requiredColumns)) {
                     unset($requiredColumns[$key]);
@@ -47,8 +47,8 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         $requiredColumns = array_keys(array_filter($requiredColumns));
 
         if ($columnsMap) {
-            $mappedColumns = array();
-            foreach ($columns AS $columnName) {
+            $mappedColumns = [];
+            foreach ($columns as $columnName) {
                 $mappedColumns[] = array_key_exists($columnName, $columnsMap) ? $columnsMap[$columnName] : $columnName;
             }
             $columns = $mappedColumns;
@@ -68,7 +68,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
 
     protected static function _readRow(array $row, array $columnsMap)
     {
-        $output = array();
+        $output = [];
 
         // extract columns via alias mappings
         foreach ($columnsMap as $alias => $key) {
@@ -105,8 +105,8 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
                         }
                     } else {
                         $output[$key] = array_merge(
-                            is_array($output[$key]) ? $output[$key] : [ $output[$key] ],
-                            is_array($value) ? $value : [ $value ]
+                            is_array($output[$key]) ? $output[$key] : [$output[$key]],
+                            is_array($value) ? $value : [$value]
                         );
                     }
                 } else {
@@ -175,7 +175,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         return $isValid;
     }
 
-    protected static function _saveRecord(Job $Job, ActiveRecord $Record, $pretend, array &$results, $logOptions = array())
+    protected static function _saveRecord(Job $Job, ActiveRecord $Record, $pretend, array &$results, $logOptions = [])
     {
         // call configurable hook
         if (is_callable(static::$onBeforeSaveRecord)) {
@@ -191,7 +191,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         } elseif ($logEntry['action'] == 'update') {
             $results['updated']++;
 
-            foreach (array_keys($logEntry['changes']) AS $changedField) {
+            foreach (array_keys($logEntry['changes']) as $changedField) {
                 $results['updated-fields'][$changedField]++;
             }
         }

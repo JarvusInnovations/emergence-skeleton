@@ -2,9 +2,9 @@
 
 
 
- class PersonPhotoMedia extends PhotoMedia
- {
-     // configurables
+class PersonPhotoMedia extends PhotoMedia
+{
+    // configurables
 
 
     // protected properties
@@ -18,7 +18,7 @@
             case 'Person':
 
                 if (!isset($this->_person)) {
-                    $this->_person = call_user_func(array(Person::$StandardClass, 'getByID'), $this->ContextID);
+                    $this->_person = call_user_func([Person::$StandardClass, 'getByID'], $this->ContextID);
                 }
 
                 return $this->_person;
@@ -44,13 +44,13 @@
         {
             $recordFields['namespace'] = self::$MediaNamespace;
         }
-        
+
         if(empty($recordFields['context_id']))
         {
             $recordFields['context_id'] = $data['Person']->ID;
         }
-        
+
         return parent::prepareRecord($data, $recordFields);
     }
     */
- }
+}

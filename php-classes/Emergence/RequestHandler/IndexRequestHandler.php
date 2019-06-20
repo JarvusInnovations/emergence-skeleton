@@ -2,11 +2,10 @@
 
 namespace Emergence\RequestHandler;
 
-use Site;
-use SiteFile;
-use SiteCollection;
 use Emergence_FS;
-
+use Site;
+use SiteCollection;
+use SiteFile;
 
 class IndexRequestHandler extends AbstractRequestHandler
 {

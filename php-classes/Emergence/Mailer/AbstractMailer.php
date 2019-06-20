@@ -9,20 +9,20 @@ abstract class AbstractMailer implements IMailer
         return Mailer::$defaultFrom ? Mailer::$defaultFrom : \Site::getConfig('label').' <support@'.\Site::getConfig('primary_hostname').'>';
     }
 
-    public static function sendFromTemplate($to, $template, $data = array(), $options = array())
+    public static function sendFromTemplate($to, $template, $data = [], $options = [])
     {
         $email = static::renderTemplate($template, $data);
 
         return static::send($to, $email['subject'], $email['body'], $email['from'], $options);
     }
 
-    public static function renderTemplate($template, $data = array())
+    public static function renderTemplate($template, $data = [])
     {
-        $email = array(
+        $email = [
             'from' => null,
             'subject' => null,
             'body' => trim(\Emergence\Dwoo\Engine::getSource($template.'.email', $data))
-        );
+        ];
 
         $templateVars = \Emergence\Dwoo\Engine::getInstance()->scope;
 

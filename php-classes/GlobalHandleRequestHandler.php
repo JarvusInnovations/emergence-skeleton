@@ -30,10 +30,10 @@ class GlobalHandleRequestHandler extends RequestHandler
                     return static::throwNotFoundError();
                 }
             } else {
-                return static::respond('handle', array(
+                return static::respond('handle', [
                     'success' => true
                     ,'data' => $GlobalHandle
-                ));
+                ]);
             }
         } else {
             return static::throwNotFoundError();
@@ -45,9 +45,9 @@ class GlobalHandleRequestHandler extends RequestHandler
         $GLOBALS['Session']->requireAccountLevel('Developer');
         static::$responseMode = 'json';
 
-        $created = array();
-        $failed = array();
-        $verified = array();
+        $created = [];
+        $failed = [];
+        $verified = [];
 
         $dh = opendir('.');
         while (false !== ($file = readdir($dh))) {
@@ -56,10 +56,10 @@ class GlobalHandleRequestHandler extends RequestHandler
                 $Existing = GlobalHandle::getByHandle($handle);
 
                 if (!$Existing) {
-                    $created[] = GlobalHandle::create(array(
+                    $created[] = GlobalHandle::create([
                         'Type' => 'Reserve'
                         ,'Handle' => $handle
-                    ), true);
+                    ], true);
                 } elseif ($Existing->Type != 'Reserve') {
                     $failed[] = $Existing;
                 } else {
@@ -69,11 +69,11 @@ class GlobalHandleRequestHandler extends RequestHandler
         }
         closedir($dh);
 
-        return static::respond('autoreserve', array(
+        return static::respond('autoreserve', [
             'success' => true
             ,'created' => $created
             ,'failed' => $failed
             ,'verified' => $verified
-        ));
+        ]);
     }
 }

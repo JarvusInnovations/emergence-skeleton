@@ -3,9 +3,9 @@
 namespace Emergence\People;
 
 use DB;
-use VersionedRecord;
-use PhotoMedia;
 use Emergence\Comments\Comment;
+use PhotoMedia;
+use VersionedRecord;
 
 class Person extends VersionedRecord implements IPerson
 {
@@ -14,7 +14,7 @@ class Person extends VersionedRecord implements IPerson
     // support subclassing
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
 
     // VersionedRecord configuration
     public static $historyTable = 'history_people';
@@ -25,174 +25,174 @@ class Person extends VersionedRecord implements IPerson
     public static $pluralNoun = 'people';
     public static $collectionRoute = '/people';
 
-    public static $fields = array(
-        'FirstName' => array(
+    public static $fields = [
+        'FirstName' => [
             'includeInSummary' => true
-        )
-        ,'LastName' => array(
+        ]
+        ,'LastName' => [
             'includeInSummary' => true
-        )
-        ,'MiddleName' => array(
+        ]
+        ,'MiddleName' => [
             'notnull' => false
-        )
-        ,'PreferredName' => array(
+        ]
+        ,'PreferredName' => [
             'default' => null
-        )
-        ,'Gender' => array(
+        ]
+        ,'Gender' => [
             'type' => 'enum'
-            ,'values' => array('Male','Female')
+            ,'values' => ['Male','Female']
             ,'notnull' => false
-        )
-        ,'BirthDate' => array(
+        ]
+        ,'BirthDate' => [
             'type' => 'date'
             ,'notnull' => false
             ,'accountLevelEnumerate' => 'Staff'
-        )
-        ,'Email' => array(
+        ]
+        ,'Email' => [
             'notnull' => false
             ,'unique' => true
             ,'accountLevelEnumerate' => 'User'
-        )
-        ,'Phone' => array(
+        ]
+        ,'Phone' => [
             'type' => 'decimal'
             ,'length' => '15,0'
             ,'unsigned' => true
             ,'notnull' => false
             ,'accountLevelEnumerate' => 'User'
-        )
-        ,'Location' => array(
+        ]
+        ,'Location' => [
             'notnull' => false
-        )
-        ,'About' => array(
+        ]
+        ,'About' => [
             'type' => 'clob'
             ,'notnull' => false
-        )
-        ,'PrimaryPhotoID' => array(
+        ]
+        ,'PrimaryPhotoID' => [
             'type' => 'integer'
             ,'unsigned' => true
             ,'notnull' => false
-        )
-    );
+        ]
+    ];
 
-    public static $relationships = array(
-        'GroupMemberships' => array(
+    public static $relationships = [
+        'GroupMemberships' => [
             'type' => 'one-many'
             ,'class' => Groups\GroupMember::class
             ,'indexField' => 'GroupID'
             ,'foreign' => 'PersonID'
-        )
-        ,'Groups' => array(
+        ]
+        ,'Groups' => [
             'type' => 'many-many'
             ,'class' => Groups\Group::class
             ,'linkClass' => Groups\GroupMember::class
             ,'linkLocal' => 'PersonID'
             ,'linkForeign' => 'GroupID'
-        )
-        ,'PrimaryPhoto' => array(
+        ]
+        ,'PrimaryPhoto' => [
             'type' => 'one-one'
             ,'class' => PhotoMedia::class
             ,'local' => 'PrimaryPhotoID'
-        )
-        ,'Photos' => array(
+        ]
+        ,'Photos' => [
             'type' => 'context-children'
             ,'class' => PhotoMedia::class
             ,'contextClass' => __CLASS__
-        )
-        ,'Comments' => array(
+        ]
+        ,'Comments' => [
             'type' => 'context-children'
             ,'class' => Comment::class
             ,'contextClass' => __CLASS__
-            ,'order' => array('ID' => 'DESC')
-        )
-    );
+            ,'order' => ['ID' => 'DESC']
+        ]
+    ];
 
-    public static $dynamicFields = array(
+    public static $dynamicFields = [
         'PrimaryPhoto'
         ,'Photos'
-        ,'groupIDs' => array(
+        ,'groupIDs' => [
             'method' => 'getGroupIDs'
-        )
-    );
+        ]
+    ];
 
-    public static $searchConditions = array(
-        'FirstName' => array(
-            'qualifiers' => array('any','name','fname','firstname','first')
+    public static $searchConditions = [
+        'FirstName' => [
+            'qualifiers' => ['any','name','fname','firstname','first']
             ,'points' => 2
             ,'sql' => 'FirstName LIKE "%%%s%%"'
-        )
-        ,'LastName' => array(
-            'qualifiers' => array('any','name','lname','lastname','last')
+        ]
+        ,'LastName' => [
+            'qualifiers' => ['any','name','lname','lastname','last']
             ,'points' => 2
             ,'sql' => 'LastName LIKE "%%%s%%"'
-        )
-        ,'Username' => array(
-            'qualifiers' => array('any','username','uname','user')
+        ]
+        ,'Username' => [
+            'qualifiers' => ['any','username','uname','user']
             ,'points' => 2
             ,'sql' => 'Username LIKE "%%%s%%"'
-        )
-        ,'Gender' => array(
-            'qualifiers' => array('gender','sex')
+        ]
+        ,'Gender' => [
+            'qualifiers' => ['gender','sex']
             ,'points' => 2
             ,'sql' => 'Gender LIKE "%s"'
-        )
-        ,'Class' => array(
-            'qualifiers' => array('class')
+        ]
+        ,'Class' => [
+            'qualifiers' => ['class']
             ,'points' => 2
             ,'sql' => 'Class LIKE "%%%s%%"'
-        )
-        ,'AccountLevel' => array(
-            'qualifiers' => array('accountlevel')
+        ]
+        ,'AccountLevel' => [
+            'qualifiers' => ['accountlevel']
             ,'points' => 2
             ,'sql' => 'AccountLevel LIKE "%%%s%%"'
-        )
-        ,'Group' => array(
-            'qualifiers' => array('group')
+        ]
+        ,'Group' => [
+            'qualifiers' => ['group']
             ,'points' => 1
-            ,'join' => array(
+            ,'join' => [
                 'className' => Groups\GroupMember::class
                 ,'aliasName' => 'GroupMember'
                 ,'localField' => 'ID'
                 ,'foreignField' => 'PersonID'
-            )
+            ]
             ,'callback' => 'getGroupConditions'
-        )
-    );
+        ]
+    ];
 
-    public static $validators = array(
-        'Class' => array(
+    public static $validators = [
+        'Class' => [
             'validator' => 'selection'
-            ,'choices' => array() // filled dynamically in __classLoaded
+            ,'choices' => [] // filled dynamically in __classLoaded
             ,'required' => false
-        )
-        ,'FirstName' => array(
+        ]
+        ,'FirstName' => [
             'minlength' => 2
             ,'required' => true
             ,'errorMessage' => 'First name is required.'
-        )
-        ,'LastName' => array(
+        ]
+        ,'LastName' => [
             'minlength' => 2
             ,'required' => true
             ,'errorMessage' => 'Last name is required.'
-        )
-        ,'Email' => array(
+        ]
+        ,'Email' => [
             'field' => 'Email'
             ,'validator' => 'email'
             ,'required' => false
-        )
-        ,'Phone' => array(
+        ]
+        ,'Phone' => [
             'validator' => 'phone'
             ,'required' => false
-        )
-        ,'BirthDate' => array(
+        ]
+        ,'BirthDate' => [
             'validator' => 'date_ymd'
             ,'required' => false
-        )
-        ,'Gender' => array(
+        ]
+        ,'Gender' => [
             'validator' => 'selection'
             ,'required' => false
-            ,'choices' => array() // filled dynamically in __classLoaded
-        )
-    );
+            ,'choices' => [] // filled dynamically in __classLoaded
+        ]
+    ];
 
     // Person
     public static function __classLoaded()
@@ -221,6 +221,7 @@ class Person extends VersionedRecord implements IPerson
                 } else {
                     return $this->FirstName . '\'s';
                 }
+                // no break
             case 'FullNamePossessive':
                 $fullName = $this->FullName;
 
@@ -229,6 +230,7 @@ class Person extends VersionedRecord implements IPerson
                 } else {
                     return $fullName . '\'s';
                 }
+                // no break
             case 'EmailRecipient':
                 return sprintf('"%s" <%s>', $this->FullName, $this->Email);
             default:
@@ -253,10 +255,10 @@ class Person extends VersionedRecord implements IPerson
 
     public static function getByFullName($firstName, $lastName)
     {
-        return static::getByWhere(array(
+        return static::getByWhere([
             'FirstName' => $firstName
             ,'LastName' => $lastName
-        ));
+        ]);
     }
 
     public static function getOrCreateByFullName($firstName, $lastName, $save = false)
@@ -264,10 +266,10 @@ class Person extends VersionedRecord implements IPerson
         if ($Person = static::getByFullName($firstName, $lastName)) {
             return $Person;
         } else {
-            return static::create(array(
+            return static::create([
                 'FirstName' => $firstName
                 ,'LastName' => $lastName
-            ), $save);
+            ], $save);
         }
     }
 
@@ -279,10 +281,10 @@ class Person extends VersionedRecord implements IPerson
             throw new \Exception('Full name must contain a first and last name separated by a space.');
         }
 
-        return array(
+        return [
             'FirstName' => $parts[0]
             ,'LastName' => $parts[1]
-        );
+        ];
     }
 
     public function validate($deep = true)
@@ -316,24 +318,24 @@ class Person extends VersionedRecord implements IPerson
             return false;
         }
 
-        $containedGroups = DB::allRecords('SELECT ID FROM %s WHERE `Left` BETWEEN %u AND %u', array(
+        $containedGroups = DB::allRecords('SELECT ID FROM %s WHERE `Left` BETWEEN %u AND %u', [
             Groups\Group::$tableName
             ,$group->Left
             ,$group->Right
-        ));
+        ]);
 
-        $containedGroups = array_map(function($group) {
+        $containedGroups = array_map(function ($group) {
             return $group['ID'];
-        },$containedGroups);
+        }, $containedGroups);
 
-        $condition = $matchedCondition['join']['aliasName'].'.GroupID'.' IN ('.implode(',',$containedGroups).')';
+        $condition = $matchedCondition['join']['aliasName'].'.GroupID'.' IN ('.implode(',', $containedGroups).')';
 
         return $condition;
     }
 
     public function getGroupIDs()
     {
-        return array_map(function($Group){
+        return array_map(function ($Group) {
             return $Group->ID;
         }, $this->Groups);
     }

@@ -78,8 +78,8 @@ class Email
         $data .= '--'.$mimeBoundary.PHP_EOL;
 
         // attachments
-        foreach ($attachments AS $filename => $contents) {
-            $cleanFilename = str_replace('"','',$filename);
+        foreach ($attachments as $filename => $contents) {
+            $cleanFilename = str_replace('"', '', $filename);
             $mimeType = File::getMIMETypeFromContents($contents);
             $data .= "Content-Type: $mimeType; name=\"$cleanFilename\"".PHP_EOL;
             $data .= "Content-Disposition: attachment; filename=\"$cleanFilename\"".PHP_EOL;
@@ -142,9 +142,9 @@ class Email
         $delimiter = '***THROW AWAY BELOW***';
 
         // clients' check
-        if ($messageBody != preg_replace($GmailRegex, $delimiter ,$messageBody)) {
+        if ($messageBody != preg_replace($GmailRegex, $delimiter, $messageBody)) {
             // Gmail check
-            $messageBody = preg_replace($GmailRegex, $delimiter ,$messageBody);
+            $messageBody = preg_replace($GmailRegex, $delimiter, $messageBody);
             $endPos = strpos($messageBody, $delimiter);
             $messageBody = substr($messageBody, 0, $endPos);
         } elseif (strpos($body, '-----Original Message-----')) {
@@ -152,11 +152,11 @@ class Email
             $startPos = strpos($messageBody, '-----Original Message-----');
             $messageBody = substr($messageBody, 0, $startPos);
         }
-/*      elseif
-        {
-            // add more email client checks
-        }
-*/
+        /*      elseif
+                {
+                    // add more email client checks
+                }
+        */
 
         return $messageBody;
     }

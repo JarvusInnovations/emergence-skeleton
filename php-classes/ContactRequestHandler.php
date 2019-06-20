@@ -3,15 +3,15 @@
 class ContactRequestHandler extends RequestHandler
 {
     public static $emailTo;
-    public static $validators = array();
-    public static $formatters = array();
-    public static $excludeFields = array('path');
+    public static $validators = [];
+    public static $formatters = [];
+    public static $excludeFields = ['path'];
     public static $accountLevelBrowse = 'Administrator';
 
-    public static $userResponseModes = array(
+    public static $userResponseModes = [
         'application/json' => 'json',
         'text/csv' => 'csv'
-    );
+    ];
 
     public static function handleRequest()
     {
@@ -38,7 +38,7 @@ class ContactRequestHandler extends RequestHandler
             // validate
             $Validator = new RecordValidator($_REQUEST);
 
-            foreach (static::$validators AS $validatorConfig) {
+            foreach (static::$validators as $validatorConfig) {
                 // execute callable validator
                 if (is_callable($validatorConfig)) {
                     $validatorConfig($Validator, $subform);
@@ -65,39 +65,39 @@ class ContactRequestHandler extends RequestHandler
 
                 // generate email report
                 if (!empty(static::$emailTo)) {
-                    $headers = array();
+                    $headers = [];
                     if (!empty($_REQUEST['Email']) && Validators::email($_REQUEST['Email'])) {
                         $headers['Reply-To'] = $_REQUEST['Email'];
                     }
 
-                    Emergence\Mailer\Mailer::sendFromTemplate(static::$emailTo, 'staffNotice', array(
+                    Emergence\Mailer\Mailer::sendFromTemplate(static::$emailTo, 'staffNotice', [
                         'Submission' => $Submission
                         ,'formatters' => static::$formatters
-                    ), array(
+                    ], [
                         'Headers' => $headers
-                    ));
+                    ]);
                 }
 
                 // respond success
-                return static::respond('contactSubmitted', array(
+                return static::respond('contactSubmitted', [
                     'success' => true
                     ,'subform' => $subform
-                ));
+                ]);
             }
         }
 
-        return static::respond('contact', array(
-            'validationErrors' => isset($Validator) ? $Validator->getErrors() : array()
+        return static::respond('contact', [
+            'validationErrors' => isset($Validator) ? $Validator->getErrors() : []
             ,'subform' => $subform
-        ));
+        ]);
     }
-    
+
     public static function handleSubmissionsRequest()
     {
         $GLOBALS['Session']->requireAccountLevel(static::$accountLevelBrowse);
 
-        return static::respond('submissions', array(
-            'data' => ContactSubmission::getAll(array('order' => array('ID' => 'DESC')))
-        ));
+        return static::respond('submissions', [
+            'data' => ContactSubmission::getAll(['order' => ['ID' => 'DESC']])
+        ]);
     }
 }

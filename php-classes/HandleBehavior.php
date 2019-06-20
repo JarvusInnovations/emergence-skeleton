@@ -6,7 +6,7 @@ class HandleBehavior extends RecordBehavior
     public static $suffixFormat = '%s-%u';
     public static $transliterate = true;
 
-    public static function onSave(ActiveRecord $Record, $handleInput = false, array $handleOptions = array())
+    public static function onSave(ActiveRecord $Record, $handleInput = false, array $handleOptions = [])
     {
         // set handle
         if (!$Record->Handle) {
@@ -16,12 +16,12 @@ class HandleBehavior extends RecordBehavior
 
     public static function onValidate(ActiveRecord $Record, RecordValidator $validator)
     {
-        $validator->validate(array(
+        $validator->validate([
             'field' => 'Handle'
             ,'required' => false
             ,'validator' => 'handle'
             ,'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
-        ));
+        ]);
 
         // check handle uniqueness
         if ($Record->isFieldDirty('Handle') && !$validator->hasErrors('Handle') && $Record->Handle) {
@@ -33,28 +33,29 @@ class HandleBehavior extends RecordBehavior
         }
     }
 
-    public static function transformText($text, $options = array())
+    public static function transformText($text, $options = [])
     {
         // apply default options
-        $options = array_merge(array(
+        $options = array_merge([
             'transliterate' => static::$transliterate
             ,'case' => 'lower' // 'lower' / 'upper' / null
-        ), $options);
+        ], $options);
 
         // strip bad characters
         $text = preg_replace(
-             array(
-                 '/\s+/'                                // 1- Find spaces
-                 ,'/^[^\\pL]+/u'                        // 2- Find anything not a letter at the beginning
-                 ,'/[-_]*[^\\pL\d_:\-\.]+[-_]*/u'       // 3- Find non-allowed charecters segment and any placeholders next to it
-                 ,'/[-_]*:[-_]*/')                      // 4- Find any : and any placeholders next to it
-            ,array(
+            [
+                '/\s+/'                                // 1- Find spaces
+                ,'/^[^\\pL]+/u'                        // 2- Find anything not a letter at the beginning
+                ,'/[-_]*[^\\pL\d_:\-\.]+[-_]*/u'       // 3- Find non-allowed charecters segment and any placeholders next to it
+                ,'/[-_]*:[-_]*/'                      // 4- Find any : and any placeholders next to it
+            ],
+            [
                 '_'                                     // 1- Replace spaces with _
                 , ''                                    // 2- Erase anything not a letter at the beginning
                 ,'-'                                    // 3- Replace non-allowed characters with -
                 ,'--'                                   // 4- Replace any : with --
-            )
-            ,$text
+            ],
+            $text
         );
 
         // transliterate
@@ -78,18 +79,18 @@ class HandleBehavior extends RecordBehavior
         return $text;
     }
 
-    public static function getUniqueHandle($class, $text, $options = array())
+    public static function getUniqueHandle($class, $text, $options = [])
     {
         // apply default options
-        $options = array_merge(array(
+        $options = array_merge([
             'handleField' => 'Handle'
-            ,'domainConstraints' => array()
+            ,'domainConstraints' => []
             ,'alwaysSuffix' => static::$alwaysSuffix
             ,'randomSuffix' => false
             ,'randomSuffixMin' => 100
             ,'randomSuffixMax' => 999
             ,'suffixFormat' => static::$suffixFormat
-        ), $options);
+        ], $options);
 
         // transform text to handle-friendly form
         $text = static::transformText($text, $options);
@@ -122,12 +123,12 @@ class HandleBehavior extends RecordBehavior
         return $handle;
     }
 
-    public static function generateRandomHandle($class, $length = 32, $options = array())
+    public static function generateRandomHandle($class, $length = 32, $options = [])
     {
         // apply default options
-        $options = array_merge(array(
+        $options = array_merge([
             'handleField' => 'Handle'
-        ), $options);
+        ], $options);
 
         do {
             $handle = md5(mt_rand(0, mt_getrandmax()));

@@ -68,21 +68,21 @@ class Media extends AbstractItem
         switch ($Media->Class) {
             case 'AudioMedia':
                 return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link audio-link">'
-                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
+                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth, static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
                     .'</a>';
             case 'VideoMedia':
                 return '<div title="'.htmlspecialchars($Media->Caption).'" class="media-link video-link" id="player-'.$Media->ID.'" style="width:425px;height:300px;">'
-                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
+                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth, static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
                     .'</div><script>flowplayer("player-'.$Media->ID.'", "/swf/flowplayer-3.2.15.swf",{playlist:["'.$Media->WebPath.'"]})</script>';
             case 'PDFMedia':
                 return '<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link pdf-link">'
-                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth,static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
+                    .'<img src="'.$Media->getThumbnailRequest(static::$thumbWidth, static::$thumbHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
                     .'</a>';
             case 'PhotoMedia':
             default:
                 return '<figure class="media-figure">'
                         .'<a href="'.$Media->WebPath.'" title="'.htmlspecialchars($Media->Caption).'" class="media-link image-link">'
-                            .'<img class="media-img" src="'.$Media->getThumbnailRequest(static::$fullWidth,static::$fullHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
+                            .'<img class="media-img" src="'.$Media->getThumbnailRequest(static::$fullWidth, static::$fullHeight).'" alt="'.htmlspecialchars($Media->Caption).'">'
                         .'</a>'
                         .(
                             $Media->Caption ?

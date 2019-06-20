@@ -13,6 +13,3 @@ function Dwoo_Plugin_format_duration(Dwoo_Core $dwoo, $seconds, $showUnits = tru
 
     return $string;
 }
-
-
-?>

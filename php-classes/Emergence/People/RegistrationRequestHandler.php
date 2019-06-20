@@ -2,9 +2,9 @@
 
 namespace Emergence\People;
 
-use PasswordToken;
-use Emergence\Mailer\Mailer;
 use Emergence\EventBus;
+use Emergence\Mailer\Mailer;
+use PasswordToken;
 
 class RegistrationRequestHandler extends \RequestHandler
 {
@@ -13,7 +13,7 @@ class RegistrationRequestHandler extends \RequestHandler
     public static $createUser;
     public static $onRegisterComplete;
     public static $applyRegistrationData;
-    public static $registrationFields = array(
+    public static $registrationFields = [
         'FirstName'
         ,'LastName'
         ,'Gender'
@@ -24,13 +24,13 @@ class RegistrationRequestHandler extends \RequestHandler
         ,'Phone'
         ,'Location'
         ,'About'
-    );
+    ];
 
     // RequestHandler
     public static $responseMode = 'html';
-    public static $userResponseModes = array(
+    public static $userResponseModes = [
         'application/json' => 'json'
-    );
+    ];
 
     public static function handleRequest()
     {
@@ -45,7 +45,7 @@ class RegistrationRequestHandler extends \RequestHandler
         }
     }
 
-    public static function handleRegistrationRequest($overrideFields = array())
+    public static function handleRegistrationRequest($overrideFields = [])
     {
         if (!empty($_SESSION['User'])) {
             return static::throwError('You are already logged in. Please log out if you need to register a new account.');
@@ -56,10 +56,10 @@ class RegistrationRequestHandler extends \RequestHandler
         }
 
         $filteredRequestFields = array_intersect_key($_REQUEST, array_flip(static::$registrationFields));
-        $additionalErrors = array();
+        $additionalErrors = [];
 
         if (is_callable(static::$createUser)) {
-            $User = call_user_func_array(static::$createUser, array(&$filteredRequestFields, &$additionalErrors));
+            $User = call_user_func_array(static::$createUser, [&$filteredRequestFields, &$additionalErrors]);
         } else {
             $className = User::getStaticDefaultClass();
             $User = new $className();
@@ -82,14 +82,14 @@ class RegistrationRequestHandler extends \RequestHandler
 
             // configurable hook
             if (is_callable(static::$applyRegistrationData)) {
-                call_user_func_array(static::$applyRegistrationData, array($User, $filteredRequestFields, &$additionalErrors));
+                call_user_func_array(static::$applyRegistrationData, [$User, $filteredRequestFields, &$additionalErrors]);
             }
 
-            EventBus::fireEvent('beforeRegister', self::class, array(
+            EventBus::fireEvent('beforeRegister', self::class, [
                 'User' => $User,
                 'requestData' => $_REQUEST,
                 'additionalErrors' => &$additionalErrors
-            ));
+            ]);
 
             // validate
             if ($User->validate() && empty($additionalErrors)) {
@@ -97,29 +97,29 @@ class RegistrationRequestHandler extends \RequestHandler
                 $User->save();
 
                 // upgrade session
-                $GLOBALS['Session'] = $GLOBALS['Session']->changeClass('UserSession', array(
+                $GLOBALS['Session'] = $GLOBALS['Session']->changeClass('UserSession', [
                     'PersonID' => $User->ID
-                ));
+                ]);
 
                 // send welcome email
-                Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', array(
+                Mailer::sendFromTemplate($User->EmailRecipient, 'registerComplete', [
                     'User' => $User,
                     'registrationData' => $filteredRequestFields
-                ));
+                ]);
 
                 if (is_callable(static::$onRegisterComplete)) {
                     call_user_func(static::$onRegisterComplete, $User, $filteredRequestFields);
                 }
 
-                EventBus::fireEvent('registerComplete', self::class, array(
+                EventBus::fireEvent('registerComplete', self::class, [
                     'User' => $User,
                     'requestData' => $_REQUEST
-                ));
+                ]);
 
-                return static::respond('registerComplete', array(
+                return static::respond('registerComplete', [
                     'success' => true
                     ,'data' => $User
-                ));
+                ]);
             }
 
             if (count($additionalErrors)) {
@@ -132,10 +132,10 @@ class RegistrationRequestHandler extends \RequestHandler
             $User->setFields($overrideFields);
         }
 
-        return static::respond('register', array(
+        return static::respond('register', [
             'success' => false
             ,'data' => $User
-        ));
+        ]);
     }
 
 
@@ -151,21 +151,21 @@ class RegistrationRequestHandler extends \RequestHandler
             } elseif (!$User->Email) {
                 $error = 'Unforunately, there is no email address on file for this account. Please contact an administrator.';
             } else {
-                $Token = PasswordToken::create(array(
+                $Token = PasswordToken::create([
                     'CreatorID' => $User->ID
-                ), true);
+                ], true);
 
                 $Token->sendEmail($User->Email);
 
-                return static::respond('recoverPasswordComplete', array(
+                return static::respond('recoverPasswordComplete', [
                     'success' => true
-                ));
+                ]);
             }
         }
 
-        return static::respond('recoverPassword', array(
+        return static::respond('recoverPassword', [
             'success' => empty($error),
             'error' => isset($error) ? $error : false
-        ));
+        ]);
     }
 }

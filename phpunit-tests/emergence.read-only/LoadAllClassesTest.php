@@ -4,7 +4,7 @@ class LoadAllClassesTest extends PHPUnit_Framework_TestCase
 {
     public function testLoad()
     {
-        foreach (Emergence_FS::findFiles('\.php$', true, 'php-classes') AS $classNode) {
+        foreach (Emergence_FS::findFiles('\.php$', true, 'php-classes') as $classNode) {
             if ($classNode->Type != 'application/php') {
                 continue;
             }

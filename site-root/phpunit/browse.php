@@ -10,17 +10,15 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
         <ul>
         <?php
         Emergence_FS::cacheTree('phpunit-tests');
-        foreach (Emergence_FS::getAggregateChildren('phpunit-tests') AS $testsSubNode) {
+        foreach (Emergence_FS::getAggregateChildren('phpunit-tests') as $testsSubNode) {
             if (!is_a($testsSubNode, 'SiteCollection')) {
                 continue;
             }
 
             print "<li><a href='?suite=$testsSubNode->Handle'>$testsSubNode->Handle</a> <form action='/phpunit/run?suite=$testsSubNode->Handle' method='POST' style='display:inline'><input type='submit' value='Run All Tests'></form></li>";
-        }
-        ?>
+        } ?>
         </ul>
     <?php
-
     } elseif (count($testNodes = Emergence_FS::getAggregateChildren("phpunit-tests/$_GET[suite]"))) {
         ?>
         <h1>Tests in suite <?=htmlspecialchars($_GET['suite'])?></h1>
@@ -29,7 +27,7 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
         </form>
         <ul>
         <?php
-        foreach ($testNodes AS $testNode) {
+        foreach ($testNodes as $testNode) {
             if (is_a($testNode, 'SiteCollection')) {
                 if ($testNode->Handle == 'src' || $testNode->Handle == 'data') {
                     continue;
@@ -41,11 +39,9 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
                 }
                 print "<li>$testNode->Handle <form action='/phpunit/run?suite=$_GET[suite]&test=$testNode->Handle' method='POST' style='display:inline'><input type='submit' value='Run Test'></form></li>";
             }
-        }
-        ?>
+        } ?>
         </ul>
     <?php
-
     } else {
         echo "Suite not found";
     }

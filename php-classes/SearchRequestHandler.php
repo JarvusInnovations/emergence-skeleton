@@ -2,13 +2,13 @@
 
 class SearchRequestHandler extends RequestHandler
 {
-    public static $searchClasses = array();
+    public static $searchClasses = [];
     public static $useBoolean = true;
 
-    public static $userResponseModes = array(
+    public static $userResponseModes = [
         'application/json' => 'json'
         ,'text/csv' => 'csv'
-    );
+    ];
 
     public static function __classLoaded()
     {
@@ -49,7 +49,7 @@ class SearchRequestHandler extends RequestHandler
             return static::throwError('No search classes configured for this site');
         }
 
-        $searchResults = array();
+        $searchResults = [];
         $totalResults = 0;
         /*
 
@@ -66,41 +66,41 @@ class SearchRequestHandler extends RequestHandler
 
         }
         */
-        foreach (static::$searchClasses AS $className => $options) {
+        foreach (static::$searchClasses as $className => $options) {
             if (is_string($options)) {
                 $className = $options;
-                $options = array();
+                $options = [];
             }
 
-            $options = array_merge(array(
+            $options = array_merge([
                 'className' => $className
-                ,'fields' => array('Title')
-                ,'conditions' => array()
-            ), $options);
+                ,'fields' => ['Title']
+                ,'conditions' => []
+            ], $options);
 
             if (empty($options['fields'])) {
                 continue;
             }
 
             // parse fields
-            $columns = array(
-                'fulltext' => array()
-                ,'like' => array()
-                ,'exact' => array()
-                ,'sql' => array()
-            );
-            foreach ($options['fields'] AS $field) {
+            $columns = [
+                'fulltext' => []
+                ,'like' => []
+                ,'exact' => []
+                ,'sql' => []
+            ];
+            foreach ($options['fields'] as $field) {
                 // transform string-only
                 if (is_string($field)) {
-                    $field = array(
+                    $field = [
                         'field' => $field
-                    );
+                    ];
                 }
 
                 // apply defaults
-                $field = array_merge(array(
+                $field = array_merge([
                     'method' => 'fulltext'
-                ), $field);
+                ], $field);
 
                 // sort conditions
                 $columns[$field['method']][] = $field['method'] == 'sql' ? $field['sql'] : $className::getColumnName($field['field']);
@@ -109,7 +109,7 @@ class SearchRequestHandler extends RequestHandler
             // add match conditions
             $query = $_REQUEST['q'];
             $escapedQuery = DB::escape($query);
-            $matchConditions = array();
+            $matchConditions = [];
 
             if ($columns['fulltext']) {
                 $matchConditions[] = sprintf('MATCH (`%s`) AGAINST ("%s" %s)', implode('`,`', $columns['fulltext']), $escapedQuery, static::$useBoolean ? 'IN BOOLEAN MODE' : '');
@@ -118,7 +118,7 @@ class SearchRequestHandler extends RequestHandler
             if ($columns['like']) {
                 $matchConditions[] =
                     '('
-                    .join(') OR (', array_map(function($column) use ($escapedQuery) {
+                    .join(') OR (', array_map(function ($column) use ($escapedQuery) {
                         return sprintf('`%s` LIKE "%%%s%%"', $column, $escapedQuery);
                     }, $columns['like']))
                     .')';
@@ -127,7 +127,7 @@ class SearchRequestHandler extends RequestHandler
             if ($columns['exact']) {
                 $matchConditions[] =
                     '('
-                    .join(') OR (', array_map(function($column) use ($escapedQuery) {
+                    .join(') OR (', array_map(function ($column) use ($escapedQuery) {
                         return sprintf('`%s` = "%s"', $column, $escapedQuery);
                     }, $columns['exact']))
                     .')';
@@ -136,7 +136,7 @@ class SearchRequestHandler extends RequestHandler
             if ($columns['sql']) {
                 $matchConditions[] =
                     '('
-                    .join(') OR (', array_map(function($sql) use ($query, $escapedQuery) {
+                    .join(') OR (', array_map(function ($sql) use ($query, $escapedQuery) {
                         return is_callable($sql) ? call_user_func($sql, $query) : sprintf($sql, $escapedQuery);
                     }, $columns['sql']))
                     .')';
@@ -153,41 +153,41 @@ class SearchRequestHandler extends RequestHandler
                         .' FROM `tag_items` t'
                         .' INNER JOIN `%s` p ON (p.ID = t.`ContextID`)'
                         .' WHERE t.`TagID` = %u AND t.`ContextClass` = "%s"'
-                        .' AND (%s)'
-                        , array(
+                        .' AND (%s)',
+                        [
                             $tableAlias,
                             $className::$tableName,
                             $tableAlias,
                             $Tag->ID,
                             $className,
                             join(') AND (', $className::mapConditions($options['conditions']))
-                        )
+                        ]
                     );
                 } else {
                     $results = DB::allRecords(
-                        'SELECT * FROM `%s` %s WHERE (%s)'
-                        , array(
+                        'SELECT * FROM `%s` %s WHERE (%s)',
+                        [
                             $className::$tableName,
                             $tableAlias,
                             join(') AND (', $className::mapConditions($options['conditions']))
-                        )
+                        ]
                     );
                 }
             } catch (TableNotFoundException $e) {
-                $results = array();
+                $results = [];
             }
 
             $classResults = count($results);
             $totalResults += $classResults;
 
-            $searchResults[$className] = $classResults ? ActiveRecord::instantiateRecords($results) : array();
+            $searchResults[$className] = $classResults ? ActiveRecord::instantiateRecords($results) : [];
         }
 
         //DebugLog::dumpLog();
 
-        static::respond('search', array(
+        static::respond('search', [
             'data' => $searchResults
             ,'totalResults' => $totalResults
-        ));
+        ]);
     }
 }

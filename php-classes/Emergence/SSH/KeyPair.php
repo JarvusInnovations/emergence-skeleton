@@ -2,9 +2,8 @@
 
 namespace Emergence\SSH;
 
-use Site;
 use Exception;
-
+use Site;
 
 class KeyPair
 {

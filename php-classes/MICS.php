@@ -35,7 +35,7 @@ class MICS
         return $value;
     }
 
-    public static function prepareOptions($value, $defaults = array())
+    public static function prepareOptions($value, $defaults = [])
     {
         if (is_string($value)) {
             $value = json_decode($value, true);

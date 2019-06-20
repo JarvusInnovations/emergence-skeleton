@@ -5,7 +5,6 @@ namespace Sencha;
 use ActiveRecord;
 use VersionedRecord;
 
-
 class CodeGenerator
 {
     const INDENT = '    ';
@@ -71,7 +70,7 @@ class CodeGenerator
                     $validators[] =  (object)[
                         'field' => $config['field'],
                         'type' => 'format',
-                        'matcher' => (object) [ '_type' => 'regex', 'pattern' => '^[a-zA-Z][a-zA-Z0-9_:\.-]*$' ],
+                        'matcher' => (object) ['_type' => 'regex', 'pattern' => '^[a-zA-Z][a-zA-Z0-9_:\.-]*$'],
                         'message' => $config['errorMessage'] ?: "{$config['field']} is required"
                     ];
                     break;
@@ -137,7 +136,7 @@ class CodeGenerator
         // analyze input
         end($data);
         $lastGroupName = key($data);
-        end ($data[$lastGroupName]);
+        end($data[$lastGroupName]);
         $lastItemKey = key($data[$lastGroupName]);
 
 
@@ -204,7 +203,7 @@ class CodeGenerator
     public static function buildArrayCode($data, $indent = 0, $appendComma = false)
     {
         // analyze input
-        end ($data);
+        end($data);
         $lastItemKey = key($data);
 
 

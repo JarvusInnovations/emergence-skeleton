@@ -6,7 +6,6 @@ use Exception;
 
 use Site;
 
-
 abstract class App implements IApp
 {
     public static $buildsRoot = 'webapp-builds';

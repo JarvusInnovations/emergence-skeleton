@@ -2,26 +2,26 @@
 
 
 
- class AMF0Parser
- {
-     // {{{ Type constants
+class AMF0Parser
+{
+    // {{{ Type constants
     const TYPE_NUMBER = 0x00;
-     const TYPE_BOOLEAN = 0x01;
-     const TYPE_STRING = 0x02;
-     const TYPE_OBJECT = 0x03;
-     const TYPE_MOVIECLIP = 0x04;
-     const TYPE_NULL = 0x05;
-     const TYPE_UNDEFINED = 0x06;
-     const TYPE_REFERENCE = 0x07;
-     const TYPE_MIXEDARRAY = 0x08;
-     const TYPE_OBJECT_TERM = 0x09;
-     const TYPE_ARRAY = 0x0a;
-     const TYPE_DATE = 0x0b;
-     const TYPE_LONGSTRING = 0x0c;
-     const TYPE_RECORDSET = 0x0e;
-     const TYPE_XML = 0x0f;
-     const TYPE_TYPED_OBJECT = 0x10;
-     const TYPE_AMF3 = 0x11;
+    const TYPE_BOOLEAN = 0x01;
+    const TYPE_STRING = 0x02;
+    const TYPE_OBJECT = 0x03;
+    const TYPE_MOVIECLIP = 0x04;
+    const TYPE_NULL = 0x05;
+    const TYPE_UNDEFINED = 0x06;
+    const TYPE_REFERENCE = 0x07;
+    const TYPE_MIXEDARRAY = 0x08;
+    const TYPE_OBJECT_TERM = 0x09;
+    const TYPE_ARRAY = 0x0a;
+    const TYPE_DATE = 0x0b;
+    const TYPE_LONGSTRING = 0x0c;
+    const TYPE_RECORDSET = 0x0e;
+    const TYPE_XML = 0x0f;
+    const TYPE_TYPED_OBJECT = 0x10;
+    const TYPE_AMF3 = 0x11;
     // }}} Type constants
 
     /**
@@ -76,15 +76,15 @@
         $tmp = pack("L", 1);
 
         // Unpack it in big endian order
-        $tmp2 = unpack("None",$tmp);
+        $tmp2 = unpack("None", $tmp);
 
         // Check if it's still one
         if ($tmp2['one'] == 1) {
             $this->endian = 0x00;
         } // Yes, big endian
-            else {
-                $this->endian = 0x01;
-            }    // No, little endian
+        else {
+            $this->endian = 0x01;
+        }    // No, little endian
 
         // Initialize if needed
         if ($str !== false) {
@@ -109,7 +109,7 @@
 
     /**
      * Read all packets
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	string		$str	AMF0 data (optional, uses the initialized one if not given)
@@ -123,7 +123,7 @@
         }
 
         // Parse each packet
-        $ret = array();
+        $ret = [];
         while ($this->index < $this->dataLength) {
             $ret[] = $this->readPacket();
         }
@@ -157,13 +157,13 @@
                 throw new Exception("Unhandled AMF type: MovieClip (04)");
                 break;
             case self::TYPE_NULL:        // NULL 0x05
-                return NULL;
+                return null;
             case self::TYPE_UNDEFINED:        // Undefined 0x06
                 return 'undefined';
             case self::TYPE_REFERENCE:        // Reference
                 throw new Exception("Unhandled AMF type: Reference (07)");
                 break;
-            case self::TYPE_MIXEDARRAY :    // Mixed array 0x08
+            case self::TYPE_MIXEDARRAY:    // Mixed array 0x08
                 return $this->readMixedArray();
             case self::TYPE_OBJECT_TERM:    // ObjectTerm
                 throw new Exception("Unhandled AMF type: ObjectTerm (09) -- should only happen in the getObject function");
@@ -204,7 +204,7 @@
         }
 
         // Get length
-        $len = unpack('nlen', substr($this->data,$this->index,2));
+        $len = unpack('nlen', substr($this->data, $this->index, 2));
         $this->index+=2;
 
         // Get string
@@ -230,7 +230,7 @@
         }
 
         // Get length
-        $len = unpack('Nlen', substr($this->data,$this->index,4));
+        $len = unpack('Nlen', substr($this->data, $this->index, 4));
         $this->index+=4;
 
         // Get string
@@ -348,7 +348,7 @@
 
     /**
      * Read a mixed array at current position
-     * 
+     *
      * Note: A mixed array is basically an object, but with a long integer describing its highest index at first.
      *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
@@ -379,11 +379,11 @@
         }
 
         // Get item count
-        $len = unpack('Nlen',substr($this->data,$this->index,4));
+        $len = unpack('Nlen', substr($this->data, $this->index, 4));
         $this->index+=4;
 
         // Get each packet
-        $ret = array();
+        $ret = [];
         for ($i=0;$i<$len['len'];$i++) {
             $ret[] = $this->readPacket();
         }
@@ -430,16 +430,16 @@
         // Make epoch GMT, and then convert to local time
         $time = $epoch;
         $time += $timezone*60;    // Timezone is in seconds
-        $time += date('Z',$time);
+        $time += date('Z', $time);
 
         // Return it
-        return date('r',$time);
+        return date('r', $time);
     } // readDate function
 
 
     /**
      * Write a packet
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	mixed	$value
@@ -457,7 +457,7 @@
             } elseif (is_array($value)) {
                 $type = self::TYPE_ARRAY;
                 foreach (array_keys($value) as $k) {
-                    if (preg_match(',[^0-9],',$k)) {
+                    if (preg_match(',[^0-9],', $k)) {
                         $type = self::TYPE_MIXEDARRAY;
                         break;
                     }
@@ -598,7 +598,7 @@
 
     /**
      * Write a null
-     * 
+     *
      * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @return 	string
@@ -614,7 +614,7 @@
 
     /**
      * Write a boolean
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	bool	$boolean
@@ -634,7 +634,7 @@
 
     /**
      * Write a mixed array
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	array	$array
@@ -646,7 +646,7 @@
         $value = chr(self::TYPE_MIXEDARRAY);
 
         // Write index
-        $value .= pack('N',count($array));
+        $value .= pack('N', count($array));
 
         // Write as object
         $value .= $this->writeObjectSub($array);
@@ -657,7 +657,7 @@
 
     /**
      * Write an object
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	stdClass|array	$object
@@ -677,7 +677,7 @@
 
     /**
      * Write a typed object
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	stdClass|array	$object
@@ -707,7 +707,7 @@
 
     /**
      * Write an object, without the leading type
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	private
      * @internal
@@ -721,14 +721,14 @@
         // Write each element
         foreach ($object as $key=>$value) {
             // Write key
-            $output .= pack('n',strlen($key)).$key;
+            $output .= pack('n', strlen($key)).$key;
 
             // Write value
             $output .= $this->writePacket($value);
         }
 
         // Write object term
-        $output .= pack('n',0);
+        $output .= pack('n', 0);
         $output .= chr(0x09);
 
         // Return it
@@ -737,7 +737,7 @@
 
     /**
      * Write an index array
-     * 
+     *
      * @author	Tommy Lacroix <lacroix.tommy@gmail.com>
      * @access 	public
      * @param 	array	$array
@@ -759,4 +759,4 @@
         // Return it
         return $value;
     } // writeArray function
- }
+}

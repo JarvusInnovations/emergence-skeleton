@@ -2,7 +2,6 @@
 
 namespace Emergence\WebApps;
 
-
 interface IApp
 {
     public static function load($appName);

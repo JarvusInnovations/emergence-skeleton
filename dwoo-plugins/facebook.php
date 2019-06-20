@@ -26,7 +26,7 @@ function Dwoo_Plugin_facebook(Dwoo_Core $dwoo, $page, $assign = 'fbFeed', $limit
     if (!empty($result['data']) && is_array($result['data'])) {
         $dwoo->assignInScope($result['data'], $assign);
     } else {
-        $dwoo->assignInScope(array(), $assign);
+        $dwoo->assignInScope([], $assign);
     }
 
 

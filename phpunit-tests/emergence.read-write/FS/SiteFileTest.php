@@ -3,8 +3,8 @@
 namespace Emergence\TestsRW\FS;
 
 use \Site;
-use \SiteFile;
 use \SiteCollection;
+use \SiteFile;
 
 class SiteFileTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,7 +81,7 @@ class SiteFileTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SiteFile', $instantiatedNode, 'instantiated node is SiteFile');
         $this->assertEquals($fileData['ID'], $instantiatedNode->ID, 'instantiated node ID matches created');
         $this->assertEquals($filename, $instantiatedNode->Handle, 'instantiated node handle matches created');
-        $this->assertEquals('Normal',$instantiatedNode->Status, 'instantiated node status is Normal');
+        $this->assertEquals('Normal', $instantiatedNode->Status, 'instantiated node status is Normal');
         $this->assertEquals(14, $instantiatedNode->Size, 'instantiated node size is 14');
         $this->assertEquals('text/plain', $instantiatedNode->Type, 'instantiated node type is text/plain');
         $this->assertEquals('5e841ee02c64eb30f882676939a7b6bccc06c326', $instantiatedNode->SHA1, 'instantiated node SHA1 is 5e841ee02c64eb30f882676939a7b6bccc06c326');
@@ -91,7 +91,7 @@ class SiteFileTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SiteFile', $retrievedNode, 'resolved node is SiteFile');
         $this->assertEquals($fileData['ID'], $retrievedNode->ID, 'resolved node ID matches created');
         $this->assertEquals($filename, $retrievedNode->Handle, 'resolved node handle matches created');
-        $this->assertEquals('Normal',$retrievedNode->Status, 'resolved node status is Normal');
+        $this->assertEquals('Normal', $retrievedNode->Status, 'resolved node status is Normal');
         $this->assertEquals(14, $retrievedNode->Size, 'resolved node size is 14');
         $this->assertEquals('text/plain', $retrievedNode->Type, 'resolved node type is text/plain');
         $this->assertEquals('5e841ee02c64eb30f882676939a7b6bccc06c326', $retrievedNode->SHA1, 'resolved node SHA1 is 5e841ee02c64eb30f882676939a7b6bccc06c326');

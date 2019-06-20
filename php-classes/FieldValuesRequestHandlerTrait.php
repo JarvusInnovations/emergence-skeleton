@@ -2,7 +2,7 @@
 
 trait FieldValuesRequestHandlerTrait
 {
-    public static function handleFieldValuesRequest($fieldName, array $additionalValues = array())
+    public static function handleFieldValuesRequest($fieldName, array $additionalValues = [])
     {
         $recordClass = static::$recordClass;
 
@@ -19,7 +19,7 @@ trait FieldValuesRequestHandlerTrait
             case 'enum':
                 $values = $field['values'];
                 if ($query) {
-                    $values = array_filter($values, function($value) use ($query) {
+                    $values = array_filter($values, function ($value) use ($query) {
                         return stripos($value, $query) !== false;
                     });
                 }

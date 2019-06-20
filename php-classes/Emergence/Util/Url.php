@@ -4,7 +4,6 @@ namespace Emergence\Util;
 
 use Site;
 
-
 class Url
 {
     public static function buildAbsolute($path = null, $params = null)

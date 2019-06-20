@@ -66,7 +66,7 @@ class Cmd
         $shellCommand = $this->getExecutable();
 
         $args = array_filter(func_get_args());
-        foreach ($args AS $arg) {
+        foreach ($args as $arg) {
             if (is_string($arg)) {
                 $shellCommand .= ' '.$arg;
             } elseif (is_array($arg)) {

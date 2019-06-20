@@ -40,9 +40,9 @@ class TokensRequestHandler extends RequestHandler
         }
 
         $tokenClass = $Token->Class;
-        return static::respond($tokenClass::$formTemplate, array(
+        return static::respond($tokenClass::$formTemplate, [
             'Token' => $Token
             ,'error' => isset($error) ? $error : false
-        ));
+        ]);
     }
 }

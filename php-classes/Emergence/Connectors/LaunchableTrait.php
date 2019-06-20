@@ -2,7 +2,6 @@
 
 namespace Emergence\Connectors;
 
-
 trait LaunchableTrait
 {
     public static $launchers = [];
@@ -11,7 +10,7 @@ trait LaunchableTrait
     {
         $launchers = [];
 
-        foreach ($this->Mappings AS $Mapping) {
+        foreach ($this->Mappings as $Mapping) {
             if (empty(static::$launchers[$Mapping->Connector])) {
                 continue;
             }

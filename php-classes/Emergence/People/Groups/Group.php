@@ -2,13 +2,14 @@
 
 namespace Emergence\People\Groups;
 
-use DB;
 use ActiveRecord;
-use HandleBehavior, NestingBehavior;
-use Person; // TODO: use Emergence\People\Person instead in skeleton-v2+
-use Emergence\People\IPerson;
-use PeopleRequestHandler;
+use DB;
 use DuplicateKeyException;
+use Emergence\People\IPerson;
+use HandleBehavior; // TODO: use Emergence\People\Person instead in skeleton-v2+
+use NestingBehavior;
+use PeopleRequestHandler;
+use Person;
 use TableNotFoundException;
 
 class Group extends ActiveRecord
@@ -22,74 +23,74 @@ class Group extends ActiveRecord
     // they can be manipulated via config files to plug in same-table subclasses
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__, 'Emergence\People\Groups\Organization');
+    public static $subClasses = [__CLASS__, 'Emergence\People\Groups\Organization'];
 
-    public static $fields = array(
+    public static $fields = [
         'Name'
-        ,'Handle' => array(
+        ,'Handle' => [
             'unique' => true
-        )
-        ,'Status' => array(
+        ]
+        ,'Status' => [
             'type' => 'enum'
-            ,'values' => array('Active', 'Disabled')
+            ,'values' => ['Active', 'Disabled']
             ,'default' => 'Active'
-        )
-        ,'ParentID' => array(
+        ]
+        ,'ParentID' => [
             'type' => 'uint'
             ,'notnull' => false
-        )
-        ,'Left' => array(
+        ]
+        ,'Left' => [
             'type' => 'uint'
             ,'notnull' => false
             ,'unique' => true
-        )
-        ,'Right' => array(
+        ]
+        ,'Right' => [
             'type' => 'uint'
             ,'notnull' => false
-        )
-        ,'Founded' => array(
+        ]
+        ,'Founded' => [
             'type' => 'timestamp'
             ,'default' => null
-        )
-        ,'About' => array(
+        ]
+        ,'About' => [
             'type' => 'clob'
             ,'notnull' => false
-        )
-    );
+        ]
+    ];
 
-    public static $relationships = array(
-        'Members' => array(
+    public static $relationships = [
+        'Members' => [
             'type' => 'one-many'
             ,'class' => 'Emergence\People\Groups\GroupMember'
             ,'foreign' => 'GroupID'
-        )
-        ,'Parent' => array(
+        ]
+        ,'Parent' => [
             'type' => 'one-one'
             ,'class' => __CLASS__
-        )
-        ,'People' => array(
+        ]
+        ,'People' => [
             'type' => 'many-many'
             ,'class' => 'Person'
             ,'linkClass' => 'Emergence\People\Groups\GroupMember'
             ,'linkLocal' => 'GroupID'
             ,'linkForeign' => 'PersonID'
-        )
-    );
+        ]
+    ];
 
-    public static $dynamicFields = array(
-        'FullPath' => array(
+    public static $dynamicFields = [
+        'FullPath' => [
             'method' => 'getFullPath'
-        )
-        ,'Population' => array(
+        ]
+        ,'Population' => [
             'method' => 'getPopulation'
-        )
-    );
+        ]
+    ];
 
-    public static $validators = array(
-        'Name' => array(
+    public static $validators = [
+        'Name' => [
             'errorMessage' => 'A name is required'
-        )
-    );
+        ]
+    ];
 
     public static function getByHandle($handle)
     {
@@ -133,7 +134,7 @@ class Group extends ActiveRecord
 
     public function getAllPeople()
     {
-        $order = PeopleRequestHandler::$browseOrder ? Person::mapFieldOrder(PeopleRequestHandler::$browseOrder) : array();
+        $order = PeopleRequestHandler::$browseOrder ? Person::mapFieldOrder(PeopleRequestHandler::$browseOrder) : [];
 
         array_unshift($order, 'GroupMember.Rank DESC');
 
@@ -142,27 +143,27 @@ class Group extends ActiveRecord
             .' FROM `%s` GroupMember'
             .' JOIN `%s` Person ON (Person.ID = GroupMember.PersonID)'
             .' WHERE GroupMember.GroupID IN (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u)'
-            .' ORDER BY '.join(',', $order)
-            ,array(
+            .' ORDER BY '.join(',', $order),
+            [
                 GroupMember::$tableName
                 ,Person::$tableName
                 ,Group::$tableName
                 ,$this->Left
                 ,$this->Right
-            )
+            ]
         );
     }
 
     public function getFullPath($separator = '/')
     {
         return DB::oneValue(
-            'SELECT GROUP_CONCAT(Name SEPARATOR "%s") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`'
-            ,array(
+            'SELECT GROUP_CONCAT(Name SEPARATOR "%s") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`',
+            [
                 DB::escape($separator)
                 ,static::$tableName
                 ,$this->Left
                 ,$this->Right
-            )
+            ]
         );
     }
 
@@ -170,13 +171,13 @@ class Group extends ActiveRecord
     {
         try {
             return (integer)DB::oneValue(
-                'SELECT COUNT(*) FROM (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u) `Group` JOIN `%s` GroupMember ON GroupID = `Group`.ID'
-                ,array(
+                'SELECT COUNT(*) FROM (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u) `Group` JOIN `%s` GroupMember ON GroupID = `Group`.ID',
+                [
                     static::$tableName
                     ,$this->Left
                     ,$this->Right
                     ,GroupMember::$tableName
-                )
+                ]
             );
         } catch (TableNotFoundException $e) {
             return 0;
@@ -185,13 +186,13 @@ class Group extends ActiveRecord
 
     public static function setPersonGroups(IPerson $Person, $groupIDs)
     {
-        $assignedGroups = array();
+        $assignedGroups = [];
 
         if (is_string($groupIDs)) {
             $groupIDs = preg_split('/\s*[,]+\s*/', trim($groupIDs));
         }
 
-        foreach ($groupIDs AS $groupID) {
+        foreach ($groupIDs as $groupID) {
             if (!$groupID) {
                 continue;
             }
@@ -205,12 +206,12 @@ class Group extends ActiveRecord
         // delete tags
         try {
             DB::query(
-                'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)'
-                ,array(
+                'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)',
+                [
                     GroupMember::$tableName
                     ,$Person->ID
                     ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
-                )
+                ]
             );
         } catch (TableNotFoundException $e) {
             // no groups need to be deleted
@@ -219,7 +220,7 @@ class Group extends ActiveRecord
         return $assignedGroups;
     }
 
-    public function assignMember(IPerson $Person, $memberData = array())
+    public function assignMember(IPerson $Person, $memberData = [])
     {
         $memberData['GroupID'] = $this->ID;
         $memberData['PersonID'] = $Person->ID;

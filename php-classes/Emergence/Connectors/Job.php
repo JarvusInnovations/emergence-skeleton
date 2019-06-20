@@ -3,14 +3,13 @@
 namespace Emergence\Connectors;
 
 use ActiveRecord;
-use HandleBehavior;
-use Psr\Log\LogLevel;
-use Psr\Log\LoggerInterface;
 use Emergence\Logger;
+use HandleBehavior;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class Job extends ActiveRecord implements LoggerInterface
 {
-
     use \Psr\Log\LoggerTrait;
 
     public $logEntries;
@@ -23,55 +22,55 @@ class Job extends ActiveRecord implements LoggerInterface
     // required for shared-table subclassing support
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
 
-    public static $fields = array(
-        'Title' => array(
+    public static $fields = [
+        'Title' => [
             'default' => null
-        )
-        ,'Handle' => array(
+        ]
+        ,'Handle' => [
             'unique' => true
-        )
+        ]
 
-        ,'Status' => array(
+        ,'Status' => [
             'type' => 'enum'
-            ,'values' => array('Template','Pending','InProgress','Completed','Failed','Abandoned')
+            ,'values' => ['Template','Pending','InProgress','Completed','Failed','Abandoned']
             ,'default' => 'Pending'
-        )
+        ]
 
         ,'Connector'
-        ,'TemplateID' => array(
+        ,'TemplateID' => [
             'type' => 'uint'
             ,'notnull' => false
-        )
+        ]
 
-        ,'Direction' => array(
+        ,'Direction' => [
             'type' => 'enum'
-            ,'values' => array('In','Out','Both')
+            ,'values' => ['In','Out','Both']
             ,'notnull' => false
-        )
+        ]
 
-        ,'Config' => array(
+        ,'Config' => [
             'type' => 'json'
-        )
-        ,'Results' => array(
+        ]
+        ,'Results' => [
             'type' => 'json'
             ,'default' => null
-        )
-    );
+        ]
+    ];
 
-    public static $relationships = array(
-        'Template' => array(
+    public static $relationships = [
+        'Template' => [
             'type' => 'one-one'
             ,'class' => __CLASS__
-        )
-        ,'TemplatedJobs' => array(
+        ]
+        ,'TemplatedJobs' => [
             'type' => 'one-many'
             ,'class' => __CLASS__
             ,'foreign' => 'TemplateID'
-            ,'order' => array('ID' => 'DESC')
-        )
-    );
+            ,'order' => ['ID' => 'DESC']
+        ]
+    ];
 
 
     public function save($deep = true)
@@ -91,11 +90,11 @@ class Job extends ActiveRecord implements LoggerInterface
         return $className::getTitle();
     }
 
-    public function logRecordDelta(ActiveRecord $Record, $options = array())
+    public function logRecordDelta(ActiveRecord $Record, $options = [])
     {
-        $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : array();
-        $labelRenderers = is_array($options['labelRenderers']) ? $options['labelRenderers'] : array();
-        $valueRenderers = is_array($options['valueRenderers']) ? $options['valueRenderers'] : array();
+        $ignoreFields = is_array($options['ignoreFields']) ? $options['ignoreFields'] : [];
+        $labelRenderers = is_array($options['labelRenderers']) ? $options['labelRenderers'] : [];
+        $valueRenderers = is_array($options['valueRenderers']) ? $options['valueRenderers'] : [];
         $messageRenderer = is_callable($options['messageRenderer']) ? $options['messageRenderer'] : function ($logEntry) use ($options) {
             $title = $options['title'] ?: $logEntry['record']->getTitle();
             $class = $logEntry['record']->Class;
@@ -107,13 +106,13 @@ class Job extends ActiveRecord implements LoggerInterface
             return $logEntry['action'].' '.$title;
         };
 
-        $logEntry = array(
-            'changes' => array()
+        $logEntry = [
+            'changes' => []
             ,'level' => array_key_exists('level', $options) ? $options['level'] : LogLevel::NOTICE
             ,'record' => &$Record
-        );
+        ];
 
-        foreach ($Record->originalValues AS $field => $from) {
+        foreach ($Record->originalValues as $field => $from) {
             if (in_array($field, $ignoreFields)) {
                 continue;
             }
@@ -133,10 +132,10 @@ class Job extends ActiveRecord implements LoggerInterface
                 $to = call_user_func($valueRenderers[$field], $to, $logEntry, $field, 'to');
             }
 
-            $logEntry['changes'][$fieldLabel] = array(
+            $logEntry['changes'][$fieldLabel] = [
                 'from' => $from
                 ,'to' => $to
-            );
+            ];
         }
 
         if ($Record->isPhantom || $Record->isNew) {

@@ -2,20 +2,19 @@
 
 namespace Emergence\Util;
 
+use Emergence_FS;
 use Exception;
 use SiteFile;
-use Emergence_FS;
 use Symfony\Component\Yaml\Yaml;
-
 
 /**
  * TODO: use this in Sencha_App
  */
 class Data
 {
-    public static function expandDottedKeysToTree($input, &$output = array())
+    public static function expandDottedKeysToTree($input, &$output = [])
     {
-        foreach ($input AS $key => $value) {
+        foreach ($input as $key => $value) {
             $keys = explode('.', $key);
             $target =& $output;
 
@@ -24,7 +23,7 @@ class Data
 
                 if (count($keys)) {
                     if (!array_key_exists($subKey, $target)) {
-                        $target[$subKey] = array();
+                        $target[$subKey] = [];
                     }
 
                     $target =& $target[$subKey];
@@ -37,9 +36,9 @@ class Data
         return $output;
     }
 
-    public static function collapseTreeToDottedKeys($input, &$output = array(), $prefix = null)
+    public static function collapseTreeToDottedKeys($input, &$output = [], $prefix = null)
     {
-        foreach ($input AS $key => $value) {
+        foreach ($input as $key => $value) {
             $key = $prefix ? "$prefix.$key" : $key;
             if (is_array($value)) {
                 static::collapseTreeToDottedKeys($value, $output, $key);
@@ -62,9 +61,9 @@ class Data
     /**
      * return array of 'to' values from delta
      */
-    public static function extractToFromDelta($delta, &$output = array())
+    public static function extractToFromDelta($delta, &$output = [])
     {
-        foreach ($delta AS $key => $value) {
+        foreach ($delta as $key => $value) {
             if (!is_array($value)) {
                 continue;
             }
@@ -115,7 +114,7 @@ class Data
         $docsTree = Emergence_FS::findFiles('\.(ya?ml|json)$', true, $root);
 
         $data = $base;
-        foreach ($docsTree AS $path => $node) {
+        foreach ($docsTree as $path => $node) {
             $pathStack = array_slice($node->getFullPath(null, false), 1);
             $dataRoot = &$data;
 

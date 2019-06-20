@@ -30,6 +30,3 @@ function Dwoo_Plugin_format_text(Dwoo_Core $dwoo, $text, $format = 'plain', $mod
 
     }
 }
-
-
-?>

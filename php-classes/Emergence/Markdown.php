@@ -22,14 +22,14 @@ class Markdown extends \Michelf\MarkdownExtra
 
         $html = parent::_doFencedCodeBlocks_callback($matches);
 
-        preg_replace_callback('/B\x1A[0-9]+B/', function($blockHashMatches) use (&$hashes) {
+        preg_replace_callback('/B\x1A[0-9]+B/', function ($blockHashMatches) use (&$hashes) {
             $hashId = $blockHashMatches[0];
 
             if (array_key_exists($hashId, $hashes)) {
-                $hashes[$hashId] = preg_replace_callback('|<pre class="shell">(.*?)</pre>|s', function($codeBlockMatches) {
+                $hashes[$hashId] = preg_replace_callback('|<pre class="shell">(.*?)</pre>|s', function ($codeBlockMatches) {
                     $shellCode = $codeBlockMatches[1];
 
-                    $shellCode = preg_replace_callback('/^([^\s]+\s+)([^\s]+\s+)([#$])\s+(.*)/m', function($commandMatches) {
+                    $shellCode = preg_replace_callback('/^([^\s]+\s+)([^\s]+\s+)([#$])\s+(.*)/m', function ($commandMatches) {
                         $shellUser = trim($commandMatches[1]);
                         $shellPromptPath = trim($commandMatches[2]);
                         $shellPromptSymbol = $commandMatches[3];

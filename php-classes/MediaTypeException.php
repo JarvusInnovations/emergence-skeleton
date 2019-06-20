@@ -2,6 +2,6 @@
 
 
 
- class MediaTypeException extends Exception
- {
- }
+class MediaTypeException extends Exception
+{
+}

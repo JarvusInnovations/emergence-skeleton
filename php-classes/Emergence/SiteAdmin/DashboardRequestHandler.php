@@ -3,10 +3,10 @@
 namespace Emergence\SiteAdmin;
 
 use DB;
-use Site;
-use Person;
-use User;
 use Emergence\Util\ByteSize;
+use Person;
+use Site;
+use User;
 
 class DashboardRequestHandler extends \RequestHandler
 {
@@ -24,7 +24,7 @@ class DashboardRequestHandler extends \RequestHandler
         $memoryOutput = explode(PHP_EOL, trim(shell_exec('free -b')));
         array_shift($memoryOutput);
 
-        foreach ($memoryOutput AS $line) {
+        foreach ($memoryOutput as $line) {
             $line = preg_split('/\s+/', $line);
 
             if ($line[0] == 'Mem:') {
@@ -104,7 +104,9 @@ class DashboardRequestHandler extends \RequestHandler
                 ],
                 [
                     'label' => 'Host Load Average',
-                    'value' => implode(' ', array_map(function ($n) { return number_format($n, 2); }, sys_getloadavg()))
+                    'value' => implode(' ', array_map(function ($n) {
+                        return number_format($n, 2);
+                    }, sys_getloadavg()))
                 ],
                 [
                     'label' => 'Database tables',

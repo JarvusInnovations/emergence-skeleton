@@ -83,8 +83,8 @@ class ErrorHandler extends RequestHandler
         $report = sprintf("<h2>Backtrace</h2>\n");
         $report .= sprintf("<table border='1'>\n");
         $report .= sprintf("<tr><th>Function</th><th>Args</th><th>Object</th><th>File:Line</th></tr>\n");
-        foreach ($backtrace AS $track) {
-            foreach ($track['args'] AS &$arg) {
+        foreach ($backtrace as $track) {
+            foreach ($track['args'] as &$arg) {
                 if (is_object($arg)) {
                     $arg = get_class($arg);
                 } else {
@@ -93,14 +93,14 @@ class ErrorHandler extends RequestHandler
             }
 
             $report .= sprintf(
-                '<tr><td>%s<br/>%s%s</td><td>%s</td><td>%s</td><td>%s<br/>Line %s</td></tr>'
-                , isset($track['class']) ? $track['class'] : ''
-                , isset($track['type']) ? $track['type'] : ''
-                , $track['function']
-                , join('<hr />', $track['args'])
-                , isset($track['object']) ? get_class($track['object']) : ''
-                , $track['file']
-                , $track['line']
+                '<tr><td>%s<br/>%s%s</td><td>%s</td><td>%s</td><td>%s<br/>Line %s</td></tr>',
+                isset($track['class']) ? $track['class'] : '',
+                isset($track['type']) ? $track['type'] : '',
+                $track['function'],
+                join('<hr />', $track['args']),
+                isset($track['object']) ? get_class($track['object']) : '',
+                $track['file'],
+                $track['line']
             );
         }
         $report .= sprintf("</table>");
@@ -116,5 +116,3 @@ class ErrorHandler extends RequestHandler
         }
     }
 }
-
-

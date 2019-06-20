@@ -7,7 +7,7 @@ class RecordValidator
 
     // protected properties
     protected $_record;
-    protected $_errors = array();
+    protected $_errors = [];
 
 
     // magic methods
@@ -31,7 +31,7 @@ class RecordValidator
     // public instance methods
     public function resetErrors()
     {
-        $this->_errors = array();
+        $this->_errors = [];
     }
 
     public function getErrors($id = false)
@@ -67,10 +67,10 @@ class RecordValidator
     public function validate($options)
     {
         // apply default
-        $options = array_merge(array(
+        $options = array_merge([
             'validator' => 'string'
             , 'required' => true
-        ), $options);
+        ], $options);
 
 
         // check 'field'
@@ -90,7 +90,7 @@ class RecordValidator
 
         // get validator
         if (is_string($options['validator'])) {
-            $validator = array('Validators', $options['validator']);
+            $validator = ['Validators', $options['validator']];
         } else {
             $validator = $options['validator'];
         }
@@ -109,8 +109,8 @@ class RecordValidator
 
         // parse 'field' for multiple values and array paths
         if (is_array($options['field'])) {
-            $value = array();
-            foreach ($options['field'] AS $field_single) {
+            $value = [];
+            foreach ($options['field'] as $field_single) {
                 $value[] = $this->resolveValue($field_single);
             }
 
@@ -171,7 +171,7 @@ class RecordValidator
     // protected static methods
     protected static function trimArray(&$array)
     {
-        foreach ($array AS &$var) {
+        foreach ($array as &$var) {
             if (is_string($var)) {
                 $var = trim($var);
             } elseif (is_array($var)) {

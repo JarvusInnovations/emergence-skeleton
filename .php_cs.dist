@@ -1,0 +1,27 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__.'/dwoo-plugins')
+    ->in(__DIR__.'/event-handlers')
+    ->in(__DIR__.'/php-classes')
+    ->in(__DIR__.'/php-config')
+    ->in(__DIR__.'/php-migrations')
+    ->in(__DIR__.'/phpunit-tests')
+    ->in(__DIR__.'/site-root')
+    ->in(__DIR__.'/site-tasks')
+;
+
+return PhpCsFixer\Config::create()
+    ->setIndent('    ')
+    ->setRules([
+        '@PSR2' => true,
+        'no_whitespace_in_blank_line' => true,
+        'ordered_imports' => true,
+        'trim_array_spaces' => true,
+        'array_indentation' => true,
+        'array_syntax' => ['syntax' => 'short'],
+    ])
+    ->setFinder($finder)
+;
+
+// braces,elseif,function_call_space,indentation,linefeed,trailing_spaces,visibility,concat_without_spaces,whitespacy_lines,parenthesis,short_array_syntax

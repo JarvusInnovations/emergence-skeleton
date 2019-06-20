@@ -2,7 +2,6 @@
 
 namespace Emergence\Site;
 
-
 class Response implements IResponse
 {
     protected $id;

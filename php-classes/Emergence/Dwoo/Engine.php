@@ -7,13 +7,13 @@ use Site;
 class Engine extends \Dwoo_Core
 {
     // configurables
-    public static $magicGlobals = array('Session');
+    public static $magicGlobals = ['Session'];
     public static $pathCompile = '/tmp/dwoo-compiled';
     public static $pathCache = '/tmp/dwoo-cached';
     public static $onGlobalsSet;
-    public static $templateResources = array(
+    public static $templateResources = [
         'emergence' => 'Emergence\Dwoo\Template'
-    );
+    ];
     public static $defaultTemplateResource = 'emergence';
 
 
@@ -37,8 +37,8 @@ class Engine extends \Dwoo_Core
         parent::__construct(static::$pathCompile, static::$pathCache);
 
         // register template resources
-        foreach (static::$templateResources AS $handle => $class) {
-            $this->addResource($handle, $class, array(__CLASS__, 'compilerFactory'));
+        foreach (static::$templateResources as $handle => $class) {
+            $this->addResource($handle, $class, [__CLASS__, 'compilerFactory']);
         }
     }
 
@@ -62,7 +62,7 @@ class Engine extends \Dwoo_Core
         return static::$_instance_compiler;
     }
 
-    public static function respond($template, $data = array(), $factory = null)
+    public static function respond($template, $data = [], $factory = null)
     {
         $dwoo = static::getInstance();
 
@@ -77,7 +77,7 @@ class Engine extends \Dwoo_Core
         Site::finishRequest();
     }
 
-    public static function getSource($template, $data = array(), $factory = null)
+    public static function getSource($template, $data = [], $factory = null)
     {
         $dwoo = static::getInstance();
 
@@ -112,13 +112,13 @@ class Engine extends \Dwoo_Core
         parent::initRuntimeVars($tpl);
 
         // set site information
-        $this->globals['Site'] = array(
+        $this->globals['Site'] = [
             'title' => Site::$title
             ,'degredations' => Site::getConfig('degredations')
-        );
+        ];
 
         // add magic globals
-        foreach (self::$magicGlobals AS $name => $value) {
+        foreach (self::$magicGlobals as $name => $value) {
             if (is_int($name)) {
                 $name = $value;
             }

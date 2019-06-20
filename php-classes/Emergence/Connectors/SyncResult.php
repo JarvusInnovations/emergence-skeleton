@@ -49,5 +49,4 @@ class SyncResult
             return $this->context;
         }
     }
-
 }

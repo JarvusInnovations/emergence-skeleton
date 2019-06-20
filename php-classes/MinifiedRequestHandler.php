@@ -9,9 +9,9 @@ class MinifiedRequestHandler extends RequestHandler
     {
         switch (static::shiftPath()) {
             case 'js':
-                return static::handleAssetsRequest(array('site-root','js'), 'application/javascript', 'JSMin');
+                return static::handleAssetsRequest(['site-root','js'], 'application/javascript', 'JSMin');
             case 'css':
-                return static::handleAssetsRequest(array('site-root','css'), 'text/css', 'CssMin');
+                return static::handleAssetsRequest(['site-root','css'], 'text/css', 'CssMin');
             default:
                 return static::throwInvalidRequestError();
         }
@@ -86,7 +86,7 @@ class MinifiedRequestHandler extends RequestHandler
 
         if (is_array($cacheHashOrSourceReport) && is_array($cacheHashOrSourceReport['files'])) {
             $code = '';
-            foreach ($cacheHashOrSourceReport['files'] AS $path => $fileData) {
+            foreach ($cacheHashOrSourceReport['files'] as $path => $fileData) {
                 $code .= $minifier::minify(file_get_contents(SiteFile::getRealPathByID($fileData['ID'])));
             }
 
@@ -101,10 +101,10 @@ class MinifiedRequestHandler extends RequestHandler
     {
         $sourceFiles = static::getSourceNodes($paths, $root, $contentType);
 
-        return array(
+        return [
             'files' => $sourceFiles
             ,'hash' => static::getFilesHash($sourceFiles)
-        );
+        ];
     }
 
     public static function getSourceNodes($paths, $root, $contentType = null)
@@ -115,9 +115,9 @@ class MinifiedRequestHandler extends RequestHandler
             $root = Site::splitPath($root);
         }
 
-        $sourceFiles = array();
+        $sourceFiles = [];
 
-        foreach ($paths AS $path) {
+        foreach ($paths as $path) {
             $path = array_merge($root, $path);
             list($filename) = array_slice($path, -1);
 
@@ -125,7 +125,7 @@ class MinifiedRequestHandler extends RequestHandler
                 array_pop($path);
 
                 Emergence_FS::cacheTree($path);
-                foreach (Emergence_FS::getTreeFiles($path, false, $contentType ? array('Type' => $contentType) : null) AS $path => $fileData) {
+                foreach (Emergence_FS::getTreeFiles($path, false, $contentType ? ['Type' => $contentType] : null) as $path => $fileData) {
                     $sourceFiles[$path] = $fileData;
                 }
             } else {
@@ -138,10 +138,10 @@ class MinifiedRequestHandler extends RequestHandler
                     throw new Exception('Source file "'.implode('/', $path).'" does not match requested content type "'.$contentType.'"', self::ERROR_TYPE_MISMATCH);
                 }
 
-                $sourceFiles[join('/', $path)] = array(
+                $sourceFiles[join('/', $path)] = [
                     'ID' => $node->ID
                     ,'SHA1' => $node->SHA1
-                );
+                ];
             }
         }
 
@@ -154,7 +154,7 @@ class MinifiedRequestHandler extends RequestHandler
             $paths = implode('/', $paths);
         }
 
-        return array_map(function($path) {
+        return array_map(function ($path) {
             return array_filter(explode('/', $path));
         }, preg_split('/(\+|%2B|%20|\s+)/', $paths));
     }
@@ -163,7 +163,7 @@ class MinifiedRequestHandler extends RequestHandler
     {
         $hashStr = '';
 
-        foreach ($files AS $path => $fileData) {
+        foreach ($files as $path => $fileData) {
             $hashStr .= "$path\t$fileData[SHA1]\n";
         }
 

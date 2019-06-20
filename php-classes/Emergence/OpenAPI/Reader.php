@@ -2,11 +2,10 @@
 
 namespace Emergence\OpenAPI;
 
-use Exception;
 use ActiveRecord;
+use Emergence\Util\Data as DataUtil;
+use Exception;
 use VersionedRecord;
-use Emergence\Util\Data AS DataUtil;
-
 
 class Reader
 {
@@ -71,7 +70,7 @@ class Reader
     {
         $results = [];
 
-        foreach ($array AS $key => $value) {
+        foreach ($array as $key => $value) {
             if (!is_array($value)) {
                 continue;
             }
@@ -90,7 +89,7 @@ class Reader
 
     protected static function isPathObject(array $object)
     {
-        foreach (static::$pathObjectProperties AS $key) {
+        foreach (static::$pathObjectProperties as $key) {
             if (array_key_exists($key, $object)) {
                 return true;
             }
@@ -101,7 +100,7 @@ class Reader
 
     protected static function isSchemaObject(array $object)
     {
-        foreach (static::$schemaObjectProperties AS $key) {
+        foreach (static::$schemaObjectProperties as $key) {
             if (array_key_exists($key, $object)) {
                 return true;
             }
@@ -125,7 +124,7 @@ class Reader
 
             $required = [];
 
-            foreach ($object['x-activeRecord']::aggregateStackedConfig('fields') AS $fieldName => $fieldConfig) {
+            foreach ($object['x-activeRecord']::aggregateStackedConfig('fields') as $fieldName => $fieldConfig) {
                 if ($fieldName == 'RevisionID' && is_a($object['x-activeRecord'], VersionedRecord::class, true)) {
                     continue;
                 }
@@ -176,6 +175,7 @@ class Reader
                     case 'enum':
                         $propertyDefaults['enum'] = $fieldConfig['values'];
                         // fall through to string type
+                        // no break
                     case 'set':
                     case 'string':
                     case 'clob':
@@ -272,19 +272,19 @@ class Reader
                 'required' => []
             ];
 
-            $definitions = array_map(function($definition) use ($document) {
+            $definitions = array_map(function ($definition) use ($document) {
                 return static::dereferenceNode($definition, $document);
             }, $schema['allOf']);
 
-            foreach ($definitions AS $definition) {
-                foreach ($definition['required'] AS $required) {
+            foreach ($definitions as $definition) {
+                foreach ($definition['required'] as $required) {
                     if (!in_array($required, $aggregate['required'])) {
                         $aggregate['required'][] = $required;
                     }
                 }
                 unset($definition['required']);
 
-                foreach ($definition['properties'] AS $property => $propertyData) {
+                foreach ($definition['properties'] as $property => $propertyData) {
                     $aggregate['properties'][$property] = $propertyData;
                 }
                 unset($definition['properties']);

@@ -13,49 +13,50 @@ class Address extends ActiveRecord
     // required for shared-table subclassing support
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = array(__CLASS__);
+    public static $subClasses = [__CLASS__];
 
-    public static $fields = array(
+    public static $fields = [
         'Class' => null
-        ,'Name' => array(
+        ,'Name' => [
             'type' => 'string'
-        )
-        ,'Address' => array(
+        ]
+        ,'Address' => [
             'type' => 'string'
-        )
-        ,'Address2' => array(
+        ]
+        ,'Address2' => [
             'type' => 'string'
             ,'notnull' => false
-        )
-        ,'City' => array(
+        ]
+        ,'City' => [
             'type' => 'string'
-        )
-        ,'State_Province' => array(
+        ]
+        ,'State_Province' => [
             'type' => 'enum'
-            ,'values' => array()
+            ,'values' => []
             ,'notnull' => false
-        )
-        ,'Zip_Postal' => array(
+        ]
+        ,'Zip_Postal' => [
             'type' => 'string'
             ,'length' => '15'
             ,'notnull' => false
-        )
-        ,'Country' => array(
+        ]
+        ,'Country' => [
             'type' => 'enum'
-            ,'values' => array()
-        )
-        ,'Phone' => array(
+            ,'values' => []
+        ]
+        ,'Phone' => [
             'type' => 'decimal'
             ,'length' => '15,0'
             ,'notnull' => false
-        )
-        ,'PhoneExt' => array(
+        ]
+        ,'PhoneExt' => [
             'type' => 'decimal'
             ,'length' => '5,0'
             ,'notnull' => false
-    ));
+        ]
+    ];
 
-    protected static function _initField($field, $options = array())
+    protected static function _initField($field, $options = [])
     {
         if ($field == 'State_Province') {
             $options['values'] = array_merge(array_keys(static::$usStates), array_keys(static::$caProvinces), array_keys(static::$auStates));
@@ -84,7 +85,7 @@ class Address extends ActiveRecord
         global $Session;
 
         if ($Session->Person) {
-            $Address = static::getByWhere(array(
+            $Address = static::getByWhere([
                 'Name' => $data['Name']
                 ,'Address' => $data['Address']
                 ,'Address2' => $data['Address2']
@@ -94,7 +95,7 @@ class Address extends ActiveRecord
                 ,'Country' => $data['Country']
                 ,'Phone' => $data['Phone']
                 ,'CreatorID' => $Session->PersonID
-            ));
+            ]);
         }
 
         return $Address ? $Address : static::create($data);
@@ -105,49 +106,49 @@ class Address extends ActiveRecord
         // call parent
         parent::validate($deep);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Name'
-        ));
+        ]);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Address'
             ,'validator' => 'address'
-        ));
+        ]);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Address2'
             ,'required' => false
-        ));
+        ]);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'City'
-        ));
+        ]);
 
-        $this->_validator->validate(array(
+        $this->_validator->validate([
             'field' => 'Country'
             ,'validator' => 'selection'
             ,'choices' => static::getFieldOptions('Country', 'values')
-        ));
+        ]);
 
         if (!$this->_validator->hasErrors('Country')) {
-            $this->_validator->validate(array(
+            $this->_validator->validate([
                 'field' => 'State_Province'
                 ,'validator' => 'state_province'
                 ,'country' => $this->Country
-            ));
+            ]);
 
-            $this->_validator->validate(array(
+            $this->_validator->validate([
                 'field' => 'Zip_Postal'
                 ,'validator' => 'zip_postal'
                 ,'country' => $this->Country
-            ));
+            ]);
 
-            $this->_validator->validate(array(
+            $this->_validator->validate([
                 'field' => 'Phone'
                 ,'validator' => 'phone'
                 ,'country' => $this->Country
                 ,'required' => static::$requirePhone
-            ));
+            ]);
         }
 
 
@@ -161,7 +162,7 @@ class Address extends ActiveRecord
     }
 
 
-    public static $usStates = array(
+    public static $usStates = [
         'AL' => 'Alabama',
         'AK' => 'Alaska',
         'AZ' => 'Arizona',
@@ -213,9 +214,9 @@ class Address extends ActiveRecord
         'WV' => 'West Virginia',
         'WI' => 'Wisconsin',
         'WY' => 'Wyoming'
-    );
+    ];
 
-    public static $auStates = array(
+    public static $auStates = [
         'AU-NSW'    => 'New South Wales'
         ,'AU-QLD'    => 'Queensland'
         ,'AU-SA'    => 'South Australia'
@@ -228,9 +229,9 @@ class Address extends ActiveRecord
         ,'CX'        => 'Christmas Island'
         ,'HM'        => 'Heard Island and McDonald Islands'
         ,'NF'        => 'Norfolk Island'
-    );
+    ];
 
-    public static $caProvinces = array(
+    public static $caProvinces = [
         'AB' => 'Alberta ',
         'BC' => 'British Columbia ',
         'MB' => 'Manitoba ',
@@ -244,9 +245,9 @@ class Address extends ActiveRecord
         'QC' => 'Quebec ',
         'SK' => 'Saskatchewan ',
         'YT' => 'Yukon Territory '
-    );
+    ];
 
-    public static $countries = array(
+    public static $countries = [
         'US' => 'United States',
         'CA' => 'Canada',
         'AF' => 'Afghanistan',
@@ -491,5 +492,5 @@ class Address extends ActiveRecord
         'YE' => 'Yemen',
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe'
-    );
+    ];
 }

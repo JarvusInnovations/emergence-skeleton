@@ -6,7 +6,7 @@
  */
 class TemplateResponse extends Emergence\Dwoo\Engine
 {
-    public static $MagicGlobals = array();
+    public static $MagicGlobals = [];
 
     public static function __classLoaded()
     {

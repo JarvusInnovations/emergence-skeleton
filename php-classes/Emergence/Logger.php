@@ -8,18 +8,18 @@ class Logger extends \Psr\Log\AbstractLogger
 {
     public static $logger; // set from a config script to override general logger instance
     public static $logPath;
-    public static $logLevelsWrite = array(
+    public static $logLevelsWrite = [
         LogLevel::EMERGENCY
         ,LogLevel::ALERT
         ,LogLevel::CRITICAL
         ,LogLevel::ERROR
         ,LogLevel::WARNING
-    );
-    public static $logLevelsEmail = array(
+    ];
+    public static $logLevelsEmail = [
         LogLevel::EMERGENCY
         ,LogLevel::ALERT
         ,LogLevel::CRITICAL
-    );
+    ];
 
     public static function __classLoaded()
     {
@@ -29,31 +29,30 @@ class Logger extends \Psr\Log\AbstractLogger
     }
 
     // handle logging
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
-        \Debug::log(array(
+        \Debug::log([
             'level' => $level
             ,'message' => $message
             ,'context' => $context
-        ));
+        ]);
 
         if (in_array($level, static::$logLevelsWrite)) {
             file_put_contents(
-                static::$logPath
-                ,
-                    date('Y-m-d H:i:s')." [$level] $message\n\t"
+                static::$logPath,
+                date('Y-m-d H:i:s')." [$level] $message\n\t"
                     ."context: ".trim(str_replace(PHP_EOL, "\n\t", print_r($context, true)))."\n"
                     ."\tbacktrace:\n\t\t".implode("\n\t\t", static::buildBacktraceLines())
-                    ."\n\n"
-                ,FILE_APPEND
+                    ."\n\n",
+                FILE_APPEND
             );
         }
 
         if (in_array($level, static::$logLevelsEmail)) {
             \Emergence\Mailer\Mailer::send(
-                \Site::$webmasterEmail
-                ,"$level logged on $_SERVER[HTTP_HOST]"
-                ,'<dl>'
+                \Site::$webmasterEmail,
+                "$level logged on $_SERVER[HTTP_HOST]",
+                '<dl>'
                     .'<dt>Timestamp</dt><dd>'.date('Y-m-d H:i:s').'</dd>'
                     .'<dt>Level</dt><dd>'.$level.'</dd>'
                     .'<dt>Message</dt><dd>'.htmlspecialchars($message).'</dd>'
@@ -75,7 +74,7 @@ class Logger extends \Psr\Log\AbstractLogger
     public static function buildBacktraceLines()
     {
         $backtrace = debug_backtrace();
-        $lines = array();
+        $lines = [];
 
         // trim call to this method
         array_shift($backtrace);
@@ -106,7 +105,7 @@ class Logger extends \Psr\Log\AbstractLogger
             $lines[] =
                 (!empty($frame['class']) ? "$frame[class]$frame[type]" : '')
                 .$frame['function']
-                .(!empty($frame['args']) ? '('.implode(',', array_map(function($arg) {
+                .(!empty($frame['args']) ? '('.implode(',', array_map(function ($arg) {
                     return is_string($arg) || is_numeric($arg) ? var_export($arg, true) : gettype($arg);
                 }, $frame['args'])).')' : '')
                 .(!empty($frame['file']) ? " called at $frame[file]:$frame[line]" : '');
@@ -131,7 +130,7 @@ class Logger extends \Psr\Log\AbstractLogger
         $logger = static::getLogger();
 
         if (preg_match('/^general_(.*)$/', $name, $matches) && method_exists($logger, $matches[1])) {
-            call_user_func_array(array(&$logger, $matches[1]), $arguments);
+            call_user_func_array([&$logger, $matches[1]], $arguments);
         } else {
             throw new \Exception('Undefined logger method');
         }

@@ -1,14 +1,13 @@
 <?php
 
+use Emergence\Dwoo\Engine as DwooEngine;
 use Symfony\Component\Yaml\Yaml;
-use Emergence\Dwoo\Engine AS DwooEngine;
-
 
 abstract class RequestHandler
 {
     // configurables
     public static $responseMode = 'html';
-    public static $userResponseModes = array(); // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
+    public static $userResponseModes = []; // array of responseModes that can be selected by the user, with key optionally set to a MIME Type
     public static $beforeRespond;
     public static $wkhtmltopdfPath = 'wkhtmltopdf';
     public static $wkhtmltopdfArguments = '-L 0.5in -R 0.5in -T 0.5in -B 0.5in';
@@ -67,7 +66,7 @@ abstract class RequestHandler
         }
     }
 
-    public static function respond($responseID, $responseData = array(), $responseMode = false)
+    public static function respond($responseID, $responseData = [], $responseMode = false)
     {
         if (!$responseMode) {
             $responseMode = static::getResponseMode();
@@ -78,7 +77,7 @@ abstract class RequestHandler
         }
 
         if (is_callable(static::$beforeRespond)) {
-            call_user_func_array(static::$beforeRespond, array($responseID, &$responseData, $responseMode));
+            call_user_func_array(static::$beforeRespond, [$responseID, &$responseData, $responseMode]);
         }
 
         switch ($responseMode) {
@@ -104,22 +103,22 @@ abstract class RequestHandler
                 return static::respondHtml($responseID, $responseData);
 
             case 'return':
-                return array(
+                return [
                     'responseID' => $responseID
                     ,'data' => $responseData
-                );
+                ];
 
             default:
                 throw new Exception('Invalid response mode');
         }
     }
 
-    public static function respondJson($responseID, $responseData = array())
+    public static function respondJson($responseID, $responseData = [])
     {
         return JSON::translateAndRespond($responseData, !empty($_GET['summary']), !empty($_GET['include']) ? $_GET['include'] : null);
     }
 
-    public static function respondYaml($responseID, $responseData = array())
+    public static function respondYaml($responseID, $responseData = [])
     {
         header('Content-type: application/x-yaml; charset=utf-8');
 
@@ -128,7 +127,7 @@ abstract class RequestHandler
         exit();
     }
 
-    public static function respondCsv($responseID, $responseData = array())
+    public static function respondCsv($responseID, $responseData = [])
     {
         if (!empty($_REQUEST['downloadToken'])) {
             setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
@@ -144,7 +143,7 @@ abstract class RequestHandler
         exit();
     }
 
-    public static function respondPrint($responseID, $responseData = array(), $format = 'html')
+    public static function respondPrint($responseID, $responseData = [], $format = 'html')
     {
         if (!empty($_REQUEST['downloadToken'])) {
             setcookie('downloadToken', $_REQUEST['downloadToken'], time()+300, '/');
@@ -164,7 +163,7 @@ abstract class RequestHandler
 
         if ($format == 'pdf') {
             $tmpPath = tempnam('/tmp', 'e_pdf_');
-    
+
             file_put_contents($tmpPath.'.html', $html);
 
             $command = implode(' ', [
@@ -196,13 +195,13 @@ abstract class RequestHandler
         }
     }
 
-    public static function respondXml($responseID, $responseData = array())
+    public static function respondXml($responseID, $responseData = [])
     {
         header('Content-Type: text/xml; charset=utf-8');
         return DwooEngine::respond($responseID, $responseData);
     }
 
-    public static function respondHtml($responseID, $responseData = array())
+    public static function respondHtml($responseID, $responseData = [])
     {
         header('Content-Type: text/html; charset=utf-8');
         $responseData['responseID'] = $responseID;
@@ -218,7 +217,7 @@ abstract class RequestHandler
         header('HTTP/1.0 403 Forbidden');
         $args = func_get_args();
         $args[0] = $message;
-        return call_user_func_array(array(get_called_class(), 'throwError'), $args);
+        return call_user_func_array([get_called_class(), 'throwError'], $args);
     }
 
     public static function throwAPIUnauthorizedError($message = 'You do not have authorization to access this resource')
@@ -227,10 +226,10 @@ abstract class RequestHandler
         switch (static::$responseMode) {
             case 'json':
             default:
-                JSON::respond(array(
+                JSON::respond([
                     'success' => false
                     ,'message' => $message
-                ));
+                ]);
         }
     }
 
@@ -239,7 +238,7 @@ abstract class RequestHandler
         header('HTTP/1.0 404 Not Found');
         $args = func_get_args();
         $args[0] = $message;
-        return call_user_func_array(array(get_called_class(), 'throwError'), $args);
+        return call_user_func_array([get_called_class(), 'throwError'], $args);
     }
 
     public static function throwServerError($message = 'An unknown problem has prevented the server from completing your request')
@@ -247,19 +246,19 @@ abstract class RequestHandler
         header('HTTP/1.0 500 Internal Server Error');
         $args = func_get_args();
         $args[0] = $message;
-        return call_user_func_array(array(get_called_class(), 'throwError'), $args);
+        return call_user_func_array([get_called_class(), 'throwError'], $args);
     }
 
     public static function throwValidationError(RecordValidationException $e, $message = 'There were errors validating your submission')
     {
         header('HTTP/1.0 400 Bad Request');
-        return static::respond('validationError', array(
+        return static::respond('validationError', [
             'success' => false
             ,'message' => $message
             ,'validationErrors' => $e->recordObject->validationErrors
             ,'recordClass' => get_class($e->recordObject)
             ,'recordID' => $e->recordObject->ID
-        ));
+        ]);
     }
 
     public static function throwInvalidRequestError($message = 'You did not supply the needed parameters correctly')
@@ -272,9 +271,9 @@ abstract class RequestHandler
     {
         $args = func_get_args();
 
-        return static::respond('error', array(
+        return static::respond('error', [
             'success' => false
             ,'message' => vsprintf($message, array_slice($args, 1))
-        ));
+        ]);
     }
 }

@@ -16,10 +16,9 @@ function Dwoo_Plugin_flickr(Dwoo_Core $dwoo, $tags, $assign = 'flickrPhotos', $c
     if (!empty($flickrData['items'])) {
         $dwoo->assignInScope(array_slice($flickrData['items'], 0, $count), $assign);
     } else {
-        $dwoo->assignInScope(array(), $assign);
+        $dwoo->assignInScope([], $assign);
     }
 
 
     return '';
 }
-

@@ -10,7 +10,7 @@ class MediaRequestHandler extends RecordsRequestHandler
     public static $accountLevelWrite = 'Staff';
     public static $accountLevelAPI = false;
     public static $browseLimit = 100;
-    public static $browseOrder = array('ID' => 'DESC');
+    public static $browseOrder = ['ID' => 'DESC'];
 
     // configurables
     public static $defaultPage = 'browse';
@@ -19,28 +19,28 @@ class MediaRequestHandler extends RecordsRequestHandler
     public static $uploadFileFieldName = 'mediaFile';
     public static $responseMode = 'html';
 
-    public static $searchConditions = array(
-        'Caption' => array(
-            'qualifiers' => array('any','caption')
+    public static $searchConditions = [
+        'Caption' => [
+            'qualifiers' => ['any','caption']
             ,'points' => 2
             ,'sql' => 'Caption LIKE "%%%s%%"'
-        )
-        ,'CaptionLike' => array(
-            'qualifiers' => array('caption-like')
+        ]
+        ,'CaptionLike' => [
+            'qualifiers' => ['caption-like']
             ,'points' => 2
             ,'sql' => 'Caption LIKE "%s"'
-        )
-        ,'CaptionNot' => array(
-            'qualifiers' => array('caption-not')
+        ]
+        ,'CaptionNot' => [
+            'qualifiers' => ['caption-not']
             ,'points' => 2
             ,'sql' => 'Caption NOT LIKE "%%%s%%"'
-        )
-        ,'CaptionNotLike' => array(
-            'qualifiers' => array('caption-not-like')
+        ]
+        ,'CaptionNotLike' => [
+            'qualifiers' => ['caption-not-like']
             ,'points' => 2
             ,'sql' => 'Caption NOT LIKE "%s"'
-        )
-    );
+        ]
+    ];
 
     public static function handleRequest()
     {
@@ -129,7 +129,7 @@ class MediaRequestHandler extends RecordsRequestHandler
     }
 
 
-    public static function handleUploadRequest($options = array(), $authenticationRequired = true)
+    public static function handleUploadRequest($options = [], $authenticationRequired = true)
     {
         global $Session;
 
@@ -140,9 +140,9 @@ class MediaRequestHandler extends RecordsRequestHandler
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // init options
-            $options = array_merge(array(
+            $options = array_merge([
                 'fieldName' => static::$uploadFileFieldName
-            ), $options);
+            ], $options);
 
 
             // check upload
@@ -226,11 +226,11 @@ class MediaRequestHandler extends RecordsRequestHandler
             $Media->save();
         }
 
-        return static::respond('uploadComplete', array(
+        return static::respond('uploadComplete', [
             'success' => (boolean)$Media
             ,'data' => $Media
             ,'TagID' => isset($Tag) ? $Tag->ID : null
-        ));
+        ]);
     }
 
 
@@ -256,10 +256,10 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         if (static::$responseMode == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
-            JSON::translateAndRespond(array(
+            JSON::translateAndRespond([
                 'success' => true
                 ,'data' => $Media
-            ));
+            ]);
         } else {
 
             // determine variant
@@ -441,15 +441,15 @@ class MediaRequestHandler extends RecordsRequestHandler
             $Media->Caption = $_REQUEST['Caption'];
             $Media->save();
 
-            return static::respond('mediaCaptioned', array(
+            return static::respond('mediaCaptioned', [
                 'success' => true
                 ,'data' => $Media
-            ));
+            ]);
         }
 
-        return static::respond('mediaCaption', array(
+        return static::respond('mediaCaption', [
             'data' => $Media
-        ));
+        ]);
     }
 
     public static function handleDeleteRequest(ActiveRecord $Record)
@@ -458,15 +458,15 @@ class MediaRequestHandler extends RecordsRequestHandler
         $GLOBALS['Session']->requireAccountLevel('Staff');
 
         if ($mediaID = static::peekPath()) {
-            $mediaIDs = array($mediaID);
+            $mediaIDs = [$mediaID];
         } elseif (!empty($_REQUEST['mediaID'])) {
-            $mediaIDs = array($_REQUEST['mediaID']);
+            $mediaIDs = [$_REQUEST['mediaID']];
         } elseif (is_array($_REQUEST['media'])) {
             $mediaIDs = $_REQUEST['media'];
         }
 
-        $deleted = array();
-        foreach ($mediaIDs AS $mediaID) {
+        $deleted = [];
+        foreach ($mediaIDs as $mediaID) {
             if (!is_numeric($mediaID)) {
                 static::throwError('Invalid mediaID');
             }
@@ -483,10 +483,10 @@ class MediaRequestHandler extends RecordsRequestHandler
             }
         }
 
-        return static::respond('mediaDeleted', array(
+        return static::respond('mediaDeleted', [
             'success' => true
             ,'data' => $deleted
-        ));
+        ]);
     }
 
 
@@ -564,7 +564,7 @@ class MediaRequestHandler extends RecordsRequestHandler
 
 
 
-    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = null, $responseData = array())
+    public static function handleBrowseRequest($options = [], $conditions = [], $responseID = null, $responseData = [])
     {
         // apply tag filter
         if (!empty($_REQUEST['tag'])) {
@@ -591,34 +591,34 @@ class MediaRequestHandler extends RecordsRequestHandler
 
 
 
-#	public static function handleMediaRequest()
-#	{
-#		if(static::peekPath() == 'delete')
-#		{
-#			return static::handleMediaDeleteRequest();
-#		}
-#
-#
-#		// get media
-#		$media = JSON::translateRecords(Media::getAll(), true);
-#
-#		// get tag media assignments
-#		$media_tags = Tag::getAllItems('media');
-#
-#		// inject album assignments to photo records
-#		foreach($media_tags AS $media_id => $tags)
-#		{
-#			foreach($tags AS $tag)
-#			{
-#				$media[$media_id]['tags'][] = $tag['tag_id'];
-#			}
-#		}
-#
-#		return static::respond('media', array(
-#			'success' => true
-#			,'data' => array_values($media)
-#		));
-#	}
+    #	public static function handleMediaRequest()
+    #	{
+    #		if(static::peekPath() == 'delete')
+    #		{
+    #			return static::handleMediaDeleteRequest();
+    #		}
+    #
+    #
+    #		// get media
+    #		$media = JSON::translateRecords(Media::getAll(), true);
+    #
+    #		// get tag media assignments
+    #		$media_tags = Tag::getAllItems('media');
+    #
+    #		// inject album assignments to photo records
+    #		foreach($media_tags AS $media_id => $tags)
+    #		{
+    #			foreach($tags AS $tag)
+    #			{
+    #				$media[$media_id]['tags'][] = $tag['tag_id'];
+    #			}
+    #		}
+    #
+    #		return static::respond('media', array(
+    #			'success' => true
+    #			,'data' => array_values($media)
+    #		));
+    #	}
 
 
     public static function handleMediaDeleteRequest()
@@ -629,8 +629,8 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         // retrieve photos
-        $media_array = array();
-        foreach ($_REQUEST['media'] AS $media_id) {
+        $media_array = [];
+        foreach ($_REQUEST['media'] as $media_id) {
             if (!is_numeric($media_id)) {
                 static::throwError('Invalid request');
             }
@@ -645,16 +645,16 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         // delete
-        $deleted = array();
-        foreach ($media_array AS $media_id => $Media) {
+        $deleted = [];
+        foreach ($media_array as $media_id => $Media) {
             if ($Media->delete()) {
                 $deleted[] = $media_id;
             }
         }
 
-        return static::respond('mediaDeleted', array(
+        return static::respond('mediaDeleted', [
             'success' => true
             ,'deleted' => $deleted
-        ));
+        ]);
     }
 }

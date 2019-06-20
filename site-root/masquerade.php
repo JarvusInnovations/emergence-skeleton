@@ -10,11 +10,11 @@ if (!empty($_POST['username'])) {
     $GLOBALS['Session']->Person = $User;
     $GLOBALS['Session']->save();
 
-    RequestHandler::respond('message', array(
+    RequestHandler::respond('message', [
         'message' => sprintf('You are now logged in as %s. Logout and then log back into your normal account when you are finished.', $User->Username),
         'returnURL' => '/',
         'returnLabel' => 'Continue to '.Site::$hostname.' as '.$User->Username
-    ));
+    ]);
 }
 
 

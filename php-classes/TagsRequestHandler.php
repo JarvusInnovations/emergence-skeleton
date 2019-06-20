@@ -21,22 +21,22 @@ class TagsRequestHandler extends RecordsRequestHandler
             }
         }
     }
-    
-    public static function handleBrowseRequest($options = array(), $conditions = array(), $responseID = NULL, $responseData = array())
+
+    public static function handleBrowseRequest($options = [], $conditions = [], $responseID = null, $responseData = [])
     {
         if (!empty($_REQUEST['q']) && $_REQUEST['valuesqry'] == 'true') {
             $handles = explode('|', $_REQUEST['q']);
-            $conditions = 'Handle IN ("'.join('","',DB::escape($handles)).'")';
-            
-            return static::respond('tags', array(
+            $conditions = 'Handle IN ("'.join('","', DB::escape($handles)).'")';
+
+            return static::respond('tags', [
                 'success' => true
                 ,'data' => Tag::getAllByWhere($conditions)
-            ));
+            ]);
         }
 
         return parent::handleBrowseRequest($options, $conditions, $responseID, $responseData);
     }
-    
+
     public static function handleRecordRequest(ActiveRecord $Tag, $action = false)
     {
         switch ($action ? $action : $action = static::shiftPath()) {
@@ -54,27 +54,27 @@ class TagsRequestHandler extends RecordsRequestHandler
 
     public static function handleTagItemsRequest(Tag $Tag)
     {
-        $conditions = array(
+        $conditions = [
             'TagID' => $Tag->ID
-        );
+        ];
 
         if (!empty($_REQUEST['Class']) && Validators::className($_REQUEST['Class'])) {
             $conditions['ContextClass'] = $_REQUEST['Class'];
         }
 
-        return static::respond('tagItems', array(
+        return static::respond('tagItems', [
             'success' => true
             ,'data' => TagItem::getAllByWhere($conditions)
-        ));
+        ]);
     }
-    
+
     public static function handleMultiAssignRequest()
     {
         if (static::$accountLevelAssign) {
             $GLOBALS['Session']->requireAccountLevel(static::$accountLevelAssign);
         }
 
-        if (static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], array('POST','PUT'))) {
+        if (static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT'])) {
             $_REQUEST = JSON::getRequestData();
         }
 
@@ -83,9 +83,9 @@ class TagsRequestHandler extends RecordsRequestHandler
         }
 
         $className = static::$recordClass;
-        $results = array();
+        $results = [];
 
-        foreach ($_REQUEST['data'] AS $datum) {
+        foreach ($_REQUEST['data'] as $datum) {
             if (!$Tag = $className::getByID($datum['TagID'])) {
                 return static::throwNotFoundError();
             }
@@ -97,9 +97,9 @@ class TagsRequestHandler extends RecordsRequestHandler
             }
         }
 
-        return static::respond($className::$pluralNoun.'Saved', array(
+        return static::respond($className::$pluralNoun.'Saved', [
             'success' => true
             ,'data' => $results
-        ));
+        ]);
     }
 }

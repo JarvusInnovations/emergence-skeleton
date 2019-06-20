@@ -11,16 +11,16 @@ class Format
         }
 
         return sprintf(
-            '<a href="%s">%s</a>'
-            ,$mailto
-            ,$email
+            '<a href="%s">%s</a>',
+            $mailto,
+            $email
         );
     }
 
     public static function usPhone($input, $format = '(%s) %s-%s')
     {
         // strip non-digits
-        $numbers = preg_replace('/\D/','',$input);
+        $numbers = preg_replace('/\D/', '', $input);
 
         // strip prefixed 1
         if ((strlen($numbers) == 11) && ($numbers[0] == '1')) {
@@ -34,10 +34,10 @@ class Format
 
         // return formatted string
         return sprintf(
-            $format
-            , substr($numbers,0,3)
-            , substr($numbers,3,3)
-            , substr($numbers,6,4)
+            $format,
+            substr($numbers, 0, 3),
+            substr($numbers, 3, 3),
+            substr($numbers, 6, 4)
         );
     }
 
@@ -71,14 +71,14 @@ class Format
       define( 'ONE_WEEK',   ONE_DAY*7 );
       define( 'ONE_MONTH',  ONE_WEEK*4 );
       define( 'ONE_YEAR',   ONE_MONTH*12 );
-     
+
       // sod = start of day :)
       $sod = mktime( 0, 0, 0, date( 'm', $time ), date( 'd', $time ), date( 'Y', $time ) );
       $sod_now = mktime( 0, 0, 0, date( 'm', NOW ), date( 'd', NOW ), date( 'Y', NOW ) );
-     
+
       // used to convert numbers to strings
       $convert = array( 1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four', 5 => 'five', 6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten', 11 => 'eleven' );
-     
+
       // today
       if ( $sod_now == $sod ) {
         if ( $time > NOW-(ONE_MINUTE*3) ) {
@@ -90,7 +90,7 @@ class Format
         }
         return 'today at ' . date( 'g:ia', $time );
       }
-     
+
       // yesterday
       if ( ($sod_now-$sod) <= ONE_DAY ) {
         if ( date( 'i', $time ) > (ONE_MINUTE+30) ) {
@@ -98,7 +98,7 @@ class Format
         }
         return 'yesterday around ' . date( 'ga', $time );
       }
-     
+
       // within the last 5 days
       if ( ($sod_now-$sod) <= (ONE_DAY*5) ) {
         $str = date( 'l', $time );
@@ -114,7 +114,7 @@ class Format
         }
         return $str;
       }
-     
+
       // number of weeks (between 1 and 3)...
       if ( ($sod_now-$sod) < (ONE_WEEK*3.5) ) {
         if ( ($sod_now-$sod) < (ONE_WEEK*1.5) ) {
@@ -125,7 +125,7 @@ class Format
           return 'about three weeks ago';
         }
       }
-     
+
       // number of months (between 1 and 11)...
       if ( ($sod_now-$sod) < (ONE_MONTH*11.5) ) {
         for ( $i = (ONE_WEEK*3.5), $m=0; $i < ONE_YEAR; $i += ONE_MONTH, $m++ ) {
@@ -134,21 +134,21 @@ class Format
           }
         }
       }
-     
+
       // number of years...
       for ( $i = (ONE_MONTH*11.5), $y=0; $i < (ONE_YEAR*10); $i += ONE_YEAR, $y++ ) {
         if ( ($sod_now-$sod) <= $i ) {
           return 'about ' . $convert[$y] . ' year' . (($y>1)?'s':'') . ' ago';
         }
       }
-     
+
       // more than ten years...
       return 'more than ten years ago';
       */
 
         if (!ctype_digit($timestamp) && ($timestamp = strtotime($timestamp)) == false) {
             echo $timestamp;
-            return FALSE;
+            return false;
         }
         $diff = time() - $timestamp;
 
@@ -188,37 +188,37 @@ class Format
         if (!isset($GLOBALS['bbcodeEngine'])) {
             function bbcode_clean_list($text)
             {
-                return preg_replace("/[\r\n]/",'',$text);
+                return preg_replace("/[\r\n]/", '', $text);
             }
 
-            $GLOBALS['bbcodeEngine'] = bbcode_create(array(
-                '' => array('type'=>BBCODE_TYPE_ROOT,  'childs'=>'!*')
-                ,'h2' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h2>', 'close_tag'=>'</h2>')
-                ,'h3' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h3>', 'close_tag'=>'</h3>')
-                ,'h4' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h4>', 'close_tag'=>'</h4>')
-                ,'h5' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h5>', 'close_tag'=>'</h5>')
-                ,'h6' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h6>', 'close_tag'=>'</h6>')
-                ,'i' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<i>', 'close_tag'=>'</i>')
-                ,'cite' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<cite>', 'close_tag'=>'</cite>')
-                ,'b' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<b>', 'close_tag'=>'</b>')
-                ,'u' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<u>', 'close_tag'=>'</u>')
-                ,'s' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<s>', 'close_tag'=>'</s>')
-                ,'small' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<small>', 'close_tag'=>'</small>')
-                ,'quote' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<blockquote>', 'close_tag'=>'</blockquote>')
-                ,'sig' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<div class="sig">', 'close_tag'=>'</div>')
-                ,'url' => array('type'=>BBCODE_TYPE_OPTARG, 'open_tag'=>'<a href="{PARAM}" target="_blank">', 'close_tag'=>'</a>', 'default_arg'=>'{CONTENT}', 'childs'=>'b,i')
-                ,'img' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<img src="', 'close_tag'=>'" />', 'childs'=>'')
-                ,'list'=> array(
+            $GLOBALS['bbcodeEngine'] = bbcode_create([
+                '' => ['type'=>BBCODE_TYPE_ROOT,  'childs'=>'!*']
+                ,'h2' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h2>', 'close_tag'=>'</h2>']
+                ,'h3' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h3>', 'close_tag'=>'</h3>']
+                ,'h4' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h4>', 'close_tag'=>'</h4>']
+                ,'h5' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h5>', 'close_tag'=>'</h5>']
+                ,'h6' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h6>', 'close_tag'=>'</h6>']
+                ,'i' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<i>', 'close_tag'=>'</i>']
+                ,'cite' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<cite>', 'close_tag'=>'</cite>']
+                ,'b' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<b>', 'close_tag'=>'</b>']
+                ,'u' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<u>', 'close_tag'=>'</u>']
+                ,'s' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<s>', 'close_tag'=>'</s>']
+                ,'small' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<small>', 'close_tag'=>'</small>']
+                ,'quote' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<blockquote>', 'close_tag'=>'</blockquote>']
+                ,'sig' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<div class="sig">', 'close_tag'=>'</div>']
+                ,'url' => ['type'=>BBCODE_TYPE_OPTARG, 'open_tag'=>'<a href="{PARAM}" target="_blank">', 'close_tag'=>'</a>', 'default_arg'=>'{CONTENT}', 'childs'=>'b,i']
+                ,'img' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<img src="', 'close_tag'=>'" />', 'childs'=>'']
+                ,'list'=> [
                     'type' => BBCODE_TYPE_NOARG
                     ,'open_tag' => '<ul>'
                     ,'close_tag' => '</ul>'
                     ,'childs' => '*'
                     ,'content_handling' => 'bbcode_clean_list'
-                )
-                ,'*' => array('type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<li>', 'close_tag'=>'</li>', 'parent'=>'list', 'flags'=>BBCODE_FLAGS_ONE_OPEN_PER_LEVEL)
-                ,'l' => array('type'=>BBCODE_TYPE_SINGLE, 'open_tag' => '[')
-                ,'r' => array('type'=>BBCODE_TYPE_SINGLE, 'open_tag' => ']')
-            ));
+                ]
+                ,'*' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<li>', 'close_tag'=>'</li>', 'parent'=>'list', 'flags'=>BBCODE_FLAGS_ONE_OPEN_PER_LEVEL]
+                ,'l' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => '[']
+                ,'r' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => ']']
+            ]);
         }
 
         if ($mode == 'strip') {
@@ -246,10 +246,10 @@ class Format
             $text = preg_replace('/\s*<p>\s*<('.$blockEls.')>(.*?)<\/\1>\s*<\/p>\s*/i', '<$1>$2</$1>', $text);
 
             // simple character replacements
-            $text = str_replace(array('--','(r)','(tm)','(c)'), array('&mdash;','&reg;','&trade;','&copy;'), $text);
+            $text = str_replace(['--','(r)','(tm)','(c)'], ['&mdash;','&reg;','&trade;','&copy;'], $text);
 
             // ordinals
-            $text = preg_replace('/(\d+)(st|nd|rd|th|st)\b/i', '$1<sup>$2</sup>',$text);
+            $text = preg_replace('/(\d+)(st|nd|rd|th|st)\b/i', '$1<sup>$2</sup>', $text);
 
             // turn remaining single newlines into brs
             $text = nl2br($text);

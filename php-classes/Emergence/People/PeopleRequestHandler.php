@@ -6,7 +6,6 @@ use ActiveRecord;
 use Media;
 use MediaRequestHandler;
 
-
 class PeopleRequestHandler extends \PeopleRequestHandler
 {
     public static $personClass = Person::class;

@@ -17,10 +17,10 @@ if (static::columnExists($tableName, $columnName)) {
 
 // migration
 printf("Adding column `%s`.`%s`\n", $tableName, $columnName);
-DB::nonQuery('ALTER TABLE `%s` ADD `%s` text NULL default NULL AFTER `Visibility`', array($tableName, $columnName));
+DB::nonQuery('ALTER TABLE `%s` ADD `%s` text NULL default NULL AFTER `Visibility`', [$tableName, $columnName]);
 
 printf("Adding column `history_%s`.`%s`\n", $tableName, $columnName);
-DB::nonQuery('ALTER TABLE `history_%s` ADD `%s` text NULL default NULL AFTER `Visibility`', array($tableName, $columnName));
+DB::nonQuery('ALTER TABLE `history_%s` ADD `%s` text NULL default NULL AFTER `Visibility`', [$tableName, $columnName]);
 
 
 // done
