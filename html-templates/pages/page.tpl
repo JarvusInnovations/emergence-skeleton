@@ -7,9 +7,9 @@
     {$Page = $data}
     <article class="cms-page reading-width">
         <header class="page-header">
-            <h2 class="header-title">
+            <h1 class="header-title title-1">
                 <a href="{$Page->getURL()}">{$Page->Title}</a>
-            </h2>
+            </h1>
             {if Emergence\CMS\PagesRequestHandler::checkWriteAccess($Page, true)}
                 <div class="header-buttons">
                     <a href="{$Page->getURL()}/edit" class="button small">Edit</a>&nbsp;

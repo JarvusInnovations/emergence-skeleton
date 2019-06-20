@@ -7,7 +7,7 @@
 	<div class="main-col">
 		<div class="col-inner">
 			<header class="page-header">
-				<h2 class="header-title">Pages Directory</h2>
+				<h1 class="header-title title-1">Pages Directory</h1>
 			</header>
 		
 		    <ul class="pages-list">

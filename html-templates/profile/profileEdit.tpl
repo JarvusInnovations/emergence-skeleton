@@ -2,168 +2,160 @@
 
 {block "title"}Edit Profile &mdash; {$dwoo.parent}{/block}
 
-{block "app-menu"}
-    <a href="/{MICS::getApp()}" class="page open">Edit My Profile</a>
-    <a href="/{MICS::getApp()}/view" class="page">View Profile</a>
-{/block}
-
 {block "content"}
-
     {$User = $data}
 
-    <h1>Manage {tif $User->ID == $.User->ID ? 'Your' : $User->FullNamePossessive} Profile</h1>
-    <hr class="clear" />
+    <header class="page-header">
+        <h1 class="header-title title-1">Manage {tif $User->ID == $.User->ID ? 'Your' : $User->FullNamePossessive} Profile</h1>
+    </header>
 
     {if $.get.status == 'photoUploaded'}
-        <p class="status highlight">Photo uploaded.</p>
+        <p class="notify success">Photo uploaded.</p>
     {elseif $.get.status == 'photoPrimaried'}
-        <p class="status highlight">Default photo selected.</p>
+        <p class="notify success">Default photo selected.</p>
     {elseif $.get.status == 'photoDeleted'}
-        <p class="status highlight">Photo deleted.</p>
+        <p class="notify">Photo deleted.</p>
     {elseif $.get.status == 'passwordChanged'}
-        <p class="status highlight">Password changed.</p>
+        <p class="notify success">Password changed.</p>
     {elseif $.get.status == 'saved'}
-        <p class="status highlight">Profile saved.</p>
+        <p class="notify success">Profile saved.</p>
     {/if}
 
+    <div class="sidebar-layout sidebar-28">
 
-    <form id="uploadPhotoForm" class="generic" action="/profile/uploadPhoto?{refill_query}" method="POST" enctype="multipart/form-data">
+        <div class="main-col">
+            <div class="col-inner">
 
-        <fieldset class="section">
-            <legend>Photos</legend>
-            {strip}
-            <div class="photosGallery clearfix">
-                {foreach item=Photo from=$User->Photos}
-                    <div class="photo {if $Photo->ID == $User->PrimaryPhotoID}highlight{/if}">
-                        <div class="photothumb"><img src="{$Photo->getThumbnailRequest(100,100)}"></div>
-                        {*<input type="text" name="Caption[{$Photo->ID}]" class="caption" value="{$Photo->Caption|escape}">*}
-                        <div class="buttons">
-                            <span>
-                                {if $Photo->ID != $User->PrimaryPhotoID}
-                                    <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">
-                                        {icon "user-circle-o"} Make Default
-                                    </a>
-                                {else}
-                                    {icon "user-circle-o"} Default
-                                {/if}
-                            </span>
-                            &emsp;
-                            <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');">
-                                {icon "times-circle"} Delete
-                            </a>
+                {include includes/profileEdit.main-top.tpl}
+
+                <form method="POST">
+                    {if ProfileRequestHandler::$accountLevelEditOthers && $.User->hasAccountLevel(ProfileRequestHandler::$accountLevelEditOthers)}
+
+                        <fieldset class="stretch">
+                            <h2 class="legend title-3">Account Settings ({ProfileRequestHandler::$accountLevelEditOthers} only)</h2>
+
+                            {field inputName="Username" label="Username" default=$User->Username}
+
+                            {capture assign=accountLevelHtml}
+                                <select class="field-control" name="AccountLevel">
+                                    {foreach item=level from=Emergence\People\User::getFieldOptions(AccountLevel, values)}
+                                        <option {refill field=AccountLevel default=$User->AccountLevel selected=$level}>{$level}</option>
+                                    {/foreach}
+                                </select>
+                            {/capture}
+                            {labeledField html=$accountLevelHtml type=select label='Account Level'}
+
+                            {capture assign=classHtml}
+                                <select class="field-control" name="Class">
+                                    {foreach item=class from=Emergence\People\User::getFieldOptions(Class, values)}
+                                        <option {refill field=Class default=$User->Class selected=$class}>{$class}</option>
+                                    {/foreach}
+                                </select>
+                            {/capture}
+                            {labeledField html=$classHtml type=select label='Person subclass'}
+
+                            <div class="submit-area">
+                                <button type="submit" class="submit">Save Profile</button>
+                            </div>
+                        </fieldset>
+                    {/if}
+
+                    <fieldset class="stretch">
+                        <h2 class="legend title-3">Profile Details</h2>
+
+                        {field inputName="Location" label="Location" default=$User->Location}
+                        {textarea inputName="About" label="About Me" default=$User->About hint="Use <a href='http://daringfireball.net/projects/markdown'>Markdown</a> to give your text some style"}
+
+                        <div class="submit-area">
+                            <button type="submit" class="submit">Save Profile</button>
                         </div>
-                    </div>
-                {/foreach}
-            </div>
-            {/strip}
+                    </fieldset>
 
-            <div class="field upload">
-                <input type="file" name="photoFile" id="photoFile">
-            </div>
-            <div class="submit">
-                <input type="submit" class="submit inline" value="Upload New Photo">
-            </div>
-        </fieldset>
-    </form>
+                    <fieldset class="stretch">
+                        <h2 class="legend title-3">Contact Information</h2>
 
-    <form method="POST" id="profileForm" class="generic">
-        {if ProfileRequestHandler::$accountLevelEditOthers && $.User->hasAccountLevel(ProfileRequestHandler::$accountLevelEditOthers)}
-            <h2 class="legend">Account Settings ({ProfileRequestHandler::$accountLevelEditOthers} only)</h2>
-            <fieldset class="section">
-                <div class="field">
-                    <label>
-                        Username
-                        <input type="text" class="text" name="Username" value="{refill field=Username default=$User->Username}">
-                    </label>
-                </div>
+                        {field inputName="Email" label="Email" type="email" default=$User->Email}
+                        {field inputName="Phone" label="Phone" type="tel"   default=$User->Phone}
 
-                <div class="field">
-                    <label>
-                        Account Level
-                        <select name="AccountLevel">
-                            {foreach item=level from=User::getFieldOptions(AccountLevel, values)}
-                                <option {refill field=AccountLevel default=$User->AccountLevel selected=$level}>{$level}</option>
+                        <div class="submit-area">
+                            <button type="submit" class="submit">Save Profile</button>
+                        </div>
+                    </fieldset>
+                </form>
+
+                <form action="/profile/password?{refill_query}" method="POST">
+                    <fieldset class="stretch">
+                        <h2 class="legend title-3">Change Password</h2>
+                        {field inputName="OldPassword" label="Old Password" type="password"}
+                        {field inputName="Password" label="New Password" type="password"}
+                        {field inputName="PasswordConfirm" label="New Password (Confirm)" type="password"}
+
+                        <div class="submit-area">
+                            <button type="submit" class="submit">Change Password</button>
+                        </div>
+                    </fieldset>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="sidebar-col">
+            <div class="col-inner">
+
+                {include includes/profileEdit.side-top.tpl}
+
+                <form class="profile-photo-form" action="/profile/uploadPhoto?{refill_query}" method="POST" enctype="multipart/form-data">
+                    <fieldset class="stretch">
+                        <h2 class="title-3">Profile Photo</h2>
+
+                        <div class="current-photo">
+                            {avatar $User size=200}
+                            {if $User->PrimaryPhoto}
+                                <a class="button small block destructive" href="/profile/deletePhoto?{refill_query MediaID=$User->PrimaryPhotoID}">Remove This Photo</a>
+                            {elseif $User->Email}
+                                <div class="muted">Using <a href="//gravatar.com">Gravatar</a> image for {$User->Email}.</div>
+                            {/if}
+                        </div>
+
+                        {if $User->Photos}
+                            <ul class="available-photos">
+                                <p class="hint">Choose a default:</p>
+                            {foreach item=Photo from=$User->Photos}
+                                <li class="photo-item {if $Photo->ID == $User->PrimaryPhotoID}current{/if}">
+                                    {if $Photo->ID != $.Session->Person->PrimaryPhotoID}<a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">{/if}
+                                        <img src="{$Photo->getThumbnailRequest(96, 96, null, true)}" width=48 height=48 alt="">
+                                    {if $Photo->ID != $.Session->Person->PrimaryPhotoID}</a>{/if}
+
+                                    {*
+                                    <div class="buttons">
+                                        <span>
+                                            {if $Photo->ID != $User->PrimaryPhotoID}
+                                                <a href="/profile/primaryPhoto?{refill_query MediaID=$Photo->ID}" title="Make Default">
+                                                    {icon 'user-circle-o'} Make Default
+                                                </a>
+                                            {else}
+                                                {icon 'user-circle-o'} Default
+                                            {/if}
+                                        </span>
+                                        &emsp;
+                                        <a href="/profile/deletePhoto?{refill_query MediaID=$Photo->ID}" title="Delete Photo" onclick="return confirm('Are you sure you want to delete this photo from your profile?');">
+                                            {icon 'times-circle'} Delete
+                                        </a>
+                                    </div>
+                                    *}
+                                </li>
                             {/foreach}
-                        </select>
-                    </label>
-                </div>
+                            </ul>
+                        {/if}
 
-                <div class="field">
-                    <label>
-                        Person subclass
-                        <select name="Class">
-                            {foreach item=class from=User::getFieldOptions(Class, values)}
-                                <option {refill field=Class default=$User->Class selected=$class}>{$class}</option>
-                            {/foreach}
-                        </select>
-                    </label>
-                </div>
-
-                <div class="submit">
-                    <input type="submit" class="submit" value="Save account">
-                </div>
-            </fieldset>
-        {/if}
-
-        <h2 class="legend">Profile Details</h2>
-        <fieldset class="section">
-            <div class="field">
-                <label for="Location">Location</label>
-                <input type="text" class="text" id="Location" name="Location" value="{refill field=Location default=$User->Location}">
+                        <div class="photo-upload field">
+                            <input class="field-control" type="file" name="photoFile" id="photoFile">
+                            <button type="submit" class="submit">Upload New Photo</button>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
+        </div>
 
-            <div class="field expand">
-                <label for="about">About</label>
-                <textarea id="about" name="About">{refill field=About default=$User->About}</textarea>
-                <p class="hint">Check out the <a href="/pages/Formatting_Guide">Formatting Guide</a> to give your text some style</p>
-            </div>
-
-            <div class="submit">
-                <input type="submit" class="submit" value="Save profile">
-            </div>
-
-        </fieldset>
-
-
-        <h2 class="legend">Contact Information</h2>
-        <fieldset class="section">
-            <div class="field">
-                <label for="Email">Email</label>
-                <input type="email" class="text" id="Email" name="Email" value="{refill field=Email default=$User->Email}">
-            </div>
-
-            <div class="field">
-                <label for="Phone">Phone</label>
-                <input type="tel" class="text" id="Phone" name="Phone" value="{refill field=Phone default=$User->Phone modifier=phone}">
-            </div>
-
-            <div class="submit">
-                <input type="submit" class="submit" value="Save profile">
-            </div>
-
-        </fieldset>
-    </form>
-
-
-
-    <form action="/profile/password{refill_query}" method="POST" id="passwordForm" class="generic">
-        <h2 class="legend">Change Password</h2>
-        <fieldset class="section">
-            <div class="field">
-                <label for="oldpassword">Old Password</label>
-                <input type="password" class="text" id="oldpassword" name="OldPassword">
-            </div>
-            <div class="field">
-                <label for="password">New Password</label>
-                <input type="password" class="text" id="password" name="Password">
-                <input type="password" class="text" id="password2" name="PasswordConfirm">
-                <p class="hint">Please type your new password in both boxes above to make sure it is correct.</p>
-            </div>
-
-            <div class="submit">
-                <input type="submit" class="submit" value="Save new password">
-            </div>
-        </fieldset>
-    </form>
-
+    </div>
 {/block}

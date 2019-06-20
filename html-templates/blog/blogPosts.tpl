@@ -5,7 +5,7 @@
     {load_templates "subtemplates/paging.tpl"}
     
     <header class="page-header">
-        <h2 class="header-title">Blog Feed</h2>
+        <h1 class="header-title title-1">Blog Feed</h1>
         <div class="header-buttons">
             <a href="/blog/create" class="button primary">Create a Post</a>
         </div>            
@@ -13,7 +13,7 @@
     
     <section class="page-section article-collection">
     {foreach item=BlogPost from=$data}
-        {blogPost $BlogPost headingLevel=h3}
+        {blogPost $BlogPost headingLevel=h2}
     {foreachelse}
         <p class="empty-text">Stay tuned for the first post&hellip;</p>
     {/foreach}

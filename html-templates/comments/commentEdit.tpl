@@ -5,7 +5,7 @@
     {$Comment = $data}
     
     <header class="page-header">
-        <h3 class="header-title">Comment on &ldquo;{$Comment->Context->getTitle()}&rdquo;</h3>
+        <h1 class="header-title title-2">Comment on &ldquo;{$Comment->Context->getTitle()}&rdquo;</h1>
     </header>
 
     <div class="reading-width">

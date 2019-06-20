@@ -1,5 +1,8 @@
 <?php
 
+use Emergence\People\Person;
+use Emergence\People\User;
+
 class UserSession extends Session
 {
      // ActiveRecord configuration

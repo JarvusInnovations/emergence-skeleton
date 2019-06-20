@@ -1,20 +1,13 @@
-{* Optimized Analytics loader (uncomment and change UA-XXXXX-X to be your site's ID) goo.gl/PpmmQ
-<script>
-	var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];(function(d,t){
-	var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-	g.async=1;g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)
-	}(document,'script'))
-</script>
-*}
-{* Optimized Clicky loader (uncomment and change the below occurence of XXXXXXXX to your site's clicky ID)
-{$clickySiteId = "XXXXXXXX"}
+{*
+{$clickySiteId = 12345}
+
 <script type="text/javascript">
 {if $.User}
-	var clicky_custom = {
+    var clicky_custom = {
 		session: {
-    		username: {$.User->Username|json_encode},
-			email: {$.User->Email|json_encode},
-			full_name: {$.User->FullName|json_encode}
+			username: '{$.User->Username}'
+			,email: '{$.User->Email}'
+			,full_name: '{$.User->FullName}'
 		}
 	};
 {/if}

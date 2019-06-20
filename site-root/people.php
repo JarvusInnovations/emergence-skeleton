@@ -1,3 +1,3 @@
 <?php
 
-PeopleRequestHandler::handleRequest();
+Emergence\People\PeopleRequestHandler::handleRequest();

@@ -1,5 +1,7 @@
 <?php
 
+use Emergence\People\Person;
+
 class ProfileRequestHandler extends RequestHandler
 {
     public static $profileFields = array('Location','About','Phone','Email');

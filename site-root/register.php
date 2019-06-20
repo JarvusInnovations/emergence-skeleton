@@ -1,3 +1,3 @@
 <?php
 
-RegistrationRequestHandler::handleRequest();
+Emergence\People\RegistrationRequestHandler::handleRequest();

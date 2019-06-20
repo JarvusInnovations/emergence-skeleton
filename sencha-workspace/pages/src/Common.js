@@ -1,7 +1,14 @@
+/*jslint browser: true, undef: true *//*global Ext*/
 Ext.define('Site.Common', {
     singleton: true,
     requires: [
-        'Ext.dom.Element'
+        'Ext.dom.Element',
+
+        //'Site.widget.ContentBlocks',
+        'Site.widget.Search',
+        'Site.widget.model.Person',
+        'Site.widget.model.Tag',
+        'Site.widget.model.Content'
     ],
 
     constructor: function() {
@@ -12,6 +19,9 @@ Ext.define('Site.Common', {
         var me = this,
             body = Ext.getBody();
 
-        console.info('Site.Common.onDocReady(%o)', body);
+        // site search
+        me.siteSearch = Ext.create('Site.widget.Search', {
+            searchForm: body.down('.js-site-search')
+        });
     }
 });
