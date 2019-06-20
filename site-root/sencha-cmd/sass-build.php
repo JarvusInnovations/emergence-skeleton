@@ -90,32 +90,6 @@ $exportResult = Emergence_FS::exportTree($buildPath, $buildTmpPath);
 Benchmark::mark("exported $buildPath to $buildTmpPath: ".http_build_query($exportResult));
 
 
-// write any libraries from classpath
-$classPaths = explode(',', $App->getBuildCfg('app.classpath'));
-
-foreach ($classPaths AS $classPath) {
-    if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-        $extensionPath = substr($classPath, 19);
-        $classPathSource = "ext-library/$extensionPath";
-        $classPathDest = "$tmpPath/x/$extensionPath";
-        Benchmark::mark("importing classPathSource: $classPathSource");
-
-#		$cachedFiles = Emergence_FS::cacheTree($classPathSource);
-#		Benchmark::mark("precached $cachedFiles files in $classPathSource");
-
-        $sourceNode = Site::resolvePath($classPathSource);
-
-        if (is_a($sourceNode, SiteFile)) {
-            mkdir(dirname($classPathDest), 0777, true);
-            copy($sourceNode->RealPath, $classPathDest);
-            Benchmark::mark("copied file $classPathSource to $classPathDest");
-        } else {
-            $exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-            Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
-        }
-    }
-}
-
 // write archive
 if (!empty($_GET['archive'])) {
     try {
