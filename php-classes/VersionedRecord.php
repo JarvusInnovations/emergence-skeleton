@@ -110,7 +110,7 @@ abstract class VersionedRecord extends ActiveRecord
         ];
 
         if ($options['order']) {
-            $query .= ' ORDER BY '.join(',', static::_mapFieldOrder($options['order']));
+            $query .= ' ORDER BY ' . join(',', static::_mapFieldOrder($options['order']));
         }
 
         if ($options['limit']) {

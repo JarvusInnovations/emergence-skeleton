@@ -74,7 +74,7 @@ class VideoMedia extends Media
                         return 'mov';
 
                     default:
-                        throw new Exception('Unable to find video extension for mime-type: '.$this->MIMEType);
+                        throw new Exception('Unable to find video extension for mime-type: ' . $this->MIMEType);
                 }
 
                 // no break
@@ -160,9 +160,7 @@ class VideoMedia extends Media
                 mkdir($outputDir, static::$newDirectoryPermissions, true);
             }
 
-            $tmpOutputPath = $outputDir.'/'.'tmp-'.basename($outputPath);
-            ;
-
+            $tmpOutputPath = $outputDir . '/' . 'tmp-' . basename($outputPath);
 
             // build avconv command
             $cmd = ['avconv', '-loglevel quiet'];
@@ -211,7 +209,7 @@ class VideoMedia extends Media
 
 
             // convert command to string and decorate for process control
-            $cmd = '(nohup '.implode(' ', $cmd).') > /dev/null 2>/dev/null & echo $! &';
+            $cmd = '(nohup ' . implode(' ', $cmd) . ') > /dev/null 2>/dev/null & echo $! &';
 
 
             // execute command and retrieve the spawned PID
@@ -224,7 +222,7 @@ class VideoMedia extends Media
     {
         foreach ($options as $key => $value) {
             if (!is_int($key)) {
-                $cmd[] = '-'.$key;
+                $cmd[] = '-' . $key;
             }
 
             if ($value) {
@@ -236,8 +234,8 @@ class VideoMedia extends Media
     public function getFilesystemPath($variant = 'original', $filename = null)
     {
         if (!$filename && array_key_exists($variant, static::$encodingProfiles)) {
-            $filename = $this->ID.'.'.static::$encodingProfiles[$variant]['extension'];
-            $variant = 'video-'.$variant;
+            $filename = $this->ID . '.' . static::$encodingProfiles[$variant]['extension'];
+            $variant = 'video-' . $variant;
         }
 
         return parent::getFilesystemPath($variant, $filename);
@@ -249,7 +247,7 @@ class VideoMedia extends Media
             return static::$encodingProfiles[$variant]['mimeType'];
         }
 
-        return parent::getMIMEType($variant, $filename);
+        return parent::getMIMEType($variant);
     }
 
     public function isVariantAvailable($variant)
