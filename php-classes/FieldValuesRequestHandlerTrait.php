@@ -56,7 +56,7 @@ trait FieldValuesRequestHandlerTrait
 
         natcasesort($values);
 
-        return static::respond('task-field-values', [
+        return static::respond('field-values', [
             'data' => array_values($values),
             'field' => $fieldName,
             'total' => count($values)
