@@ -13,7 +13,7 @@ class BlogPost extends AbstractContent
     public static function getRecentlyPublished($limit = 5)
     {
         $conditions = [
-            'Class' => 'Emergence\CMS\BlogPost',
+            'Class' => __CLASS__,
             'Status' => 'Published',
             'Published IS NULL OR Published <= CURRENT_TIMESTAMP'
         ];

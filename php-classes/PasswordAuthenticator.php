@@ -1,5 +1,7 @@
 <?php
 
+use Emergence\People\User;
+
 class PasswordAuthenticator extends Authenticator
 {
     // configurable settings

@@ -3,9 +3,13 @@
 namespace Emergence\CMS;
 
 use ActiveRecord;
+use Emergence\Comments\Comment;
 use Emergence\People\IPerson;
+use Emergence\People\Person;
 use HandleBehavior;
 use JSON;
+use Tag;
+use TagItem;
 
 abstract class AbstractContent extends \VersionedRecord
 {
@@ -17,7 +21,10 @@ abstract class AbstractContent extends \VersionedRecord
     // required for shared-table subclassing support
     public static $rootClass = __CLASS__;
     public static $defaultClass = __CLASS__;
-    public static $subClasses = ['Emergence\CMS\Page', 'Emergence\CMS\BlogPost'];
+    public static $subClasses = [
+        Page::class,
+        BlogPost::class
+    ];
 
     public static $searchConditions = [
         'Title' => [
@@ -77,25 +84,25 @@ abstract class AbstractContent extends \VersionedRecord
         ]
         ,'Author' =>  [
             'type' =>  'one-one'
-            ,'class' => 'Person'
+            ,'class' => Person::class
         ]
         ,'Items' => [
             'type' => 'one-many'
-            ,'class' => 'Emergence\CMS\Item\AbstractItem'
+            ,'class' => Item\AbstractItem::class
             ,'foreign' => 'ContentID'
             ,'conditions' => 'Status != "Deleted"'
             ,'order' => ['Order','ID']
         ]
         ,'Tags' => [
             'type' => 'many-many'
-            ,'class' => 'Tag'
-            ,'linkClass' => 'TagItem'
+            ,'class' => Tag::class
+            ,'linkClass' => TagItem::class
             ,'linkLocal' => 'ContextID'
             ,'conditions' => ['Link.ContextClass = "Emergence\\\\CMS\\\\AbstractContent"']
         ]
         ,'Comments' => [
             'type' => 'context-children'
-            ,'class' => 'Emergence\Comments\Comment'
+            ,'class' => Comment::class
             ,'order' => ['ID' => 'DESC']
         ]
     ];
