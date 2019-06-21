@@ -19,28 +19,28 @@ class Comment extends \VersionedRecord
     public static $collectionRoute = '/comments';
 
     public static $fields = [
-        'ContextClass'
-        ,'ContextID' => 'uint'
-        ,'Handle' => [
+        'ContextClass',
+        'ContextID' => 'uint',
+        'Handle' => [
             'unique' => true
-        ]
-        ,'ReplyToID' => [
-            'type' => 'uint'
-            ,'notnull' => false
-        ]
-        ,'Message' => [
-            'type' => 'clob'
-            ,'fulltext' => true
+        ],
+        'ReplyToID' => [
+            'type' => 'uint',
+            'notnull' => false
+        ],
+        'Message' => [
+            'type' => 'clob',
+            'fulltext' => true
         ]
     ];
 
     public static $relationships = [
         'Context' => [
             'type' => 'context-parent'
-        ]
-        ,'ReplyTo' => [
-            'type' => 'one-one'
-            ,'class' => __CLASS__
+        ],
+        'ReplyTo' => [
+            'type' => 'one-one',
+            'class' => __CLASS__
         ]
     ];
 
@@ -57,7 +57,7 @@ class Comment extends \VersionedRecord
 
     public static $searchConditions = [
         'Message' => [
-            'qualifiers' => ['any','message']
+            'qualifiers' => ['any', 'message']
         ]
     ];
 

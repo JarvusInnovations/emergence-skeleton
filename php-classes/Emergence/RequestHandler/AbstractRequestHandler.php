@@ -95,8 +95,8 @@ abstract class AbstractRequestHandler
 
             case 'return':
                 return [
-                    'responseID' => $responseId
-                    ,'data' => $responseData
+                    'responseID' => $responseId,
+                    'data' => $responseData
                 ];
 
             default:
@@ -181,8 +181,8 @@ abstract class AbstractRequestHandler
             case 'json':
             default:
                 JSON::respond([
-                    'success' => false
-                    ,'message' => $message
+                    'success' => false,
+                    'message' => $message
                 ]);
         }
     }
@@ -207,11 +207,11 @@ abstract class AbstractRequestHandler
     {
         header('HTTP/1.0 400 Bad Request');
         return static::respond('validationError', [
-            'success' => false
-            ,'message' => $message
-            ,'validationErrors' => $e->recordObject->validationErrors
-            ,'recordClass' => get_class($e->recordObject)
-            ,'recordID' => $e->recordObject->ID
+            'success' => false,
+            'message' => $message,
+            'validationErrors' => $e->recordObject->validationErrors,
+            'recordClass' => get_class($e->recordObject),
+            'recordID' => $e->recordObject->ID
         ]);
     }
 
@@ -226,8 +226,8 @@ abstract class AbstractRequestHandler
         $args = func_get_args();
 
         return static::respond('error', [
-            'success' => false
-            ,'message' => vsprintf($message, array_slice($args, 1))
+            'success' => false,
+            'message' => vsprintf($message, array_slice($args, 1))
         ]);
     }
 }

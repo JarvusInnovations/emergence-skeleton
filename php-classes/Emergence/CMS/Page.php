@@ -14,11 +14,11 @@ class Page extends AbstractContent
 
     public static $fields = [
         'LayoutClass' => [
-            'type' => 'enum'
-            ,'values' => ['OneColumn']
-            ,'default' => 'OneColumn'
-        ]
-        ,'LayoutConfig'  => 'json'
+            'type' => 'enum',
+            'values' => ['OneColumn'],
+            'default' => 'OneColumn'
+        ],
+        'LayoutConfig'  => 'json'
     ];
 
 

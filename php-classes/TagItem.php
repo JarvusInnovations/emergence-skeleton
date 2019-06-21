@@ -6,17 +6,17 @@ class TagItem extends ActiveRecord
     public static $rootClass = __CLASS__;
 
     public static $fields = [
-        'ID' => null
-        ,'Class' => null
-        ,'ContextClass' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'ContextID' => [
-            'type' => 'integer'
-            ,'notnull' => false
-        ]
-        ,'TagID' => [
+        'ID' => null,
+        'Class' => null,
+        'ContextClass' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'ContextID' => [
+            'type' => 'integer',
+            'notnull' => false
+        ],
+        'TagID' => [
             'type' => 'integer'
         ]
     ];
@@ -24,17 +24,17 @@ class TagItem extends ActiveRecord
     public static $relationships = [
         'Context' => [
             'type' => 'context-parent'
-        ]
-        ,'Tag' => [
-            'type' => 'one-one'
-            ,'class' => 'Tag'
+        ],
+        'Tag' => [
+            'type' => 'one-one',
+            'class' => 'Tag'
         ]
     ];
 
     public static $indexes = [
         'TagItem' => [
-            'fields' => ['TagID','ContextClass','ContextID']
-            ,'unique' => true
+            'fields' => ['TagID', 'ContextClass', 'ContextID'],
+            'unique' => true
         ]
     ];
 
@@ -51,18 +51,18 @@ class TagItem extends ActiveRecord
         parent::validate($deep);
 
         $this->_validator->validate([
-            'field' => 'TagID'
-            ,'validator' => 'number'
+            'field' => 'TagID',
+            'validator' => 'number'
         ]);
 
         $this->_validator->validate([
-            'field' => 'ContextClass'
-            ,'validator' => 'className'
+            'field' => 'ContextClass',
+            'validator' => 'className'
         ]);
 
         $this->_validator->validate([
-            'field' => 'ContextID'
-            ,'validator' => 'number'
+            'field' => 'ContextID',
+            'validator' => 'number'
         ]);
 
         // save results
@@ -78,13 +78,13 @@ class TagItem extends ActiveRecord
     public function destroy()
     {
         DB::nonQuery('DELETE FROM `%s` WHERE `%s` = \'%s\' AND `%s` = %u AND `%s` = %u', [
-            static::$tableName
-            ,static::_cn('ContextClass')
-            ,$this->ContextClass
-            ,static::_cn('ContextID')
-            ,$this->ContextID
-            ,static::_cn('TagID')
-            ,$this->TagID
+            static::$tableName,
+            static::_cn('ContextClass'),
+            $this->ContextClass,
+            static::_cn('ContextID'),
+            $this->ContextID,
+            static::_cn('TagID'),
+            $this->TagID
         ]);
 
         return DB::affectedRows() > 0;
@@ -93,14 +93,14 @@ class TagItem extends ActiveRecord
     public static function getTagsSummary($options = [])
     {
         $options = array_merge([
-            'tagConditions' => []
-            ,'itemConditions' => []
-            ,'Class' => false
-            ,'classConditions' => []
-            ,'overlayTag' => false
-            ,'order' => 'itemsCount DESC'
-            ,'excludeEmpty' => true
-            ,'limit' => false
+            'tagConditions' => [],
+            'itemConditions' => [],
+            'Class' => false,
+            'classConditions' => [],
+            'overlayTag' => false,
+            'order' => 'itemsCount DESC',
+            'excludeEmpty' => true,
+            'limit' => false
         ], $options);
 
         // initialize conditions
@@ -116,18 +116,18 @@ class TagItem extends ActiveRecord
         if (!empty($options['classConditions'])) {
             $classSubquery = 'SELECT `%s` FROM `%s` WHERE (%s)';
             $classParams = [
-                $options['Class']::getColumnName('ID')
-                ,$options['Class']::$tableName
-                ,join(') AND (', $options['classConditions'])
+                $options['Class']::getColumnName('ID'),
+                $options['Class']::$tableName,
+                join(') AND (', $options['classConditions'])
             ];
         }
 
         $itemsCountQuery = 'SELECT COUNT(*) FROM `%s` TagItem WHERE TagItem.`%s` = Tag.`%s` AND (%s)';
         $itemsCountParams = [
-            TagItem::$tableName
-            ,TagItem::getColumnName('TagID')
-            ,Tag::getColumnName('ID')
-            ,count($options['itemConditions']) ? join(') AND (', $options['itemConditions']) : '1'
+            TagItem::$tableName,
+            TagItem::getColumnName('TagID'),
+            Tag::getColumnName('ID'),
+            count($options['itemConditions']) ? join(') AND (', $options['itemConditions']) : '1'
         ];
 
         if (!empty($options['overlayTag'])) {
@@ -161,9 +161,9 @@ class TagItem extends ActiveRecord
 
         $tagSummaryQuery = 'SELECT Tag.*, (%s) AS itemsCount FROM `%s` Tag WHERE (%s)';
         $tagSummaryParams = [
-            DB::prepareQuery($itemsCountQuery, $itemsCountParams)
-            ,Tag::$tableName
-            ,count($options['tagConditions']) ? join(') AND (', $options['tagConditions']) : '1'
+            DB::prepareQuery($itemsCountQuery, $itemsCountParams),
+            Tag::$tableName,
+            count($options['tagConditions']) ? join(') AND (', $options['tagConditions']) : '1'
         ];
 
         // exclude empty

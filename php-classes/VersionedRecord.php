@@ -7,17 +7,17 @@ abstract class VersionedRecord extends ActiveRecord
 
     public static $fields = [
         'RevisionID' => [
-            'columnName' => 'RevisionID'
-            ,'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
+            'columnName' => 'RevisionID',
+            'type' => 'integer',
+            'unsigned' => true,
+            'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'OldVersions' => [
-            'type' => 'history'
-            ,'order' => ['RevisionID' => 'DESC']
+            'type' => 'history',
+            'order' => ['RevisionID' => 'DESC']
         ]
     ];
 
@@ -96,17 +96,17 @@ abstract class VersionedRecord extends ActiveRecord
     public static function getRevisionRecords($options = [])
     {
         $options = array_merge([
-            'indexField' => false
-            ,'conditions' => []
-            ,'order' => false
-            ,'limit' => false
-            ,'offset' => 0
+            'indexField' => false,
+            'conditions' => [],
+            'order' => false,
+            'limit' => false,
+            'offset' => 0
         ], $options);
 
         $query = 'SELECT * FROM `%s` WHERE (%s)';
         $params = [
-            static::getHistoryTableName()
-            , count($options['conditions']) ? join(') AND (', static::_mapConditions($options['conditions'])) : 1
+            static::getHistoryTableName(),
+            count($options['conditions']) ? join(') AND (', static::_mapConditions($options['conditions'])) : 1
         ];
 
         if ($options['order']) {
@@ -159,8 +159,8 @@ abstract class VersionedRecord extends ActiveRecord
             DB::nonQuery(
                 'INSERT INTO `%s` SET %s',
                 [
-                    static::getHistoryTableName()
-                    , join(',', $set)
+                    static::getHistoryTableName(),
+                    join(',', $set)
                 ]
             );
         }

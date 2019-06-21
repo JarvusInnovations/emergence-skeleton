@@ -13,10 +13,10 @@ class DraftsRequestHandler extends \RequestHandler
         }
 
         return static::respond('drafts', [
-            'success' => true
-            ,'data' => AbstractContent::getAllByWhere([
-                'AuthorID' => $GLOBALS['Session']->PersonID
-                ,'Status = "Draft" OR Published > CURRENT_TIMESTAMP'
+            'success' => true,
+            'data' => AbstractContent::getAllByWhere([
+                'AuthorID' => $GLOBALS['Session']->PersonID,
+                'Status = "Draft" OR Published > CURRENT_TIMESTAMP'
             ])
         ]);
     }

@@ -9,16 +9,16 @@ class Logger extends \Psr\Log\AbstractLogger
     public static $logger; // set from a config script to override general logger instance
     public static $logPath;
     public static $logLevelsWrite = [
-        LogLevel::EMERGENCY
-        ,LogLevel::ALERT
-        ,LogLevel::CRITICAL
-        ,LogLevel::ERROR
-        ,LogLevel::WARNING
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL,
+        LogLevel::ERROR,
+        LogLevel::WARNING
     ];
     public static $logLevelsEmail = [
-        LogLevel::EMERGENCY
-        ,LogLevel::ALERT
-        ,LogLevel::CRITICAL
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL
     ];
 
     public static function __classLoaded()
@@ -32,9 +32,9 @@ class Logger extends \Psr\Log\AbstractLogger
     public function log($level, $message, array $context = [])
     {
         \Debug::log([
-            'level' => $level
-            ,'message' => $message
-            ,'context' => $context
+            'level' => $level,
+            'message' => $message,
+            'context' => $context
         ]);
 
         if (in_array($level, static::$logLevelsWrite)) {

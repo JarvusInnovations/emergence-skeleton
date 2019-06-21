@@ -14,16 +14,16 @@ class RegistrationRequestHandler extends \RequestHandler
     public static $onRegisterComplete;
     public static $applyRegistrationData;
     public static $registrationFields = [
-        'FirstName'
-        ,'LastName'
-        ,'Gender'
-        ,'BirthDate'
-        ,'Username'
-        ,'Password'
-        ,'Email'
-        ,'Phone'
-        ,'Location'
-        ,'About'
+        'FirstName',
+        'LastName',
+        'Gender',
+        'BirthDate',
+        'Username',
+        'Password',
+        'Email',
+        'Phone',
+        'Location',
+        'About'
     ];
 
     // RequestHandler
@@ -117,8 +117,8 @@ class RegistrationRequestHandler extends \RequestHandler
                 ]);
 
                 return static::respond('registerComplete', [
-                    'success' => true
-                    ,'data' => $User
+                    'success' => true,
+                    'data' => $User
                 ]);
             }
 
@@ -133,8 +133,8 @@ class RegistrationRequestHandler extends \RequestHandler
         }
 
         return static::respond('register', [
-            'success' => false
-            ,'data' => $User
+            'success' => false,
+            'data' => $User
         ]);
     }
 

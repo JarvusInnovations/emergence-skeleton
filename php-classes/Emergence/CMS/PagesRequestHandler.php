@@ -13,8 +13,8 @@ class PagesRequestHandler extends AbstractRequestHandler
     protected static function throwRecordNotFoundError($handle, $message = 'Record not found')
     {
         return static::respond('pageNotFound', [
-            'success' => false
-            ,'pageHandle' => $handle
+            'success' => false,
+            'pageHandle' => $handle
         ]);
     }
 }

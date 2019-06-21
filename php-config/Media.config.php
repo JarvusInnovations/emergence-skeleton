@@ -1,3 +1,3 @@
 <?php
 
-Media::$subClasses = ['PhotoMedia','AudioMedia','VideoMedia','PDFMedia'];
+Media::$subClasses = ['PhotoMedia', 'AudioMedia', 'VideoMedia', 'PDFMedia'];

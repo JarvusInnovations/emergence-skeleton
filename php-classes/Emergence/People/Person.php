@@ -28,169 +28,169 @@ class Person extends VersionedRecord implements IPerson
     public static $fields = [
         'FirstName' => [
             'includeInSummary' => true
-        ]
-        ,'LastName' => [
+        ],
+        'LastName' => [
             'includeInSummary' => true
-        ]
-        ,'MiddleName' => [
+        ],
+        'MiddleName' => [
             'notnull' => false
-        ]
-        ,'PreferredName' => [
+        ],
+        'PreferredName' => [
             'default' => null
-        ]
-        ,'Gender' => [
-            'type' => 'enum'
-            ,'values' => ['Male','Female']
-            ,'notnull' => false
-        ]
-        ,'BirthDate' => [
-            'type' => 'date'
-            ,'notnull' => false
-            ,'accountLevelEnumerate' => 'Staff'
-        ]
-        ,'Email' => [
+        ],
+        'Gender' => [
+            'type' => 'enum',
+            'values' => ['Male', 'Female'],
             'notnull' => false
-            ,'unique' => true
-            ,'accountLevelEnumerate' => 'User'
-        ]
-        ,'Phone' => [
-            'type' => 'decimal'
-            ,'length' => '15,0'
-            ,'unsigned' => true
-            ,'notnull' => false
-            ,'accountLevelEnumerate' => 'User'
-        ]
-        ,'Location' => [
+        ],
+        'BirthDate' => [
+            'type' => 'date',
+            'notnull' => false,
+            'accountLevelEnumerate' => 'Staff'
+        ],
+        'Email' => [
+            'notnull' => false,
+            'unique' => true,
+            'accountLevelEnumerate' => 'User'
+        ],
+        'Phone' => [
+            'type' => 'decimal',
+            'length' => '15,0',
+            'unsigned' => true,
+            'notnull' => false,
+            'accountLevelEnumerate' => 'User'
+        ],
+        'Location' => [
             'notnull' => false
-        ]
-        ,'About' => [
-            'type' => 'clob'
-            ,'notnull' => false
-        ]
-        ,'PrimaryPhotoID' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
+        ],
+        'About' => [
+            'type' => 'clob',
+            'notnull' => false
+        ],
+        'PrimaryPhotoID' => [
+            'type' => 'integer',
+            'unsigned' => true,
+            'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'GroupMemberships' => [
-            'type' => 'one-many'
-            ,'class' => Groups\GroupMember::class
-            ,'indexField' => 'GroupID'
-            ,'foreign' => 'PersonID'
-        ]
-        ,'Groups' => [
-            'type' => 'many-many'
-            ,'class' => Groups\Group::class
-            ,'linkClass' => Groups\GroupMember::class
-            ,'linkLocal' => 'PersonID'
-            ,'linkForeign' => 'GroupID'
-        ]
-        ,'PrimaryPhoto' => [
-            'type' => 'one-one'
-            ,'class' => PhotoMedia::class
-            ,'local' => 'PrimaryPhotoID'
-        ]
-        ,'Photos' => [
-            'type' => 'context-children'
-            ,'class' => PhotoMedia::class
-            ,'contextClass' => __CLASS__
-        ]
-        ,'Comments' => [
-            'type' => 'context-children'
-            ,'class' => Comment::class
-            ,'contextClass' => __CLASS__
-            ,'order' => ['ID' => 'DESC']
+            'type' => 'one-many',
+            'class' => Groups\GroupMember::class,
+            'indexField' => 'GroupID',
+            'foreign' => 'PersonID'
+        ],
+        'Groups' => [
+            'type' => 'many-many',
+            'class' => Groups\Group::class,
+            'linkClass' => Groups\GroupMember::class,
+            'linkLocal' => 'PersonID',
+            'linkForeign' => 'GroupID'
+        ],
+        'PrimaryPhoto' => [
+            'type' => 'one-one',
+            'class' => PhotoMedia::class,
+            'local' => 'PrimaryPhotoID'
+        ],
+        'Photos' => [
+            'type' => 'context-children',
+            'class' => PhotoMedia::class,
+            'contextClass' => __CLASS__
+        ],
+        'Comments' => [
+            'type' => 'context-children',
+            'class' => Comment::class,
+            'contextClass' => __CLASS__,
+            'order' => ['ID' => 'DESC']
         ]
     ];
 
     public static $dynamicFields = [
-        'PrimaryPhoto'
-        ,'Photos'
-        ,'groupIDs' => [
+        'PrimaryPhoto',
+        'Photos',
+        'groupIDs' => [
             'method' => 'getGroupIDs'
         ]
     ];
 
     public static $searchConditions = [
         'FirstName' => [
-            'qualifiers' => ['any','name','fname','firstname','first']
-            ,'points' => 2
-            ,'sql' => 'FirstName LIKE "%%%s%%"'
-        ]
-        ,'LastName' => [
-            'qualifiers' => ['any','name','lname','lastname','last']
-            ,'points' => 2
-            ,'sql' => 'LastName LIKE "%%%s%%"'
-        ]
-        ,'Username' => [
-            'qualifiers' => ['any','username','uname','user']
-            ,'points' => 2
-            ,'sql' => 'Username LIKE "%%%s%%"'
-        ]
-        ,'Gender' => [
-            'qualifiers' => ['gender','sex']
-            ,'points' => 2
-            ,'sql' => 'Gender LIKE "%s"'
-        ]
-        ,'Class' => [
-            'qualifiers' => ['class']
-            ,'points' => 2
-            ,'sql' => 'Class LIKE "%%%s%%"'
-        ]
-        ,'AccountLevel' => [
-            'qualifiers' => ['accountlevel']
-            ,'points' => 2
-            ,'sql' => 'AccountLevel LIKE "%%%s%%"'
-        ]
-        ,'Group' => [
-            'qualifiers' => ['group']
-            ,'points' => 1
-            ,'join' => [
-                'className' => Groups\GroupMember::class
-                ,'aliasName' => 'GroupMember'
-                ,'localField' => 'ID'
-                ,'foreignField' => 'PersonID'
-            ]
-            ,'callback' => 'getGroupConditions'
+            'qualifiers' => ['any', 'name', 'fname', 'firstname', 'first'],
+            'points' => 2,
+            'sql' => 'FirstName LIKE "%%%s%%"'
+        ],
+        'LastName' => [
+            'qualifiers' => ['any', 'name', 'lname', 'lastname', 'last'],
+            'points' => 2,
+            'sql' => 'LastName LIKE "%%%s%%"'
+        ],
+        'Username' => [
+            'qualifiers' => ['any', 'username', 'uname', 'user'],
+            'points' => 2,
+            'sql' => 'Username LIKE "%%%s%%"'
+        ],
+        'Gender' => [
+            'qualifiers' => ['gender', 'sex'],
+            'points' => 2,
+            'sql' => 'Gender LIKE "%s"'
+        ],
+        'Class' => [
+            'qualifiers' => ['class'],
+            'points' => 2,
+            'sql' => 'Class LIKE "%%%s%%"'
+        ],
+        'AccountLevel' => [
+            'qualifiers' => ['accountlevel'],
+            'points' => 2,
+            'sql' => 'AccountLevel LIKE "%%%s%%"'
+        ],
+        'Group' => [
+            'qualifiers' => ['group'],
+            'points' => 1,
+            'join' => [
+                'className' => Groups\GroupMember::class,
+                'aliasName' => 'GroupMember',
+                'localField' => 'ID',
+                'foreignField' => 'PersonID'
+            ],
+            'callback' => 'getGroupConditions'
         ]
     ];
 
     public static $validators = [
         'Class' => [
-            'validator' => 'selection'
-            ,'choices' => [] // filled dynamically in __classLoaded
-            ,'required' => false
-        ]
-        ,'FirstName' => [
-            'minlength' => 2
-            ,'required' => true
-            ,'errorMessage' => 'First name is required.'
-        ]
-        ,'LastName' => [
-            'minlength' => 2
-            ,'required' => true
-            ,'errorMessage' => 'Last name is required.'
-        ]
-        ,'Email' => [
-            'field' => 'Email'
-            ,'validator' => 'email'
-            ,'required' => false
-        ]
-        ,'Phone' => [
-            'validator' => 'phone'
-            ,'required' => false
-        ]
-        ,'BirthDate' => [
-            'validator' => 'date_ymd'
-            ,'required' => false
-        ]
-        ,'Gender' => [
-            'validator' => 'selection'
-            ,'required' => false
-            ,'choices' => [] // filled dynamically in __classLoaded
+            'validator' => 'selection',
+            'choices' => [], // filled dynamically in __classLoaded
+            'required' => false
+        ],
+        'FirstName' => [
+            'minlength' => 2,
+            'required' => true,
+            'errorMessage' => 'First name is required.'
+        ],
+        'LastName' => [
+            'minlength' => 2,
+            'required' => true,
+            'errorMessage' => 'Last name is required.'
+        ],
+        'Email' => [
+            'field' => 'Email',
+            'validator' => 'email',
+            'required' => false
+        ],
+        'Phone' => [
+            'validator' => 'phone',
+            'required' => false
+        ],
+        'BirthDate' => [
+            'validator' => 'date_ymd',
+            'required' => false
+        ],
+        'Gender' => [
+            'validator' => 'selection',
+            'required' => false,
+            'choices' => [] // filled dynamically in __classLoaded
         ]
     ];
 
@@ -256,8 +256,8 @@ class Person extends VersionedRecord implements IPerson
     public static function getByFullName($firstName, $lastName)
     {
         return static::getByWhere([
-            'FirstName' => $firstName
-            ,'LastName' => $lastName
+            'FirstName' => $firstName,
+            'LastName' => $lastName
         ]);
     }
 
@@ -267,8 +267,8 @@ class Person extends VersionedRecord implements IPerson
             return $Person;
         } else {
             return static::create([
-                'FirstName' => $firstName
-                ,'LastName' => $lastName
+                'FirstName' => $firstName,
+                'LastName' => $lastName
             ], $save);
         }
     }
@@ -282,8 +282,8 @@ class Person extends VersionedRecord implements IPerson
         }
 
         return [
-            'FirstName' => $parts[0]
-            ,'LastName' => $parts[1]
+            'FirstName' => $parts[0],
+            'LastName' => $parts[1]
         ];
     }
 
@@ -319,9 +319,9 @@ class Person extends VersionedRecord implements IPerson
         }
 
         $containedGroups = DB::allRecords('SELECT ID FROM %s WHERE `Left` BETWEEN %u AND %u', [
-            Groups\Group::$tableName
-            ,$group->Left
-            ,$group->Right
+            Groups\Group::$tableName,
+            $group->Left,
+            $group->Right
         ]);
 
         $containedGroups = array_map(function ($group) {

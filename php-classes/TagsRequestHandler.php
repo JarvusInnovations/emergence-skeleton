@@ -29,8 +29,8 @@ class TagsRequestHandler extends RecordsRequestHandler
             $conditions = 'Handle IN ("'.join('","', DB::escape($handles)).'")';
 
             return static::respond('tags', [
-                'success' => true
-                ,'data' => Tag::getAllByWhere($conditions)
+                'success' => true,
+                'data' => Tag::getAllByWhere($conditions)
             ]);
         }
 
@@ -63,8 +63,8 @@ class TagsRequestHandler extends RecordsRequestHandler
         }
 
         return static::respond('tagItems', [
-            'success' => true
-            ,'data' => TagItem::getAllByWhere($conditions)
+            'success' => true,
+            'data' => TagItem::getAllByWhere($conditions)
         ]);
     }
 
@@ -74,7 +74,7 @@ class TagsRequestHandler extends RecordsRequestHandler
             $GLOBALS['Session']->requireAccountLevel(static::$accountLevelAssign);
         }
 
-        if (static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT'])) {
+        if (static::$responseMode == 'json' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {
             $_REQUEST = JSON::getRequestData();
         }
 
@@ -98,8 +98,8 @@ class TagsRequestHandler extends RecordsRequestHandler
         }
 
         return static::respond($className::$pluralNoun.'Saved', [
-            'success' => true
-            ,'data' => $results
+            'success' => true,
+            'data' => $results
         ]);
     }
 }

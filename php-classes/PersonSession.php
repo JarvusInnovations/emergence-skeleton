@@ -18,9 +18,9 @@ class PersonSession extends Session
 
         // call parent and apply additional default options
         parent::__construct(array_merge([
-            'Authenticator' => self::$DefaultAuthenticator
-            ,'RequireAuthentication' => self::$DefaultRequireAuthentication
-            ,'PersonClass' => Person::$StandardClass
+            'Authenticator' => self::$DefaultAuthenticator,
+            'RequireAuthentication' => self::$DefaultRequireAuthentication,
+            'PersonClass' => Person::$StandardClass
         ], $options));
 
         // initialize authenticator

@@ -24,8 +24,8 @@ SearchRequestHandler::$searchClasses[Emergence\CMS\BlogPost::class] = [
             'field' => 'Handle',
             'method' => 'like'
         ]
-    ]
-    ,'conditions' => [
+    ],
+    'conditions' => [
         'Class' => Emergence\CMS\BlogPost::class,
         'Status' => 'Published',
         'Published IS NULL OR Published <= CURRENT_TIMESTAMP'

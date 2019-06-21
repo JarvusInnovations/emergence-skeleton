@@ -59,23 +59,23 @@ class ActiveRecord
      */
     public static $fields = [
         'ID' => [
-            'type' => 'integer'
-            ,'autoincrement' => true
-            ,'unsigned' => true
-            ,'includeInSummary' => true
-        ]
-        ,'Class' => [
-            'type' => 'enum'
-            ,'notnull' => true
-            ,'values' => []
-        ]
-        ,'Created' => [
-            'type' => 'timestamp'
-            ,'default' => 'CURRENT_TIMESTAMP'
-        ]
-        ,'CreatorID' => [
-            'type' => 'integer'
-            ,'notnull' => false
+            'type' => 'integer',
+            'autoincrement' => true,
+            'unsigned' => true,
+            'includeInSummary' => true
+        ],
+        'Class' => [
+            'type' => 'enum',
+            'notnull' => true,
+            'values' => []
+        ],
+        'Created' => [
+            'type' => 'timestamp',
+            'default' => 'CURRENT_TIMESTAMP'
+        ],
+        'CreatorID' => [
+            'type' => 'integer',
+            'notnull' => false
         ]
     ];
 
@@ -97,9 +97,9 @@ class ActiveRecord
      */
     public static $relationships = [
         'Creator' => [
-            'type' => 'one-one'
-            ,'class' => 'Person'
-            ,'local' => 'CreatorID'
+            'type' => 'one-one',
+            'class' => 'Person',
+            'local' => 'CreatorID'
         ]
     ];
 
@@ -191,15 +191,15 @@ class ActiveRecord
         if (static::$trackModified) {
             if (empty(static::$fields['Modified'])) {
                 static::$fields['Modified'] = [
-                    'type' => 'timestamp'
-                    ,'notnull' => false
+                    'type' => 'timestamp',
+                    'notnull' => false
                 ];
             }
 
             if (empty(static::$fields['ModifierID'])) {
                 static::$fields['ModifierID'] = [
-                    'type' => 'uint'
-                    ,'notnull' => false
+                    'type' => 'uint',
+                    'notnull' => false
                 ];
             }
 
@@ -888,8 +888,8 @@ class ActiveRecord
                 $insertQuery = DB::prepareQuery(
                     'INSERT INTO `%s` SET %s',
                     [
-                        static::$tableName
-                        , join(',', $set)
+                        static::$tableName,
+                        join(',', $set)
                     ]
                 );
 
@@ -950,10 +950,10 @@ class ActiveRecord
                 DB::nonQuery(
                     'UPDATE `%s` SET %s WHERE `%s` = %u',
                     [
-                        static::$tableName
-                        , join(',', $set)
-                        , static::_cn('ID')
-                        , $this->ID
+                        static::$tableName,
+                        join(',', $set),
+                        static::_cn('ID'),
+                        $this->ID
                     ]
                 );
 
@@ -1172,9 +1172,9 @@ class ActiveRecord
         }
 
         DB::nonQuery('DELETE FROM `%s` WHERE `%s` = %u', [
-            static::$tableName
-            ,static::_cn('ID')
-            ,$id
+            static::$tableName,
+            static::_cn('ID'),
+            $id
         ]);
 
         static::_invalidateRecordCaches($id);
@@ -1190,8 +1190,8 @@ class ActiveRecord
     public static function getByContext($contextClass, $contextID, $options = [])
     {
         $options = array_merge([
-            'conditions' => []
-            ,'order' => false
+            'conditions' => [],
+            'order' => false
         ], $options);
 
         $options['conditions']['ContextClass'] = $contextClass;
@@ -1227,9 +1227,9 @@ class ActiveRecord
     {
         $query = 'SELECT * FROM `%s` WHERE `%s` = %s LIMIT 1';
         $params = [
-            static::$tableName
-            , static::_cn($field)
-            , static::quoteValue($value)
+            static::$tableName,
+            static::_cn($field),
+            static::quoteValue($value)
         ];
 
         try {
@@ -1279,9 +1279,9 @@ class ActiveRecord
             return DB::oneRecord(
                 'SELECT * FROM `%s` WHERE (%s) %s LIMIT 1',
                 [
-                    static::$tableName
-                    , join(') AND (', $conditions)
-                    , $order ? 'ORDER BY '.join(',', $order) : ''
+                    static::$tableName,
+                    join(') AND (', $conditions),
+                    $order ? 'ORDER BY '.join(',', $order) : ''
                 ]
             );
         } catch (TableNotFoundException $e) {
@@ -1329,14 +1329,14 @@ class ActiveRecord
     public static function getAllRecordsByWhere($conditions = [], $options = [])
     {
         $options = array_merge([
-            'indexField' => false
-            ,'order' => false
-            ,'limit' => false
-            ,'offset' => 0
-            ,'calcFoundRows' => false
-            ,'joinRelated' => false
-            ,'extraColumns' => false
-            ,'having' => false
+            'indexField' => false,
+            'order' => false,
+            'limit' => false,
+            'offset' => 0,
+            'calcFoundRows' => false,
+            'joinRelated' => false,
+            'extraColumns' => false,
+            'having' => false
         ], $options);
 
 
@@ -1398,11 +1398,11 @@ class ActiveRecord
         }
 
         $params = [
-            $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : ''
-            , static::$tableName
-            , $tableAlias
-            , $join
-            , $conditions ? join(') AND (', $conditions) : '1'
+            $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : '',
+            static::$tableName,
+            $tableAlias,
+            $join,
+            $conditions ? join(') AND (', $conditions) : '1'
         ];
 
 
@@ -1434,10 +1434,10 @@ class ActiveRecord
     public static function getAllRecords($options = [])
     {
         $options = array_merge([
-            'indexField' => false
-            ,'order' => false
-            ,'limit' => false
-            ,'offset' => 0
+            'indexField' => false,
+            'order' => false,
+            'limit' => false,
+            'offset' => 0
         ], $options);
 
         $query = 'SELECT * FROM `%s`';
@@ -1495,8 +1495,8 @@ class ActiveRecord
 
         try {
             return intval(DB::oneValue('SELECT COUNT(*) FROM `%s` WHERE (%s)', [
-                static::$tableName
-                ,$conditions ? join(') AND (', $conditions) : '1'
+                static::$tableName,
+                $conditions ? join(') AND (', $conditions) : '1'
             ]));
         } catch (TableNotFoundException $e) {
             return 0;
@@ -1532,10 +1532,10 @@ class ActiveRecord
     public static function getSqlSearchConditions($qualifier, $term)
     {
         $sqlSearchConditions = [
-            'conditions' => []
-            ,'points' => 1
-            ,'joins' => []
-            ,'qualifierFound' => false
+            'conditions' => [],
+            'points' => 1,
+            'joins' => [],
+            'qualifierFound' => false
         ];
 
         foreach (static::aggregateStackedConfig('searchConditions') as $k => $condition) {
@@ -1576,9 +1576,9 @@ class ActiveRecord
 
             if ($sqlCondition) {
                 $sqlSearchConditions['conditions'][] = [
-                    'condition' => is_array($sqlCondition) ? implode(' AND ', static::mapConditions($sqlCondition)) : $sqlCondition
-                    ,'points' => $condition['points']
-                    ,'qualifier' => $qualifier
+                    'condition' => is_array($sqlCondition) ? implode(' AND ', static::mapConditions($sqlCondition)) : $sqlCondition,
+                    'points' => $condition['points'],
+                    'qualifier' => $qualifier
                 ];
             }
         }
@@ -1638,15 +1638,15 @@ class ActiveRecord
     protected static function _initField($field, $options = [])
     {
         $options = array_merge([
-            'type' => null
-            ,'length' => null
-            ,'primary' => null
-            ,'unique' => null
-            ,'autoincrement' => null
-            ,'notnull' => array_key_exists('default', $options) && $options['default'] === null ? false : true
-            ,'unsigned' => null
-            ,'default' => null
-            ,'values' => null
+            'type' => null,
+            'length' => null,
+            'primary' => null,
+            'unique' => null,
+            'autoincrement' => null,
+            'notnull' => array_key_exists('default', $options) && $options['default'] === null ? false : true,
+            'unsigned' => null,
+            'default' => null,
+            'values' => null
         ], static::$fieldDefaults, ['columnName' => $field], $options);
 
         if ($field == 'Class') {
@@ -1718,8 +1718,8 @@ class ActiveRecord
 
         if (is_string($options)) {
             $options = [
-                'type' => 'one-one'
-                ,'class' => $options
+                'type' => 'one-one',
+                'class' => $options
             ];
         }
 
@@ -2180,7 +2180,7 @@ class ActiveRecord
     protected function _setFieldValue($field, $value)
     {
         // ignore overwriting meta fields
-        if (in_array($field, ['Created','CreatorID']) && $this->_getFieldValue($field, false)) {
+        if (in_array($field, ['Created', 'CreatorID']) && $this->_getFieldValue($field, false)) {
             return false;
         }
 
@@ -2432,9 +2432,9 @@ class ActiveRecord
                         ]
                     ),
                     [
-                        'indexField' => $rel['indexField']
-                        ,'order' => $rel['order']
-                        ,'conditions' => $rel['conditions']
+                        'indexField' => $rel['indexField'],
+                        'order' => $rel['order'],
+                        'conditions' => $rel['conditions']
                     ]
                 );
 
@@ -2447,15 +2447,15 @@ class ActiveRecord
                 }
 
                 $conditions = array_merge(is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'], [
-                    'ContextClass' => $rel['contextClass']
-                    ,'ContextID' => $this->_getFieldValue($rel['local'])
+                    'ContextClass' => $rel['contextClass'],
+                    'ContextID' => $this->_getFieldValue($rel['local'])
                 ]);
 
                 $this->_relatedObjects[$relationship] = $rel['class']::getAllByWhere(
                     $conditions,
                     [
-                        'indexField' => $rel['indexField']
-                        ,'order' => $rel['order']
+                        'indexField' => $rel['indexField'],
+                        'order' => $rel['order']
                     ]
                 );
 
@@ -2463,8 +2463,8 @@ class ActiveRecord
                 static::_linkFieldToRelationship($rel['local'], $relationship);
             } elseif ($rel['type'] == 'context-child') {
                 $conditions = array_merge(is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'], [
-                    'ContextClass' => $rel['contextClass']
-                    ,'ContextID' => $this->_getFieldValue($rel['local'])
+                    'ContextClass' => $rel['contextClass'],
+                    'ContextID' => $this->_getFieldValue($rel['local'])
                 ]);
 
                 $this->_relatedObjects[$relationship] = $rel['class']::getByWhere(
@@ -2490,13 +2490,13 @@ class ActiveRecord
                 // TODO: support order
                 $query = 'SELECT Related.* FROM `%s` Link JOIN `%s` Related ON (Related.`%s` = Link.%s) WHERE Link.`%s` = %u AND %s';
                 $params = [
-                    $rel['linkClass']::$tableName
-                    ,$rel['class']::$tableName
-                    ,$rel['foreign']
-                    ,$rel['linkForeign']
-                    ,$rel['linkLocal']
-                    ,$this->_getFieldValue($rel['local'])
-                    ,$conditions ? join(' AND ', $conditions) : '1'
+                    $rel['linkClass']::$tableName,
+                    $rel['class']::$tableName,
+                    $rel['foreign'],
+                    $rel['linkForeign'],
+                    $rel['linkLocal'],
+                    $this->_getFieldValue($rel['local']),
+                    $conditions ? join(' AND ', $conditions) : '1'
                 ];
 
                 if ($rel['indexField']) {

@@ -21,43 +21,43 @@ class User extends Person implements IUser
     // ActiveRecord configuration
     public static $fields = [
         'Username' => [
-            'unique' => true
-            ,'includeInSummary' => true
-        ]
-        ,'Password' => [
-            'type' => 'string'
-            ,'excludeFromData' => true
-        ]
-        ,'AccountLevel' => [
-            'type' => 'enum'
-            ,'values' => ['Disabled','Contact','User','Staff','Administrator','Developer']
-            ,'default' => 'User'
+            'unique' => true,
+            'includeInSummary' => true
+        ],
+        'Password' => [
+            'type' => 'string',
+            'excludeFromData' => true
+        ],
+        'AccountLevel' => [
+            'type' => 'enum',
+            'values' => ['Disabled', 'Contact', 'User', 'Staff', 'Administrator', 'Developer'],
+            'default' => 'User'
         ]
     ];
 
     public static $searchConditions = [
         'Username' => [
-            'qualifiers' => ['any','username','uname','user']
-            ,'points' => 3
-            ,'sql' => 'Username LIKE "%%%s%%"'
-        ]
-        ,'AccountLevel' => [
-            'qualifiers' => ['accountlevel']
-            ,'points' => 2
-            ,'sql' => 'AccountLevel LIKE "%%%s%%"'
+            'qualifiers' => ['any', 'username', 'uname', 'user'],
+            'points' => 3,
+            'sql' => 'Username LIKE "%%%s%%"'
+        ],
+        'AccountLevel' => [
+            'qualifiers' => ['accountlevel'],
+            'points' => 2,
+            'sql' => 'AccountLevel LIKE "%%%s%%"'
         ]
     ];
 
     public static $validators = [
         'Username' => [
-            'validator' => 'handle'
-            ,'required' => true
-            ,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores.'
-        ]
-        ,'AccountLevel' => [
-            'validator' => 'selection'
-            ,'choices' => [] // filled dynamically in __classLoaded
-            ,'required' => false
+            'validator' => 'handle',
+            'required' => true,
+            'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores.'
+        ],
+        'AccountLevel' => [
+            'validator' => 'selection',
+            'choices' => [], // filled dynamically in __classLoaded
+            'required' => false
         ]
     ];
 
@@ -236,7 +236,7 @@ class User extends Person implements IUser
 
     protected static function generatePassword($length = 8)
     {
-        $chars = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's' ,'t', 'u', 'v', 'w', 'x', 'y', 'z'];
+        $chars = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's' , 't', 'u', 'v', 'w', 'x', 'y', 'z'];
         $password = '';
 
         for ($i=0; $i<$length; $i++) {

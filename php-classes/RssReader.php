@@ -126,10 +126,10 @@ class RssReader
                 } else {
                     $tempNode[$nodeName]['value']  = $this->extractDOM($values->childNodes, $values->nodeName);
                 }
-                if (in_array($parentNodeName, ['channel','rdf:RDF'])) {
+                if (in_array($parentNodeName, ['channel', 'rdf:RDF'])) {
                     if ($values->nodeName == 'item') {
                         $this->items[] = $tempNode[$nodeName]['value'];
-                    } elseif (!in_array($values->nodeName, ['rss','channel'])) {
+                    } elseif (!in_array($values->nodeName, ['rss', 'channel'])) {
                         $this->channel[$values->nodeName] = $tempNode[$nodeName];
                     }
                 }

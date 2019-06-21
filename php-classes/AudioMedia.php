@@ -85,9 +85,9 @@ class AudioMedia extends Media
 
         // create media instance
         $PreviewMedia = Media::createFromFile($previewPath, [
-            'ContextClass' => 'Media'
-            ,'ContextID' => $this->ID
-            ,'Caption' => sprintf('%u sec preview (%us-%us)', static::$previewDuration, $startTime, $startTime+static::$previewDuration)
+            'ContextClass' => 'Media',
+            'ContextID' => $this->ID,
+            'Caption' => sprintf('%u sec preview (%us-%us)', static::$previewDuration, $startTime, $startTime+static::$previewDuration)
         ]);
 
         return $PreviewMedia;

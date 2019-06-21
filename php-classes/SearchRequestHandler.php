@@ -6,8 +6,8 @@ class SearchRequestHandler extends RequestHandler
     public static $useBoolean = true;
 
     public static $userResponseModes = [
-        'application/json' => 'json'
-        ,'text/csv' => 'csv'
+        'application/json' => 'json',
+        'text/csv' => 'csv'
     ];
 
     public static function __classLoaded()
@@ -73,9 +73,9 @@ class SearchRequestHandler extends RequestHandler
             }
 
             $options = array_merge([
-                'className' => $className
-                ,'fields' => ['Title']
-                ,'conditions' => []
+                'className' => $className,
+                'fields' => ['Title'],
+                'conditions' => []
             ], $options);
 
             if (empty($options['fields'])) {
@@ -84,10 +84,10 @@ class SearchRequestHandler extends RequestHandler
 
             // parse fields
             $columns = [
-                'fulltext' => []
-                ,'like' => []
-                ,'exact' => []
-                ,'sql' => []
+                'fulltext' => [],
+                'like' => [],
+                'exact' => [],
+                'sql' => []
             ];
             foreach ($options['fields'] as $field) {
                 // transform string-only
@@ -186,8 +186,8 @@ class SearchRequestHandler extends RequestHandler
         //DebugLog::dumpLog();
 
         static::respond('search', [
-            'data' => $searchResults
-            ,'totalResults' => $totalResults
+            'data' => $searchResults,
+            'totalResults' => $totalResults
         ]);
     }
 }

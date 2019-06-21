@@ -13,10 +13,10 @@ class PostmarkMailer extends AbstractMailer
         }
 
         return static::apiPost(array_merge($options, [
-            'To' => $to
-            ,'From' => $from
-            ,'Subject' => $subject
-            ,'HtmlBody' => $body
+            'To' => $to,
+            'From' => $from,
+            'Subject' => $subject,
+            'HtmlBody' => $body
         ]));
     }
 
@@ -25,9 +25,9 @@ class PostmarkMailer extends AbstractMailer
     {
         $ch = curl_init('https://api.postmarkapp.com/email');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-            ,'Accept: application/json'
-            ,'X-Postmark-Server-Token: '.static::$apiKey
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'X-Postmark-Server-Token: '.static::$apiKey
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

@@ -14,16 +14,16 @@ class EmailSubscriber extends ActiveRecord
     public static $pluralNoun = 'email subscribers';
 
     public static $fields = [
-        'ContextClass' => null
-        ,'ContextID' => null
-        ,'Name' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'Email' => [
-            'type' => 'string'
-            ,'unique' => true
-            ,'notnull' => true
+        'ContextClass' => null,
+        'ContextID' => null,
+        'Name' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'Email' => [
+            'type' => 'string',
+            'unique' => true,
+            'notnull' => true
         ]
     ];
 
@@ -33,8 +33,8 @@ class EmailSubscriber extends ActiveRecord
         parent::validate($deep);
 
         $this->_validator->validate([
-            'field' => 'Email'
-            ,'validator' => 'email'
+            'field' => 'Email',
+            'validator' => 'email'
         ]);
 
         // save results

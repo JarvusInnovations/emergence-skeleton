@@ -19,6 +19,7 @@ return PhpCsFixer\Config::create()
         'ordered_imports' => true,
         'trim_array_spaces' => true,
         'array_indentation' => true,
+        'whitespace_after_comma_in_array' => true,
         'array_syntax' => ['syntax' => 'short'],
     ])
     ->setFinder($finder)

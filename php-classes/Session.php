@@ -58,8 +58,8 @@ class Session extends ActiveRecord
     public static function getFromRequest($create = true)
     {
         $sessionData = [
-            'LastIP' => !empty($_SERVER['REMOTE_ADDR']) ? ip2long($_SERVER['REMOTE_ADDR']) : null
-            ,'LastRequest' => time()
+            'LastIP' => !empty($_SERVER['REMOTE_ADDR']) ? ip2long($_SERVER['REMOTE_ADDR']) : null,
+            'LastRequest' => time()
         ];
 
         $Session = null;

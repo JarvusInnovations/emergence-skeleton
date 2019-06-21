@@ -16,12 +16,12 @@ class ContactSubmission extends ActiveRecord
 
 
     public static $fields = [
-        'ContextClass' => null
-        ,'ContextID' => null
-        ,'Subform' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'Data' => 'serialized'
+        'ContextClass' => null,
+        'ContextID' => null,
+        'Subform' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'Data' => 'serialized'
     ];
 }

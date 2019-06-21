@@ -96,8 +96,8 @@ class JSON
         $args = func_get_args();
 
         self::respond([
-            'success' => false
-            ,'message' => vsprintf($message, array_slice($args, 1))
+            'success' => false,
+            'message' => vsprintf($message, array_slice($args, 1))
         ]);
     }
 
@@ -127,7 +127,7 @@ class JSON
 
                             if ($prefix == '*') {
                                 $includeThisLevel = '*';
-                            } elseif ($includeThisLevel != '*' &&!in_array($prefix, $includeThisLevel)) {
+                            } elseif ($includeThisLevel != '*' && !in_array($prefix, $includeThisLevel)) {
                                 $includeThisLevel[] = $prefix;
                             }
 

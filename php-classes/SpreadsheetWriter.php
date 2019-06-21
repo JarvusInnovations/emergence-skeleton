@@ -3,11 +3,11 @@
 class SpreadsheetWriter
 {
     protected $_options = [
-        'filename' => null
-        ,'fileHandle' => null
-        ,'delimiter' => ','
-        ,'enclosure' => '"'
-        ,'autoHeader' => false
+        'filename' => null,
+        'fileHandle' => null,
+        'delimiter' => ',',
+        'enclosure' => '"',
+        'autoHeader' => false
     ];
     protected $_fh;
     protected $_headersWritten = false;

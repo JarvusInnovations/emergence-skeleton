@@ -12,13 +12,13 @@ class BlogRequestHandler extends AbstractRequestHandler
     public static $accountLevelWrite = 'User';
     public static $accountLevelWriteAll = 'Staff';
     public static $browseConditions = [
-        'Class' => 'Emergence\CMS\BlogPost'
-        ,'Status' => 'Published'
+        'Class' => 'Emergence\CMS\BlogPost',
+        'Status' => 'Published'
     ];
     public static $userResponseModes = [
-        'application/json' => 'json'
-        ,'text/csv' => 'csv'
-        ,'application/rss+xml' => 'rss'
+        'application/json' => 'json',
+        'text/csv' => 'csv',
+        'application/rss+xml' => 'rss'
     ];
 
     public static $browseLimitDefault = 25;

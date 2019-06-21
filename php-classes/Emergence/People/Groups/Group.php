@@ -26,62 +26,62 @@ class Group extends ActiveRecord
     public static $subClasses = [__CLASS__, 'Emergence\People\Groups\Organization'];
 
     public static $fields = [
-        'Name'
-        ,'Handle' => [
+        'Name',
+        'Handle' => [
             'unique' => true
-        ]
-        ,'Status' => [
-            'type' => 'enum'
-            ,'values' => ['Active', 'Disabled']
-            ,'default' => 'Active'
-        ]
-        ,'ParentID' => [
-            'type' => 'uint'
-            ,'notnull' => false
-        ]
-        ,'Left' => [
-            'type' => 'uint'
-            ,'notnull' => false
-            ,'unique' => true
-        ]
-        ,'Right' => [
-            'type' => 'uint'
-            ,'notnull' => false
-        ]
-        ,'Founded' => [
-            'type' => 'timestamp'
-            ,'default' => null
-        ]
-        ,'About' => [
-            'type' => 'clob'
-            ,'notnull' => false
+        ],
+        'Status' => [
+            'type' => 'enum',
+            'values' => ['Active', 'Disabled'],
+            'default' => 'Active'
+        ],
+        'ParentID' => [
+            'type' => 'uint',
+            'notnull' => false
+        ],
+        'Left' => [
+            'type' => 'uint',
+            'notnull' => false,
+            'unique' => true
+        ],
+        'Right' => [
+            'type' => 'uint',
+            'notnull' => false
+        ],
+        'Founded' => [
+            'type' => 'timestamp',
+            'default' => null
+        ],
+        'About' => [
+            'type' => 'clob',
+            'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'Members' => [
-            'type' => 'one-many'
-            ,'class' => 'Emergence\People\Groups\GroupMember'
-            ,'foreign' => 'GroupID'
-        ]
-        ,'Parent' => [
-            'type' => 'one-one'
-            ,'class' => __CLASS__
-        ]
-        ,'People' => [
-            'type' => 'many-many'
-            ,'class' => 'Person'
-            ,'linkClass' => 'Emergence\People\Groups\GroupMember'
-            ,'linkLocal' => 'GroupID'
-            ,'linkForeign' => 'PersonID'
+            'type' => 'one-many',
+            'class' => 'Emergence\People\Groups\GroupMember',
+            'foreign' => 'GroupID'
+        ],
+        'Parent' => [
+            'type' => 'one-one',
+            'class' => __CLASS__
+        ],
+        'People' => [
+            'type' => 'many-many',
+            'class' => 'Person',
+            'linkClass' => 'Emergence\People\Groups\GroupMember',
+            'linkLocal' => 'GroupID',
+            'linkForeign' => 'PersonID'
         ]
     ];
 
     public static $dynamicFields = [
         'FullPath' => [
             'method' => 'getFullPath'
-        ]
-        ,'Population' => [
+        ],
+        'Population' => [
             'method' => 'getPopulation'
         ]
     ];
@@ -145,11 +145,11 @@ class Group extends ActiveRecord
             .' WHERE GroupMember.GroupID IN (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u)'
             .' ORDER BY '.join(',', $order),
             [
-                GroupMember::$tableName
-                ,Person::$tableName
-                ,Group::$tableName
-                ,$this->Left
-                ,$this->Right
+                GroupMember::$tableName,
+                Person::$tableName,
+                Group::$tableName,
+                $this->Left,
+                $this->Right
             ]
         );
     }
@@ -159,10 +159,10 @@ class Group extends ActiveRecord
         return DB::oneValue(
             'SELECT GROUP_CONCAT(Name SEPARATOR "%s") FROM `%s` WHERE `Left` <= %u AND `Right` >= %u ORDER BY `Left`',
             [
-                DB::escape($separator)
-                ,static::$tableName
-                ,$this->Left
-                ,$this->Right
+                DB::escape($separator),
+                static::$tableName,
+                $this->Left,
+                $this->Right
             ]
         );
     }
@@ -173,10 +173,10 @@ class Group extends ActiveRecord
             return (integer)DB::oneValue(
                 'SELECT COUNT(*) FROM (SELECT ID FROM `%s` WHERE `Left` BETWEEN %u AND %u) `Group` JOIN `%s` GroupMember ON GroupID = `Group`.ID',
                 [
-                    static::$tableName
-                    ,$this->Left
-                    ,$this->Right
-                    ,GroupMember::$tableName
+                    static::$tableName,
+                    $this->Left,
+                    $this->Right,
+                    GroupMember::$tableName
                 ]
             );
         } catch (TableNotFoundException $e) {
@@ -208,9 +208,9 @@ class Group extends ActiveRecord
             DB::query(
                 'DELETE FROM `%s` WHERE PersonID = %u AND GroupID NOT IN (%s)',
                 [
-                    GroupMember::$tableName
-                    ,$Person->ID
-                    ,count($assignedGroups) ? join(',', $assignedGroups) : '0'
+                    GroupMember::$tableName,
+                    $Person->ID,
+                    count($assignedGroups) ? join(',', $assignedGroups) : '0'
                 ]
             );
         } catch (TableNotFoundException $e) {

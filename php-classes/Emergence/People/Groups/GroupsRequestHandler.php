@@ -44,9 +44,9 @@ class GroupsRequestHandler extends RecordsRequestHandler
     public static function handleMembersRequest(Group $Group)
     {
         return static::respond('members', [
-            'success' => true
-            ,'data' => $Group->getAllPeople()
-            ,'group' => $Group
+            'success' => true,
+            'data' => $Group->getAllPeople(),
+            'group' => $Group
         ]);
     }
 }

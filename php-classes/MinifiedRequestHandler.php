@@ -9,9 +9,9 @@ class MinifiedRequestHandler extends RequestHandler
     {
         switch (static::shiftPath()) {
             case 'js':
-                return static::handleAssetsRequest(['site-root','js'], 'application/javascript', 'JSMin');
+                return static::handleAssetsRequest(['site-root', 'js'], 'application/javascript', 'JSMin');
             case 'css':
-                return static::handleAssetsRequest(['site-root','css'], 'text/css', 'CssMin');
+                return static::handleAssetsRequest(['site-root', 'css'], 'text/css', 'CssMin');
             default:
                 return static::throwInvalidRequestError();
         }
@@ -102,8 +102,8 @@ class MinifiedRequestHandler extends RequestHandler
         $sourceFiles = static::getSourceNodes($paths, $root, $contentType);
 
         return [
-            'files' => $sourceFiles
-            ,'hash' => static::getFilesHash($sourceFiles)
+            'files' => $sourceFiles,
+            'hash' => static::getFilesHash($sourceFiles)
         ];
     }
 
@@ -139,8 +139,8 @@ class MinifiedRequestHandler extends RequestHandler
                 }
 
                 $sourceFiles[join('/', $path)] = [
-                    'ID' => $node->ID
-                    ,'SHA1' => $node->SHA1
+                    'ID' => $node->ID,
+                    'SHA1' => $node->SHA1
                 ];
             }
         }

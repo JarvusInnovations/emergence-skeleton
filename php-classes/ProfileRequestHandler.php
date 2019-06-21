@@ -4,7 +4,7 @@ use Emergence\People\Person;
 
 class ProfileRequestHandler extends RequestHandler
 {
-    public static $profileFields = ['Location','About','Phone','Email'];
+    public static $profileFields = ['Location', 'About', 'Phone', 'Email'];
     public static $accountLevelEditOthers = 'Staff';
 
     public static $onBeforeProfileValidated = false;
@@ -83,8 +83,8 @@ class ProfileRequestHandler extends RequestHandler
 
                 // fire created response
                 return static::respond('profileSaved', [
-                    'success' => true
-                    ,'data' => $User
+                    'success' => true,
+                    'data' => $User
                 ]);
             }
 
@@ -103,9 +103,9 @@ class ProfileRequestHandler extends RequestHandler
 
         // process photo upload with MediaRequestHandler
         $Photo = \Media::createFromUpload($_FILES['photoFile'], [
-            'ContextClass' => $User->getRootClass()
-            ,'ContextID' => $User->ID
-            ,'Caption' => $User->FullName
+            'ContextClass' => $User->getRootClass(),
+            'ContextID' => $User->ID,
+            'Caption' => $User->FullName
         ]);
 
         // set primary if none set
@@ -115,8 +115,8 @@ class ProfileRequestHandler extends RequestHandler
         }
 
         return static::respond('profilePhotoUploaded', [
-            'success' => (boolean)$Photo
-            ,'data' => $Photo
+            'success' => (boolean)$Photo,
+            'data' => $Photo
         ]);
     }
 
@@ -141,8 +141,8 @@ class ProfileRequestHandler extends RequestHandler
         $User->save();
 
         return static::respond('profilePhotoPrimaried', [
-            'success' => true
-            ,'data' => $Media
+            'success' => true,
+            'data' => $Media
         ]);
     }
 
@@ -171,8 +171,8 @@ class ProfileRequestHandler extends RequestHandler
         $Media->destroy();
 
         return static::respond('profilePhotoDeleted', [
-            'success' => true
-            ,'data' => $Media
+            'success' => true,
+            'data' => $Media
         ]);
     }
 
@@ -195,8 +195,8 @@ class ProfileRequestHandler extends RequestHandler
         $User->save();
 
         return static::respond('passwordChanged', [
-            'success' => true
-            ,'data' => $User
+            'success' => true,
+            'data' => $User
         ]);
     }
 

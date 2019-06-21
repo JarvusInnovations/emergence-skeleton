@@ -16,25 +16,25 @@ abstract class Token extends ActiveRecord
 
     public static $fields = [
         'Handle' => [
-            'type' => 'string'
-            ,'unique' => true
-        ]
-        ,'Expires' => [
-            'type' => 'timestamp'
-            ,'notnull' => false
-        ]
-        ,'Used' => [
-            'type' => 'timestamp'
-            ,'notnull' => false
+            'type' => 'string',
+            'unique' => true
+        ],
+        'Expires' => [
+            'type' => 'timestamp',
+            'notnull' => false
+        ],
+        'Used' => [
+            'type' => 'timestamp',
+            'notnull' => false
         ]
     ];
 
 
     public static $relationships = [
         'Creator' => [
-            'type' => 'one-one'
-            ,'class' => 'Person'
-            ,'local' => 'CreatorID'
+            'type' => 'one-one',
+            'class' => 'Person',
+            'local' => 'CreatorID'
         ]
     ];
 

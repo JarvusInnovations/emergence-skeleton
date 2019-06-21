@@ -46,9 +46,9 @@ class LoginRequestHandler extends RequestHandler
 
         // respond
         return static::respond('login/loginComplete', [
-            'success' => true
-            ,'data' => $GLOBALS['Session']
-            ,'returnURL' => $returnURL
+            'success' => true,
+            'data' => $GLOBALS['Session'],
+            'returnURL' => $returnURL
         ]);
     }
 
@@ -70,8 +70,8 @@ class LoginRequestHandler extends RequestHandler
         // send redirect header
         // respond
         return static::respond('login/logoutComplete', [
-            'success' => true
-            ,'returnURL' => static::getReturnURL($returnURL)
+            'success' => true,
+            'returnURL' => static::getReturnURL($returnURL)
         ]);
     }
 

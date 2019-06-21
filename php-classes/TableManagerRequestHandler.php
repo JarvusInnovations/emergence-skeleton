@@ -111,16 +111,16 @@ class TableManagerRequestHandler extends RequestHandler
                 $error = DB::getMysqli()->error;
             }
             return static::respond('sqlExecuted', [
-                'query' => $_REQUEST['sql']
-                ,'class' => $_REQUEST['class']
-                ,'success' => $success
-                ,'error' => isset($error) ? $error : null
+                'query' => $_REQUEST['sql'],
+                'class' => $_REQUEST['class'],
+                'success' => $success,
+                'error' => isset($error) ? $error : null
             ]);
         }
 
         return static::respond('sql', [
-            'query' => SQL::getCreateTable($_REQUEST['class'])
-            ,'class' => $_REQUEST['class']
+            'query' => SQL::getCreateTable($_REQUEST['class']),
+            'class' => $_REQUEST['class']
         ]);
     }
 
@@ -132,8 +132,8 @@ class TableManagerRequestHandler extends RequestHandler
         }
 
         return static::respond('ext-model', [
-            'data' => Sencha\CodeGenerator::getRecordModel($_REQUEST['class'])
-            ,'class' => $_REQUEST['class']
+            'data' => Sencha\CodeGenerator::getRecordModel($_REQUEST['class']),
+            'class' => $_REQUEST['class']
         ]);
     }
 
@@ -144,8 +144,8 @@ class TableManagerRequestHandler extends RequestHandler
         }
 
         return static::respond('ext-columns', [
-            'data' => Sencha\CodeGenerator::getRecordColumns($_REQUEST['class'])
-            ,'class' => $_REQUEST['class']
+            'data' => Sencha\CodeGenerator::getRecordColumns($_REQUEST['class']),
+            'class' => $_REQUEST['class']
         ]);
     }
 

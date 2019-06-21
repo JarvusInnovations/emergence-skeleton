@@ -15,9 +15,9 @@ class CommentsRequestHandler extends \RecordsRequestHandler
     public static $accountLevelWrite = 'User';
     public static $browseOrder = ['ID' => 'DESC'];
     public static $userResponseModes = [
-        'application/json' => 'json'
-        ,'text/csv' => 'csv'
-        ,'application/rss+xml' => 'rss'
+        'application/json' => 'json',
+        'text/csv' => 'csv',
+        'application/rss+xml' => 'rss'
     ];
 
     public static function respond($responseID, $responseData = [], $responseMode = false)

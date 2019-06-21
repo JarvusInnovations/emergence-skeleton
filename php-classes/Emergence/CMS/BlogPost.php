@@ -23,8 +23,8 @@ class BlogPost extends AbstractContent
         }
 
         return static::getAllByWhere($conditions, [
-            'order' => ['Published' => 'DESC']
-            ,'limit' => $limit
+            'order' => ['Published' => 'DESC'],
+            'limit' => $limit
         ]);
     }
 }

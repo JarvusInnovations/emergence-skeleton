@@ -18,8 +18,8 @@ class Validators
     public static function string($string, array $options = [])
     {
         $options = array_merge([
-            'minlength' => 1
-            ,'maxlength' => false
+            'minlength' => 1,
+            'maxlength' => false
         ], $options);
 
         return !empty($string) && is_string($string)
@@ -47,8 +47,8 @@ class Validators
     public static function number($number, array $options = [])
     {
         $options = array_merge([
-            'min' => false
-            ,'max' => false
+            'min' => false,
+            'max' => false
         ], $options);
 
         return is_numeric($number)
@@ -325,7 +325,7 @@ class Validators
             return !empty($postal) && preg_match('/^[0-9]{5}([^a-zA-Z0-9]*[0-9]{4})?$/', $postal);
         } elseif ($options['country'] == 'CA') {
             return !empty($postal) && preg_match('/^[a-zA-Z][0-9][a-zA-Z][[:space:]]?[0-9][a-zA-Z][0-9]$/', $postal);
-        } elseif (in_array($options['country'], ['AD','AR', 'BM', 'BN', 'JM', 'MT', 'MD', 'NL', 'GB', 'VE'])) {
+        } elseif (in_array($options['country'], ['AD', 'AR', 'BM', 'BN', 'JM', 'MT', 'MD', 'NL', 'GB', 'VE'])) {
             return !empty($postal) && preg_match('/^[a-zA-Z0-9 \-]+$/', $postal);
         } else {
             return true;
@@ -347,8 +347,8 @@ class Validators
     public static function phone($phone, array $options = [])
     {
         $options = array_merge([
-            'country' => 'US'
-            ,'fakeDetector' => false
+            'country' => 'US',
+            'fakeDetector' => false
         ], $options);
 
 
@@ -411,8 +411,8 @@ class Validators
         }
 
         $options = array_merge([
-            'choices' => []
-            ,'minCount' => 0
+            'choices' => [],
+            'minCount' => 0
         ], $options);
 
         if (!$value) {
@@ -425,8 +425,8 @@ class Validators
     public static function time_hm($value, array $options = [])
     {
         $options = array_merge([
-            'delimiter' => ':'
-            ,'24hour' => false
+            'delimiter' => ':',
+            '24hour' => false
         ], $options);
 
         if (empty($value) || (substr_count($value, $options['delimiter']) != 1)) {
@@ -455,8 +455,8 @@ class Validators
     public static function time_24hm($value, array $options = [])
     {
         $options = array_merge([
-            'delimiter' => ':'
-            ,'24hour' => true
+            'delimiter' => ':',
+            '24hour' => true
         ], $options);
 
         return self::time_hm($value, $options);
@@ -470,8 +470,8 @@ class Validators
     public static function identifier_string($string, array $options = [])
     {
         $options = array_merge([
-            'minlength' => 0
-            ,'maxlength' => false
+            'minlength' => 0,
+            'maxlength' => false
         ], $options);
 
         return !empty($string) && ctype_print($string)
@@ -530,8 +530,8 @@ class Validators
     public static function handle($string, array $options = [])
     {
         $options = array_merge([
-            'pattern' => '/^[\\pL][\\pL\d_:\-\.]*$/u'
-            ,'allowNumeric' => false
+            'pattern' => '/^[\\pL][\\pL\d_:\-\.]*$/u',
+            'allowNumeric' => false
         ], $options);
 
         return ($options['allowNumeric'] || !is_numeric($string)) && preg_match($options['pattern'], $string);
@@ -549,11 +549,11 @@ class Validators
     public static function items($value, array $options = [])
     {
         $options = array_merge([
-            'itemValidator' => 'string'
-            ,'itemValidatorOptions' => []
-            ,'delimiter' => '/\s*,\s*/'
-            ,'minItems' => 0
-            ,'maxItems' => 0
+            'itemValidator' => 'string',
+            'itemValidatorOptions' => [],
+            'delimiter' => '/\s*,\s*/',
+            'minItems' => 0,
+            'maxItems' => 0
         ], $options);
 
         if (is_string($value)) {
@@ -571,7 +571,7 @@ class Validators
         }
 
         foreach ($value as $item) {
-            if (!call_user_func([__CLASS__,$options['itemValidator']], $item, $options['itemValidatorOptions'])) {
+            if (!call_user_func([__CLASS__, $options['itemValidator']], $item, $options['itemValidatorOptions'])) {
                 return false;
             }
         }

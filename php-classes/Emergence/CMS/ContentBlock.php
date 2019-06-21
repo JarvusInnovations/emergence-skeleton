@@ -16,13 +16,13 @@ class ContentBlock extends \VersionedRecord
     public static $fields = [
         'Handle' => [
             'unique' => true
-        ]
-        ,'Renderer' => [
-            'type' => 'enum'
-            ,'values' => ['text', 'html', 'markdown']
-            ,'default' => 'markdown'
-        ]
-        ,'Content' => [
+        ],
+        'Renderer' => [
+            'type' => 'enum',
+            'values' => ['text', 'html', 'markdown'],
+            'default' => 'markdown'
+        ],
+        'Content' => [
             'type' => 'clob'
         ]
     ];
@@ -45,9 +45,9 @@ class ContentBlock extends \VersionedRecord
         parent::validate($deep);
 
         $this->_validator->validate([
-            'field' => 'Handle'
-            ,'validator' => 'handle'
-            ,'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
+            'field' => 'Handle',
+            'validator' => 'handle',
+            'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
         ]);
 
         // save results

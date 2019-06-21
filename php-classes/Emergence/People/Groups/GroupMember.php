@@ -11,51 +11,51 @@ class GroupMember extends ActiveRecord
 
     public static $fields = [
         'GroupID' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-        ]
-        ,'PersonID' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-        ]
-        ,'Role' => [
-            'type' => 'enum'
-            ,'values' => ['Member', 'Administrator', 'Owner', 'Founder']
-        ]
-        ,'Rank' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
-        ]
-        ,'Title' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'Joined' => [
-            'type' => 'timestamp'
-            ,'default' => null
-        ]
-        ,'Expires' => [
-            'type' => 'timestamp'
-            ,'notnull' => false
+            'type' => 'integer',
+            'unsigned' => true
+        ],
+        'PersonID' => [
+            'type' => 'integer',
+            'unsigned' => true
+        ],
+        'Role' => [
+            'type' => 'enum',
+            'values' => ['Member', 'Administrator', 'Owner', 'Founder']
+        ],
+        'Rank' => [
+            'type' => 'integer',
+            'unsigned' => true,
+            'notnull' => false
+        ],
+        'Title' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'Joined' => [
+            'type' => 'timestamp',
+            'default' => null
+        ],
+        'Expires' => [
+            'type' => 'timestamp',
+            'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'Person' => [
-            'type' => 'one-one'
-            ,'class' => 'Person'
-        ]
-        ,'Group' => [
-            'type' => 'one-one'
-            ,'class' => 'Emergence\People\Groups\Group'
+            'type' => 'one-one',
+            'class' => 'Person'
+        ],
+        'Group' => [
+            'type' => 'one-one',
+            'class' => 'Emergence\People\Groups\Group'
         ]
     ];
 
     public static $indexes = [
         'GroupPerson' => [
-            'fields' => ['GroupID', 'PersonID']
-            ,'unique' => true
+            'fields' => ['GroupID', 'PersonID'],
+            'unique' => true
         ]
     ];
 

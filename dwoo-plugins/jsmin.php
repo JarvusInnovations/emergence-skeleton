@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_jsmin(Dwoo_Core $dwoo, $files, $root = ['site-root','js'], $embed = false, $debug = false)
+function Dwoo_Plugin_jsmin(Dwoo_Core $dwoo, $files, $root = ['site-root', 'js'], $embed = false, $debug = false)
 {
     if (is_array($files)) {
         $files = implode('+', $files);

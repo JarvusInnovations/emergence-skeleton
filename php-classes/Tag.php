@@ -16,33 +16,33 @@ class Tag extends ActiveRecord
     public static $fields = [
         'Title' => [
             'includeInSummary' => true
-        ]
-        ,'Handle' => [
+        ],
+        'Handle' => [
             'unique' => true,
             'includeInSummary' => true
-        ]
-        ,'Description' => [
+        ],
+        'Description' => [
             'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'Creator' => [
-            'type' => 'one-one'
-            ,'local' => 'CreatorID'
-            ,'class' => 'Person'
-        ]
-        ,'Items' => [
-            'type' => 'one-many'
-            ,'class' => 'TagItem'
+            'type' => 'one-one',
+            'local' => 'CreatorID',
+            'class' => 'Person'
+        ],
+        'Items' => [
+            'type' => 'one-many',
+            'class' => 'TagItem'
         ]
     ];
 
     public static $searchConditions = [
         'Prefix' => [
-            'qualifiers' => ['prefix']
-            ,'points' => 2
-            ,'sql' => 'Handle LIKE "%%%s%%.%"'
+            'qualifiers' => ['prefix'],
+            'points' => 2,
+            'sql' => 'Handle LIKE "%%%s%%.%"'
         ],
         'Title' => [
             'qualifiers' => ['any', 'title'],
@@ -131,11 +131,11 @@ class Tag extends ActiveRecord
                 DB::query(
                     'DELETE FROM `%s` WHERE ContextClass = "%s" AND ContextID = %u AND TagID NOT IN (%s) %s',
                     [
-                        TagItem::$tableName
-                        ,DB::escape($Context->getRootClass())
-                        ,$Context->ID
-                        ,count($assignedTags) ? join(',', array_keys($assignedTags)) : '0'
-                        ,!empty($prefixTags) ? (' AND TagID IN ('.implode(',', $prefixTags).')') : ''
+                        TagItem::$tableName,
+                        DB::escape($Context->getRootClass()),
+                        $Context->ID,
+                        count($assignedTags) ? join(',', array_keys($assignedTags)) : '0',
+                        !empty($prefixTags) ? (' AND TagID IN ('.implode(',', $prefixTags).')') : ''
                     ]
                 );
             } catch (TableNotFoundException $e) {
@@ -263,9 +263,9 @@ class Tag extends ActiveRecord
         }
 
         $tagData = [
-            'TagID' => $this->ID
-            ,'ContextClass' => $contextClass
-            ,'ContextID' => $contextID
+            'TagID' => $this->ID,
+            'ContextClass' => $contextClass,
+            'ContextID' => $contextID
         ];
 
         try {
@@ -295,9 +295,9 @@ class Tag extends ActiveRecord
     {
         // apply defaults
         $options = array_merge([
-            'contextClass' => false
-            ,'conditions' => false
-            ,'limit' => false
+            'contextClass' => false,
+            'conditions' => false,
+            'limit' => false
         ], $options);
 
         $where[] = sprintf('`%s` = %u', TagItem::getColumnName('TagID'), $this->ID);
@@ -309,9 +309,9 @@ class Tag extends ActiveRecord
         return TagItem::instantiateRecords(DB::allRecords(
             'SELECT * FROM `%s` WHERE (%s) ORDER BY rand() %s',
             [
-                TagItem::$tableName
-                , join(') AND (', $where)
-                , $options['limit'] ? sprintf('LIMIT %u', $options['limit']) : ''
+                TagItem::$tableName,
+                join(') AND (', $where),
+                $options['limit'] ? sprintf('LIMIT %u', $options['limit']) : ''
             ]
         ));
     }
@@ -325,12 +325,12 @@ class Tag extends ActiveRecord
     {
         // apply defaults
         $options = array_merge([
-            'conditions' => false
-            ,'order' => false
-            ,'limit' => is_numeric($options) ? $options : false
-            ,'offset' => 0
-            ,'overlayTag' => false
-            ,'calcFoundRows' => false
+            'conditions' => false,
+            'order' => false,
+            'limit' => is_numeric($options) ? $options : false,
+            'offset' => 0,
+            'overlayTag' => false,
+            'calcFoundRows' => false
         ], $options);
 
         // build TagItem query
@@ -381,10 +381,8 @@ class Tag extends ActiveRecord
             .' JOIN `%s` Content ON (Content.ID = TagItem.ContextID)'
             .' WHERE (%s)',
             $options['calcFoundRows'] ? 'SQL_CALC_FOUND_ROWS' : '',
-            $tagQuery                                                 // tag_items query
-            ,
-            $class::$tableName                                        // item's table name
-            ,
+            $tagQuery,                                                 // tag_items query
+            $class::$tableName,                                        // item's table name
             count($classWhere) ? join(') AND (', $classWhere) : '1'   // optional where clause
         );
 

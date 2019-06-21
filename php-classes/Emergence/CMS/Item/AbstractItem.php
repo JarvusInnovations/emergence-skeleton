@@ -13,49 +13,49 @@ abstract class AbstractItem extends \VersionedRecord
     public static $rootClass = __CLASS__;
     public static $defaultClass = 'Emergence\CMS\Item\Text';
     public static $subClasses = [
-        'Emergence\CMS\Item\Album'
-        ,'Emergence\CMS\Item\Embed'
-        ,'Emergence\CMS\Item\Media'
-        ,'Emergence\CMS\Item\RichText'
-        ,'Emergence\CMS\Item\Text'
-        ,'Emergence\CMS\Item\Markdown'
+        'Emergence\CMS\Item\Album',
+        'Emergence\CMS\Item\Embed',
+        'Emergence\CMS\Item\Media',
+        'Emergence\CMS\Item\RichText',
+        'Emergence\CMS\Item\Text',
+        'Emergence\CMS\Item\Markdown'
     ];
 
     public static $fields = [
         'Title' => [
+            'notnull' => false,
+            'blankisnull' => true
+        ],
+        'ContentID' => [
+            'type'  => 'integer',
+            'unsigned' => true,
+            'index' => true
+        ],
+        'AuthorID' => [
+            'type'  =>  'integer',
+            'unsigned' => true
+        ],
+        'Status' => [
+            'type' => 'enum',
+            'values' => ['Draft', 'Published', 'Hidden', 'Deleted'],
+            'default' => 'Published'
+        ],
+        'Order' => [
+            'type' => 'integer',
+            'unsigned' => true,
             'notnull' => false
-            ,'blankisnull' => true
-        ]
-        ,'ContentID' => [
-            'type'  => 'integer'
-            ,'unsigned' => true
-            ,'index' => true
-        ]
-        ,'AuthorID' => [
-            'type'  =>  'integer'
-            ,'unsigned' => true
-        ]
-        ,'Status' => [
-            'type' => 'enum'
-            ,'values' => ['Draft','Published','Hidden','Deleted']
-            ,'default' => 'Published'
-        ]
-        ,'Order' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
-        ]
-        ,'Data' => 'json'
+        ],
+        'Data' => 'json'
     ];
 
     public static $relationships = [
         'Author'    =>  [
-            'type'  =>  'one-one'
-            ,'class' => 'Person'
-        ]
-        ,'Content' =>   [
-            'type'  =>  'one-one'
-            ,'class' => 'Emergence\CMS\AbstractContent'
+            'type'  =>  'one-one',
+            'class' => 'Person'
+        ],
+        'Content' =>   [
+            'type'  =>  'one-one',
+            'class' => 'Emergence\CMS\AbstractContent'
         ]
     ];
 

@@ -1,28 +1,28 @@
 <?php
 
 ContactRequestHandler::$validators[] = [
-    'field' => 'Name'
-    ,'validator' => 'string'
-    ,'required' => true
+    'field' => 'Name',
+    'validator' => 'string',
+    'required' => true
 ];
 
 
 ContactRequestHandler::$validators[] = [
-    'field' => 'Email'
-    ,'validator' => 'email'
-    ,'required' => true
+    'field' => 'Email',
+    'validator' => 'email',
+    'required' => true
 ];
 
 
 ContactRequestHandler::$validators[] = [
-    'field' => 'Phone'
-    ,'validator' => 'phone'
-    ,'required' => false
+    'field' => 'Phone',
+    'validator' => 'phone',
+    'required' => false
 ];
 
 
 ContactRequestHandler::$validators[] = [
-    'field' => 'Message'
-    ,'validator' => 'string_multiline'
-    ,'required' => true
+    'field' => 'Message',
+    'validator' => 'string_multiline',
+    'required' => true
 ];

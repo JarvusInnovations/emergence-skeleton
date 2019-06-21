@@ -22,15 +22,15 @@ class NestingBehavior extends RecordBehavior
                 DB::nonQuery(
                     'UPDATE `%s` SET `Right` = `Right` + 2 WHERE `Right` >= %u ORDER BY `Right` DESC',
                     [
-                        $Record::$tableName
-                        ,$Record->Left
+                        $Record::$tableName,
+                        $Record->Left
                     ]
                 );
                 DB::nonQuery(
                     'UPDATE `%s` SET `Left` = `Left` + 2 WHERE `Left` > %u ORDER BY `Left` DESC',
                     [
-                        $Record::$tableName
-                        ,$Record->Left
+                        $Record::$tableName,
+                        $Record->Left
                     ]
                 );
 
@@ -69,27 +69,27 @@ class NestingBehavior extends RecordBehavior
         DB::nonQuery(
             'DELETE FROM `%s` WHERE `Left` BETWEEN %u AND %u;',
             [
-                $className::$tableName
-                ,$left
-                ,$right
+                $className::$tableName,
+                $left,
+                $right
             ]
         );
 
         DB::nonQuery(
             'UPDATE `%s` SET `Right` = `Right` - %u WHERE `Right` > %u;',
             [
-                $className::$tableName
-                ,$width
-                ,$right
+                $className::$tableName,
+                $width,
+                $right
             ]
         );
 
         DB::nonQuery(
             'UPDATE `%s` SET `Left` = `Left` - %u WHERE `Left` > %u',
             [
-                $className::$tableName
-                ,$width
-                ,$right
+                $className::$tableName,
+                $width,
+                $right
             ]
         );
     }
@@ -114,9 +114,9 @@ class NestingBehavior extends RecordBehavior
         $result = DB::query(
             'SELECT ID, `%2$s` FROM `%1$s` ORDER BY `%2$s`, %3$s',
             [
-                $tableName
-                ,$parentCol
-                ,!empty($className::$siblingOrder) ? $className::$siblingOrder : 'ID'
+                $tableName,
+                $parentCol,
+                !empty($className::$siblingOrder) ? $className::$siblingOrder : 'ID'
             ]
         );
 
@@ -154,9 +154,9 @@ class NestingBehavior extends RecordBehavior
         DB::nonQuery(
             'UPDATE `%s` SET `%s` = NULL, `%s` = NULL',
             [
-                $tableName
-                ,$leftCol
-                ,$rightCol
+                $tableName,
+                $leftCol,
+                $rightCol
             ]
         );
 
@@ -164,12 +164,12 @@ class NestingBehavior extends RecordBehavior
             DB::nonQuery(
                 'UPDATE `%s` SET `%s` = %u, `%s` = %u WHERE ID = %u',
                 [
-                    $tableName
-                    ,$leftCol
-                    ,$record[$leftCol]
-                    ,$rightCol
-                    ,$record[$rightCol]
-                    ,$record['ID']
+                    $tableName,
+                    $leftCol,
+                    $record[$leftCol],
+                    $rightCol,
+                    $record[$rightCol],
+                    $record['ID']
                 ]
             );
         }

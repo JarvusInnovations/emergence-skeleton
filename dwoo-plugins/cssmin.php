@@ -1,6 +1,6 @@
 <?php
 
-function Dwoo_Plugin_cssmin(Dwoo_Core $dwoo, $files, $root = ['site-root','css'], $embed = false, $debug = false)
+function Dwoo_Plugin_cssmin(Dwoo_Core $dwoo, $files, $root = ['site-root', 'css'], $embed = false, $debug = false)
 {
     if (is_array($files)) {
         $files = implode('+', $files);

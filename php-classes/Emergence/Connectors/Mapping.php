@@ -18,23 +18,23 @@ class Mapping extends \ActiveRecord
         'ContextClass' => [
             'type' => 'string',
             'collate' => 'ascii_bin'
-        ]
-        ,'ContextID' => 'uint'
-        ,'Source' => [
-            'type' => 'enum'
-            ,'values' => ['creation', 'matching', 'manual']
-        ]
-        ,'Connector' => [
-            'type' => 'string'
-            ,'length' => 25,
+        ],
+        'ContextID' => 'uint',
+        'Source' => [
+            'type' => 'enum',
+            'values' => ['creation', 'matching', 'manual']
+        ],
+        'Connector' => [
+            'type' => 'string',
+            'length' => 25,
             'collate' => 'ascii_bin'
-        ]
-        ,'ExternalKey' => [
-            'type' => 'string'
-            ,'length' => 25,
+        ],
+        'ExternalKey' => [
+            'type' => 'string',
+            'length' => 25,
             'collate' => 'ascii_bin'
-        ]
-        ,'ExternalIdentifier' => [
+        ],
+        'ExternalIdentifier' => [
             'type' => 'string',
             'collate' => 'utf8_bin'
         ]
@@ -48,8 +48,8 @@ class Mapping extends \ActiveRecord
 
     public static $indexes = [
         'Mapping' => [
-            'fields' => ['Connector', 'ExternalKey', 'ExternalIdentifier']
-            ,'unique' => true
+            'fields' => ['Connector', 'ExternalKey', 'ExternalIdentifier'],
+            'unique' => true
         ]
     ];
 
@@ -59,10 +59,10 @@ class Mapping extends \ActiveRecord
             $Mapping = parent::create($values, $save);
         } catch (\DuplicateKeyException $e) {
             $Mapping = static::getByWhere([
-                'ContextClass' => $values['Context'] ? $values['Context']->getRootClass() : $values['ContextClass']
-                ,'Connector' => $values['Connector']
-                ,'ExternalKey' => $values['ExternalKey']
-                ,'ExternalIdentifier' => $values['ExternalIdentifier']
+                'ContextClass' => $values['Context'] ? $values['Context']->getRootClass() : $values['ContextClass'],
+                'Connector' => $values['Connector'],
+                'ExternalKey' => $values['ExternalKey'],
+                'ExternalIdentifier' => $values['ExternalIdentifier']
             ]);
 
             $Mapping->ContextID = $values['Context'] ? $values['Context']->ID : $values['ContextID'];

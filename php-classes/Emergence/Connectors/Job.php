@@ -27,48 +27,48 @@ class Job extends ActiveRecord implements LoggerInterface
     public static $fields = [
         'Title' => [
             'default' => null
-        ]
-        ,'Handle' => [
+        ],
+        'Handle' => [
             'unique' => true
-        ]
+        ],
 
-        ,'Status' => [
-            'type' => 'enum'
-            ,'values' => ['Template','Pending','InProgress','Completed','Failed','Abandoned']
-            ,'default' => 'Pending'
-        ]
+        'Status' => [
+            'type' => 'enum',
+            'values' => ['Template', 'Pending', 'InProgress', 'Completed', 'Failed', 'Abandoned'],
+            'default' => 'Pending'
+        ],
 
-        ,'Connector'
-        ,'TemplateID' => [
-            'type' => 'uint'
-            ,'notnull' => false
-        ]
+        'Connector',
+        'TemplateID' => [
+            'type' => 'uint',
+            'notnull' => false
+        ],
 
-        ,'Direction' => [
-            'type' => 'enum'
-            ,'values' => ['In','Out','Both']
-            ,'notnull' => false
-        ]
+        'Direction' => [
+            'type' => 'enum',
+            'values' => ['In', 'Out', 'Both'],
+            'notnull' => false
+        ],
 
-        ,'Config' => [
+        'Config' => [
             'type' => 'json'
-        ]
-        ,'Results' => [
-            'type' => 'json'
-            ,'default' => null
+        ],
+        'Results' => [
+            'type' => 'json',
+            'default' => null
         ]
     ];
 
     public static $relationships = [
         'Template' => [
-            'type' => 'one-one'
-            ,'class' => __CLASS__
-        ]
-        ,'TemplatedJobs' => [
-            'type' => 'one-many'
-            ,'class' => __CLASS__
-            ,'foreign' => 'TemplateID'
-            ,'order' => ['ID' => 'DESC']
+            'type' => 'one-one',
+            'class' => __CLASS__
+        ],
+        'TemplatedJobs' => [
+            'type' => 'one-many',
+            'class' => __CLASS__,
+            'foreign' => 'TemplateID',
+            'order' => ['ID' => 'DESC']
         ]
     ];
 
@@ -107,9 +107,9 @@ class Job extends ActiveRecord implements LoggerInterface
         };
 
         $logEntry = [
-            'changes' => []
-            ,'level' => array_key_exists('level', $options) ? $options['level'] : LogLevel::NOTICE
-            ,'record' => &$Record
+            'changes' => [],
+            'level' => array_key_exists('level', $options) ? $options['level'] : LogLevel::NOTICE,
+            'record' => &$Record
         ];
 
         foreach ($Record->originalValues as $field => $from) {
@@ -133,8 +133,8 @@ class Job extends ActiveRecord implements LoggerInterface
             }
 
             $logEntry['changes'][$fieldLabel] = [
-                'from' => $from
-                ,'to' => $to
+                'from' => $from,
+                'to' => $to
             ];
         }
 

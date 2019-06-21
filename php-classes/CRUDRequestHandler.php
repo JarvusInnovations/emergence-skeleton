@@ -145,8 +145,8 @@ abstract class CRUDRequestHandler extends RequestHandler
             foreach ($filter as $field) {
                 if ($_GET['anyMatch']) {
                     $conditions[$field['property']] = [
-                        'value'    =>    '%'.$field['value'].'%'
-                        ,'operator' => 'LIKE'
+                        'value'    =>    '%'.$field['value'].'%',
+                        'operator' => 'LIKE'
                     ];
                 } else {
                     $conditions[$field['property']] = $field['value'];
@@ -188,9 +188,9 @@ abstract class CRUDRequestHandler extends RequestHandler
         }
 
         return static::respond($responseID, array_merge([
-            'success' => true
-            ,'data' => $payload
-            ,'total' => DB::foundRows()
+            'success' => true,
+            'data' => $payload,
+            'total' => DB::foundRows()
         ]), $additional);
     }
 
@@ -198,9 +198,9 @@ abstract class CRUDRequestHandler extends RequestHandler
     public static function throwRecordInvalidError(ActiveRecord $Record, $data = null)
     {
         return static::respond(static::getResponseID('singular', 'invalid'), [
-            'success' => false
-            ,'data' => $Record
-            ,'errors' => $Record->validationErrors
+            'success' => false,
+            'data' => $Record,
+            'errors' => $Record->validationErrors
         ]);
     }
 

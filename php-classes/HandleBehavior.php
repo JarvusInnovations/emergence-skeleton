@@ -17,10 +17,10 @@ class HandleBehavior extends RecordBehavior
     public static function onValidate(ActiveRecord $Record, RecordValidator $validator)
     {
         $validator->validate([
-            'field' => 'Handle'
-            ,'required' => false
-            ,'validator' => 'handle'
-            ,'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
+            'field' => 'Handle',
+            'required' => false,
+            'validator' => 'handle',
+            'errorMessage' => 'Handle can only contain letters, numbers, hyphens, and underscores'
         ]);
 
         // check handle uniqueness
@@ -37,23 +37,23 @@ class HandleBehavior extends RecordBehavior
     {
         // apply default options
         $options = array_merge([
-            'transliterate' => static::$transliterate
-            ,'case' => 'lower' // 'lower' / 'upper' / null
+            'transliterate' => static::$transliterate,
+            'case' => 'lower' // 'lower' / 'upper' / null
         ], $options);
 
         // strip bad characters
         $text = preg_replace(
             [
-                '/\s+/'                                // 1- Find spaces
-                ,'/^[^\\pL]+/u'                        // 2- Find anything not a letter at the beginning
-                ,'/[-_]*[^\\pL\d_:\-\.]+[-_]*/u'       // 3- Find non-allowed charecters segment and any placeholders next to it
-                ,'/[-_]*:[-_]*/'                      // 4- Find any : and any placeholders next to it
+                '/\s+/',                           // 1- Find spaces
+                '/^[^\\pL]+/u',                    // 2- Find anything not a letter at the beginning
+                '/[-_]*[^\\pL\d_:\-\.]+[-_]*/u',   // 3- Find non-allowed charecters segment and any placeholders next to it
+                '/[-_]*:[-_]*/'                    // 4- Find any : and any placeholders next to it
             ],
             [
-                '_'                                     // 1- Replace spaces with _
-                , ''                                    // 2- Erase anything not a letter at the beginning
-                ,'-'                                    // 3- Replace non-allowed characters with -
-                ,'--'                                   // 4- Replace any : with --
+                '_',                               // 1- Replace spaces with _
+                '',                                // 2- Erase anything not a letter at the beginning
+                '-',                               // 3- Replace non-allowed characters with -
+                '--',                              // 4- Replace any : with --
             ],
             $text
         );
@@ -83,13 +83,13 @@ class HandleBehavior extends RecordBehavior
     {
         // apply default options
         $options = array_merge([
-            'handleField' => 'Handle'
-            ,'domainConstraints' => []
-            ,'alwaysSuffix' => static::$alwaysSuffix
-            ,'randomSuffix' => false
-            ,'randomSuffixMin' => 100
-            ,'randomSuffixMax' => 999
-            ,'suffixFormat' => static::$suffixFormat
+            'handleField' => 'Handle',
+            'domainConstraints' => [],
+            'alwaysSuffix' => static::$alwaysSuffix,
+            'randomSuffix' => false,
+            'randomSuffixMin' => 100,
+            'randomSuffixMax' => 999,
+            'suffixFormat' => static::$suffixFormat
         ], $options);
 
         // transform text to handle-friendly form

@@ -21,66 +21,66 @@ class Media extends ActiveRecord
 
     public static $fields = [
         'ContextClass' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'ContextID' => [
-            'type' => 'integer'
-            ,'notnull' => false
-        ]
-        ,'MIMEType' => 'string'
-        ,'Width' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
-        ]
-        ,'Height' => [
-            'type' => 'integer'
-            ,'unsigned' => true
-            ,'notnull' => false
-        ]
-        ,'Duration' => [
-            'type' => 'float'
-            ,'unsigned' => true
-            ,'notnull' => false
-        ]
-        ,'Caption' => [
-            'type' => 'string'
-            ,'notnull' => false
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'ContextID' => [
+            'type' => 'integer',
+            'notnull' => false
+        ],
+        'MIMEType' => 'string',
+        'Width' => [
+            'type' => 'integer',
+            'unsigned' => true,
+            'notnull' => false
+        ],
+        'Height' => [
+            'type' => 'integer',
+            'unsigned' => true,
+            'notnull' => false
+        ],
+        'Duration' => [
+            'type' => 'float',
+            'unsigned' => true,
+            'notnull' => false
+        ],
+        'Caption' => [
+            'type' => 'string',
+            'notnull' => false
         ]
     ];
 
     public static $relationships = [
         'Creator' => [
-            'type' => 'one-one'
-            ,'class' => 'Person'
-            ,'local' => 'CreatorID'
-        ]
-        ,'Context' => [
+            'type' => 'one-one',
+            'class' => 'Person',
+            'local' => 'CreatorID'
+        ],
+        'Context' => [
             'type' => 'context-parent'
         ]
     ];
 
     public static $searchConditions = [
         'Caption' => [
-            'qualifiers' => ['any','caption']
-            ,'points' => 2
-            ,'sql' => 'Caption LIKE "%%%s%%"'
-        ]
-        ,'CaptionLike' => [
-            'qualifiers' => ['caption-like']
-            ,'points' => 2
-            ,'sql' => 'Caption LIKE "%s"'
-        ]
-        ,'CaptionNot' => [
-            'qualifiers' => ['caption-not']
-            ,'points' => 2
-            ,'sql' => 'Caption NOT LIKE "%%%s%%"'
-        ]
-        ,'CaptionNotLike' => [
-            'qualifiers' => ['caption-not-like']
-            ,'points' => 2
-            ,'sql' => 'Caption NOT LIKE "%s"'
+            'qualifiers' => ['any', 'caption'],
+            'points' => 2,
+            'sql' => 'Caption LIKE "%%%s%%"'
+        ],
+        'CaptionLike' => [
+            'qualifiers' => ['caption-like'],
+            'points' => 2,
+            'sql' => 'Caption LIKE "%s"'
+        ],
+        'CaptionNot' => [
+            'qualifiers' => ['caption-not'],
+            'points' => 2,
+            'sql' => 'Caption NOT LIKE "%%%s%%"'
+        ],
+        'CaptionNotLike' => [
+            'qualifiers' => ['caption-not-like'],
+            'points' => 2,
+            'sql' => 'Caption NOT LIKE "%s"'
         ]
     ];
 
@@ -99,11 +99,11 @@ class Media extends ActiveRecord
     public static $mimeHandlers = [];
 
     public static $mimeRewrites = [
-        'image/photoshop'               => 'application/psd'
-        ,'image/x-photoshop'            => 'application/psd'
-        ,'image/psd'                    => 'application/psd'
-        ,'application/photoshop'        => 'application/psd'
-        ,'image/vnd.adobe.photoshop'    => 'application/psd'
+        'image/photoshop'               => 'application/psd',
+        'image/x-photoshop'            => 'application/psd',
+        'image/psd'                    => 'application/psd',
+        'application/photoshop'        => 'application/psd',
+        'image/vnd.adobe.photoshop'    => 'application/psd'
     ];
 
 
@@ -131,14 +131,14 @@ class Media extends ActiveRecord
             case 'SummaryData':
             case 'JsonTranslation':
                 return [
-                    'ID' => $this->ID
-                    ,'Class' => $this->Class
-                    ,'ContextClass' => $this->ContextClass
-                    ,'ContextID' => $this->ContextID
-                    ,'MIMEType' => $this->MIMEType
-                    ,'Width' => $this->Width
-                    ,'Height' => $this->Height
-                    ,'Duration' => $this->Duration
+                    'ID' => $this->ID,
+                    'Class' => $this->Class,
+                    'ContextClass' => $this->ContextClass,
+                    'ContextID' => $this->ContextID,
+                    'MIMEType' => $this->MIMEType,
+                    'Width' => $this->Width,
+                    'Height' => $this->Height,
+                    'Duration' => $this->Duration
                 ];
 
             case 'Filename':
@@ -527,11 +527,11 @@ class Media extends ActiveRecord
             return $Media;
         } catch (Exception $e) {
             \Emergence\Logger::general_warning('Caught exception while processing media upload, aborting upload and returning null', [
-                'exceptionClass' => get_class($e)
-                ,'exceptionMessage' => $e->getMessage()
-                ,'exceptionCode' => $e->getCode()
-                ,'recordData' => $Media ? $Media->getData() : null
-                ,'mediaInfo' => $mediaInfo
+                'exceptionClass' => get_class($e),
+                'exceptionMessage' => $e->getMessage(),
+                'exceptionCode' => $e->getCode(),
+                'recordData' => $Media ? $Media->getData() : null,
+                'mediaInfo' => $mediaInfo
             ]);
             // fall through to cleanup below
         }
@@ -617,7 +617,7 @@ class Media extends ActiveRecord
 
     public static function getBlankPath($contextClass)
     {
-        $path = ['site-root','img',sprintf(static::$defaultFilenameFormat, $contextClass)];
+        $path = ['site-root', 'img', sprintf(static::$defaultFilenameFormat, $contextClass)];
 
         if ($node = Site::resolvePath($path)) {
             return $node->RealPath;

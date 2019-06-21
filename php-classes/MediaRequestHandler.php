@@ -21,24 +21,24 @@ class MediaRequestHandler extends RecordsRequestHandler
 
     public static $searchConditions = [
         'Caption' => [
-            'qualifiers' => ['any','caption']
-            ,'points' => 2
-            ,'sql' => 'Caption LIKE "%%%s%%"'
-        ]
-        ,'CaptionLike' => [
-            'qualifiers' => ['caption-like']
-            ,'points' => 2
-            ,'sql' => 'Caption LIKE "%s"'
-        ]
-        ,'CaptionNot' => [
-            'qualifiers' => ['caption-not']
-            ,'points' => 2
-            ,'sql' => 'Caption NOT LIKE "%%%s%%"'
-        ]
-        ,'CaptionNotLike' => [
-            'qualifiers' => ['caption-not-like']
-            ,'points' => 2
-            ,'sql' => 'Caption NOT LIKE "%s"'
+            'qualifiers' => ['any', 'caption'],
+            'points' => 2,
+            'sql' => 'Caption LIKE "%%%s%%"'
+        ],
+        'CaptionLike' => [
+            'qualifiers' => ['caption-like'],
+            'points' => 2,
+            'sql' => 'Caption LIKE "%s"'
+        ],
+        'CaptionNot' => [
+            'qualifiers' => ['caption-not'],
+            'points' => 2,
+            'sql' => 'Caption NOT LIKE "%%%s%%"'
+        ],
+        'CaptionNotLike' => [
+            'qualifiers' => ['caption-not-like'],
+            'points' => 2,
+            'sql' => 'Caption NOT LIKE "%s"'
         ]
     ];
 
@@ -227,9 +227,9 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         return static::respond('uploadComplete', [
-            'success' => (boolean)$Media
-            ,'data' => $Media
-            ,'TagID' => isset($Tag) ? $Tag->ID : null
+            'success' => (boolean)$Media,
+            'data' => $Media,
+            'TagID' => isset($Tag) ? $Tag->ID : null
         ]);
     }
 
@@ -257,8 +257,8 @@ class MediaRequestHandler extends RecordsRequestHandler
 
         if (static::$responseMode == 'json' || $_SERVER['HTTP_ACCEPT'] == 'application/json') {
             JSON::translateAndRespond([
-                'success' => true
-                ,'data' => $Media
+                'success' => true,
+                'data' => $Media
             ]);
         } else {
 
@@ -442,8 +442,8 @@ class MediaRequestHandler extends RecordsRequestHandler
             $Media->save();
 
             return static::respond('mediaCaptioned', [
-                'success' => true
-                ,'data' => $Media
+                'success' => true,
+                'data' => $Media
             ]);
         }
 
@@ -484,8 +484,8 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         return static::respond('mediaDeleted', [
-            'success' => true
-            ,'data' => $deleted
+            'success' => true,
+            'data' => $deleted
         ]);
     }
 
@@ -653,8 +653,8 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         return static::respond('mediaDeleted', [
-            'success' => true
-            ,'deleted' => $deleted
+            'success' => true,
+            'deleted' => $deleted
         ]);
     }
 }

@@ -28,52 +28,52 @@ abstract class AbstractContent extends \VersionedRecord
 
     public static $searchConditions = [
         'Title' => [
-            'qualifiers' => ['any', 'title']
-            ,'points' => 2
-            ,'sql' => 'Title Like "%%%s%%"'
-        ]
-        ,'Handle' => [
-            'qualifiers' => ['any', 'handle']
-            ,'points' => 2
-            ,'sql' => 'Handle Like "%%%s%%"'
+            'qualifiers' => ['any', 'title'],
+            'points' => 2,
+            'sql' => 'Title Like "%%%s%%"'
+        ],
+        'Handle' => [
+            'qualifiers' => ['any', 'handle'],
+            'points' => 2,
+            'sql' => 'Handle Like "%%%s%%"'
         ]
     ];
 
     public static $fields = [
         'ContextClass' => [
-            'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'ContextID' => [
-            'type' => 'uint'
-            ,'notnull' => false
-        ]
-        ,'Title'
-        ,'Handle' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'ContextID' => [
+            'type' => 'uint',
+            'notnull' => false
+        ],
+        'Title',
+        'Handle' => [
             'unique' => true
-        ]
-        ,'AuthorID' => [
-            'type'  =>  'integer'
-            ,'unsigned' => true
-        ]
-        ,'Status' => [
-            'type' => 'enum'
-            ,'values' => ['Draft','Published','Hidden','Deleted']
-            ,'default' => 'Published'
-        ]
-        ,'Published' => [
-            'type'  =>  'timestamp'
-            ,'notnull' => false
-            ,'index' => true
-        ]
-        ,'Visibility' => [
-            'type' => 'enum'
-            ,'values' => ['Public','Private']
-            ,'default' => 'Public'
-        ]
-        ,'Summary' => [
-            'type' => 'clob'
-            ,'notnull' => false
+        ],
+        'AuthorID' => [
+            'type'  =>  'integer',
+            'unsigned' => true
+        ],
+        'Status' => [
+            'type' => 'enum',
+            'values' => ['Draft', 'Published', 'Hidden', 'Deleted'],
+            'default' => 'Published'
+        ],
+        'Published' => [
+            'type'  =>  'timestamp',
+            'notnull' => false,
+            'index' => true
+        ],
+        'Visibility' => [
+            'type' => 'enum',
+            'values' => ['Public', 'Private'],
+            'default' => 'Public'
+        ],
+        'Summary' => [
+            'type' => 'clob',
+            'notnull' => false
         ]
     ];
 
@@ -81,37 +81,37 @@ abstract class AbstractContent extends \VersionedRecord
     public static $relationships = [
         'Context' => [
             'type' => 'context-parent'
-        ]
-        ,'Author' =>  [
-            'type' =>  'one-one'
-            ,'class' => Person::class
-        ]
-        ,'Items' => [
-            'type' => 'one-many'
-            ,'class' => Item\AbstractItem::class
-            ,'foreign' => 'ContentID'
-            ,'conditions' => 'Status != "Deleted"'
-            ,'order' => ['Order','ID']
-        ]
-        ,'Tags' => [
-            'type' => 'many-many'
-            ,'class' => Tag::class
-            ,'linkClass' => TagItem::class
-            ,'linkLocal' => 'ContextID'
-            ,'conditions' => ['Link.ContextClass = "Emergence\\\\CMS\\\\AbstractContent"']
-        ]
-        ,'Comments' => [
-            'type' => 'context-children'
-            ,'class' => Comment::class
-            ,'order' => ['ID' => 'DESC']
+        ],
+        'Author' =>  [
+            'type' =>  'one-one',
+            'class' => Person::class
+        ],
+        'Items' => [
+            'type' => 'one-many',
+            'class' => Item\AbstractItem::class,
+            'foreign' => 'ContentID',
+            'conditions' => 'Status != "Deleted"',
+            'order' => ['Order', 'ID']
+        ],
+        'Tags' => [
+            'type' => 'many-many',
+            'class' => Tag::class,
+            'linkClass' => TagItem::class,
+            'linkLocal' => 'ContextID',
+            'conditions' => ['Link.ContextClass = "Emergence\\\\CMS\\\\AbstractContent"']
+        ],
+        'Comments' => [
+            'type' => 'context-children',
+            'class' => Comment::class,
+            'order' => ['ID' => 'DESC']
         ]
     ];
 
     public static $dynamicFields = [
-        'tags' => 'Tags'
-        ,'items' => 'Items'
-        ,'Author'
-        ,'Context'
+        'tags' => 'Tags',
+        'items' => 'Items',
+        'Author',
+        'Context'
     ];
 
 
@@ -186,8 +186,8 @@ abstract class AbstractContent extends \VersionedRecord
         parent::validate();
 
         $this->_validator->validate([
-            'field' => 'Title'
-            ,'errorMessage' => 'A title is required'
+            'field' => 'Title',
+            'errorMessage' => 'A title is required'
         ]);
 
         // implement handles

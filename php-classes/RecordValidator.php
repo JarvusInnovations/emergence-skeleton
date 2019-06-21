@@ -70,8 +70,8 @@ class RecordValidator
     {
         // apply default
         $options = array_merge([
-            'validator' => 'string'
-            , 'required' => true
+            'validator' => 'string',
+            'required' => true
         ], $options);
 
 

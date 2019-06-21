@@ -105,8 +105,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         $terms = preg_split('/\s+/', $query);
 
         $options = array_merge([
-            'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault
-            ,'offset' => !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false
+            'limit' =>  !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : static::$browseLimitDefault,
+            'offset' => !empty($_REQUEST['offset']) && is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : false
         ], $options);
 
         $select = [$tableAlias.'.*'];
@@ -186,26 +186,26 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         return static::respond(
             isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun),
             array_merge($responseData, [
-                'success' => true
-                ,'data' => $className::getAllByQuery(
+                'success' => true,
+                'data' => $className::getAllByQuery(
                     'SELECT DISTINCT %s %s FROM `%s` %s %s WHERE (%s) %s %s %s',
                     [
-                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : ''
-                        ,join(',', $select)
-                        ,$className::$tableName
-                        ,$tableAlias
-                        ,!empty($joins) ? implode(' ', $joins) : ''
-                        ,$conditions ? join(') AND (', $className::mapConditions($conditions)) : '1'
-                        ,count($having) ? 'HAVING ('.join(') AND (', $having).')' : ''
-                        ,count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : ''
-                        ,$options['limit'] ? sprintf('LIMIT %u,%u', $options['offset'], $options['limit']) : ''
+                        static::$browseCalcFoundRows ? 'SQL_CALC_FOUND_ROWS' : '',
+                        join(',', $select),
+                        $className::$tableName,
+                        $tableAlias,
+                        !empty($joins) ? implode(' ', $joins) : '',
+                        $conditions ? join(') AND (', $className::mapConditions($conditions)) : '1',
+                        count($having) ? 'HAVING ('.join(') AND (', $having).')' : '',
+                        count($options['order']) ? 'ORDER BY '.join(',', $options['order']) : '',
+                        $options['limit'] ? sprintf('LIMIT %u,%u', $options['offset'], $options['limit']) : ''
                     ]
-                )
-                ,'query' => $query
-                ,'conditions' => $conditions
-                ,'total' => DB::foundRows()
-                ,'limit' => $options['limit']
-                ,'offset' => $options['offset']
+                ),
+                'query' => $query,
+                'conditions' => $conditions,
+                'total' => DB::foundRows(),
+                'limit' => $options['limit'],
+                'offset' => $options['offset']
             ])
         );
     }
@@ -246,10 +246,10 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         }
 
         $options = array_merge([
-            'limit' =>  $limit
-            ,'offset' => $offset
-            ,'order' => $order
-            ,'calcFoundRows' => static::$browseCalcFoundRows
+            'limit' =>  $limit,
+            'offset' => $offset,
+            'order' => $order,
+            'calcFoundRows' => static::$browseCalcFoundRows
         ], $options);
 
         // handle query search
@@ -298,12 +298,12 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         return static::respond(
             isset($responseId) ? $responseId : static::getTemplateName($className::$pluralNoun),
             array_merge($responseData, [
-                'success' => true
-                ,'data' => $results
-                ,'conditions' => $conditions
-                ,'total' => $resultsTotal
-                ,'limit' => $options['limit']
-                ,'offset' => $options['offset']
+                'success' => true,
+                'data' => $results,
+                'conditions' => $conditions,
+                'total' => $resultsTotal,
+                'limit' => $options['limit'],
+                'offset' => $options['offset']
             ])
         );
     }
@@ -318,8 +318,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
                 $className = static::$recordClass;
 
                 return static::respond(static::getTemplateName($className::$singularNoun), [
-                    'success' => true
-                    ,'data' => $Record
+                    'success' => true,
+                    'data' => $Record
                 ]);
             }
 
@@ -389,8 +389,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
             // check write access
             if (!static::checkWriteAccess($Record)) {
                 $failed[] = [
-                    'record' => $datum
-                    ,'errors' => 'Write access denied'
+                    'record' => $datum,
+                    'errors' => 'Write access denied'
                 ];
                 continue;
             }
@@ -413,8 +413,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
                 static::onRecordSaved($Record, $datum);
             } catch (RecordValidationException $e) {
                 $failed[] = [
-                    'record' => $Record->getData()
-                    ,'validationErrors' => $e->validationErrors
+                    'record' => $Record->getData(),
+                    'validationErrors' => $e->validationErrors
                 ];
 
                 if (!$message) {
@@ -424,10 +424,10 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         }
 
         return static::respond(static::getTemplateName($className::$pluralNoun).'Saved', [
-            'success' => count($results) || !count($failed)
-            ,'data' => $results
-            ,'failed' => $failed
-            ,'message' => $message
+            'success' => count($results) || !count($failed),
+            'data' => $results,
+            'failed' => $failed,
+            'message' => $message
         ]);
     }
 
@@ -454,16 +454,16 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
                 $recordID = $datum['ID'];
             } else {
                 $failed[] = [
-                    'record' => $datum
-                    ,'errors' => 'ID missing'
+                    'record' => $datum,
+                    'errors' => 'ID missing'
                 ];
                 continue;
             }
 
             if (!$Record = $className::getByID($recordID)) {
                 $failed[] = [
-                    'record' => $datum
-                    ,'errors' => 'ID not found'
+                    'record' => $datum,
+                    'errors' => 'ID not found'
                 ];
                 continue;
             }
@@ -471,8 +471,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
             // check write access
             if (!static::checkWriteAccess($Record)) {
                 $failed[] = [
-                    'record' => $datum
-                    ,'errors' => 'Write access denied'
+                    'record' => $datum,
+                    'errors' => 'Write access denied'
                 ];
                 continue;
             }
@@ -484,9 +484,9 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
         }
 
         return static::respond(static::getTemplateName($className::$pluralNoun).'Destroyed', [
-            'success' => count($results) || !count($failed)
-            ,'data' => $results
-            ,'failed' => $failed
+            'success' => count($results) || !count($failed),
+            'data' => $results,
+            'failed' => $failed
         ]);
     }
 
@@ -544,8 +544,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
                 // fire created response
                 $responseId = static::getTemplateName($className::$singularNoun).'Saved';
                 $responseData = static::getEditResponse($responseId, [
-                    'success' => true
-                    ,'data' => $Record
+                    'success' => true,
+                    'data' => $Record
                 ]);
                 return static::respond($responseId, $responseData);
             }
@@ -555,8 +555,8 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
         $responseId = static::getTemplateName($className::$singularNoun).'Edit';
         $responseData = static::getEditResponse($responseId, [
-            'success' => false
-            ,'data' => $Record
+            'success' => false,
+            'data' => $Record
         ]);
 
         return static::respond($responseId, $responseData);
@@ -576,14 +576,14 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
             // fire created response
             return static::respond(static::getTemplateName($className::$singularNoun).'Deleted', [
-                'success' => true
-                ,'data' => $Record
+                'success' => true,
+                'data' => $Record
             ]);
         }
 
         return static::respond('confirm', [
-            'question' => 'Are you sure you want to delete this '.$className::$singularNoun.'?'
-            ,'data' => $Record
+            'question' => 'Are you sure you want to delete this '.$className::$singularNoun.'?',
+            'data' => $Record
         ]);
     }
 
@@ -596,13 +596,13 @@ abstract class RequestHandler extends \Emergence\RequestHandler\AbstractRequestH
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $Comment = Emergence\Comments\Comment::create([
-                'Context' => $Record
-                ,'Message' => $_POST['Message']
+                'Context' => $Record,
+                'Message' => $_POST['Message']
             ], true);
 
             return static::respond('commentSaved', [
-                'success' => true
-                ,'data' => $Comment
+                'success' => true,
+                'data' => $Comment
             ]);
         } else {
             return static::throwInvalidRequestError();

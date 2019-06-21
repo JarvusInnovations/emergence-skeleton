@@ -16,43 +16,43 @@ class Address extends ActiveRecord
     public static $subClasses = [__CLASS__];
 
     public static $fields = [
-        'Class' => null
-        ,'Name' => [
+        'Class' => null,
+        'Name' => [
             'type' => 'string'
-        ]
-        ,'Address' => [
+        ],
+        'Address' => [
             'type' => 'string'
-        ]
-        ,'Address2' => [
+        ],
+        'Address2' => [
+            'type' => 'string',
+            'notnull' => false
+        ],
+        'City' => [
             'type' => 'string'
-            ,'notnull' => false
-        ]
-        ,'City' => [
-            'type' => 'string'
-        ]
-        ,'State_Province' => [
-            'type' => 'enum'
-            ,'values' => []
-            ,'notnull' => false
-        ]
-        ,'Zip_Postal' => [
-            'type' => 'string'
-            ,'length' => '15'
-            ,'notnull' => false
-        ]
-        ,'Country' => [
-            'type' => 'enum'
-            ,'values' => []
-        ]
-        ,'Phone' => [
-            'type' => 'decimal'
-            ,'length' => '15,0'
-            ,'notnull' => false
-        ]
-        ,'PhoneExt' => [
-            'type' => 'decimal'
-            ,'length' => '5,0'
-            ,'notnull' => false
+        ],
+        'State_Province' => [
+            'type' => 'enum',
+            'values' => [],
+            'notnull' => false
+        ],
+        'Zip_Postal' => [
+            'type' => 'string',
+            'length' => '15',
+            'notnull' => false
+        ],
+        'Country' => [
+            'type' => 'enum',
+            'values' => []
+        ],
+        'Phone' => [
+            'type' => 'decimal',
+            'length' => '15,0',
+            'notnull' => false
+        ],
+        'PhoneExt' => [
+            'type' => 'decimal',
+            'length' => '5,0',
+            'notnull' => false
         ]
     ];
 
@@ -86,15 +86,15 @@ class Address extends ActiveRecord
 
         if ($Session->Person) {
             $Address = static::getByWhere([
-                'Name' => $data['Name']
-                ,'Address' => $data['Address']
-                ,'Address2' => $data['Address2']
-                ,'City' => $data['City']
-                ,'State_Province' => $data['State_Province']
-                ,'Zip_Postal' => $data['Zip_Postal']
-                ,'Country' => $data['Country']
-                ,'Phone' => $data['Phone']
-                ,'CreatorID' => $Session->PersonID
+                'Name' => $data['Name'],
+                'Address' => $data['Address'],
+                'Address2' => $data['Address2'],
+                'City' => $data['City'],
+                'State_Province' => $data['State_Province'],
+                'Zip_Postal' => $data['Zip_Postal'],
+                'Country' => $data['Country'],
+                'Phone' => $data['Phone'],
+                'CreatorID' => $Session->PersonID
             ]);
         }
 
@@ -111,13 +111,13 @@ class Address extends ActiveRecord
         ]);
 
         $this->_validator->validate([
-            'field' => 'Address'
-            ,'validator' => 'address'
+            'field' => 'Address',
+            'validator' => 'address'
         ]);
 
         $this->_validator->validate([
-            'field' => 'Address2'
-            ,'required' => false
+            'field' => 'Address2',
+            'required' => false
         ]);
 
         $this->_validator->validate([
@@ -125,29 +125,29 @@ class Address extends ActiveRecord
         ]);
 
         $this->_validator->validate([
-            'field' => 'Country'
-            ,'validator' => 'selection'
-            ,'choices' => static::getFieldOptions('Country', 'values')
+            'field' => 'Country',
+            'validator' => 'selection',
+            'choices' => static::getFieldOptions('Country', 'values')
         ]);
 
         if (!$this->_validator->hasErrors('Country')) {
             $this->_validator->validate([
-                'field' => 'State_Province'
-                ,'validator' => 'state_province'
-                ,'country' => $this->Country
+                'field' => 'State_Province',
+                'validator' => 'state_province',
+                'country' => $this->Country
             ]);
 
             $this->_validator->validate([
-                'field' => 'Zip_Postal'
-                ,'validator' => 'zip_postal'
-                ,'country' => $this->Country
+                'field' => 'Zip_Postal',
+                'validator' => 'zip_postal',
+                'country' => $this->Country
             ]);
 
             $this->_validator->validate([
-                'field' => 'Phone'
-                ,'validator' => 'phone'
-                ,'country' => $this->Country
-                ,'required' => static::$requirePhone
+                'field' => 'Phone',
+                'validator' => 'phone',
+                'country' => $this->Country,
+                'required' => static::$requirePhone
             ]);
         }
 
@@ -217,18 +217,18 @@ class Address extends ActiveRecord
     ];
 
     public static $auStates = [
-        'AU-NSW'    => 'New South Wales'
-        ,'AU-QLD'    => 'Queensland'
-        ,'AU-SA'    => 'South Australia'
-        ,'AU-TAS'    => 'Tasmania'
-        ,'AU-VIC'    => 'Victoria'
-        ,'AU-WA'    => 'Western Australia'
-        ,'AU-ACT'    => 'Australian Capital Territory'
-        ,'AU-NT'    => 'Northern Territory'
-        ,'CC'        => 'Cocos (Keeling) Islands'
-        ,'CX'        => 'Christmas Island'
-        ,'HM'        => 'Heard Island and McDonald Islands'
-        ,'NF'        => 'Norfolk Island'
+        'AU-NSW'    => 'New South Wales',
+        'AU-QLD'    => 'Queensland',
+        'AU-SA'    => 'South Australia',
+        'AU-TAS'    => 'Tasmania',
+        'AU-VIC'    => 'Victoria',
+        'AU-WA'    => 'Western Australia',
+        'AU-ACT'    => 'Australian Capital Territory',
+        'AU-NT'    => 'Northern Territory',
+        'CC'        => 'Cocos (Keeling) Islands',
+        'CX'        => 'Christmas Island',
+        'HM'        => 'Heard Island and McDonald Islands',
+        'NF'        => 'Norfolk Island'
     ];
 
     public static $caProvinces = [

@@ -107,9 +107,9 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
             }
 
             $Job = Job::create([
-                'Connector' => $TemplateJob->Connector
-                ,'Template' => $TemplateJob
-                ,'Config' => $TemplateJob->Config
+                'Connector' => $TemplateJob->Connector,
+                'Template' => $TemplateJob,
+                'Config' => $TemplateJob->Config
             ]);
         } else {
             if (static::$synchronizeRequiredAccountLevel) {
@@ -135,10 +135,10 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
         // show template if not a post
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return static::respond('createJob', [
-                'data' => $Job
-                ,'templates' => Job::getAllByWhere([
-                    'Status' => 'Template'
-                    ,'Connector' => get_called_class()
+                'data' => $Job,
+                'templates' => Job::getAllByWhere([
+                    'Status' => 'Template',
+                    'Connector' => get_called_class()
                 ])
             ]);
         }
@@ -183,8 +183,8 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
             // email report
             if (!empty($Job->Config['reportTo'])) {
                 \Emergence\Mailer\Mailer::sendFromTemplate($Job->Config['reportTo'], 'syncronizeComplete', [
-                    'Job' => $Job
-                    ,'connectorBaseUrl' => static::_getConnectorBaseUrl(true)
+                    'Job' => $Job,
+                    'connectorBaseUrl' => static::_getConnectorBaseUrl(true)
                 ]);
             }
         }
@@ -192,9 +192,9 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
 
         // all done, respond
         return static::respond('syncronizeComplete', [
-            'data' => $Job
-            ,'success' => $success
-            ,'pretend' => $pretend
+            'data' => $Job,
+            'success' => $success,
+            'pretend' => $pretend
         ]);
     }
 

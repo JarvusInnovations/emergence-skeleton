@@ -3,10 +3,10 @@
 class SpreadsheetReader
 {
     protected $_options = [
-        'parseHeader' => true
-        ,'autoTrim' => true
-        ,'packedColumn' => false // set to an integer index to pack extra columns into given column by comma
-        ,'arrayValues' => false
+        'parseHeader' => true,
+        'autoTrim' => true,
+        'packedColumn' => false, // set to an integer index to pack extra columns into given column by comma
+        'arrayValues' => false
     ];
     protected $_fh;
     protected $_columnNames;
@@ -140,9 +140,9 @@ class SpreadsheetReader
         DB::nonQuery(
             'CREATE TABLE `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8;',
             [
-                $tableName
-                ,join(',', $fieldDefs)
-                ,$type
+                $tableName,
+                join(',', $fieldDefs),
+                $type
             ]
         );
 
@@ -156,8 +156,8 @@ class SpreadsheetReader
             DB::nonQuery(
                 'INSERT INTO `%s` VALUES ("%s")',
                 [
-                    $tableName
-                    ,implode('","', array_map(['DB', 'escape'], $row))
+                    $tableName,
+                    implode('","', array_map(['DB', 'escape'], $row))
                 ]
             );
             $count++;

@@ -71,8 +71,8 @@ class ContactRequestHandler extends RequestHandler
                     }
 
                     Emergence\Mailer\Mailer::sendFromTemplate(static::$emailTo, 'staffNotice', [
-                        'Submission' => $Submission
-                        ,'formatters' => static::$formatters
+                        'Submission' => $Submission,
+                        'formatters' => static::$formatters
                     ], [
                         'Headers' => $headers
                     ]);
@@ -80,15 +80,15 @@ class ContactRequestHandler extends RequestHandler
 
                 // respond success
                 return static::respond('contactSubmitted', [
-                    'success' => true
-                    ,'subform' => $subform
+                    'success' => true,
+                    'subform' => $subform
                 ]);
             }
         }
 
         return static::respond('contact', [
-            'validationErrors' => isset($Validator) ? $Validator->getErrors() : []
-            ,'subform' => $subform
+            'validationErrors' => isset($Validator) ? $Validator->getErrors() : [],
+            'subform' => $subform
         ]);
     }
 

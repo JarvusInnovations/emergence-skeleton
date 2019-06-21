@@ -5,14 +5,14 @@ namespace Emergence\Dwoo;
 class PluginLoader implements \Dwoo_ILoader
 {
     public static $searchPaths = [
-        ''
-        ,'personal/'
-        ,'thirdparty/'
-        ,'builtin/'
-        ,'builtin/blocks/'
-        ,'builtin/filters/'
-        ,'builtin/functions/'
-        ,'builtin/processors/'
+        '',
+        'personal/',
+        'thirdparty/',
+        'builtin/',
+        'builtin/blocks/',
+        'builtin/filters/',
+        'builtin/functions/',
+        'builtin/processors/'
     ];
 
     public function loadPlugin($pluginName, $forceRehash = true)

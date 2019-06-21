@@ -192,32 +192,32 @@ class Format
             }
 
             $GLOBALS['bbcodeEngine'] = bbcode_create([
-                '' => ['type'=>BBCODE_TYPE_ROOT,  'childs'=>'!*']
-                ,'h2' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h2>', 'close_tag'=>'</h2>']
-                ,'h3' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h3>', 'close_tag'=>'</h3>']
-                ,'h4' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h4>', 'close_tag'=>'</h4>']
-                ,'h5' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h5>', 'close_tag'=>'</h5>']
-                ,'h6' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h6>', 'close_tag'=>'</h6>']
-                ,'i' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<i>', 'close_tag'=>'</i>']
-                ,'cite' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<cite>', 'close_tag'=>'</cite>']
-                ,'b' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<b>', 'close_tag'=>'</b>']
-                ,'u' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<u>', 'close_tag'=>'</u>']
-                ,'s' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<s>', 'close_tag'=>'</s>']
-                ,'small' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<small>', 'close_tag'=>'</small>']
-                ,'quote' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<blockquote>', 'close_tag'=>'</blockquote>']
-                ,'sig' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<div class="sig">', 'close_tag'=>'</div>']
-                ,'url' => ['type'=>BBCODE_TYPE_OPTARG, 'open_tag'=>'<a href="{PARAM}" target="_blank">', 'close_tag'=>'</a>', 'default_arg'=>'{CONTENT}', 'childs'=>'b,i']
-                ,'img' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<img src="', 'close_tag'=>'" />', 'childs'=>'']
-                ,'list'=> [
-                    'type' => BBCODE_TYPE_NOARG
-                    ,'open_tag' => '<ul>'
-                    ,'close_tag' => '</ul>'
-                    ,'childs' => '*'
-                    ,'content_handling' => 'bbcode_clean_list'
-                ]
-                ,'*' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<li>', 'close_tag'=>'</li>', 'parent'=>'list', 'flags'=>BBCODE_FLAGS_ONE_OPEN_PER_LEVEL]
-                ,'l' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => '[']
-                ,'r' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => ']']
+                '' => ['type'=>BBCODE_TYPE_ROOT,  'childs'=>'!*'],
+                'h2' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h2>', 'close_tag'=>'</h2>'],
+                'h3' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h3>', 'close_tag'=>'</h3>'],
+                'h4' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h4>', 'close_tag'=>'</h4>'],
+                'h5' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h5>', 'close_tag'=>'</h5>'],
+                'h6' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<h6>', 'close_tag'=>'</h6>'],
+                'i' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<i>', 'close_tag'=>'</i>'],
+                'cite' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<cite>', 'close_tag'=>'</cite>'],
+                'b' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<b>', 'close_tag'=>'</b>'],
+                'u' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<u>', 'close_tag'=>'</u>'],
+                's' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<s>', 'close_tag'=>'</s>'],
+                'small' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<small>', 'close_tag'=>'</small>'],
+                'quote' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<blockquote>', 'close_tag'=>'</blockquote>'],
+                'sig' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<div class="sig">', 'close_tag'=>'</div>'],
+                'url' => ['type'=>BBCODE_TYPE_OPTARG, 'open_tag'=>'<a href="{PARAM}" target="_blank">', 'close_tag'=>'</a>', 'default_arg'=>'{CONTENT}', 'childs'=>'b,i'],
+                'img' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<img src="', 'close_tag'=>'" />', 'childs'=>''],
+                'list'=> [
+                    'type' => BBCODE_TYPE_NOARG,
+                    'open_tag' => '<ul>',
+                    'close_tag' => '</ul>',
+                    'childs' => '*',
+                    'content_handling' => 'bbcode_clean_list'
+                ],
+                '*' => ['type'=>BBCODE_TYPE_NOARG, 'open_tag'=>'<li>', 'close_tag'=>'</li>', 'parent'=>'list', 'flags'=>BBCODE_FLAGS_ONE_OPEN_PER_LEVEL],
+                'l' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => '['],
+                'r' => ['type'=>BBCODE_TYPE_SINGLE, 'open_tag' => ']']
             ]);
         }
 
@@ -246,7 +246,7 @@ class Format
             $text = preg_replace('/\s*<p>\s*<('.$blockEls.')>(.*?)<\/\1>\s*<\/p>\s*/i', '<$1>$2</$1>', $text);
 
             // simple character replacements
-            $text = str_replace(['--','(r)','(tm)','(c)'], ['&mdash;','&reg;','&trade;','&copy;'], $text);
+            $text = str_replace(['--', '(r)', '(tm)', '(c)'], ['&mdash;', '&reg;', '&trade;', '&copy;'], $text);
 
             // ordinals
             $text = preg_replace('/(\d+)(st|nd|rd|th|st)\b/i', '$1<sup>$2</sup>', $text);

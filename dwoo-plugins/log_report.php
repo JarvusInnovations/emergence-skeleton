@@ -7,11 +7,11 @@ function Dwoo_Plugin_log_report(Dwoo_Core $dwoo, $groupers = [])
     }
 
     $groupers = array_merge([
-        '/SELECT \* FROM `_e_file_collections` WHERE \(Handle = "[^"]+"\) AND .* LIMIT 1/'
-        ,'/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+\.config\.php" ORDER BY ID DESC LIMIT 1/'
-        ,'/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+\.class\.php" ORDER BY ID DESC LIMIT 1/'
-        ,'/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+" ORDER BY ID DESC LIMIT 1/'
-        ,'/SELECT \* FROM `media` WHERE `ID` = "\d+" LIMIT 1/'
+        '/SELECT \* FROM `_e_file_collections` WHERE \(Handle = "[^"]+"\) AND .* LIMIT 1/',
+        '/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+\.config\.php" ORDER BY ID DESC LIMIT 1/',
+        '/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+\.class\.php" ORDER BY ID DESC LIMIT 1/',
+        '/SELECT \* FROM `_e_files` WHERE CollectionID = \d+ AND Handle = "[^"]+" ORDER BY ID DESC LIMIT 1/',
+        '/SELECT \* FROM `media` WHERE `ID` = "\d+" LIMIT 1/'
     ], $groupers);
 
 
