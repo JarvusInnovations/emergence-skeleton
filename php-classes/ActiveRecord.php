@@ -1039,8 +1039,6 @@ class ActiveRecord
                 foreach ($this->_relatedObjects[$relationship] as $related) {
                     $related->save();
                 }
-            } elseif ($options['type'] == 'handle') {
-                $this->_setFieldValue($options['local'], $this->_relatedObjects[$relationship]->Handle);
             } else {
                 // TODO: Implement other methods
             }
@@ -1056,10 +1054,7 @@ class ActiveRecord
                 continue;
             }
 
-            if ($options['type'] == 'handle') {
-                $this->_relatedObjects[$relationship]->Context = $this;
-                $this->_relatedObjects[$relationship]->save();
-            } elseif ($options['type'] == 'one-one') {
+            if ($options['type'] == 'one-one') {
                 $related = $this->_relatedObjects[$relationship];
 
                 if ($options['local'] == 'ID') {
@@ -1834,14 +1829,6 @@ class ActiveRecord
             if (empty($options['classField'])) {
                 $options['classField'] = 'ContextClass';
             }
-        } elseif ($options['type'] == 'handle') {
-            if (empty($options['local'])) {
-                $options['local'] = 'Handle';
-            }
-
-            if (empty($options['class'])) {
-                $options['class'] = 'GlobalHandle';
-            }
         } elseif ($options['type'] == 'many-many') {
             if (empty($options['class'])) {
                 die('required many-many option "class" missing');
@@ -2492,15 +2479,6 @@ class ActiveRecord
                 // hook both relationships for invalidation
                 static::_linkFieldToRelationship($rel['classField'], $relationship);
                 static::_linkFieldToRelationship($rel['local'], $relationship);
-            } elseif ($rel['type'] == 'handle') {
-                if ($handle = $this->_getFieldValue($rel['local'])) {
-                    $this->_relatedObjects[$relationship] = $rel['class']::getByHandle($handle);
-
-                    // hook relationship for invalidation
-                    static::_linkFieldToRelationship($rel['local'], $relationship);
-                } else {
-                    $this->_relatedObjects[$relationship] = null;
-                }
             } elseif ($rel['type'] == 'many-many') {
                 if (!empty($rel['indexField']) && !$rel['class']::_fieldExists($rel['indexField'])) {
                     $rel['indexField'] = false;
@@ -2576,12 +2554,6 @@ class ActiveRecord
             // so any invalid values are removed
             $value = $set;
             $this->_isDirty = true;
-        } elseif ($rel['type'] ==  'handle') {
-            if ($value !== null && !is_a($value, __CLASS__)) {
-                return false;
-            }
-
-            $this->_setFieldValue($rel['local'], $value ? $value->Handle : null);
         } elseif ($rel['type'] == 'context-children') {
             $set = [];
 
