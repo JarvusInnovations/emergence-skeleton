@@ -1,5 +1,7 @@
 <?php
 
+use Emergence\Util\Inflector;
+
 class RecordValidator
 {
     // configurables

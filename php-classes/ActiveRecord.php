@@ -1,6 +1,7 @@
 <?php
 
 use Emergence\People\IPerson;
+use Emergence\Util\Inflector;
 
 class ActiveRecord
 {

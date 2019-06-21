@@ -15,7 +15,7 @@
                 {$count = count($results)}
                 <section class="page-section">
                     <header class="section-header">
-                        <h3 class="header-title" id="results-{$className}">{$count|number_format} {Inflector::pluralizeRecord($className, $count)}</h3>
+                        <h3 class="header-title" id="results-{$className}">{$count|number_format} {Emergence\Util\Inflector::pluralizeRecord($className, $count)}</h3>
                     </header>
                     <ul>
                     {foreach item=result from=$results}

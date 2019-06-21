@@ -2,7 +2,7 @@
 
 namespace Emergence\ActiveRecord;
 
-use Inflector;
+use Emergence\Util\Inflector;
 
 abstract class AbstractActiveRecord implements ActiveRecordInterface
 {

@@ -1,5 +1,7 @@
 <?php
 
+namespace Emergence\Util;
+
 class Inflector
 {
     public static function spacifyCaps($string)
