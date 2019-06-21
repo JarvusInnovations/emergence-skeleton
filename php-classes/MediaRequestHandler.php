@@ -248,7 +248,7 @@ class MediaRequestHandler extends RecordsRequestHandler
         }
 
         if (!$Media) {
-            static::throwNotFoundError('Media ID #%u was not found', $media_id);
+            static::throwNotFoundError('Media ID #%u was not found', $mediaID);
         }
 
         if (!static::checkReadAccess($Media)) {
@@ -288,7 +288,7 @@ class MediaRequestHandler extends RecordsRequestHandler
             $filePath = $Media->getFilesystemPath($variant);
             $fp = fopen($filePath, 'rb');
             $size = filesize($filePath);
-            $length = $filesize;
+            $length = $size;
             $start = 0;
             $end = $size - 1;
 
