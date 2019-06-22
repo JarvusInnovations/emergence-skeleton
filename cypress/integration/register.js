@@ -71,5 +71,27 @@ describe('Admin login test', () => {
         cy.contains('Upload New Photo').click();
         cy.upload_file('photo.jpg', 'image/jpeg', 'input[type=file]');
         cy.contains('Upload New Photo').click();
+
+        cy.get('.photosGallery .photo:first-child')
+            .should('have.class', 'highlight')
+            .should('not.contain', 'Make Default')
+            .next('.photo')
+                .should('not.have.class', 'highlight')
+                .contains('Make Default')
+                .click()
+        ;
+
+        cy.get('.photosGallery .photo:first-child')
+            .should('not.have.class', 'highlight')
+            .should('contain', 'Make Default')
+            .next('.photo')
+                .should('have.class', 'highlight')
+                .should('not.contain', 'Make Default')
+                .find('img')
+                    .should('have.attr', 'src', '/thumbnail/2/100x100')
+                    .should('have.prop', 'width', 100)
+                    .should('have.prop', 'height', 75)
+        ;
+
     });
 });
