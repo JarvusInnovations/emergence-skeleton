@@ -18,27 +18,32 @@ describe('Admin login test', () => {
         cy.focused()
             .should('have.attr', 'name', 'FirstName')
             .type('Fname')
-            .tab();
+            .tab()
+        ;
 
         cy.focused()
             .should('have.attr', 'name', 'LastName')
             .type('Lname')
-            .tab();
+            .tab()
+        ;
 
         cy.focused()
             .should('have.attr', 'name', 'Email')
             .type('email@example.org')
-            .tab();
+            .tab()
+        ;
 
         cy.focused()
             .should('have.attr', 'name', 'Username')
             .type('zerocool')
-            .tab();
+            .tab()
+        ;
 
         cy.focused()
             .should('have.attr', 'name', 'Password')
             .type('password123')
-            .tab();
+            .tab()
+        ;
 
         cy.focused()
             .should('have.attr', 'name', 'PasswordConfirm')
