@@ -1,5 +1,15 @@
 describe('Admin login test', () => {
-    it('Visit the homepage', () => {
+
+    // reset database before tests
+    before(() => {
+        const studioContainer = Cypress.env('STUDIO_CONTAINER');
+
+        if (studioContainer) {
+            cy.exec(`echo 'DROP DATABASE \`default\`;' | docker exec -i ${studioContainer} hab pkg exec core/mysql mysql -u root -h 127.0.0.1`);
+        }
+    });
+
+    it('Register and set up profile', () => {
         cy.visit('/');
 
         cy.contains('Register').click();
