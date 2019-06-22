@@ -42,7 +42,8 @@ describe('Admin login test', () => {
 
         cy.focused()
             .should('have.attr', 'name', 'PasswordConfirm')
-            .type('password1234{enter}');
+            .type('password1234{enter}')
+        ;
 
         cy.location('pathname').should('eq', '/register');
 
@@ -55,7 +56,8 @@ describe('Admin login test', () => {
             .tab()
             .tab()
             .tab()
-            .type('password123{enter}');
+            .type('password123{enter}')
+        ;
 
         cy.contains('Fill out your profile').click();
 
