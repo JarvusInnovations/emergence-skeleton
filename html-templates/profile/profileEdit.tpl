@@ -115,7 +115,7 @@
             <div class="field expand">
                 <label for="about">About</label>
                 <textarea id="about" name="About">{refill field=About default=$User->About}</textarea>
-                <p class="hint">Check out the <a href="/pages/Formatting_Guide">Formatting Guide</a> to give your text some style</p>
+                <p class="hint">Use <a href="https://www.markdownguide.org/cheat-sheet" target="_blank">Markdown codes</a> to format your text</p>
             </div>
 
             <div class="submit">
