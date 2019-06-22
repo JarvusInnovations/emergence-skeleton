@@ -7,18 +7,14 @@ files = [
 
     # filter out legacy content
     "!**/ext-watermark/**",
-    "!ext-library/**",
     "!html-templates/app/*.tpl",
     "!html-templates/app/ContentEditor/**",
     "!html-templates/git/**",
     "!html-templates/manage/**",
-    "!js-library/**",
     "!php-classes/Chaki/**",
     "!php-classes/MP4Info.*",
     "!php-classes/MP4Info/**",
     "!php-classes/PHPGit_*",
-    "!php-classes/Sabre/**",
-    "!sencha-build/EmergenceContentEditor/production/resources/images/**",
     "!site-root/app.php",
     "!site-root/css/**",
     "!site-root/git.php",
