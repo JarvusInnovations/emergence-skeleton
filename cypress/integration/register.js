@@ -46,5 +46,13 @@ describe('Admin login test', () => {
             .tab()
             .tab()
             .type('password123{enter}');
+
+        cy.contains('Fill out your profile').click();
+
+        // upload same photo twice
+        cy.upload_file('photo.jpg', 'image/jpeg', 'input[type=file]');
+        cy.contains('Upload New Photo').click();
+        cy.upload_file('photo.jpg', 'image/jpeg', 'input[type=file]');
+        cy.contains('Upload New Photo').click();
     });
 });
