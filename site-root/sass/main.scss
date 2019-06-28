@@ -1,5 +1,8 @@
 @import './compass-all';            // import compass for useful functions, mixins, etc.
                                     // compass's variables can be overridden by 'site/compass'
+                                    // -------------------------------------------------------
+                                    // deprecated; we'd like to remove the compass dependency
+                                    // from future versions of skeleton
 
 @import './variables-all';          // loads the variable files in order for all layers
 
