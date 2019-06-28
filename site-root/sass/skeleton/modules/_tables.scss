@@ -1,7 +1,9 @@
 table {
+    border-collapse: collapse;
+    border-spacing: 0;
     margin: 1em 0;
     width: 100%;
-    
+
     .button {
         margin-bottom: 0;
     }
@@ -12,7 +14,7 @@ caption {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	
+
 	.button {
 		margin-top: -.3em;
 	}
@@ -28,7 +30,7 @@ th {
 
 td, th {
 	padding: .25em .5em;
-	
+
     .field {
         margin: .25em 0;
         width: 100%;
@@ -46,7 +48,7 @@ thead {
 		text-align: left;
 		vertical-align: bottom;
 	}
-	
+
 	small {
 	    color: $muted-color;
     	display: block;
@@ -94,6 +96,6 @@ table.row-highlight {
             > td, > th {
                 background: rgba($link-color, .12);
             }
-        }    
+        }
     }
 }
