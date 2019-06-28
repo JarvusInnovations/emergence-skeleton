@@ -1,3 +1,13 @@
+@import './compass-all';            // import compass for useful functions, mixins, etc.
+                                    // compass's variables can be overridden by 'site/compass'
+                                    // -------------------------------------------------------
+                                    // deprecated; we'd like to remove the compass dependency
+                                    // from future versions of skeleton
+
+@import './variables-all';          // loads the variable files in order for all layers
+
+@import './mixins-all';             // Loads mixin files in order for all layers
+
 .openAPI-tpl {
     .site > .inner {
         width: auto;
@@ -54,44 +64,44 @@
           0% { opacity: .2; }
         100% { opacity: 1; }
     }
-    
+
     @keyframes fade-in {
           0% { opacity: .2; }
         100% { opacity: 1; }
     }
-    
+
     .console-ct {
         margin: 1.5em 0;
-    
+
         &.is-loading {
             .loading-indicator {
                 display: inline-block;
             }
-    
+
             .request-ct {
                 -webkit-animation: fade-request .5s both;
                         animation: fade-request .5s both;
             }
-    
+
             .response-ct {
                 opacity: .2;
                 @include transition(none);
             }
         }
     }
-    
+
     @-webkit-keyframes load8 {
         0% {
             -webkit-transform: rotate(0deg);
             transform: rotate(0deg);
         }
-    
+
         100% {
             -webkit-transform: rotate(360deg);
             transform: rotate(360deg);
         }
     }
-    
+
     @keyframes load8 {
         0% {
             -webkit-transform: rotate(0deg);
@@ -102,7 +112,7 @@
             transform: rotate(360deg);
         }
     }
-    
+
     .loading-indicator {
         border: 3px solid rgba($text-color, .2);
         border-left-color: $text-color;
@@ -114,10 +124,10 @@
         text-indent: 100%;
         vertical-align: -.125em;
         white-space: nowrap;
-    
+
         -webkit-animation: load8 .25s infinite linear;
         animation: load8 .25s infinite linear;
-    
+
         &,
         &::after {
             border-radius: 50%;
@@ -125,13 +135,13 @@
             height: 1em;
         }
     }
-    
+
     .request-ct,
     .response-ct {
         margin: 1.5em 0;
         @include transition(opacity .5s);
     }
-    
+
     .response-body {
         background: rgba(white, .4);
         border: 1px solid $border-color;
@@ -140,31 +150,31 @@
         max-height: 60vh;
         white-space: pre-wrap;
     }
-    
+
     .request-headers,
     .response-headers {
         display: table;
-    
+
         .dli {
             display: table-row;
         }
-    
+
         dt, dd {
             display: table-cell;
         }
-    
+
         dt {
             color: $muted-color;
             min-width: 10em;
             padding-right: 1em;
             text-align: right;
         }
-    
+
         dd {
             margin: 0;
         }
     }
-    
+
     .schema-table {
         .merge-up {
             color: $muted-color;
@@ -175,7 +185,7 @@
     .key-selector-ct {
         margin-bottom: -1em;
     }
-    
+
     .key-selector {
         border: 1px solid $border-color;
         display: inline-block;
@@ -185,60 +195,60 @@
 
     .endpoint-path-method {
         margin-bottom: 2em;
-    
+
         .section-header {
             border: 0;
         }
     }
-    
+
     .endpoint-model {
         .docs-table {
             margin: 0;
         }
     }
-    
+
     .swagger-button {
         border-radius: .25em;
         display: inline-block;
         margin-right: .125em;
         overflow: hidden;
         vertical-align: -.6667em;
-    
+
         img {
             display: block;
         }
-    
+
         &:hover,
         &:focus {
             opacity: .8;
         }
     }
-    
+
     .toggle {
         position: relative;
-    
+
         input {
             position: absolute;
             visibility: hidden;
         }
-    
+
         .toggle-off { display: inline; }
         .toggle-on  { display: none; }
         .toggle-off-to-on { display: none; }
         .toggle-on-to-off { display: none; }
-    
+
         :checked {
             ~ .toggle-off { display: none; }
             ~ .toggle-on  { display: inline; }
         }
-    
+
         &.off-to-on {
             .toggle-off { display: none; }
             .toggle-on  { display: none; }
             .toggle-off-to-on { display: inline; }
             .toggle-on-to-off { display: none; }
         }
-    
+
         &.on-to-off {
             .toggle-off { display: none; }
             .toggle-on  { display: none; }

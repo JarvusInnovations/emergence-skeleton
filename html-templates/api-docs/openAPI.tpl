@@ -7,6 +7,11 @@
 {block "footer-top"}{/block}
 {block "footer"}{/block}
 
+{block "css"}
+    {$dwoo.parent}
+    {cssmin "docs.css"}
+{/block}
+
 {block "content"}
     <?php
         // we need to keep a reference to the top-level document for resolving JSONSchema refs
