@@ -1,0 +1,6 @@
+[holomapping]
+holosource = "psr-log"
+root = "Psr/Log"
+files = [
+    "**/*.php"
+]

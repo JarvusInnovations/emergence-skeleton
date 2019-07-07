@@ -1,0 +1,6 @@
+[holomapping]
+holosource = "dwoo"
+root = "lib/plugins/builtin"
+files = [
+    "**/*.php"
+]

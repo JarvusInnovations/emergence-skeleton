@@ -1,0 +1,4 @@
+[holomapping]
+holosource = "recaptcha"
+root = "src/ReCaptcha"
+files = "**/*.php"

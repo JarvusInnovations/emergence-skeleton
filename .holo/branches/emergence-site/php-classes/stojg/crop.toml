@@ -1,5 +1,0 @@
-[holomapping]
-holosource = "stojg-crop"
-root = "src/stojg/crop"
-files = "**"
-after = [ "skeleton-v1" ]

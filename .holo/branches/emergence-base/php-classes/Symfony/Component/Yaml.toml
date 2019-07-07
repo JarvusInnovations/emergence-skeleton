@@ -1,0 +1,8 @@
+[holomapping]
+holosource = "symfony-yaml"
+files = [
+    "**/*.php",
+    "LICENSE",
+    "!Tests/**",
+    "!Command/LintCommand.php"
+]

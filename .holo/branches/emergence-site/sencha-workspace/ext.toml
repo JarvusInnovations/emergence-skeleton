@@ -1,7 +1,0 @@
-[holomapping]
-holosource = "extjs"
-files = [
-    "**/*",
-    "!build/"
-]
-after = [ "skeleton-v1" ]

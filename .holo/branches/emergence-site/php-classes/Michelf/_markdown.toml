@@ -1,8 +1,0 @@
-[holomapping]
-holosource = "michaelf-markdown"
-root = "Michelf"
-files = [
-    "*.php",
-    "!*.inc.php"
-]
-after = [ "skeleton-v1" ]

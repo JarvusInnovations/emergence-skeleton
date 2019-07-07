@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "michaelf-markdown"
+root = "Michelf"
+files = [
+    "*.php",
+    "!*.inc.php"
+]

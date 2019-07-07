@@ -1,7 +1,0 @@
-[holomapping]
-holosource = "patchwork-utf8"
-root = "src/Patchwork"
-files = [
-    "Utf8.php"
-]
-after = [ "skeleton-v1" ]
