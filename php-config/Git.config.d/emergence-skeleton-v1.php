@@ -1,11 +1,10 @@
 <?php
 
-if (Site::getConfig('parent_hostname') == null) {
-    Git::$repositories['emergence-skeleton-v1'] = [
-        'remote' => 'https://github.com/JarvusInnovations/emergence-skeleton.git',
-        'originBranch' => 'master',
-        'workingBranch' => 'master',
-        'trees' => [
+Git::$repositories['emergence-skeleton-v1'] = [
+    'remote' => 'https://github.com/JarvusInnovations/emergence-skeleton.git',
+    'originBranch' => 'emergence/vfs-site',
+    'workingBranch' => 'emergence/vfs-site',
+    'trees' => [
             'api-docs',
             'data-exporters',
             'dwoo-plugins',
@@ -19,6 +18,5 @@ if (Site::getConfig('parent_hostname') == null) {
             'site-root',
             'site-tasks',
             'webapp-builds'
-        ]
-    ];
-}
+    ]
+];
