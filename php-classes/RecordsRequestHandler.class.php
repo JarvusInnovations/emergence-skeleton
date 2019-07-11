@@ -581,12 +581,24 @@ abstract class RecordsRequestHandler extends RequestHandler
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // apply delta
             static::applyRecordDelta($Record, $_REQUEST);
+            
+            // create space for transaction-level errors
+            $transactionErrors = [];
+
+            // fire event
+            Emergence\EventBus::fireEvent('beforeRecordTransaction', $className::getRootClass(), array(
+                'Record' => $Record,
+                'data' => $_REQUEST,
+                'transactionErrors' => &$transactionErrors
+            ));
 
             // call template function
             static::onBeforeRecordValidated($Record, $_REQUEST);
 
             // validate
-            if ($Record->validate()) {
+            if (!empty($transactionErrors)) {
+                $Record->addValidationErrors($transactionErrors);
+            } elseif ($Record->validate()) {
                 // call template function
                 static::onBeforeRecordSaved($Record, $_REQUEST);
 
