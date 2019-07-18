@@ -5,12 +5,10 @@ namespace Emergence\Connectors;
 use ActiveRecord;
 use HandleBehavior;
 use Psr\Log\LogLevel;
-use Psr\Log\LoggerInterface;
 use Emergence\Logger;
 
-class Job extends ActiveRecord implements LoggerInterface
+class Job extends ActiveRecord implements IJob
 {
-
     use \Psr\Log\LoggerTrait;
 
     public $logEntries;

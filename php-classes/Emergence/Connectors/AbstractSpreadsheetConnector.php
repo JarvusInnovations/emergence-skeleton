@@ -127,7 +127,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         return $output;
     }
 
-    protected static function _logRow(Job $Job, $noun, $rowNumber, array $row)
+    protected static function _logRow(IJob $Job, $noun, $rowNumber, array $row)
     {
         $nonEmptyColumns = array_filter($row);
         unset($nonEmptyColumns['_rest']);
@@ -145,7 +145,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         );
     }
 
-    protected static function _validateRecord(Job $Job, ActiveRecord $Record, array &$results)
+    protected static function _validateRecord(IJob $Job, ActiveRecord $Record, array &$results)
     {
         // call configurable hook
         if (is_callable(static::$onBeforeValidateRecord)) {
@@ -175,7 +175,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
         return $isValid;
     }
 
-    protected static function _saveRecord(Job $Job, ActiveRecord $Record, $pretend, array &$results, $logOptions = array())
+    protected static function _saveRecord(IJob $Job, ActiveRecord $Record, $pretend, array &$results, $logOptions = array())
     {
         // call configurable hook
         if (is_callable(static::$onBeforeSaveRecord)) {
