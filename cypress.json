@@ -1,0 +1,6 @@
+{
+    "baseUrl": "http://localhost:7080",
+    "env": {
+        "STUDIO_CONTAINER": "emergence-studio"
+    }
+}

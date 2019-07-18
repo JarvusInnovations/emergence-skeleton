@@ -17,6 +17,48 @@
         {block base}{/block}
 
         {block css-loader}{/block}
+
+        {block css-app}
+            {$cssBuildNode = $App->getAsset($cssBuildPath)}
+            {if $cssBuildNode}
+                <?php
+                    $this->scope['cssBuildPaths'] = [];
+
+                    // attempt to parse out a import-only main css file
+                    if ($this->scope['cssBuildNode']->Size < 512) {
+                        $basePath = dirname($this->scope['cssBuildPath']);
+                        $contents = file_get_contents($this->scope['cssBuildNode']->RealPath);
+
+                        foreach (file($this->scope['cssBuildNode']->RealPath) as $line) {
+                            $line = trim($line);
+
+                            if (!$line) {
+                                continue;
+                            }
+
+                            if (!preg_match('/^@import \'([^\']+)\';$/', $line, $matches)) {
+                                $this->scope['cssBuildPaths'] = [];
+                                break;
+                            }
+
+                            $this->scope['cssBuildPaths'][] = $basePath . '/' . $matches[1];
+                        }
+                    }
+
+                    if (!count($this->scope['cssBuildPaths'])) {
+                        $this->scope['cssBuildPaths'][] = $this->scope['cssBuildPath'];
+                    }
+                ?>
+
+                {foreach item=cssPath from=$cssBuildPaths}
+                    <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath($cssPath)}" />
+                {/foreach}
+            {elseif $appTheme}
+                <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/resources/' $appTheme '-all.css'))}" />
+            {else}
+                <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath('sdk/resources/css/ext-all.css')}" />
+            {/if}
+        {/block}
     </head>
 
     <body class="{block body-class}loading{/block}">
@@ -31,16 +73,6 @@
                 SiteEnvironment.appMode = {$mode|json_encode};
                 SiteEnvironment.appBaseUrl = '/app/{$App->getName()}/{tif $mode == production || $mode == testing ? "build/$mode/"}';
             </script>
-        {/block}
-
-        {block css-app}
-            {if $App->getAsset($cssBuildPath)}
-                <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath($cssBuildPath)}" />
-            {elseif $appTheme}
-                <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath(cat('sdk/packages/$appTheme/build/resources/' $appTheme '-all.css'))}" />
-            {else}
-                <link rel="stylesheet" type="text/css" href="{$App->getVersionedPath('sdk/resources/css/ext-all.css')}" />
-            {/if}
         {/block}
 
         {block js-app}
@@ -74,7 +106,7 @@
                     {if $appTheme}
                         {$workspaceThemeIncludePath = cat('packages/$appTheme/build/' $appTheme '.js')}
                         {$sdkThemeIncludePath = cat('sdk/packages/$appTheme/build/' $appTheme '.js')}
-                        
+
                         {if $App->getAsset($workspaceThemeIncludePath)}
                             <script type="text/javascript" src="{$App->getVersionedPath($workspaceThemeIncludePath)}"></script>
                         {elseif $App->getAsset($sdkThemeIncludePath)}
@@ -89,6 +121,25 @@
             {block js-app-local}
                 <script type="text/javascript" src="{$App->getVersionedPath($jsEntryPath)}"></script>
             {/block}
+
+            <script>
+            (function() {
+                var resolveResource = Ext.resolveResource,
+                    appBaseUrl = (window.SiteEnvironment || { }).appBaseUrl;
+
+                if (resolveResource && appBaseUrl) {
+                    Ext.resolveResource = function(url) {
+                        url = resolveResource(url);
+
+                        if (url.charAt(0) != '/') {
+                            url = appBaseUrl + url;
+                        }
+
+                        return url;
+                    };
+                }
+            })();
+            </script>
 
             {block js-app-remote}
                 {foreach item=script from=$App->getAppCfg('js')}

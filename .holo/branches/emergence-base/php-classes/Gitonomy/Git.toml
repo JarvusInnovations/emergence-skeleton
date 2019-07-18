@@ -1,0 +1,6 @@
+[holomapping]
+holosource = "gitonomy-gitlib"
+root = "src/Gitonomy/Git"
+files = [
+    "**/*.php"
+]

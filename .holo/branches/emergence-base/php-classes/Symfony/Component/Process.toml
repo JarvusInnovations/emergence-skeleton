@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "symfony-process"
+files = [
+    "**/*.php",
+    "LICENSE",
+    "!Tests/**"
+]

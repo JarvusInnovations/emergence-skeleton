@@ -1,7 +1,0 @@
-[holomapping]
-holosource = "psr-log"
-root = "Psr/Log"
-files = [
-    "**/*.php"
-]
-after = [ "skeleton-v1" ]

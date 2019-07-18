@@ -1,9 +1,0 @@
-[holomapping]
-holosource = "symfony-yaml"
-files = [
-    "**/*.php",
-    "LICENSE",
-    "!Tests/**",
-    "!Command/LintCommand.php"
-]
-after = [ "skeleton-v1" ]

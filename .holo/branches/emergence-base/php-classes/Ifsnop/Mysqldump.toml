@@ -1,0 +1,6 @@
+[holomapping]
+holosource = "mysqldump-php"
+root = "src/Ifsnop/Mysqldump"
+files = [
+    "**/*.php"
+]

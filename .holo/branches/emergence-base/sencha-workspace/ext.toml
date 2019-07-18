@@ -1,0 +1,6 @@
+[holomapping]
+holosource = "extjs"
+files = [
+    "**/*",
+    "!build/"
+]

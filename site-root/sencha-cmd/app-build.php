@@ -154,6 +154,8 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     // precache and write workspace config
     $cachedFiles = Emergence_FS::cacheTree($workspaceConfigPath);
     Benchmark::mark("precached $cachedFiles files in $workspaceConfigPath");
+    $exportResult = copy(Site::resolvePath("$workspacePath/workspace.json")->RealPath, "$tmpPath/workspace.json");
+    Benchmark::mark("exported $workspacePath/workspace.json to $tmpPath/workspace.json: ".var_export($exportResult, true));
     $exportResult = Emergence_FS::exportTree($workspaceConfigPath, $workspaceConfigTmpPath);
     Benchmark::mark("exported $workspaceConfigPath to $workspaceConfigTmpPath: ".http_build_query($exportResult));
 
@@ -168,38 +170,6 @@ $GLOBALS['Session']->requireAccountLevel('Developer');
     Benchmark::mark("precached $cachedFiles files in $appPath");
     $exportResult = Emergence_FS::exportTree($appPath, $appTmpPath);
     Benchmark::mark("exported $appPath to $appTmpPath: ".http_build_query($exportResult));
-
-
-    // write any legacy ${workspace.dir}/x/ classpaths from ext-library
-    $libraryClassPaths = [];
-    foreach (array_merge([$app], $packages) AS $package) {
-        foreach ($package->getClassPaths() AS $classPath) {
-            if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-                $libraryClassPaths[] = substr($classPath, 19);
-            }
-        }
-    }
-
-    $libraryClassPaths = array_unique($libraryClassPaths);
-
-    foreach ($libraryClassPaths AS $libraryClassPath) {
-        $classPathSource = "ext-library/$libraryClassPath";
-        $classPathDest = "$libraryTmpPath/$libraryClassPath";
-
-        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
-        Benchmark::mark("precached $cachedFiles files in $classPathSource");
-
-        $sourceNode = Site::resolvePath($classPathSource);
-
-        if ($sourceNode instanceof SiteFile) {
-            mkdir(dirname($classPathDest), 0777, true);
-            copy($sourceNode->RealPath, $classPathDest);
-            Benchmark::mark("copied file $classPathSource to $classPathDest");
-        } else {
-            $exportResult = Emergence_FS::exportTree($classPathSource, $classPathDest);
-            Benchmark::mark("exported $classPathSource to $classPathDest: ".http_build_query($exportResult));
-        }
-    }
 
 
     // copy packages to workspace (except framework packages)

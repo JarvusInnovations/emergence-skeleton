@@ -13,7 +13,7 @@
  * ```
  * // @require-package my-package-name
  * ````
- * 
+ *
  * TODO:
  * - Implement a workspace config option to enable/disable auto-requiring hotfix package
  *
@@ -148,30 +148,6 @@ foreach ($packages AS $packageName => $package) {
 // write any libraries from classpath
 Benchmark::mark("crawling packages for classpaths");
 $classPaths = array_merge($classPaths, Sencha::aggregateClassPathsForPackages($packages));
-
-Benchmark::mark("processing all classpaths");
-foreach ($classPaths AS &$classPath) {
-    if (strpos($classPath, '${workspace.dir}/x/') === 0) {
-        $extensionPath = substr($classPath, 19);
-        $classPathSource = "ext-library/$extensionPath";
-        $classPath = "./x/$extensionPath";
-        Benchmark::mark("importing classPathSource: $classPathSource");
-
-        $cachedFiles = Emergence_FS::cacheTree($classPathSource);
-        Benchmark::mark("precached $cachedFiles files in $classPathSource");
-
-        $sourceNode = Site::resolvePath($classPathSource);
-
-        if (is_a($sourceNode, SiteFile)) {
-            mkdir(dirname($classPath), 0777, true);
-            copy($sourceNode->RealPath, $classPath);
-            Benchmark::mark("copied file $classPathSource to $classPath");
-        } else {
-            $exportResult = Emergence_FS::exportTree($classPathSource, $classPath);
-            Benchmark::mark("exported $classPathSource to $classPath: ".http_build_query($exportResult));
-        }
-    }
-}
 
 
 // prepare cmd
