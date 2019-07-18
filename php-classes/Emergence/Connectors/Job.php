@@ -129,6 +129,13 @@ class Job extends ActiveRecord implements IJob
             if (is_callable($valueRenderers[$field])) {
                 $from = call_user_func($valueRenderers[$field], $from, $logEntry, $field, 'from');
                 $to = call_user_func($valueRenderers[$field], $to, $logEntry, $field, 'to');
+            } elseif ($fieldConfig = $Record->getFieldOptions($field)) {
+                switch ($fieldConfig['type']) {
+                    case 'timestamp':
+                        $from = date('Y-m-d H:i:s', $from);
+                        $to = date('Y-m-d H:i:s', $to);
+                        break;
+                }
             }
 
             $logEntry['changes'][$fieldLabel] = array(
