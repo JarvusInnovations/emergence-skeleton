@@ -1,1 +1,0 @@
-{extends app/EmergenceContentEditor/ext.tpl}

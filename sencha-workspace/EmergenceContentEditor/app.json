@@ -17,6 +17,7 @@
      */
     "requires": [
         "font-awesome",
+        "jarvus-hotfixes",
         "emergence-cms",
         "emergence-cms-summaries"
     ],
