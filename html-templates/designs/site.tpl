@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 {load_templates designs/site.subtemplates.tpl}
+{block "before-all"}{/block}
 <html class="no-js" lang="en">
 
 <head>
 	<meta charset="utf-8">
-	
+
 	{* now use {$dwoo.parent} on subpages to automatically fill in the site name *}
 	<title>{block "title"}{$.Site.title|escape}{/block}</title>
-	
+
 	{block "meta-info"}
         {include includes/site.meta-info.tpl}
 	{/block}
-	
+
 	{block "meta-rendering"}
         {include includes/site.meta-rendering.tpl}
 	{/block}
-	
+
 	{block "favicons"}
         {include includes/site.favicons.tpl}
 	{/block}
-    
+
 	{block "css"}
         {include includes/site.css.tpl}
 	{/block}
-	
+
 	{block "css-ie"}
 		<!--[if IE 6]><link rel="stylesheet" href="/css/ie6.css"><![endif]-->
 		<!--[if IE 7]><link rel="stylesheet" href="/css/ie7.css"><![endif]-->
 		<!--[if IE 8]><link rel="stylesheet" href="/css/ie8.css"><![endif]-->
 	{/block}
-    
+
 	{block "js-top"}
         {include includes/site.js-top.tpl}
 	{/block}
@@ -44,7 +45,7 @@
 		<h1 id="logo">
 			<a href="/"><img src="http://placehold.it/300x40" alt="{$.Site.title|escape}" width="300" height="40"></a>
 		</h1>
-		
+
 		<section id="user-info">
 			{if $.User}
 				{avatar $.User size=10} <a href="/profile" id="current-user">{personName $.User}</a> - <a href="/logout">Logout</a>
@@ -70,7 +71,7 @@
 		</nav>
 	{/block}
 	</header>
-	
+
 	<div id="content" class="clearfix" role="main">
 	{block "content"}
 		<section class="body-text">
@@ -80,14 +81,14 @@
 		</section>
 	{/block}
 	</div><!--!end #content -->
-	
+
 	<footer class="site clearfix">
 	{block "footer"}
 		<small>Copyright &copy; {date_format $.now "%Y"}. All rights reserved.</small>
 	{/block}
 	</footer>
 	</div> <!--!end .site.wrapper -->
-	
+
 	{block "js-bottom"}
         {include includes/site.js-bottom.tpl}
 	{/block}
@@ -95,7 +96,7 @@
     {block "js-analytics"}
         {include includes/site.analytics.tpl}
     {/block}
-	
+
 	{* enables site developers to dump the internal session log here by setting ?log_report=1 on any page *}
 	{log_report}
 </body>
