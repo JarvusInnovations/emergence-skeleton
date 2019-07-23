@@ -22,7 +22,7 @@ class SenchaApp extends App
     {
         $cacheKey = "sencha-app/{$name}";
 
-        if (!$manifest = Cache::fetch($cacheKey)) {
+        // if (!$manifest = Cache::fetch($cacheKey)) {
             // TODO: create cache clear event
             $manifestNode = Site::resolvePath([static::$buildsRoot, $name, 'app.json']);
 
@@ -32,8 +32,8 @@ class SenchaApp extends App
 
             $manifest = json_decode(file_get_contents($manifestNode->RealPath), true);
 
-            Cache::store($cacheKey, $manifest);
-        }
+        //     Cache::store($cacheKey, $manifest);
+        // }
 
         return new static($name, $manifest);
     }
