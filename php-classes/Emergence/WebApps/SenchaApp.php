@@ -106,6 +106,9 @@ class SenchaApp extends App
 
         // patch manifest paths
         $html[] = '<script type="text/javascript">';
+        $html[] = 'window.Ext = window.Ext || {}';
+        $html[] = 'Ext.manifest = Ext.manifest || {}';
+        $html[] = 'Ext.manifest.resources = Ext.manifest.resources || {}';
         $html[] = 'Ext.manifest.resources.path = '.json_encode($this->getUrl().'/resources');
         $html[] = '</script>';
 
