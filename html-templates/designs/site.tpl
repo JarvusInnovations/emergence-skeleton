@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {load_templates designs/site.subtemplates.tpl}
-{block "before-all"}{/block}
 <html class="no-js" lang="en">
 
 <head>
