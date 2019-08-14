@@ -115,7 +115,7 @@ $(function() {
     saveBtnEl.click(function(e) {
         var contentField = currentEditingEl.data('content-field')
             ,contentPhantom = currentEditingEl.data('content-phantom') === true
-            ,url = currentEditingEl.data('content-endpoint') + '/json'
+            ,url = currentEditingEl.data('content-endpoint')
             ,postData = {}
             ,contentHandle;
 
@@ -133,6 +133,9 @@ $(function() {
             url: url
             ,method: 'POST'
             ,data: postData
+            ,headers: {
+                Accept: 'application/json'
+            }
         }).done(function(responseData) {
             responseData = responseData.data;
             _renderContent(responseData[contentField]);
