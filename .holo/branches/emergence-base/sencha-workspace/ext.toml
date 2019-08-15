@@ -2,5 +2,12 @@
 holosource = "extjs"
 files = [
     "**/*",
-    "!build/"
+    "!build/",
+    "!**/rtl/**",
+    "!**/test/**",
+    "!classic/theme-aria/**",
+    "!classic/theme-classic/**",
+    "!classic/theme-classic-sandbox/**",
+    "!classic/theme-gray/**",
+    "!modern/theme-*/**"
 ]
