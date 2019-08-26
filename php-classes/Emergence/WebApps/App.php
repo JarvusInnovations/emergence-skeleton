@@ -65,6 +65,10 @@ abstract class App implements IApp
     {
         $node = $this->getAsset($path);
 
+        if (!is_string($path)) {
+            $path = implode('/', $path);
+        }
+
         if (!$node) {
             throw new Exception('asset not found: '.$path);
         }
