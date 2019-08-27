@@ -10,10 +10,11 @@ class Response implements IResponse
     protected $renderer;
 
 
-    public function __construct($id, array $payload = [])
+    public function __construct($id, array $payload = [], IRenderer $renderer = null)
     {
         $this->id = $id;
         $this->payload = $payload;
+        $this->renderer = $renderer;
     }
 
 
