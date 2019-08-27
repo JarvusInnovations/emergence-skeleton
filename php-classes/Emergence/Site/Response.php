@@ -7,14 +7,13 @@ class Response implements IResponse
 {
     protected $id;
     protected $payload;
-    protected $mode;
+    protected $renderer;
 
 
-    public function __construct($id, array $payload = [], $mode = 'html')
+    public function __construct($id, array $payload = [])
     {
         $this->id = $id;
         $this->payload = $payload;
-        $this->mode = $mode;
     }
 
 
@@ -43,13 +42,13 @@ class Response implements IResponse
         $this->payload[$key] = $value;
     }
 
-    public function getMode()
+    public function getRenderer()
     {
-        return $this->mode;
+        return $this->renderer;
     }
 
-    public function setMode($mode)
+    public function setRenderer(IRenderer $renderer)
     {
-        $this->mode = $mode;
+        $this->renderer = $renderer;
     }
 }
