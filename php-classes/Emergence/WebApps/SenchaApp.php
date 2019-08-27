@@ -8,10 +8,12 @@ use Site;
 use Cache;
 use JSON;
 use Emergence\Site\Response;
+use Emergence\Site\Renderers\DwooTemplate;
 
 class SenchaApp extends App
 {
     public static $jsSiteEnvironment = [];
+    public static $responseId = 'sencha';
     public static $plugins = [];
 
 
@@ -53,9 +55,11 @@ class SenchaApp extends App
 
     public function render()
     {
-        return new Response('sencha', [
+        $renderer = DwooTemplate::fromTreeContext('sencha.tpl', ['webapps', $this->name]);
+
+        return new Response(static::$responseId, [
             'app' => $this
-        ]);
+        ], $renderer);
     }
 
     public function buildCssMarkup()
