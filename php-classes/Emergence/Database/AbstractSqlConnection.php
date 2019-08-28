@@ -84,7 +84,7 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
      */
     public function quoteValue($value)
     {
-        return $this->pdo->quote($value);
+        return $value === null ? 'NULL' : $this->pdo->quote($value);
     }
 
     /**
