@@ -1,3 +1,2 @@
 [holobranch]
-extend = "emergence-base"
-lens = true
+extend = "emergence-site"

@@ -1,13 +1,3 @@
 [holomapping]
-files = [
-    "*/**",
-
-    # filter out legacy git configuration
-    "!php-config/Git.config.d/emergence-skeleton-v1.php",
-
-    # filter out legacy sencha toolkit
-    "!html-templates/app/**/*.tpl",
-    "!php-classes/Chaki/**",
-    "!site-root/app.php",
-    "!site-root/sencha-cmd/**"
-]
+files = "*/**"
+after = "*"

@@ -9,8 +9,3 @@ git holo project emergence-vfs-site \
     --fetch \
     --ref=origin/releases/v1 \
     --commit-to=emergence/vfs-site/v1
-
-git holo project emergence-vfs-skeleton \
-    --fetch \
-    --ref=origin/releases/v1 \
-    --commit-to=emergence/vfs-skeleton/v1
