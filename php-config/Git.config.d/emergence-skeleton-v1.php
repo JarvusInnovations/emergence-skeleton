@@ -6,7 +6,7 @@ Git::$repositories['emergence-skeleton-v1'] = [
     'workingBranch' => 'emergence/vfs-site',
     'trees' => [
         'api-docs',
-        'content-blocks',
+        // 'content-blocks',
         'data-exporters',
         'dwoo-plugins',
         'event-handlers',
@@ -18,6 +18,6 @@ Git::$repositories['emergence-skeleton-v1'] = [
         'site-root',
         'site-tasks',
         'webapp-builds',
-        'webapp-plugin-builds'
+        // 'webapp-plugin-builds'
     ]
 ];
