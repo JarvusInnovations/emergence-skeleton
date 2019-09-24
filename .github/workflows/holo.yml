@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: JarvusInnovations/hologit@actions/projector/v1
+      if: github.ref == 'refs/heads/releases/v1'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         HAB_LICENSE: accept
@@ -17,6 +18,7 @@ jobs:
         holobranch: emergence-skeleton
         commit-to: emergence/skeleton/v1
     - uses: JarvusInnovations/hologit@actions/projector/v1
+      if: github.ref == 'refs/heads/releases/v1'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         HAB_LICENSE: accept
