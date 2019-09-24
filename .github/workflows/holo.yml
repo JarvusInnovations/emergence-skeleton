@@ -1,0 +1,25 @@
+name: Projections
+
+on:
+  push:
+    branch:
+      - releases/v1
+
+jobs:
+  holobranch-projections:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: JarvusInnovations/hologit@actions/projector/v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        HAB_LICENSE: accept
+      with:
+        holobranch: emergence-skeleton
+        commit-to: emergence/skeleton/v1
+    - uses: JarvusInnovations/hologit@actions/projector/v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        HAB_LICENSE: accept
+      with:
+        holobranch: emergence-vfs-site
+        commit-to: emergence/vfs-site/v1
