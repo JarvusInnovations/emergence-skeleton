@@ -4,8 +4,12 @@ on:
   push:
     branch:
       - releases/v1
+  schedule:
+    - cron: '0 * * * *'
+
 
 jobs:
+  # TODO: generate release from PR before stuff gets built, keep tag local and push after projections succeed
   holobranch-projections:
     runs-on: ubuntu-latest
     steps:
