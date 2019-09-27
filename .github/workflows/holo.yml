@@ -13,19 +13,21 @@ jobs:
   holobranch-projections:
     runs-on: ubuntu-latest
     steps:
-    - uses: JarvusInnovations/hologit@actions/projector/v1
-      if: github.ref == 'refs/heads/releases/v1'
+    - name: Update emergence/skeleton/v1 holobranch
+      uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         HAB_LICENSE: accept
       with:
+        ref: releases/v1
         holobranch: emergence-skeleton
         commit-to: emergence/skeleton/v1
-    - uses: JarvusInnovations/hologit@actions/projector/v1
-      if: github.ref == 'refs/heads/releases/v1'
+    - name: Update emergence/vfs-site/v1 holobranch
+      uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         HAB_LICENSE: accept
       with:
+        ref: releases/v1
         holobranch: emergence-vfs-site
         commit-to: emergence/vfs-site/v1
