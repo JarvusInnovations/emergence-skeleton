@@ -2,8 +2,8 @@ name: Projections
 
 on:
   push:
-    branch:
-      - releases/v1
+    tags:
+      - 'v1.*'
   schedule:
     - cron: '0 * * * *'
 
