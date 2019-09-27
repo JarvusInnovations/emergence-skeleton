@@ -225,12 +225,12 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
         return static::getByField('Email', $email);
     }
 
-    public static function getByFullName($firstName, $lastName)
+    public static function getByFullName($firstName, $lastName, array $conditions = [])
     {
-        return static::getByWhere(array(
+        return static::getByWhere(array_merge([
             'FirstName' => $firstName
             ,'LastName' => $lastName
-        ));
+        ], $conditions));
     }
 
     public static function getOrCreateByFullName($firstName, $lastName, $save = false)
