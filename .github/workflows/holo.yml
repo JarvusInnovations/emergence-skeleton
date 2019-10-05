@@ -28,3 +28,22 @@ jobs:
         ref: releases/v1
         holobranch: emergence-vfs-site
         commit-to: emergence/vfs-site/v1
+    - name: 'Update skeleton-v1.emr.ge'
+      env:
+        VFS_DEV_TOKEN: ${{ secrets.VFS_DEV_TOKEN }}
+      run: |
+        # pull latest commit
+        curl -X POST \
+          --silent \
+          -H "Authorization: Token ${VFS_DEV_TOKEN}" \
+          -H "Accept: application/json" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/pull" \
+          | jq '.'
+
+        # sync VFS to git
+        curl -X POST \
+          --silent \
+          -H "Authorization: Token ${VFS_DEV_TOKEN}" \
+          -H "Accept: application/json" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/sync-to-vfs" \
+          | jq '.'
