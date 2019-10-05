@@ -7,11 +7,10 @@ on:
 
 
 jobs:
-  # TODO: generate release from PR before stuff gets built, keep tag local and push after projections succeed
   holobranch-projections:
     runs-on: ubuntu-latest
     steps:
-    - name: Update emergence/skeleton/v1 holobranch
+    - name: 'Update holobranch: emergence/skeleton/v1'
       uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -20,7 +19,7 @@ jobs:
         ref: releases/v1
         holobranch: emergence-skeleton
         commit-to: emergence/skeleton/v1
-    - name: Update emergence/vfs-site/v1 holobranch
+    - name: 'Update holobranch: emergence/vfs-site/v1'
       uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
