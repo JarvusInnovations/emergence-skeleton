@@ -4,16 +4,13 @@ on:
   push:
     tags:
       - 'v1.*'
-  schedule:
-    - cron: '0 * * * *'
 
 
 jobs:
-  # TODO: generate release from PR before stuff gets built, keep tag local and push after projections succeed
   holobranch-projections:
     runs-on: ubuntu-latest
     steps:
-    - name: Update emergence/skeleton/v1 holobranch
+    - name: 'Update holobranch: emergence/skeleton/v1'
       uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +19,7 @@ jobs:
         ref: releases/v1
         holobranch: emergence-skeleton
         commit-to: emergence/skeleton/v1
-    - name: Update emergence/vfs-site/v1 holobranch
+    - name: 'Update holobranch: emergence/vfs-site/v1'
       uses: JarvusInnovations/hologit@actions/projector/v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,3 +28,22 @@ jobs:
         ref: releases/v1
         holobranch: emergence-vfs-site
         commit-to: emergence/vfs-site/v1
+    - name: 'Update skeleton-v1.emr.ge'
+      env:
+        VFS_DEV_TOKEN: ${{ secrets.VFS_DEV_TOKEN }}
+      run: |
+        # pull latest commit
+        curl -X POST \
+          --silent \
+          -H "Authorization: Token ${VFS_DEV_TOKEN}" \
+          -H "Accept: application/json" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/pull" \
+          | jq '.'
+
+        # sync VFS to git
+        curl -X POST \
+          --silent \
+          -H "Authorization: Token ${VFS_DEV_TOKEN}" \
+          -H "Accept: application/json" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/sync-to-vfs" \
+          | jq '.'
