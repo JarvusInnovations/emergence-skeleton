@@ -37,7 +37,7 @@ jobs:
           --silent \
           -H "Authorization: Token ${VFS_DEV_TOKEN}" \
           -H "Accept: application/json" \
-          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/pull" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/emergence-skeleton-v1/pull" \
           | jq '.'
 
         # sync VFS to git
@@ -45,5 +45,5 @@ jobs:
           --silent \
           -H "Authorization: Token ${VFS_DEV_TOKEN}" \
           -H "Accept: application/json" \
-          "http://skeleton-v1.emr.ge/site-admin/sources/slate-cbl/sync-to-vfs" \
+          "http://skeleton-v1.emr.ge/site-admin/sources/emergence-skeleton-v1/sync-to-vfs" \
           | jq '.'
