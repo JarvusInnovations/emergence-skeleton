@@ -3,7 +3,7 @@
 class PDFMedia extends Media
 {
     // configurables
-    public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>/dev/null'; // 1=pdf path, 2=page
+    public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:-'; // 1=pdf path, 2=page
     public static $extractPageIndex = 0;
 
 
@@ -24,6 +24,8 @@ class PDFMedia extends Media
         switch ($name) {
             case 'ThumbnailMIMEType':
                 return 'image/png';
+            case 'ThumbnailExtension':
+                return 'png';
 
             case 'Extension':
 
@@ -52,7 +54,19 @@ class PDFMedia extends Media
         }
 
         $cmd = sprintf(static::$extractPageCommand, $sourceFile, static::$extractPageIndex);
-        $fileImage = imagecreatefromstring(shell_exec($cmd));
+
+        if (!empty($_GET['dump'])) {
+            $output = shell_exec("$cmd 2&>1");
+            dd(compact('cmd', 'output'));
+        } else {
+            $output = shell_exec("$cmd 2>/dev/null");
+        }
+
+        if (!$output) {
+            die("convert failed: ".shell_exec("$cmd 2&>1"));
+        }
+
+        $fileImage = imagecreatefromstring($output);
 
         return $fileImage;
     }

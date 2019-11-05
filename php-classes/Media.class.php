@@ -147,6 +147,9 @@ class Media extends ActiveRecord
             case 'ThumbnailMIMEType':
                 return $this->MIMEType;
 
+            case 'ThumbnailExtension':
+                return $this->Extension;
+
             case 'Extension':
                 throw new MediaTypeException('Unable to find extension for mime-type: '.$this->MIMEType);
 
@@ -279,10 +282,10 @@ class Media extends ActiveRecord
             $thumbFormat .= '.cropped';
         }
 
-        $thumbPath = Site::$rootPath.'/site-data/media/'.$thumbFormat.'/'.$this->Filename;
+        $thumbPath = Site::$rootPath.'/site-data/media/'.$thumbFormat.'/'.$this->ID.'.'.$this->ThumbnailExtension;
 
         // look for cached thumbnail
-        if (!file_exists($thumbPath)) {
+        // if (!file_exists($thumbPath)) {
             // ensure directory exists
             $thumbDir = dirname($thumbPath);
             if (!is_dir($thumbDir)) {
@@ -291,7 +294,7 @@ class Media extends ActiveRecord
 
             // create new thumbnail
             $this->createThumbnailImage($thumbPath, $maxWidth, $maxHeight, $fillColor, $cropped);
-        }
+        // }
 
 
         // return path
@@ -300,159 +303,184 @@ class Media extends ActiveRecord
 
     public function createThumbnailImage($thumbPath, $maxWidth, $maxHeight, $fillColor = false, $cropped = false)
     {
-        $thumbWidth = $maxWidth;
-        $thumbHeight = $maxHeight;
+        $image = new Imagick("{$this->FilesystemPath}[0]");
 
-        if ($cropped && extension_loaded('imagick') && $this->FilesystemPath) {
-            $originalTimeLimit = ini_get('max_execution_time');
-
-            // check for existing facedetect job
-            $cacheKey = "facedetect:{$thumbPath}";
-            $faceDetectTime = Cache::fetch($cacheKey);
-
-            // a parallel or dead worker is already working on this thumb
-            if ($faceDetectTime) {
-                // wait for existing job to finish or timeout
-                while (time() - $faceDetectTime < static::$faceDetectionTimeLimit) {
-                    sleep(1);
-                }
-
-                // other worker succeeded, we're done
-                if (file_exists($thumbPath)) {
-                    return true;
-                }
-
-                // disable face detection because it already failed for this thumb
-                static::$useFaceDetection = false;
-            }
-
-            if (static::$useFaceDetection && extension_loaded('facedetect')) {
-                Cache::store($cacheKey, time());
-                set_time_limit(static::$faceDetectionTimeLimit);
-
-                $cropper = new CropFace($this->FilesystemPath);
-            } else {
-                $cropper = new stojg\crop\CropEntropy($this->FilesystemPath);
-            }
-
-            $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
-
-            $croppedImage->writeimage($thumbPath);
-
-            set_time_limit($originalTimeLimit);
-            Cache::delete($cacheKey);
-        } else {
-            // load source image
-            $srcImage = $this->getImage();
-            $srcWidth = imagesx($srcImage);
-            $srcHeight = imagesy($srcImage);
-
-            // calculate
-            if ($srcWidth && $srcHeight) {
-                $widthRatio = ($srcWidth > $maxWidth) ? ($maxWidth / $srcWidth) : 1;
-                $heightRatio = ($srcHeight > $maxHeight) ? ($maxHeight / $srcHeight) : 1;
-
-                // crop width/height to scale size if fill disabled
-                if ($cropped) {
-                    $ratio = max($widthRatio, $heightRatio);
-                } else {
-                    $ratio = min($widthRatio, $heightRatio);
-                }
-
-                $scaledWidth = round($srcWidth * $ratio);
-                $scaledHeight = round($srcHeight * $ratio);
-            } else {
-                $scaledWidth = $maxWidth;
-                $scaledHeight = $maxHeight;
-            }
-
-            if (!$fillColor && !$cropped) {
-                $thumbWidth = $scaledWidth;
-                $thumbHeight = $scaledHeight;
-            }
-
-            // create thumbnail images
-            $image = imagecreatetruecolor($thumbWidth, $thumbHeight);
-
-            // paint fill color
-            if ($fillColor) {
-                // extract decimal values from hex triplet
-                $fillColor = sscanf($fillColor, '%2x%2x%2x');
-
-                // convert to color index
-                $fillColor = imagecolorallocate($image, $fillColor[0], $fillColor[1], $fillColor[2]);
-
-                // fill background
-                imagefill($image, 0, 0, $fillColor);
-            } elseif (($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png')) {
-                $trans_index = imagecolortransparent($srcImage);
-
-                // check if there is a specific transparent color
-                if ($trans_index >= 0 && $trans_index < imagecolorstotal($srcImage)) {
-                    $trans_color = imagecolorsforindex($srcImage, $trans_index);
-
-                    // allocate in thumbnail
-                    $trans_index = imagecolorallocate($image, $trans_color['red'], $trans_color['green'], $trans_color['blue']);
-
-                    // fill background
-                    imagefill($image, 0, 0, $trans_index);
-                    imagecolortransparent($image, $trans_index);
-                } elseif ($this->MIMEType == 'image/png') {
-                    imagealphablending($image, false);
-                    $trans_color = imagecolorallocatealpha($image, 0, 0, 0, 127);
-                    imagefill($image, 0, 0, $trans_color);
-                    imagesavealpha($image, true);
-                }
-
-    /*
-                $trans_index = imagecolorallocate($image, 218, 0, 245);
-                ImageColorTransparent($image, $background); // make the new temp image all transparent
-                imagealphablending($image, false); // turn off the alpha blending to keep the alpha channel
-    */
-            }
-
-            // resize photo to thumbnail
-            if ($cropped) {
-                imagecopyresampled(
-                      $image
-                    , $srcImage
-                    , ($thumbWidth - $scaledWidth) / 2, ($thumbHeight - $scaledHeight) / 2
-                    , 0, 0
-                    , $scaledWidth, $scaledHeight
-                    , $srcWidth, $srcHeight
-                );
-            } else {
-                imagecopyresampled(
-                      $image
-                    , $srcImage
-                    , round(($thumbWidth - $scaledWidth) / 2), round(($thumbHeight - $scaledHeight) / 2)
-                    , 0, 0
-                    , $scaledWidth, $scaledHeight
-                    , $srcWidth, $srcHeight
-                );
-            }
-
-            // save thumbnail to disk
-            switch ($this->ThumbnailMIMEType) {
-                case 'image/gif':
-                    imagegif($image, $thumbPath);
-                    break;
-
-                case 'image/jpeg':
-                    imagejpeg($image, $thumbPath, static::$thumbnailJPEGCompression);
-                    break;
-
-                case 'image/png':
-                    imagepng($image, $thumbPath, static::$thumbnailPNGCompression);
-                    break;
-
-                default:
-                    throw new Exception('Unhandled thumbnail format');
-            }
+        if ($fillColor) {
+            $image->setImageBackgroundColor('lime');
         }
 
+        $image->setImageAlphaChannel(imagick::ALPHACHANNEL_REMOVE);
+        $image->mergeImageLayers(imagick::LAYERMETHOD_FLATTEN);
+
+        // apply any type-specific changes
+        switch ($this->MIMEType) {
+            case 'application/pdf':
+                $image->setResolution(300, 300);
+        }
+
+        $image->thumbnailImage($maxWidth, $maxHeight, true, boolval($fillColor), false);
+
+        if (!empty($_GET['dump'])) {
+            dd([
+                '$this' => $this,
+                '$image->getImageFormat()' => $image->getImageFormat(),
+                '$image' => $image,
+                'args' => compact('thumbPath', 'maxWidth', 'maxHeight', 'fillColor', 'cropped'),
+                'Imagick::queryformats()' => Imagick::queryformats()
+            ]);
+        }
+
+        $image->writeimage($thumbPath);
         chmod($thumbPath, static::$newFilePermissions);
         return true;
+
+        // if ($cropped && extension_loaded('imagick') && $this->FilesystemPath) {
+            // $originalTimeLimit = ini_get('max_execution_time');
+
+            // check for existing facedetect job
+            // $cacheKey = "facedetect:{$thumbPath}";
+            // $faceDetectTime = Cache::fetch($cacheKey);
+
+            // // a parallel or dead worker is already working on this thumb
+            // if ($faceDetectTime) {
+            //     // wait for existing job to finish or timeout
+            //     while (time() - $faceDetectTime < static::$faceDetectionTimeLimit) {
+            //         sleep(1);
+            //     }
+
+            //     // other worker succeeded, we're done
+            //     if (file_exists($thumbPath)) {
+            //         return true;
+            //     }
+
+            //     // disable face detection because it already failed for this thumb
+            //     static::$useFaceDetection = false;
+            // }
+
+            // if (static::$useFaceDetection && extension_loaded('facedetect')) {
+            //     Cache::store($cacheKey, time());
+            //     set_time_limit(static::$faceDetectionTimeLimit);
+
+            //     $cropper = new CropFace($this->FilesystemPath);
+            // } else {
+                // $cropper = new stojg\crop\CropEntropy($this->FilesystemPath);
+            // }
+
+            // $croppedImage = $cropper->resizeAndCrop($thumbWidth, $thumbHeight);
+
+            // $croppedImage->writeimage($thumbPath);
+
+            // set_time_limit($originalTimeLimit);
+            // Cache::delete($cacheKey);
+    //     } else {
+    //         // load source image
+    //         $srcImage = $this->getImage();
+    //         $srcWidth = imagesx($srcImage);
+    //         $srcHeight = imagesy($srcImage);
+
+    //         // calculate
+    //         if ($srcWidth && $srcHeight) {
+    //             $widthRatio = ($srcWidth > $maxWidth) ? ($maxWidth / $srcWidth) : 1;
+    //             $heightRatio = ($srcHeight > $maxHeight) ? ($maxHeight / $srcHeight) : 1;
+
+    //             // crop width/height to scale size if fill disabled
+    //             if ($cropped) {
+    //                 $ratio = max($widthRatio, $heightRatio);
+    //             } else {
+    //                 $ratio = min($widthRatio, $heightRatio);
+    //             }
+
+    //             $scaledWidth = round($srcWidth * $ratio);
+    //             $scaledHeight = round($srcHeight * $ratio);
+    //         } else {
+    //             $scaledWidth = $maxWidth;
+    //             $scaledHeight = $maxHeight;
+    //         }
+
+    //         if (!$fillColor && !$cropped) {
+    //             $thumbWidth = $scaledWidth;
+    //             $thumbHeight = $scaledHeight;
+    //         }
+
+    //         // create thumbnail images
+    //         $image = imagecreatetruecolor($thumbWidth, $thumbHeight);
+
+    //         // paint fill color
+    //         if ($fillColor) {
+    //             // extract decimal values from hex triplet
+    //             $fillColor = sscanf($fillColor, '%2x%2x%2x');
+
+    //             // convert to color index
+    //             $fillColor = imagecolorallocate($image, $fillColor[0], $fillColor[1], $fillColor[2]);
+
+    //             // fill background
+    //             imagefill($image, 0, 0, $fillColor);
+    //         } elseif (($this->MIMEType == 'image/gif') || ($this->MIMEType == 'image/png')) {
+    //             $trans_index = imagecolortransparent($srcImage);
+
+    //             // check if there is a specific transparent color
+    //             if ($trans_index >= 0 && $trans_index < imagecolorstotal($srcImage)) {
+    //                 $trans_color = imagecolorsforindex($srcImage, $trans_index);
+
+    //                 // allocate in thumbnail
+    //                 $trans_index = imagecolorallocate($image, $trans_color['red'], $trans_color['green'], $trans_color['blue']);
+
+    //                 // fill background
+    //                 imagefill($image, 0, 0, $trans_index);
+    //                 imagecolortransparent($image, $trans_index);
+    //             } elseif ($this->MIMEType == 'image/png') {
+    //                 imagealphablending($image, false);
+    //                 $trans_color = imagecolorallocatealpha($image, 0, 0, 0, 127);
+    //                 imagefill($image, 0, 0, $trans_color);
+    //                 imagesavealpha($image, true);
+    //             }
+
+    // /*
+    //             $trans_index = imagecolorallocate($image, 218, 0, 245);
+    //             ImageColorTransparent($image, $background); // make the new temp image all transparent
+    //             imagealphablending($image, false); // turn off the alpha blending to keep the alpha channel
+    // */
+    //         }
+
+    //         // resize photo to thumbnail
+    //         if ($cropped) {
+    //             imagecopyresampled(
+    //                   $image
+    //                 , $srcImage
+    //                 , ($thumbWidth - $scaledWidth) / 2, ($thumbHeight - $scaledHeight) / 2
+    //                 , 0, 0
+    //                 , $scaledWidth, $scaledHeight
+    //                 , $srcWidth, $srcHeight
+    //             );
+    //         } else {
+    //             imagecopyresampled(
+    //                   $image
+    //                 , $srcImage
+    //                 , round(($thumbWidth - $scaledWidth) / 2), round(($thumbHeight - $scaledHeight) / 2)
+    //                 , 0, 0
+    //                 , $scaledWidth, $scaledHeight
+    //                 , $srcWidth, $srcHeight
+    //             );
+    //         }
+
+    //         // save thumbnail to disk
+    //         switch ($this->ThumbnailMIMEType) {
+    //             case 'image/gif':
+    //                 imagegif($image, $thumbPath);
+    //                 break;
+
+    //             case 'image/jpeg':
+    //                 imagejpeg($image, $thumbPath, static::$thumbnailJPEGCompression);
+    //                 break;
+
+    //             case 'image/png':
+    //                 imagepng($image, $thumbPath, static::$thumbnailPNGCompression);
+    //                 break;
+
+    //             default:
+    //                 throw new Exception('Unhandled thumbnail format');
+    //         }
+    //     }
     }
 
     /*
