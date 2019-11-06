@@ -426,9 +426,9 @@ class ActiveRecord
     /**
      * @deprecated
      */
-    public function getThumbnailURL($width, $height = null, $exactSize = true)
+    public function getThumbnailURL($maxWidth, $maxHeight = null, $exactSize = true)
     {
-        return $this->getImageUrl($width, $height, [
+        return $this->getImageUrl($maxWidth, $maxHeight, [
             'fillColor' => $exactSize && is_string($exactSize) ? $exactSize : null,
             'cropped' => $exactSize && !is_string($exactSize)
         ]);
@@ -449,10 +449,10 @@ class ActiveRecord
         return null;
     }
 
-    public function getImageUrl($width, $height = null, array $options = [])
+    public function getImageUrl($maxWidth = null, $maxHeight = null, array $options = [])
     {
         if ($proxiedImageObject = $this->getProxiedImageObject()) {
-            return $proxiedImageObject->getImageUrl($width, $height, $options);
+            return $proxiedImageObject->getImageUrl($maxWidth, $maxHeight, $options);
         }
 
         return null;

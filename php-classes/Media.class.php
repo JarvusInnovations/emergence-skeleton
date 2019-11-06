@@ -206,11 +206,11 @@ class Media extends ActiveRecord
     /**
      * Wrap around original getThumbnailRequest to override new interface getThumbnailRequest
      */
-    public function getImageUrl($width, $height = null, array $options = [])
+    public function getImageUrl($maxWidth = null, $maxHeight = null, array $options = [])
     {
         return $this->getThumbnailRequest(
-            $width,
-            $height,
+            $maxWidth ?: $maxHeight,
+            $maxHeight ?: $maxWidth,
             !empty($options['fillColor']) ? $options['fillColor'] : null,
             !empty($options['cropped'])
         );
