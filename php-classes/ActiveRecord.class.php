@@ -1,8 +1,10 @@
 <?php
 
 use Emergence\People\IPerson;
+use Emergence\Interfaces\Image AS IImage;
 
 class ActiveRecord
+    implements IImage
 {
     // configurables
     /**
@@ -421,20 +423,45 @@ class ActiveRecord
         return $url;
     }
 
+    /**
+     * @deprecated
+     */
     public function getThumbnailURL($width, $height = null, $exactSize = true)
+    {
+        return $this->getImageUrl($width, $height, [
+            'fillColor' => $exactSize && is_string($exactSize) ? $exactSize : null,
+            'cropped' => $exactSize && !is_string($exactSize)
+        ]);
+    }
+
+    // implement Image interface:
+    public function getProxiedImageObject()
     {
         if (
             static::$thumbnailRelationship &&
             static::_relationshipExists(static::$thumbnailRelationship) &&
-            ($ThumbMedia = $this->_getRelationshipValue(static::$thumbnailRelationship)) &&
-            $ThumbMedia->isA('Media')
+            ($ThumbObject = $this->_getRelationshipValue(static::$thumbnailRelationship)) &&
+            $ThumbObject instanceof IImage
         ) {
-            return $ThumbMedia->getThumbnailRequest(
-                $width,
-                $height,
-                $exactSize && is_string($exactSize) ? $exactSize : null,
-                $exactSize && !is_string($exactSize)
-            );
+            return $ThumbObject;
+        }
+
+        return null;
+    }
+
+    public function getImageUrl($width, $height = null, array $options = [])
+    {
+        if ($proxiedImageObject = $this->getProxiedImageObject()) {
+            return $proxiedImageObject->getImageUrl($width, $height, $options);
+        }
+
+        return null;
+    }
+
+    public function getImage(array $options = [])
+    {
+        if ($proxiedImageObject = $this->getProxiedImageObject()) {
+            return $proxiedImageObject->getImage($options);
         }
 
         return null;

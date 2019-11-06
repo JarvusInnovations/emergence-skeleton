@@ -189,6 +189,9 @@ class Media extends ActiveRecord
         );
     }
 
+    /**
+     * @deprecated
+     */
     public function getThumbnailRequest($width, $height = null, $fillColor = null, $cropped = false)
     {
         return sprintf(
@@ -200,12 +203,21 @@ class Media extends ActiveRecord
         ).($cropped ? '/cropped' : '');
     }
 
-    public function getImage($sourceFile = null)
+    /**
+     * Wrap around original getThumbnailRequest to override new interface getThumbnailRequest
+     */
+    public function getImageUrl($width, $height = null, array $options = [])
     {
-        if (!isset($sourceFile)) {
-            $sourceFile = $this->FilesystemPath ? $this->FilesystemPath : $this->BlankPath;
-        }
+        return $this->getThumbnailRequest(
+            $width,
+            $height,
+            !empty($options['fillColor']) ? $options['fillColor'] : null,
+            !empty($options['cropped'])
+        );
+    }
 
+    public function getImage(array $options = [])
+    {
         switch ($this->MIMEType) {
             case 'application/psd':
             case 'image/tiff':
@@ -218,13 +230,14 @@ class Media extends ActiveRecord
 
             case 'application/pdf':
 
-               return PDFMedia::getImage($sourceFile);
+               return PDFMedia::getImage();
 
             case 'application/postscript':
 
                 return imagecreatefromstring(shell_exec("gs -r150 -dEPSCrop -dNOPAUSE -dBATCH -sDEVICE=png48 -sOutputFile=- -q $this->FilesystemPath"));
 
             default:
+                $sourceFile = $this->FilesystemPath ? $this->FilesystemPath : $this->BlankPath;
 
                 if (!$fileData = @file_get_contents($sourceFile)) {
                     throw new Exception('Could not load media source: '.$sourceFile);
