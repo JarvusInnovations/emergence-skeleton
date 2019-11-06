@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "cypress": "^3.4.0",
+    "cypress": "^3.6.0",
     "cypress-plugin-tab": "^1.0.1"
   },
   "scripts": {
