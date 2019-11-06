@@ -5,21 +5,15 @@ class PhotoMedia extends Media
     // configurables
     public static $jpegCompression = 90;
 
-    // magic methods
-    public static function __classLoaded()
-    {
-        $className = get_called_class();
+    public static $mimeHandlers = [
+        'image/gif',
+        'image/jpeg',
+        'image/png',
+        'image/tiff',
+        'application/psd'
+    ];
 
-        Media::$mimeHandlers['image/gif'] = $className;
-        Media::$mimeHandlers['image/jpeg'] = $className;
-        Media::$mimeHandlers['image/png'] = $className;
-        Media::$mimeHandlers['image/tiff'] = $className;
-        Media::$mimeHandlers['application/psd'] = $className;
-
-        parent::__classLoaded();
-    }
-
-
+    // public methods
     public function getValue($name)
     {
         switch ($name) {
@@ -60,13 +54,11 @@ class PhotoMedia extends Media
         }
     }
 
-
-    // public methods
-
-
     // static methods
-    public static function analyzeFile($filename, $mediaInfo = array())
+    public static function analyzeFile($filename, $mediaInfo = [])
     {
+        $mediaInfo = parent::analyzeFile($filename, $mediaInfo);
+
         if (!$mediaInfo['imageInfo'] = @getimagesize($filename)) {
             throw new Exception('Failed to read image file information');
         }

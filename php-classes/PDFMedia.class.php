@@ -6,18 +6,11 @@ class PDFMedia extends Media
     public static $extractPageCommand = 'convert \'%1$s[%2$u]\' JPEG:- 2>/dev/null'; // 1=pdf path, 2=page
     public static $extractPageIndex = 0;
 
-
-    // magic methods
-    public static function __classLoaded()
-    {
-        $className = get_called_class();
-
-        Media::$mimeHandlers['application/pdf'] = $className;
-        Media::$mimeHandlers['application/postscript'] = $className;
-        Media::$mimeHandlers['image/svg+xml'] = $className;
-        parent::__classLoaded();
-    }
-
+    public static $mimeHandlers = [
+        'application/pdf',
+        'application/postscript',
+        'image/svg+xml'
+    ];
 
     public function getValue($name)
     {
@@ -43,7 +36,6 @@ class PDFMedia extends Media
         }
     }
 
-
     // public methods
     public function getImage(array $options = [])
     {
@@ -59,8 +51,10 @@ class PDFMedia extends Media
     }
 
     // static methods
-    public static function analyzeFile($filename, $mediaInfo = array())
+    public static function analyzeFile($filename, $mediaInfo = [])
     {
+        $mediaInfo = parent::analyzeFile($filename, $mediaInfo);
+
         $cmd = sprintf(static::$extractPageCommand, $filename, static::$extractPageIndex);
         $pageIm = @imagecreatefromstring(shell_exec($cmd));
 

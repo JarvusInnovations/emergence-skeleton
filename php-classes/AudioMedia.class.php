@@ -7,17 +7,9 @@ class AudioMedia extends Media
     public static $previewDuration = 30;
     public static $iconPath = '/site-root/img/icons/filetypes/mp3.png';
 
-
-    // magic methods
-    public static function __classLoaded()
-    {
-        $className = get_called_class();
-
-        Media::$mimeHandlers['audio/mpeg'] = $className;
-
-        parent::__classLoaded();
-    }
-
+    public static $mimeHandlers = [
+        'audio/mpeg'
+    ];
 
     public function getValue($name)
     {
@@ -44,7 +36,6 @@ class AudioMedia extends Media
                 return parent::getValue($name);
         }
     }
-
 
     // public methods
     public static function getBlankPath($contextClass)
@@ -89,17 +80,18 @@ class AudioMedia extends Media
     }
 
     // static methods
-#    public static function analyzeFile($filename, $mediaInfo = array())
-#    {
-#        // Initialize getID3 engine
-#        $getID3 = new getID3();
-#
-#        $mediaInfo['id3Info'] = $getID3->analyze($filename);
-#
-#        $mediaInfo['width'] = 0;
-#        $mediaInfo['height'] = 0;
-#        $mediaInfo['duration'] = $mediaInfo['id3Info']['playtime_seconds'];
-#
-#        return $mediaInfo;
-#    }
+    public static function analyzeFile($filename, $mediaInfo = array())
+    {
+        $mediaInfo = parent::analyzeFile($filename, $mediaInfo);
+        // Initialize getID3 engine
+        $getID3 = new getID3();
+
+        $mediaInfo['id3Info'] = $getID3->analyze($filename);
+
+        $mediaInfo['width'] = 0;
+        $mediaInfo['height'] = 0;
+        $mediaInfo['duration'] = $mediaInfo['id3Info']['playtime_seconds'];
+
+        return $mediaInfo;
+    }
 }
