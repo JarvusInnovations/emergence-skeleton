@@ -86,8 +86,12 @@ class VideoMedia extends Media
     // public methods
     public function getImage(array $options = [])
     {
-        foreach ([$this->FilesystemPath, $this->BlankPath] as $sourceFile) {
-            $cmd = sprintf(self::$ExtractFrameCommand, $sourceFile, min(self::$ExtractFramePosition, floor($this->Duration)));
+        foreach (['FilesystemPath', 'BlankPath'] as $pathAttribute) {
+            if (!$sourcePath = $this->$pathAttribute) {
+                continue;
+            }
+
+            $cmd = sprintf(self::$ExtractFrameCommand, $sourcePath, min(self::$ExtractFramePosition, floor($this->Duration)));
 
             if ($imageData = shell_exec($cmd)) {
                 return imagecreatefromstring($imageData);
