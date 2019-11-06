@@ -626,9 +626,9 @@ class Media extends ActiveRecord
 
         if ($node = Site::resolvePath($path)) {
             return $node->RealPath;
-        } else {
-            throw new Exception('Could not load '.implode('/',$path));
         }
+
+        return null;
     }
 
     public static function getBlank($contextClass)
