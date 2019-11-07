@@ -5,6 +5,7 @@ namespace Emergence\Connectors;
 use ActiveRecord;
 use HandleBehavior;
 use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Emergence\Logger;
 
 class Job extends ActiveRecord implements IJob
@@ -12,6 +13,7 @@ class Job extends ActiveRecord implements IJob
     use \Psr\Log\LoggerTrait;
 
     public $logEntries;
+    private $logger;
 
     // ActiveRecord configuration
     public static $tableName = 'connector_jobs';
@@ -87,6 +89,16 @@ class Job extends ActiveRecord implements IJob
     {
         $className = $this->Connector;
         return $className::getTitle();
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     public function logRecordDelta(ActiveRecord $Record, $options = array())
@@ -218,6 +230,10 @@ class Job extends ActiveRecord implements IJob
 
     public function log($level, $message, array $context = [])
     {
+        if ($this->logger) {
+            return $this->logger->log($level, $message, $context);
+        }
+
         $entry = [
             'time' => date('Y-m-d H:i:s'),
             'message' => $message,
