@@ -14,6 +14,7 @@ class Job extends ActiveRecord implements IJob
 
     public $logEntries;
     public $muteLog = false;
+    private $tmpLogPath;
     private $logger;
 
     // ActiveRecord configuration
@@ -207,14 +208,24 @@ class Job extends ActiveRecord implements IJob
 
     public function getLogPath()
     {
-        return $this->isPhantom ? null : \Site::$rootPath.'/site-data/connector-jobs/'.$this->ID.'.json';
+        $logBase = \Site::$rootPath.'/site-data/connector-jobs';
+
+        if (!$this->isPhantom) {
+            return "{$logBase}/{$this->ID}.json";
+        }
+
+        if (!$this->tmpLogPath) {
+            $this->tmpLogPath = tempnam($logBase, 'phantom');
+        }
+
+        return $this->tmpLogPath;
     }
 
     public function writeLog($compress = true)
     {
         $logPath = $this->getLogPath();
 
-        if (!$logPath) { // record is phantom
+        if (!$logPath) {
             return;
         }
 
