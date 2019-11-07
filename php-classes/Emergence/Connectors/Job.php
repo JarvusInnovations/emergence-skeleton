@@ -13,6 +13,7 @@ class Job extends ActiveRecord implements IJob
     use \Psr\Log\LoggerTrait;
 
     public $logEntries;
+    public $muteLog = false;
     private $logger;
 
     // ActiveRecord configuration
@@ -241,7 +242,9 @@ class Job extends ActiveRecord implements IJob
             'level' => $level
         ];
 
-        $this->logEntries[] = $entry;
+        if (!$this->muteLog) {
+            $this->logEntries[] = $entry;
+        }
 
         return $entry;
     }
