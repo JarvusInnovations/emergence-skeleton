@@ -1,0 +1,4 @@
+[holomapping]
+holosource = "jdenticon"
+root = "src"
+files = "**/*.php"

@@ -1,0 +1,7 @@
+[holomapping]
+holosource = "apache-mime-types"
+root = "src/Dflydev/ApacheMimeTypes"
+files = [
+    "PhpRepository.php",
+    "RepositoryInterface.php"
+]
