@@ -2260,6 +2260,7 @@ class ActiveRecord
         // pre-process value
         $forceDirty = false;
         switch ($fieldOptions['type']) {
+            case 'enum':
             case 'clob':
             case 'string':
             {
