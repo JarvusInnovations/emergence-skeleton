@@ -1,5 +1,7 @@
 <?php
 
+use Emergence\Site\Storage;
+
 class Media extends ActiveRecord
 {
     public static $useCache = true;
@@ -292,7 +294,7 @@ class Media extends ActiveRecord
             $thumbFormat .= '.cropped';
         }
 
-        $thumbPath = Site::$rootPath.'/site-data/media/'.$thumbFormat.'/'.$this->Filename;
+        $thumbPath = Storage::getLocalStorageRoot().'/media/'.$thumbFormat.'/'.$this->Filename;
 
         // look for cached thumbnail
         if (!file_exists($thumbPath)) {
@@ -672,7 +674,7 @@ class Media extends ActiveRecord
             return null;
         }
 
-        return Site::$rootPath.'/site-data/media/'.$variant.'/'.($filename ?: $this->getFilename($variant));
+        return Storage::getLocalStorageRoot().'/media/'.$variant.'/'.($filename ?: $this->getFilename($variant));
     }
 
     public function getFilename($variant = 'original')
