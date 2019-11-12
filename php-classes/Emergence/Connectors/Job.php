@@ -7,6 +7,7 @@ use HandleBehavior;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Emergence\Logger;
+use Emergence\Site\Storage;
 
 class Job extends ActiveRecord implements IJob
 {
@@ -208,7 +209,7 @@ class Job extends ActiveRecord implements IJob
 
     public function getLogPath()
     {
-        $logBase = \Site::$rootPath.'/site-data/connector-jobs';
+        $logBase = Storage::getLocalStorageRoot().'/connector-jobs';
 
         if (!$this->isPhantom) {
             return "{$logBase}/{$this->ID}.json";
