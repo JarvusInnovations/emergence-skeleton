@@ -1,0 +1,4 @@
+[holomapping]
+holosource = "colors"
+root = "src/Colors"
+files = "**/*.php"
