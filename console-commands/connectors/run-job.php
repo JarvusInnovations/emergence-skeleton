@@ -7,7 +7,7 @@ $logger = $_COMMAND['LOGGER'];
 
 // load template
 if (empty($_COMMAND['ARGS'])) {
-    die('Usage: run-job.php HANDLE');
+    die('Usage: connectors:run-job <job-handle>');
 }
 
 $TemplateJob = Job::getByHandle($_COMMAND['ARGS']);
