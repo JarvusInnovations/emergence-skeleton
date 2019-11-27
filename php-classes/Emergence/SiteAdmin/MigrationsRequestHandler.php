@@ -187,10 +187,14 @@ class MigrationsRequestHandler extends \RequestHandler
                     );
                     break;
                 } catch (QueryException $e) {
+                    if ($upgraded) {
+                        throw $e;
+                    }
+
                     static::upgradeMigrationsTable();
                     $upgraded = true;
                 }
-            } while (!$upgraded);
+            } while (true);
         }
 
         $migration['queryLog'] = array_slice(Debug::$log, $debugLogStartIndex);
