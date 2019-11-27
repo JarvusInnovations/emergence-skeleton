@@ -251,6 +251,7 @@ class MigrationsRequestHandler extends \RequestHandler
                 .',`SHA1` char(40) NOT NULL'
                 .',`Timestamp` timestamp NOT NULL'
                 .',`Status` enum("skipped","started","failed","executed") NOT NULL'
+                .',`Output` TEXT NULL DEFAULT NULL'
                 .',PRIMARY KEY (`Key`)'
             .')'
         );
