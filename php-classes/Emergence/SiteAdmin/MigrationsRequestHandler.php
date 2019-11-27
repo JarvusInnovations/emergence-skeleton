@@ -6,6 +6,7 @@ use DB;
 use Site;
 use Emergence_FS;
 use TableNotFoundException;
+use QueryException;
 
 
 class MigrationsRequestHandler extends \RequestHandler
@@ -79,7 +80,8 @@ class MigrationsRequestHandler extends \RequestHandler
             'path' => $migrationPath,
             'status' => $migrationRecord ? $migrationRecord['Status'] : static::STATUS_NEW,
             'executed' => $migrationRecord ? $migrationRecord['Timestamp'] : null,
-            'sha1' => $migrationNode->SHA1
+            'sha1' => $migrationNode->SHA1,
+            'output' => $migrationRecord ? $migrationRecord['Output'] : null,
         ];
 
 
@@ -109,7 +111,7 @@ class MigrationsRequestHandler extends \RequestHandler
             $migration['status'] = call_user_func(function() use ($migration, $migrationNode, $resetMigrationStatus) {
                 return include($migrationNode->RealPath);
             });
-            $output = ob_get_clean();
+            $migration['output'] = ob_get_clean();
 
             $migration['executed'] = time();
 
@@ -120,20 +122,29 @@ class MigrationsRequestHandler extends \RequestHandler
                     $migration['status'] = static::STATUS_FAILED;
                 }
 
-                DB::nonQuery(
-                    'UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s" WHERE `Key` = "%s"',
-                    [
-                        $migration['executed'],
-                        $migration['status'],
-                        $migrationKey
-                    ]
-                );
+                $upgraded = false;
+                do {
+                    try {
+                        DB::nonQuery(
+                            'UPDATE `_e_migrations` SET Timestamp = FROM_UNIXTIME(%u), Status = "%s", Output = "%s" WHERE `Key` = "%s"',
+                            [
+                                $migration['executed'],
+                                $migration['status'],
+                                DB::escape($migration['output']),
+                                $migrationKey,
+                            ]
+                        );
+                        break;
+                    } catch (QueryException $e) {
+                        static::upgradeMigrationsTable();
+                        $upgraded = true;
+                    }
+                } while (!$upgraded);
             }
 
             return static::respond('migrationExecuted', [
                 'migration' => $migration,
-                'log' => array_slice(\Debug::$log, $debugLogStartIndex),
-                'output' => $output
+                'log' => array_slice(\Debug::$log, $debugLogStartIndex)
             ]);
         }
 
@@ -204,6 +215,13 @@ class MigrationsRequestHandler extends \RequestHandler
                 .',PRIMARY KEY (`Key`)'
             .')'
         );
+    }
+
+    protected static function upgradeMigrationsTable()
+    {
+        if (!static::columnExists('_e_migrations', 'Output')) {
+            return DB::nonQuery('ALTER TABLE `_e_migrations` ADD COLUMN `Output` TEXT NULL DEFAULT NULL AFTER Status');
+        }
     }
 
 
