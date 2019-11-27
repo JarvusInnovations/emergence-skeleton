@@ -30,7 +30,7 @@
             </thead>
 
             <tbody>
-                {foreach item=entry from=$log}
+                {foreach item=entry from=$migration.queryLog}
                     <tr>
                         <td>{$entry.query|escape}</td>
                         <td>{$entry.affected_rows|default:entry.result_rows|number_format}</td>
