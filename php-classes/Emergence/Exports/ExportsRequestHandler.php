@@ -70,8 +70,6 @@ class ExportsRequestHandler extends \RequestHandler
 
     public static function handleRequest()
     {
-        $GLOBALS['Session']->requireAccountLevel(static::$accountLevelBrowse);
-
         // execute a selected script
         $scriptPath = array_filter(static::getPath());
 
@@ -80,6 +78,8 @@ class ExportsRequestHandler extends \RequestHandler
         }
 
         // show list of exports
+        $GLOBALS['Session']->requireAccountLevel(static::$accountLevelBrowse);
+
         static::respond('exports', [
             'scripts' => static::getScripts()
         ]);
