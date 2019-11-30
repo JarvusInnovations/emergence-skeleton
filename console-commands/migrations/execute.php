@@ -6,36 +6,58 @@ use Emergence\SiteAdmin\MigrationsRequestHandler;
 $logger = $_COMMAND['LOGGER'];
 
 
-// load migration(s)
+// parse args
 if (empty($_COMMAND['ARGS'])) {
     die('Usage: migrations:execute <migration-key|--all>');
 }
 
-$migrationKey = $_COMMAND['ARGS'];
+$migrationKeys = [];
+$force = false;
 
+foreach (preg_split('/\s+/', $_COMMAND['ARGS']) as $arg) {
+    if ($arg == '--all') {
+        $migrationKeys = '--all';
+        continue;
+    }
+
+    if ($arg == '--force') {
+        $force = true;
+        continue;
+    }
+
+    if ($migrationKeys != '--all') {
+        $migrationKeys[] = $arg;
+    }
+}
+
+// load migration(s)
 if ($migrationKey == '--all') {
     $migrations = MigrationsRequestHandler::getMigrations();
 } else {
-    $migration = MigrationsRequestHandler::getMigrationData($migrationKey);
+    $migrations = [];
 
-    if (!$migration) {
-        $logger->error("Migration not found: $migrationKey");
-        exit(1);
+    foreach ($migrationKeys as $migrationKey) {
+        $migration = MigrationsRequestHandler::getMigrationData($migrationKey);
+
+        if (!$migration) {
+            $logger->error("Migration not found: $migrationKey");
+            exit(1);
+        }
+
+        $migrations[] = $migration;
     }
-
-    $migrations = [ $migration ];
 }
 
 
 // run them all
 foreach ($migrations as $migration) {
-    if ($migration['status'] != MigrationsRequestHandler::STATUS_NEW) {
+    if (!$force && $migration['status'] != MigrationsRequestHandler::STATUS_NEW) {
         $logger->info('Skipping migration with status {status}: {key}', $migration);
         continue;
     }
 
     $logger->info('Executing migration: {key}', $migration);
-    $migration = MigrationsRequestHandler::executeMigration($migration);
+    $migration = MigrationsRequestHandler::executeMigration($migration, $force);
 
     if ($output = trim($migration['output'])) {
         $output = explode(PHP_EOL, $output);

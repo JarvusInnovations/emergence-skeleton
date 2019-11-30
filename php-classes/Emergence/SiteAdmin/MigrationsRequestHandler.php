@@ -126,7 +126,7 @@ class MigrationsRequestHandler extends \RequestHandler
         ];
     }
 
-    public static function executeMigration($migration)
+    public static function executeMigration($migration, $force = false)
     {
         if (is_string($migration)) {
             $migrationKey = $migration;
@@ -137,11 +137,27 @@ class MigrationsRequestHandler extends \RequestHandler
             }
         }
 
-        if ($migration['status'] != static::STATUS_NEW) {
+        if (!$force && $migration['status'] != static::STATUS_NEW) {
             throw new RangeException('Cannot execute requested migration, it has already been skipped, started, or executed');
         }
 
-        $insertSql = sprintf('INSERT INTO `_e_migrations` SET `Key` = "%s", SHA1 = "%s", Timestamp = FROM_UNIXTIME(%u), Status = "%s"', $migration['key'], $migration['sha1'], time(), static::STATUS_STARTED);
+        $insertSql = sprintf(
+            '
+                INSERT INTO `_e_migrations`
+                   SET `Key` = "%1$s",
+                       SHA1 = "%2$s",
+                       Timestamp = FROM_UNIXTIME(%3$u),
+                       Status = "%4$s"
+                    ON DUPLICATE KEY UPDATE
+                       SHA1 = "%2$s",
+                       Timestamp = FROM_UNIXTIME(%3$u),
+                       Status = "%4$s"
+            ',
+            $migration['key'],
+            $migration['sha1'],
+            time(),
+            static::STATUS_STARTED
+        );
 
         try {
             DB::nonQuery($insertSql);
