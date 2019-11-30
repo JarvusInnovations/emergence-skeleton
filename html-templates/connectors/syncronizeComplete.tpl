@@ -52,7 +52,7 @@
                 <dl>
                     {foreach item=delta key=field from=$changes}
                         <dt>{$field}</dt>
-                        <dd>{$delta.from|escape} -> {$delta.to|escape}</dd>
+                        <dd>{default($delta.from, '∅')|escape} &rarr; {default($delta.to, '∅')|escape}</dd>
                     {/foreach}
                 </dl>
             {/if}
