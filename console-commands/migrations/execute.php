@@ -31,7 +31,7 @@ foreach (preg_split('/\s+/', $_COMMAND['ARGS']) as $arg) {
 }
 
 // load migration(s)
-if ($migrationKey == '--all') {
+if ($migrationKeys == '--all') {
     $migrations = MigrationsRequestHandler::getMigrations();
 } else {
     $migrations = [];
