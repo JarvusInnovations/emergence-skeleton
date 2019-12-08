@@ -13,6 +13,7 @@ if (empty($_COMMAND['ARGS'])) {
 
 $migrationKeys = [];
 $force = false;
+$retry = false;
 
 foreach (preg_split('/\s+/', $_COMMAND['ARGS']) as $arg) {
     if ($arg == '--all') {
@@ -22,6 +23,11 @@ foreach (preg_split('/\s+/', $_COMMAND['ARGS']) as $arg) {
 
     if ($arg == '--force') {
         $force = true;
+        continue;
+    }
+
+    if ($arg == '--retry') {
+        $retry = true;
         continue;
     }
 
@@ -51,13 +57,20 @@ if ($migrationKeys == '--all') {
 
 // run them all
 foreach ($migrations as $migration) {
-    if (!$force && $migration['status'] != MigrationsRequestHandler::STATUS_NEW) {
+    $retrying = $retry && $migration['status'] == MigrationsRequestHandler::STATUS_FAILED;
+
+    if (!$force && !$retrying && $migration['status'] != MigrationsRequestHandler::STATUS_NEW) {
         $logger->info('Skipping migration with status {status}: {key}', $migration);
         continue;
     }
 
-    $logger->info('Executing migration: {key}', $migration);
-    $migration = MigrationsRequestHandler::executeMigration($migration, $force);
+    if ($retrying) {
+        $logger->info('Retrying migration: {key}', $migration);
+    } else {
+        $logger->info('Executing migration: {key}', $migration);
+    }
+
+    $migration = MigrationsRequestHandler::executeMigration($migration, $force || $retrying);
 
     if ($output = trim($migration['output'])) {
         $output = explode(PHP_EOL, $output);
