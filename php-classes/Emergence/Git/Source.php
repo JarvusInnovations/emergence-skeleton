@@ -410,7 +410,7 @@ class Source
         list ($status, $commits) = explode(' ', $output[0]);
 
         if ($status != 'Updating') {
-            throw new \Exception('Unexpected merge status output: ' . $status);
+            throw new \Exception("Unexpected merge status output '{$status}' from line: {$output[0]}");
         }
 
         list ($from, $to) = explode('..', $commits);
