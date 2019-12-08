@@ -403,7 +403,7 @@ class Source
         $output = trim($this->getRepository()->run('merge', ['--ff-only', '--no-stat', '@{upstream}']));
         $output = explode(PHP_EOL, $output);
 
-        if ($output[0] == 'Already up-to-date.') {
+        if ($output[0] == 'Already up-to-date.' || $output[0] == 'Already up to date.') {
             return false;
         }
 
