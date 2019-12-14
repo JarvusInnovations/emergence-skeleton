@@ -2429,7 +2429,7 @@ class ActiveRecord
                     ,$rel['linkLocal']
                     ,$this->_getFieldValue($rel['local'])
                     ,$conditions ? join(' AND ', $conditions) : '1'
-                    ,empty($rel['order']) ? '' : ' ORDER BY ' . $rel['order']
+                    ,empty($rel['order']) ? '' : ' ORDER BY ' . join(',', static::_mapFieldOrder($rel['order']))
                 );
 
                 if ($rel['indexField']) {
