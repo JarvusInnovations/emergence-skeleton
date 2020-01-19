@@ -1085,7 +1085,7 @@ class ActiveRecord
         //die('psr');
         // save relationship objects
         foreach (static::getStackedConfig('relationships') AS $relationship => $options) {
-            if (!isset($this->_relatedObjects[$relationship])) {
+            if (!isset($this->_relatedObjects[$relationship]) || !empty($options['ignorePostSave'])) {
                 continue;
             }
 
@@ -1183,19 +1183,18 @@ class ActiveRecord
                     $relatedObjects[$related->ID] = $related;
                 }
 
-                if (isset($options['prune']) && $options['prune'] == 'delete') {
-                    $orphans = $relatedObjectClass::getAllByWhere([
-                        $options['linkLocal'] => $this->ID,
-                        'ID' => [
-                            'operator' => 'NOT IN',
-                            'values' => array_keys($relatedObjects)
-                        ]
-                    ]);
+                $orphans = $relatedObjectClass::getAllByWhere([
+                    $options['linkLocal'] => $this->ID,
+                    'ID' => [
+                        'operator' => 'NOT IN',
+                        'values' => array_keys($relatedObjects)
+                    ]
+                ]);
 
-                    foreach ($orphans as $orphan) {
-                        $orphan->destroy();
-                    }
+                foreach ($orphans as $orphan) {
+                    $orphan->destroy();
                 }
+
             }
         }
     }
