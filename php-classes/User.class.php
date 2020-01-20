@@ -86,6 +86,11 @@ class User extends Person implements Emergence\People\IUser
             ,'errorMessage' => 'Username can only contain letters, numbers, hyphens, and underscores.'
         ));
 
+        // disallow 'system' username
+        if ($this->isFieldDirty('Username') && strtolower($this->Username) === 'system') {
+            $this->_validator->addError('Username', "Username 'system' is forbidden");
+        }
+
         // check handle uniqueness
         if ($this->isDirty && !$this->_validator->hasErrors('Username') && $this->Username) {
             $ExistingUser = User::getByUsername($this->Username);
