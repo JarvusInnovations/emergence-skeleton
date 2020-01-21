@@ -1,6 +1,9 @@
 {
+  "name": "emergence-skeleton-devtools",
+  "version": "1.0.0",
+  "description": "Development tooling for emergence-skeleton",
   "devDependencies": {
-    "cypress": "^3.6.0",
+    "cypress": "^3.8.2",
     "cypress-plugin-tab": "^1.0.1"
   },
   "scripts": {
