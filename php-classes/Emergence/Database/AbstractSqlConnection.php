@@ -116,9 +116,11 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
 
         $statement->execute($params);
 
+        $rowCount = $statement->rowCount();
+
         $statement->closeCursor();
 
-        return true;
+        return $rowCount;
     }
 
     /**
