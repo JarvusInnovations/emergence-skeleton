@@ -18,6 +18,7 @@ return [
     'buildRows' => function (array $query = [], array $config = []) {
 
         $classNodes = Emergence_FS::findFiles('\.php$', true, 'php-classes');
+        ksort($classNodes);
 
         foreach ($classNodes as $classNode) {
             if ($classNode->Type != 'application/php') {
