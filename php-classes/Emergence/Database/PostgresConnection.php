@@ -38,34 +38,4 @@ class PostgresConnection extends AbstractSqlConnection
     {
         return $value === null ? 'NULL' : $this->pdo->quote($value);
     }
-
-    /*
-    * Method below is STILL expiremental/in development.
-    *
-    */
-
-    public function insertMultiple($table, array $rows = [])
-    {
-        $query = 'INSERT INTO ' . $this->quoteIdentifier($table);
-
-        if (!empty($rows)) {
-            $query .= ' (' . implode(',', array_map([$this, 'quoteIdentifier'], array_keys($rows[0]))) . ')';
-            $query .= ' VALUES ';
-
-            foreach (array_chunk($rows, 10000) as $chunkedRows) {
-                $totalRows = count($chunkedRows);
-                $statement = $query;
-                for ($i = 0; $i < $totalRows; $i++) {
-                    $statement .= '(' . implode(',', array_map([$this, 'quoteValue'], array_values($chunkedRows[$i]))) . ')';
-                    if ($i + 1 < $totalRows) {
-                        $statement .= ', ';
-                    }
-                }
-                $this->nonQuery($statement);
-            }
-        } else {
-            $query .= ' DEFAULT VALUES';
-            $this->nonQuery($query);
-        }
-    }
 }
