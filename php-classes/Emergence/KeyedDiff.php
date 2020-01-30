@@ -5,7 +5,7 @@ namespace Emergence;
 class KeyedDiff
 {
     private $newValues;
-    private $oldValue;
+    private $oldValues;
 
     public function __construct(array $newValues, array $oldValues = null)
     {
@@ -20,7 +20,7 @@ class KeyedDiff
 
     public function getOldValues()
     {
-        return $this->oldValue;
+        return $this->oldValues;
     }
 
     public function getValues()
