@@ -7,7 +7,7 @@ class KeyedDiff
     private $newValues;
     private $oldValues;
 
-    public function __construct(array $newValues, array $oldValues = null)
+    public function __construct(array $newValues = [], array $oldValues = [])
     {
         $this->newValues = $newValues;
         $this->oldValues = $oldValues;
@@ -23,11 +23,26 @@ class KeyedDiff
         return $this->oldValues;
     }
 
-    public function getValues()
+    public function addChange($key, $newValue, $oldValue = null)
     {
-        return [
-            'new' => $this->newValues,
-            'old' => $this->oldValues
-        ];
+        $this->newValues[$key] = $newValue;
+        $this->oldValues[$key] = $oldValue;
+    }
+
+    public function getDelta()
+    {
+        $delta = [];
+
+        foreach ($this->newValues as $key => $newValue) {
+            $oldValue = isset($this->oldValues[$key]) ? $this->oldValues[$key] : null;
+
+            if ($newValue === $oldValue) {
+                continue;
+            }
+
+            $delta[$key] = [ 'old' => $oldValue, 'new' => $newValue ];
+        }
+
+        return $delta;
     }
 }
