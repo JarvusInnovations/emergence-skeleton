@@ -159,7 +159,7 @@ class Job extends ActiveRecord implements IJob
 
         if ($Record->isPhantom || $Record->isNew) {
             $logEntry['action'] = 'create';
-        } elseif ($Record->isDirty && count($logEntry['changes']->getDelta())) {
+        } elseif ($Record->isDirty && $logEntry['changes']->hasChanges()) {
             $logEntry['action'] = 'update';
         } else {
             return;

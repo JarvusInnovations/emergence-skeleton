@@ -45,4 +45,9 @@ class KeyedDiff
 
         return $delta;
     }
+
+    public function hasChanges()
+    {
+        return count($this->getDelta()) > 0;
+    }
 }
