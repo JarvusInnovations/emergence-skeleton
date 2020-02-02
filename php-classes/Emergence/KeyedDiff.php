@@ -29,7 +29,7 @@ class KeyedDiff
         $this->oldValues[$key] = $oldValue;
     }
 
-    public function getDelta()
+    public function getDiff()
     {
         $delta = [];
 
@@ -48,6 +48,6 @@ class KeyedDiff
 
     public function hasChanges()
     {
-        return count($this->getDelta()) > 0;
+        return count($this->getDiff()) > 0;
     }
 }
