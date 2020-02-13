@@ -2,12 +2,11 @@
 
 namespace Emergence\Git;
 
-use Gitonomy\Git\Repository;
 use Sabre\HTTP\BasicAuth;
 use Site;
 use User;
 
-class HttpBackend extends \RequestHandler
+class HttpBackend
 {
     /**
      * Require and cache developer authentication in a git-friendly way.
@@ -43,29 +42,12 @@ class HttpBackend extends \RequestHandler
     }
 
     /**
-     * Default route synchronizes and serves up primary site repository.
-     */
-    public static function handleRequest()
-    {
-        static::requireAuthentication();
-
-        set_time_limit(0);
-
-        // get site repository and synchronize
-        $repo = new SiteRepository();
-        $repo->synchronize();
-
-        // continue with generic repository request
-        return static::handleRepositoryRequest($repo);
-    }
-
-    /**
      * Handle a git HTTP backend request for given repository.
      *
      * ## TODO
      * - fire events
      */
-    public static function handleRepositoryRequest(Repository $repo)
+    public static function handleRepositoryRequest(Repository $repo, array $path)
     {
         static::requireAuthentication();
 
@@ -84,9 +66,10 @@ class HttpBackend extends \RequestHandler
             null,
             [
                 'GIT_HTTP_EXPORT_ALL' => 1,
+                // 'GIT_HTTP_MAX_REQUEST_BUFFER' => '1000M',
 
                 'GIT_PROJECT_ROOT' => $repo->getGitDir(),
-                'PATH_INFO' => '/'.implode('/', static::getPath()),
+                'PATH_INFO' => '/'.implode('/', $path),
 
                 'CONTENT_TYPE' => $_SERVER['CONTENT_TYPE'],
                 'QUERY_STRING' => $_SERVER['QUERY_STRING'],
@@ -111,7 +94,7 @@ class HttpBackend extends \RequestHandler
         if ($error) {
             $exitCode = proc_close($process);
 
-            throw new \Exception("git exited with code $exitCode: $error");
+            throw new \Exception("git exited with code {$exitCode}: {$error}");
         }
 
         // read and set headers first
@@ -125,7 +108,12 @@ class HttpBackend extends \RequestHandler
         fclose($pipes[1]);
 
         // clean up
-        proc_close($process);
+        $exitCode = proc_close($process);
+
+        // if ($exitCode != 0) {
+        //     throw new \Exception("git exited with code {$exitCode}");
+        // }
+
         exit();
     }
 }

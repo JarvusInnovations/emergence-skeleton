@@ -7,7 +7,6 @@ use Emergence\SSH\KeyPair;
 use Emergence_FS;
 use Gitonomy\Git\Admin as GitAdmin;
 use Gitonomy\Git\Exception\ProcessException as GitProcessException;
-use Gitonomy\Git\Repository;
 use Site;
 use SiteFile;
 
