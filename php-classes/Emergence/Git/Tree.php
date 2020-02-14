@@ -11,6 +11,7 @@ class Tree implements HashableInterface
     const REMOTES_MODE_FETCH = 'fetch';
     const REMOTES_MODE_LINK = 'link';
     const TREE_REGEX = '/^(?<mode>[^ ]+) (?<type>[^ ]+) (?<hash>[^\t]+)\t(?<path>.*)/';
+    const EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
     protected $root = [];
     protected $remotesMode = self::REMOTES_MODE_FETCH;
@@ -193,9 +194,19 @@ class Tree implements HashableInterface
                 throw new \Exception('unhandlable content for '.$name);
             }
 
+            // skip empty trees
+            if ('tree' == $type && $hash == static::EMPTY_TREE_HASH) {
+                continue;
+            }
+
             $mode = 'blob' == $type ? '100644' : '040000';
 
             $treeContent .= "$mode $type $hash\t$name\n";
+        }
+
+        // short-circuit for empty trees
+        if (!$treeContent) {
+            return static::EMPTY_TREE_HASH;
         }
 
         // open git-mktree process
