@@ -43,7 +43,7 @@ class UserSession extends Session
 
         // require authentication ?
         if (static::$requireAuthentication && !$this->requireAuthentication()) {
-            throw new AuthenticationFailedException();
+            throw new RuntimeException('authentication required');
         }
 
         // export data to _SESSION superglobal
