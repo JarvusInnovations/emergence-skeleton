@@ -5,7 +5,6 @@ namespace Emergence\Connectors;
 use ActiveRecord;
 use SpreadsheetReader;
 use Psr\Log\LogLevel;
-use Emergence\KeyedDiff;
 
 class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnector
 {
@@ -192,15 +191,7 @@ class AbstractSpreadsheetConnector extends \Emergence\Connectors\AbstractConnect
             $results['created']++;
         } elseif ($logEntry['action'] == 'update') {
             $results['updated']++;
-
-            $changes = [];
-            if (is_a($logEntry['changes'], KeyedDiff::class)) {
-                $changes = array_keys($logEntry['changes']->getNewValues());
-            } elseif (is_array($logEntry['changes'])) { // legacy support
-                $changes = array_keys($logEntry['changes']);
-            }
-
-            foreach ($changes AS $changedField) {
+            foreach (array_keys($logEntry['changes']->getNewValues()) AS $changedField) {
                 $results['updated-fields'][$changedField]++;
             }
         }
