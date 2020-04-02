@@ -130,6 +130,10 @@ class Logger extends \Psr\Log\AbstractLogger
     {
         $replace = [];
         foreach ($context as $key => $value) {
+            if ($value instanceof KeyedDiff) {
+                continue;
+            }
+
             $replace['{' . $key . '}'] = static::toLogString($value);
         }
 
