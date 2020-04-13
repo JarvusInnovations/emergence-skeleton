@@ -1,3 +1,0 @@
-<?php
-
-LoginRequestHandler::handleRequest();
