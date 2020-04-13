@@ -32,10 +32,6 @@
 
     <header class="header site clearfix">
         <div class="inner">
-            {block "user-tools"}
-                {include includes/site.user-tools.tpl}
-            {/block}
-
             {block "branding"}
                 {include includes/site.branding.tpl}
             {/block}
