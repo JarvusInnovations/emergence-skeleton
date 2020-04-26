@@ -4,6 +4,7 @@ if (empty($_COMMAND['ARGS'])) {
     die('Usage: flags:disable <key>');
 }
 
-Cache::delete("flags/{$_COMMAND['ARGS']}");
+$key = $_COMMAND['ARGS'];
+Cache::delete("flags/{$key}");
 
 $_COMMAND['LOGGER']->info("Deleted flags/{key}", compact('key'));
