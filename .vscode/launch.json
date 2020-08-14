@@ -11,6 +11,7 @@
             "request": "launch",
             "port": 9000,
             "pathMappings": {
+                "/hab/svc/php-runtime/var/site/php-classes/Emergence/FS": "${workspaceRoot:layer-vfs}/php-classes/Emergence/FS",
                 "/hab/svc/php-runtime/var/site": "${workspaceRoot:emergence-skeleton-v1}"
             },
             "ignore": [
