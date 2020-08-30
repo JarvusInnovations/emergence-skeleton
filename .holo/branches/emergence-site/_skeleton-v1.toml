@@ -2,6 +2,7 @@
 files = [
     "*/**",
     "!.github/",
-    "!.vscode/"
+    "!.vscode/",
+    "!php-config/Git.config.d/"
 ]
 after = "*"
