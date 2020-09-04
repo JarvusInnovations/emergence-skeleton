@@ -357,7 +357,10 @@ class Media extends ActiveRecord
             Cache::delete($cacheKey);
         } else {
             // load source image
-            $srcImage = $this->getImage();
+            if (!$srcImage = $this->getImage()) {
+                throw new OutOfBoundsException("{$this->MIMEType} source not available as an image");
+            }
+
             $srcWidth = imagesx($srcImage);
             $srcHeight = imagesy($srcImage);
 
