@@ -637,7 +637,7 @@ class Media extends ActiveRecord
         $sourceInfo = @getimagesize($sourcePath);
 
         if (!$sourceInfo) {
-            throw new Exception("Unable to load blank image for context '$contextClass' from '$sourcePath'");
+            throw new OutOfBoundsException("Unable to load blank image for context '$contextClass'");
         }
 
         // get mime type
