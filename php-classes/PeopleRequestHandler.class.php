@@ -141,7 +141,7 @@ class PeopleRequestHandler extends RecordsRequestHandler
         }
 
         try {
-            return MediaRequestHandler::handleThumbnailRequest($Person->PrimaryPhoto ? $Person->PrimaryPhoto : Media::getBlank('person'));
+            return MediaRequestHandler::handleThumbnailRequest($Person->PrimaryPhoto ? $Person->PrimaryPhoto : Media::getBlank('Person'));
         } catch (OutOfBoundsException $e) {
             return static::throwNotFoundError($e->getMessage());
         }
