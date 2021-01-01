@@ -4,6 +4,7 @@ files = [
 
     # exclude CI and developer assets
     "!.github/",
+    "!.holo/lenses/mkdocs.toml",
     "!.vscode/",
     "!docs/",
     "!php-config/Git.config.d/",
