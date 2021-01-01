@@ -449,7 +449,7 @@
 <li>
 <p>Configure postfix email backend to relay to EHLO app on Docker host machine:</p>
 <div class="highlight"><pre><span></span><code><span class="nv">docker_host_ip</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>hab pkg <span class="nb">exec</span> core/busybox-static ip route<span class="p">|</span>awk <span class="s1">&#39;/default/ { print $3 }&#39;</span><span class="k">)</span><span class="s2">&quot;</span>
-enable-email-relay <span class="s2">&quot;</span><span class="si">${</span><span class="nv">docker_host_ip</span><span class="si">}</span><span class="s2">&quot;</span> <span class="m">2525</span> slate
+enable-email-relay <span class="s2">&quot;</span><span class="si">${</span><span class="nv">docker_host_ip</span><span class="si">}</span><span class="s2">&quot;</span> <span class="m">2525</span> studio
 </code></pre></div>
 </li>
 </ol>
