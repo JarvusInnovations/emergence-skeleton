@@ -1,8 +1,12 @@
 [holomapping]
 files = [
     "*/**",
+
+    # exclude CI and developer assets
     "!.github/",
     "!.vscode/",
-    "!php-config/Git.config.d/"
+    "!docs/",
+    "!php-config/Git.config.d/",
+    "!script/",
 ]
 after = "*"
