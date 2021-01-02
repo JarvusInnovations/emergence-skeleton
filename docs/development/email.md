@@ -19,8 +19,7 @@ In the studio, you can enable relaying email to a specified SMTP endpoint.
 4. Configure postfix email backend to relay to EHLO app on Docker host machine:
 
     ```bash
-    docker_host_ip="$(hab pkg exec core/busybox-static ip route|awk '/default/ { print $3 }')"
-    enable-email-relay "${docker_host_ip}" 2525 studio
+    enable-email-relay host.docker.internal 2525 studio
     ```
 
 ## Sending a test email
