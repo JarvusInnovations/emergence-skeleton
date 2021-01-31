@@ -13,6 +13,7 @@ theme:
 plugins:
   - search
   - awesome-pages
+  - macros
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.5.0/dist/mermaid.min.js
@@ -32,7 +33,7 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_div_format
+          format: '!!python/name:pymdownx.superfences.fence_div_format'
   - pymdownx.smartsymbols
   - meta
   - toc:

@@ -22,6 +22,12 @@ In the studio, you can enable relaying email to a specified SMTP endpoint.
     enable-email-relay host.docker.internal 2525 studio
     ```
 
+    Or, using mailtrap:
+
+    ```bash
+    enable-email-relay smtp.mailtrap.io 2525 mailtrapusername mailtrappassword
+    ```
+
 ## Sending a test email
 
 From the studio:
