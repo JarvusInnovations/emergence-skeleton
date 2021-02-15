@@ -9,21 +9,21 @@
       
       
       
-        <link rel="canonical" href="https://jarvusinnovations.github.io/emergence-skeleton/development/email/">
+        <link rel="canonical" href="https://jarvusinnovations.github.io/emergence-skeleton/development/testing/e2e/">
       
-      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.8">
     
     
       
-        <title>Working with Email - Skeleton Docs</title>
+        <title>End-to-end (E2E) testing - Skeleton Docs</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.cb6bc1d0.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.cb6bc1d0.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.39b8e14a.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.39b8e14a.min.css">
         
           
           
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#working-with-email" class="md-skip">
+        <a href="#end-to-end-e2e-testing" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header-nav__topic">
           <span class="md-ellipsis">
             
-              Working with Email
+              End-to-end (E2E) testing
             
           </span>
         </div>
@@ -167,7 +167,7 @@
 
 
   <li class="md-tabs__item">
-    <a href="../.." class="md-tabs__link">
+    <a href="../../.." class="md-tabs__link">
       Welcome
     </a>
   </li>
@@ -189,7 +189,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/site/" class="md-tabs__link md-tabs__link--active">
+      <a href="../../getting-started/site/" class="md-tabs__link md-tabs__link--active">
         Development
       </a>
     </li>
@@ -252,7 +252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         Welcome
       </a>
     </li>
@@ -313,7 +313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/site/" class="md-nav__link">
+      <a href="../../getting-started/site/" class="md-nav__link">
         Core website
       </a>
     </li>
@@ -329,12 +329,14 @@
             
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2" checked>
       
       <label class="md-nav__link" for="nav-2-2">
         Testing
@@ -351,24 +353,6 @@
             
   
   
-  
-    <li class="md-nav__item">
-      <a href="../testing/e2e/" class="md-nav__link">
-        End-to-end (E2E) testing
-      </a>
-    </li>
-  
-
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-          
-            
-  
-  
     
   
   
@@ -380,12 +364,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Working with Email
+          End-to-end (E2E) testing
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Working with Email
+        End-to-end (E2E) testing
       </a>
       
         
@@ -402,28 +386,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#catching-emails-in-development" class="md-nav__link">
-    Catching emails in development
-  </a>
-  
-    <nav class="md-nav" aria-label="Catching emails in development">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-helo" class="md-nav__link">
-    Using HELO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sending-a-test-email" class="md-nav__link">
-    Sending a test email
+  <a href="#running-tests" class="md-nav__link">
+    Running tests
   </a>
   
 </li>
@@ -436,12 +400,30 @@
   
 
           
+        </ul>
+      </nav>
+    </li>
+  
+
+          
             
   
   
   
     <li class="md-nav__item">
-      <a href="../migrations/" class="md-nav__link">
+      <a href="../../email/" class="md-nav__link">
+        Working with Email
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/" class="md-nav__link">
         Developing Migrations
       </a>
     </li>
@@ -479,28 +461,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#catching-emails-in-development" class="md-nav__link">
-    Catching emails in development
-  </a>
-  
-    <nav class="md-nav" aria-label="Catching emails in development">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-helo" class="md-nav__link">
-    Using HELO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sending-a-test-email" class="md-nav__link">
-    Sending a test email
+  <a href="#running-tests" class="md-nav__link">
+    Running tests
   </a>
   
 </li>
@@ -517,84 +479,21 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="/edit/develop/docs/development/email.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="/edit/develop/docs/development/testing/e2e.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="working-with-email">Working with Email<a class="headerlink" href="#working-with-email" title="Permanent link"> ¶</a></h1>
-<h2 id="catching-emails-in-development">Catching emails in development<a class="headerlink" href="#catching-emails-in-development" title="Permanent link"> ¶</a></h2>
-<p>In the studio, you can enable relaying email to a specified SMTP endpoint.</p>
-<p><a href="https://usehelo.com/">HELO</a> and <a href="https://mailtrap.io/">mailtrap</a> are easy SMTP endpoints to set up for development that provide UIs for reviewing emails sent to all recipients. When emails are configured to be relayed to these services, they will be trapped for review and never actually delivered to anyone externally, no matter what recipients you use. As opposed to overriding recipient emails to test email features, this approach enables you to verify that personalized bulk emails send the right content to the right recipients.</p>
-<h3 id="using-helo">Using HELO<a class="headerlink" href="#using-helo" title="Permanent link"> ¶</a></h3>
-<ol>
-<li>Download and open the HELO app</li>
-<li>Launch studio, run <code>start-all</code></li>
-<li>
-<p>Install and activate postfix email backend:</p>
-<div class="highlight"><pre><span></span><code>enable-email
-</code></pre></div>
-</li>
-<li>
-<p>Configure postfix email backend to relay to EHLO app on Docker host machine:</p>
-<div class="highlight"><pre><span></span><code>enable-email-relay host.docker.internal <span class="m">2525</span> studio
-</code></pre></div>
-<p>Or, using mailtrap:</p>
-<div class="highlight"><pre><span></span><code>enable-email-relay smtp.mailtrap.io <span class="m">2525</span> mailtrapusername mailtrappassword
-</code></pre></div>
-</li>
-</ol>
-<h2 id="sending-a-test-email">Sending a test email<a class="headerlink" href="#sending-a-test-email" title="Permanent link"> ¶</a></h2>
-<p>From the studio:</p>
-<ol>
-<li>
-<p>Install netcat:</p>
-<div class="highlight"><pre><span></span><code>hab pkg install --binlink core/netcat
-</code></pre></div>
-</li>
-<li>
-<p>Open SMTP connection:</p>
-<div class="highlight"><pre><span></span><code>nc localhost <span class="m">25</span>
-</code></pre></div>
-</li>
-<li>
-<p>Start SMTP session:</p>
-<div class="highlight"><pre><span></span><code><span class="go">EHLO localhost.localdomain</span>
-</code></pre></div>
-</li>
-<li>
-<p>Set sender:</p>
-<div class="highlight"><pre><span></span><code><span class="go">MAIL FROM: &lt;sender@example.com&gt;</span>
-</code></pre></div>
-</li>
-<li>
-<p>Set recipient:</p>
-<div class="highlight"><pre><span></span><code><span class="go">RCPT TO: &lt;recipient@example.com&gt;</span>
-</code></pre></div>
-</li>
-<li>
-<p>Set message:</p>
-<div class="highlight"><pre><span></span><code><span class="go">DATA</span>
-<span class="go">Subject: Hello world!</span>
+                <h1 id="end-to-end-e2e-testing">End-to-end (E2E) testing<a class="headerlink" href="#end-to-end-e2e-testing" title="Permanent link"> ¶</a></h1>
+<h2 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link"> ¶</a></h2>
+<p><a href="https://www.cypress.io/">Cypress</a> is used to provide browser-level full-stack testing. The <code>package.json</code> file at the root of the repository specifies the dependencies for running the test suite and all the configuration/tests for Cypress are container in the <code>cypress/</code> tree at the root of the repository.</p>
+<p>To get started, from a terminal <strong>outside the studio</strong> in the root of the repository:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># install development tooling locally</span>
+npm install
 
-<span class="go">This is the body of my email.</span>
-
-<span class="go">Have a good day.</span>
-
-<span class="go">.</span>
+<span class="c1"># launch cypress app</span>
+npm run cypress:open
 </code></pre></div>
-</li>
-<li>
-<p>Close SMTP session:</p>
-<div class="highlight"><pre><span></span><code><span class="go">QUIT</span>
-</code></pre></div>
-</li>
-<li>
-<p>Review postfix backend log:</p>
-<div class="highlight"><pre><span></span><code><span class="go">less -S /hab/cache/sys.log</span>
-</code></pre></div>
-</li>
-</ol>
                 
               
               
@@ -613,7 +512,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../testing/e2e/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../../getting-started/site/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -622,19 +521,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                End-to-end (E2E) testing
+                Core website
               </div>
             </div>
           </a>
         
         
-          <a href="../migrations/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../../email/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Developing Migrations
+                Working with Email
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
@@ -661,15 +560,15 @@
       
     </div>
     
-      <script src="../../assets/javascripts/vendor.18f0862e.min.js"></script>
-      <script src="../../assets/javascripts/bundle.994580cf.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      <script src="../../../assets/javascripts/vendor.18f0862e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.994580cf.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
       
       <script>
         app = initialize({
-          base: "../..",
+          base: "../../..",
           features: ['navigation.tabs'],
           search: Object.assign({
-            worker: "../../assets/javascripts/worker/search.9c0e82ba.min.js"
+            worker: "../../../assets/javascripts/worker/search.9c0e82ba.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
