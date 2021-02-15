@@ -42,3 +42,31 @@ markdown_extensions:
   - smarty
   - fontawesome_markdown
   - mdx_truly_sane_lists
+
+extra:
+  repository:
+    name: emergence-skeleton
+    url: git@github.com:JarvusInnovations/emergence-skeleton.git
+  studio:
+    web_port: 7080
+    static_port: ~
+    docs_port: 7088
+    mysql_port: 7036
+  fixtures:
+    users:
+      - username: system
+        password: system
+        level: Developer
+        about: 'Full system access'
+      - username: admin
+        password: admin
+        level: Administrator
+        about: 'Manage site and staff'
+      - username: staff
+        password: staff
+        level: Staff
+        about: 'Staff access'
+      - username: user
+        password: user
+        level: User
+        about: 'Regular user'
