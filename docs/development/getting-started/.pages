@@ -1,3 +1,4 @@
 nav:
-    - site.md
+    - local-studio.md
+    - virtual-multisite.md
     - ...
