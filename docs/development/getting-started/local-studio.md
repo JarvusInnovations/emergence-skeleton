@@ -1,8 +1,8 @@
-# Core website
+# Local Studio Container
 
 This guide will walk you through launching a Docker-container local development studio and using it to test changes made within a local Git repository.
 
-## Launch local development studio
+## Launch studio container
 
 1. Install Chef Habitat:
 
