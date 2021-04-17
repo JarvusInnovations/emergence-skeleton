@@ -1,11 +1,10 @@
 [hololens]
 package = "holo/lens-mkdocs"
 requirements = [
-    "mkdocs-material",
-    "mkdocs-awesome-pages-plugin",
     "fontawesome_markdown",
-    "mdx_truly_sane_lists",
-    "mkdocs-macros-plugin"
+    "mkdocs-awesome-pages-plugin",
+    "mkdocs-macros-plugin",
+    "mkdocs-material",
 ]
 
 [hololens.output]
