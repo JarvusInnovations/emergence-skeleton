@@ -1,6 +1,6 @@
 [holomapping]
 files = [
     ".holo/lenses/mkdocs.toml",
-    "docs/",
-    "mkdocs.yml"
+    "mkdocs.yml",
+    "mkdocs.*.yml"
 ]

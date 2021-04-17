@@ -2,6 +2,9 @@ site_name: Skeleton Docs
 site_url: https://jarvusinnovations.github.io/emergence-skeleton
 edit_uri: edit/develop/docs
 
+# docs_dir: .
+# site_dir: ../docs-site
+
 theme:
   name: material
   features:
@@ -14,6 +17,10 @@ plugins:
   - search
   - awesome-pages
   - macros
+  - exclude:
+      glob:
+        - mkdocs.yml
+        - mkdocs.*.yml
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.5.0/dist/mermaid.min.js

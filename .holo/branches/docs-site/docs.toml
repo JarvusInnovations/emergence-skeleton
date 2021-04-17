@@ -1,0 +1,4 @@
+[holomapping]
+holosource = "skeleton-v1=>emergence-skeleton"
+root = "docs"
+files = "**"
