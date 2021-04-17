@@ -1,12 +1,13 @@
 [holomapping]
 files = [
     "*/**",
+    # "mkdocs.yml",
+    # "mkdocs.*.yml",
 
     # exclude CI and developer assets
     "!.github/",
     "!.holo/lenses/mkdocs.toml",
     "!.vscode/",
-    "!docs/",
     "!php-config/Git.config.d/",
     "!script/",
 ]
