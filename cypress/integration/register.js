@@ -11,7 +11,8 @@ describe('Admin login test', () => {
         cy.contains('Register').click();
         cy.location('pathname').should('eq', '/register');
 
-        cy.focused()
+        cy.get('input[name=FirstName]')
+            .focus()
             .should('have.attr', 'name', 'FirstName')
             .type('Fname')
             .tab()
@@ -50,7 +51,18 @@ describe('Admin login test', () => {
 
         cy.get('.error');
 
-        cy.focused()
+        cy.get('input[name=Password]')
+            .should('have.value', 'password123');
+
+        cy.get('input[name=PasswordConfirm]')
+            .should('have.value', 'password1234')
+            .parent('.field')
+            .should('have.class', 'has-error')
+            .find('.error-text')
+            .contains('Please enter your password a second time for confirmation');
+
+        cy.get('input[name=FirstName]')
+            .focus()
             .should('have.attr', 'name', 'FirstName')
             .tab()
             .tab()
