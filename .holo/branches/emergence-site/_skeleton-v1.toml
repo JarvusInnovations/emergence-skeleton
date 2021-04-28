@@ -9,5 +9,10 @@ files = [
     "!docs/",
     "!php-config/Git.config.d/",
     "!script/",
+
+    # exclude submodules that support local Sencha app development
+    # -- they would overwrite the trees coming in the right way through projection
+    "!sencha-workspace/ext",
+    "!sencha-workspace/packages.remote/**",
 ]
 after = "*"
