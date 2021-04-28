@@ -48,7 +48,7 @@ extra:
     url: git@github.com:JarvusInnovations/emergence-skeleton.git
   studio:
     web_port: 7080
-    static_port: ~
+    static_port: 7081
     docs_port: 7088
     mysql_port: 7036
   fixtures:
