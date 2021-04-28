@@ -571,7 +571,10 @@
 </ul>
 <h2 id="running-live-changes">Running live changes<a class="headerlink" href="#running-live-changes" title="Permanent link"> ¶</a></h2>
 <p>The frontend Sencha application needs to be built at least once with the Sencha CMD build tool to scaffold/update a set of loader files. After that, you can just edit files the working tree and reload the browser. The two exceptions where you need to build again are changing the list of packages or changing the list of override files.</p>
-<p>There is a shortcut studio command for building the frontend application:</p>
+<p>Before the frontend application can be built to run from live changes, you&rsquo;ll need to ensure all submodules are initialized:</p>
+<div class="highlight"><pre><span></span><code>git submodule update --init
+</code></pre></div>
+<p>Then, use the shortcut studio command for building the frontend application:</p>
 <div class="highlight"><pre><span></span><code>build-content-editor
 </code></pre></div>
 <p>Once built, the live-editable version of the app can be accessed via the static web server that the studio runs on port <code>7081</code>. The backend host must be provided to the apps via the <code>?apiHost</code> query parameter. Any remote backend with CORS enabled will work, or you can use the local backend:</p>
