@@ -17,7 +17,13 @@
 
 The frontend Sencha application needs to be built at least once with the Sencha CMD build tool to scaffold/update a set of loader files. After that, you can just edit files the working tree and reload the browser. The two exceptions where you need to build again are changing the list of packages or changing the list of override files.
 
-There is a shortcut studio command for building the frontend application:
+Before the frontend application can be built to run from live changes, you'll need to ensure all submodules are initialized:
+
+```bash
+git submodule update --init
+```
+
+Then, use the shortcut studio command for building the frontend application:
 
 ```bash
 build-content-editor
