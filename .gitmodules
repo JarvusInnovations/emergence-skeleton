@@ -1,5 +1,20 @@
-[submodule ".holo/sources/dwoo"]
-	path = .holo/sources/dwoo
-	url = https://github.com/JarvusInnovations/dwoo.git
-	shallow = true
-	branch = 1.2
+[submodule "jarvus-hotfixes"]
+	path = sencha-workspace/packages.remote/jarvus-hotfixes
+	url = https://github.com/JarvusInnovations/sencha-hotfixes.git
+	branch = ext/6/2/0/981
+[submodule "emergence-apikit"]
+	path = sencha-workspace/packages.remote/emergence-apikit
+	url = https://github.com/JarvusInnovations/emergence-apikit.git
+	branch = master
+[submodule "jarvus-apikit"]
+	path = sencha-workspace/packages.remote/jarvus-apikit
+	url = https://github.com/JarvusInnovations/jarvus-apikit.git
+	branch = master
+[submodule "jarvus-fileupload"]
+	path = sencha-workspace/packages.remote/jarvus-fileupload
+	url = https://github.com/JarvusInnovations/jarvus-fileupload.git
+	branch = master
+[submodule "ext"]
+	path = sencha-workspace/ext
+	url = https://github.com/JarvusInnovations/extjs.git
+	branch = workspace/6.2

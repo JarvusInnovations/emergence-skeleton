@@ -30,7 +30,7 @@ This guide will walk you through launching a Docker-container local development 
 
 1. Launch studio:
 
-   Use the included [scripts-to-rules-them-all](https://github.com/github/scripts-to-rule-them-all) workflow script to configure and launch a studio session:
+    Use the included [scripts-to-rules-them-all](https://github.com/github/scripts-to-rule-them-all) workflow script to configure and launch a studio session:
 
     ```bash
     script/studio

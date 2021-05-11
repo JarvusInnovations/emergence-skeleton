@@ -19,11 +19,13 @@ STUDIO_NAME="${STUDIO_NAME:-skeleton-studio}"
 export HAB_DOCKER_OPTS="
     --name ${STUDIO_NAME}
     -p 7080:80
+    -p 7081:7081
     -p 7088:8000
     -p 7036:3306
     -v $(cd ~/.ssh; pwd)/known_hosts:/root/.ssh/known_hosts:ro
     --env STUDIO_DEVELOPER_UID=$(id -u)
     --env STUDIO_DEVELOPER_GID=$(id -g)
+    --env EMERGENCE_RUNTIME=emergence/php-runtime/0.9/20210303170850
 "
 echo "${HAB_DOCKER_OPTS}"
 
