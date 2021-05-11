@@ -19,6 +19,9 @@ Ext.define('Emergence.cms.view.EditorController', {
         'button[reference=statusBtn] menucheckitem, button[reference=visibilityBtn] menucheckitem': {
             checkchange: 'onEnumMenuCheckChange'
         },
+        'button[reference=summaryToggleBtn]': {
+            toggle: 'onSummaryToggle',
+        },
         'button[reference=publishedTimeBtn] menucheckitem': {
             checkchange: 'onPublishImmediatelyCheckChange'
         },
@@ -111,6 +114,10 @@ Ext.define('Emergence.cms.view.EditorController', {
         parentButton.setGlyph(menuItem.glyph);
     },
 
+    onSummaryToggle: function (toggleBtn, pressed) {
+        this.getView().setIncludeSummary(pressed);
+    },
+
     onPublishImmediatelyCheckChange: function(menuItem, checked) {
         var publishedTimeBtn = this.lookupReference('publishedTimeBtn');
 
@@ -154,6 +161,10 @@ Ext.define('Emergence.cms.view.EditorController', {
             composersColumn = editorView.items.getAt(0),
             //            openBtn = me.lookupReference('openBtn'),
             publishedTimeBtn = me.lookupReference('publishedTimeBtn'),
+            summary = contentRecord.get('Summary'),
+            summaryHasLength = summary ? summary.length > 0 : false,
+            summaryField = me.lookupReference('summaryField'),
+            summaryToggle = me.lookupReference('summaryToggleBtn'),
             tagsField = me.lookupReference('tagsField'),
             tagsStore = tagsField.getStore(),
             tagsData = Ext.Array.map(contentRecord.get('tags') || [], function(tag) {
@@ -174,8 +185,11 @@ Ext.define('Emergence.cms.view.EditorController', {
             }
 
             // sync status/visibility fields
-            me.lookupReference('statusBtn').down('[value="'+contentRecord.get('Status')+'"]').setChecked(true);
-            me.lookupReference('visibilityBtn').down('[value="'+contentRecord.get('Visibility')+'"]').setChecked(true);
+
+            // sync post summary
+            summaryField.setValue(summary);
+            summaryToggle.toggle(summaryHasLength);
+            me.getView().setIncludeSummary(summaryHasLength);
 
             // sync publish time fields
             publishedTimeBtn.down('menucheckitem').setChecked(isPhantom);
@@ -224,6 +238,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             editorView = me.getView(),
             composersColumn = editorView.items.getAt(0),
             contentRecord = editorView.getContentRecord(),
+            summaryField = me.lookupReference('summaryField'),
             itemsData = [],
             order = 1;
 
@@ -241,6 +256,9 @@ Ext.define('Emergence.cms.view.EditorController', {
         contentRecord.set('tags', Ext.Array.map(me.lookupReference('tagsField').getValueRecords(), function(tag) {
             return tag.get('ID') || tag.get('Title');
         }));
+
+        // update summary
+        contentRecord.set('Summary', summaryField.getValue());
 
         // update items list
         if (composersColumn) {

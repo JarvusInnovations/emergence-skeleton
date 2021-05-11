@@ -58,7 +58,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
                         group: 'visibility',
                         text: 'Login required',
                         value: 'Private',
-                        glyph: 0xf0c0+'@FontAwesome', // fa-group
+                        glyph: 0xf023+'@FontAwesome', // fa-lock
                         tooltip: 'Only users logged into the site can find or view this content'
                     },
                     {
@@ -71,6 +71,14 @@ Ext.define('Emergence.cms.view.Toolbar', {
                     }
                 ]
             }
+        },
+        {
+            reference: 'summaryToggleBtn',
+
+            xtype: 'button',
+            text: 'Summary',
+            glyph: 0xf10d + '@FontAwesome', // fa-quote-left
+            enableToggle: true,
         },
         '->',
         {
