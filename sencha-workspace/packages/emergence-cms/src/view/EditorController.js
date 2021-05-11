@@ -70,37 +70,54 @@ Ext.define('Emergence.cms.view.EditorController', {
         var me = this,
             editorView = me.getView(),
             contentRecord = editorView.getContentRecord(),
+            composersColumn = editorView.items.getAt(0),
+            composersIndex,
+            composersToRemove = [],
+            composersToRemoveIndex,
             wasPhantom = contentRecord.phantom;
 
         editorView.setLoading('Saving&hellip;');
-        me.syncToRecord();
 
-        contentRecord.save({
-            callback: function(record, operation, success) {
-                var contentItemsData = contentRecord.get('items');
-
-                if (success && wasPhantom) {
-                    editorView.setLoading('Opening new post&hellip;');
-                    location.href = contentRecord.getProxy().getConnection().buildUrl(contentRecord.toUrl() + '/edit');
-                } else {
-                    editorView.setLoading(false);
-
-                    // write server-returned content item data to each composer
-                    editorView.items.getAt(0).items.each(function(composer, composerIndex) {
-                        composer.setContentItem(contentItemsData[composerIndex]);
-                    });
-
-                    if (!success) {
-                        Ext.Msg.show({
-                            title: 'Failed to save blog post',
-                            message: operation.getError() || 'Please backup your work to another application and report this to your technical support contact',
-                            buttons: Ext.Msg.OK,
-                            icon: Ext.Msg.ERROR
-                        });
-                    }
+        if (composersColumn && composersColumn.items && composersColumn.items.length > 0) {
+            // remove empty markdown composers
+            // (other composer types are allowed to remain empty)
+            for (composersIndex = 0; composersIndex < composersColumn.items.length; composersIndex++) {
+                var composer = composersColumn.items.getAt(composersIndex);
+                if (composer.$className === 'Emergence.cms.view.composer.Markdown' && composer.isEmpty()) {
+                    composersToRemove.push(composer.id);
                 }
             }
-        });
+
+            for (composersToRemoveIndex = 0; composersToRemoveIndex < composersToRemove.length; composersToRemoveIndex++) {
+                composersColumn.remove(composersToRemove[composersToRemoveIndex]);
+            }
+        }
+
+        // if no composers, warn the user
+        if (!composersColumn || !composersColumn.items || composersColumn.items.length < 1) {
+            Ext.Msg.show({
+                title: 'Empty blog post',
+                message: 'Your post appears to be empty. Are you sure you want to save it?',
+                icon: Ext.Msg.QUESTION,
+                buttons: [
+                    Ext.Msg.YES,
+                    Ext.Msg.NO,
+                ],
+                buttonText: {
+                    yes: 'Save empty post',
+                    no: 'Don’t save',
+                },
+                fn: function (btn) {
+                    if (btn === 'yes') {
+                        me.savePost();
+                    } else {
+                        editorView.setLoading(false);
+                    }
+                }
+            });
+        } else {
+            me.savePost();
+        }
     },
 
     onEnumMenuCheckChange: function(menuItem, checked) {
@@ -171,7 +188,7 @@ Ext.define('Emergence.cms.view.EditorController', {
                 return parseInt(tag.ID, 10);
             });
 
-        Ext.batchLayouts(function() {
+        Ext.batchLayouts(function () {
             // sync title
             me.lookupReference('titleField').setValue(contentRecord.get('Title'));
 
@@ -179,12 +196,14 @@ Ext.define('Emergence.cms.view.EditorController', {
             if (tagsStore.isLoaded()) {
                 tagsField.setValue(tagsData);
             } else {
-                tagsStore.on('load', function() {
+                tagsStore.on('load', function () {
                     tagsField.setValue(tagsData);
                 }, me, { single: true });
             }
 
             // sync status/visibility fields
+            me.lookupReference('statusBtn').down('[value="' + contentRecord.get('Status') + '"]').setChecked(true);
+            me.lookupReference('visibilityBtn').down('[value="' + contentRecord.get('Visibility') + '"]').setChecked(true);
 
             // sync post summary
             summaryField.setValue(summary);
@@ -227,6 +246,11 @@ Ext.define('Emergence.cms.view.EditorController', {
                 editorView.addView(Ext.create('Emergence.cms.view.composer.Unknown', {
                     contentItem: contentItemData
                 }));
+            }
+
+            // add a default composer if no records
+            if (contentItemsLength === 0) {
+                editorView.addView(Ext.create('Emergence.cms.view.composer.Markdown'));
             }
 
             me.fireViewEvent('syncfromrecord', editorView, contentRecord);
@@ -273,5 +297,44 @@ Ext.define('Emergence.cms.view.EditorController', {
         contentRecord.set('items', itemsData);
 
         me.fireViewEvent('synctorecord', editorView, contentRecord);
-    }
+    },
+
+    savePost() {
+        var me = this,
+            editorView = me.getView(),
+            contentRecord = editorView.getContentRecord(),
+            composersColumn = editorView.items.getAt(0),
+            wasPhantom = contentRecord.phantom;
+
+        me.syncToRecord();
+
+        contentRecord.save({
+            callback: function (record, operation, success) {
+                var contentItemsData = contentRecord.get('items');
+
+                if (success && wasPhantom) {
+                    editorView.setLoading('Opening new post&hellip;');
+                    location.href = contentRecord.getProxy().getConnection().buildUrl(contentRecord.toUrl() + '/edit');
+                } else {
+                    editorView.setLoading(false);
+
+                    if (composersColumn && composersColumn.items) {
+                        // write server-returned content item data to each composer
+                        composersColumn.items.each(function (composer, composerIndex) {
+                            composer.setContentItem(contentItemsData[composerIndex]);
+                        });
+                    }
+
+                    if (!success) {
+                        Ext.Msg.show({
+                            title: 'Failed to save blog post',
+                            message: operation.getError() || 'Please backup your work to another application and report this to your technical support contact',
+                            buttons: Ext.Msg.OK,
+                            icon: Ext.Msg.ERROR
+                        });
+                    }
+                }
+            }
+        });
+    },
 });
