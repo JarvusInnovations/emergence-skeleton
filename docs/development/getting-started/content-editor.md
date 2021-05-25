@@ -5,7 +5,6 @@
 - `sencha-workspace/`
     - `packages/`
         - `emergence-cms/`: Primary location for content editor UI code
-        - `emergence-cms-summaries/`: Optional plugin that adds UI for attaching summaries to content
         - `emr-skeleton-theme/`: The Sencha theme used when rendering the content editor
     - `EmergenceContentEditor/`: A thin Sencha application used to make development easier and to provide a build target for generating the theme
 - `html-templates/`
