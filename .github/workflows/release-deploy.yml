@@ -15,10 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Grab PR Title
+    - name: Configure release
       run: |
-        set -e
-
         PR_TITLE=$(jq -r ".pull_request.title" $GITHUB_EVENT_PATH)
         PR_BODY=$(jq -r ".pull_request.body" $GITHUB_EVENT_PATH)
         RELEASE_TAG=$(echo "${PR_TITLE}" | grep -oP "(?<=^Release: )v\d+\.\d+\.\d+(-rc\.\d+)?$")
@@ -37,14 +35,11 @@ jobs:
         echo "${PR_BODY}" >> $GITHUB_ENV
         echo 'END_OF_PR_BODY' >> $GITHUB_ENV
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create release
+      uses: softprops/action-gh-release@v1
       with:
+        name: '${{ env.RELEASE_TAG }}'
         tag_name: '${{ env.RELEASE_TAG }}'
-        release_name: '${{ env.RELEASE_TAG }}'
         body: '${{ env.PR_BODY }}'
         draft: false
         prerelease: ${{ env.RELEASE_PRERELEASE }}
