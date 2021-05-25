@@ -5,13 +5,14 @@ describe('Admin login test', () => {
         cy.dropDatabase();
     });
 
-    it('Register and set up profile', () => {
+    it('Register user', () => {
         cy.visit('/');
 
         cy.contains('Register').click();
         cy.location('pathname').should('eq', '/register');
 
-        cy.focused()
+        cy.get('input[name=FirstName]')
+            .focus()
             .should('have.attr', 'name', 'FirstName')
             .type('Fname')
             .tab()
@@ -50,7 +51,18 @@ describe('Admin login test', () => {
 
         cy.get('.error');
 
-        cy.focused()
+        cy.get('input[name=Password]')
+            .should('have.value', 'password123');
+
+        cy.get('input[name=PasswordConfirm]')
+            .should('have.value', 'password1234')
+            .parent('.field')
+            .should('have.class', 'has-error')
+            .find('.error-text')
+            .contains('Please enter your password a second time for confirmation');
+
+        cy.get('input[name=FirstName]')
+            .focus()
             .should('have.attr', 'name', 'FirstName')
             .tab()
             .tab()
@@ -61,6 +73,13 @@ describe('Admin login test', () => {
         ;
 
         cy.contains('Fill out your profile').click();
+        cy.location('pathname').should('eq', '/profile');
+        cy.location('search').should('be.empty');
+    });
+
+    it('Upload profile photos', () => {
+        cy.loginAs('zerocool', 'password123');
+        cy.visit('/profile');
 
         // upload same photo twice
         cy.upload_file('photo.jpg', 'image/jpeg', 'input[type=file]');
@@ -88,8 +107,12 @@ describe('Admin login test', () => {
                     .should('have.prop', 'width', 100)
                     .should('have.prop', 'height', 75)
         ;
+    });
 
-        // edit profile
+    it('Fill out profile', () => {
+        cy.loginAs('zerocool', 'password123');
+        cy.visit('/profile');
+
         cy.get('input[name=Location]')
             .type('Philadelphia, PA')
             .tab()
@@ -126,15 +149,6 @@ describe('Admin login test', () => {
         cy.location('pathname').should('eq', '/profile');
         cy.location('search').should('eq', '?status=saved');
 
-        // verify profile display page
-        cy.visit('/profile/view');
-        cy.location('pathname').should('eq', '/people/zerocool');
-        cy.get('.header-title').should('contain', 'Fname Lname');
-        cy.get('a[href^="http://maps.google.com/"]').should('contain', 'Philadelphia, PA');
-        cy.get('#display-photo-link').should('have.attr', 'href', '/media/open/2');
-        cy.get('.photo-thumb').should('have.length', 2);
-        cy.get('#info .about').should('contain', 'Meow');
-
         // verify profile API data
         cy.request('/profile?format=json').its('body.data').then(data => {
             expect(data).to.have.property('ID', 1);
@@ -149,5 +163,19 @@ describe('Admin login test', () => {
             expect(data).to.have.property('Username', 'zerocool');
             expect(data).to.have.property('AccountLevel', 'User');
         });
+    });
+
+    it('View profile', () => {
+        cy.loginAs('zerocool', 'password123');
+        cy.visit('/profile');
+
+        // verify profile display page
+        cy.visit('/profile/view');
+        cy.location('pathname').should('eq', '/people/zerocool');
+        cy.get('.header-title').should('contain', 'Fname Lname');
+        cy.get('a[href^="http://maps.google.com/"]').should('contain', 'Philadelphia, PA');
+        cy.get('#display-photo-link').should('have.attr', 'href', '/media/open/2');
+        cy.get('.photo-thumb').should('have.length', 2);
+        cy.get('#info .about').should('contain', 'Meow');
     });
 });
