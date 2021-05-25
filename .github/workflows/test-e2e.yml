@@ -1,0 +1,76 @@
+name: 'Test: E2E'
+
+on: pull_request
+
+env:
+  HAB_LICENSE: accept-no-persist
+
+jobs:
+  test-e2e:
+
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    # TODO: wrap the next three steps an an emergence-studio action
+    - name: 'Stop default mysql service'
+      run: sudo service mysql stop
+
+    - name: 'Initialize Chef Habitat environment'
+      uses: JarvusInnovations/habitat-action@action/develop
+      env:
+        HAB_NGINX: |
+          [http.listen]
+          port = 7080
+        HAB_MYSQL: |
+          app_username = 'appadmin'
+          app_password = 'appadmin'
+          bind = '0.0.0.0'
+        HAB_PHP_RUNTIME: |
+          [sites.default.holo]
+          gitDir = '${{ github.workspace }}/.git'
+      with:
+        deps: |
+          jarvus/hologit
+        supervisor: |
+          core/mysql
+          emergence/php-runtime --bind="database:mysql.default"
+          emergence/nginx --bind="backend:php-runtime.default"
+
+    - name: Load site projection into emergence runtime
+      env:
+        HOLO_CACHE_FROM: origin
+        HOLO_CACHE_TO: origin
+      run: |
+        until sudo test -f /hab/svc/php-runtime/config/fpm-exec; do sleep .1; done
+        SITE_TREE="$(hab pkg exec jarvus/hologit git-holo project emergence-site)"
+        [ -n "${SITE_TREE}" ] || exit 1
+        sudo --preserve-env hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
+        # sudo chown runner:docker -R /hab/cache/artifacts
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v2
+      with:
+        env: STUDIO_CONTAINER=,STUDIO_SSH=
+
+    - name: Upload supervisor log
+      uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: supervisor-log
+        path: /hab/sup/default/sup.log
+
+    - name: Upload Cypress screenshots
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots
+
+    - name: Upload Cypress videos
+      uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: cypress-videos
+        path: cypress/videos
