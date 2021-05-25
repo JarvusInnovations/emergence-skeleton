@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Development tooling for emergence-skeleton",
   "devDependencies": {
-    "cypress": "^7.1.0",
+    "cypress": "^7.4.0",
     "cypress-plugin-tab": "^1.0.5"
   },
   "scripts": {
