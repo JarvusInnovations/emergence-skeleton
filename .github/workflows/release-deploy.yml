@@ -5,9 +5,6 @@ on:
     branches: ['releases/v*']
     types: [closed]
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   release-deploy:
 
@@ -36,10 +33,11 @@ jobs:
         echo 'END_OF_PR_BODY' >> $GITHUB_ENV
 
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: ncipollo/release-action@v1
       with:
-        name: '${{ env.RELEASE_TAG }}'
-        tag_name: '${{ env.RELEASE_TAG }}'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit: '${{ github.sha }}'
+        tag: '${{ env.RELEASE_TAG }}'
         body: '${{ env.PR_BODY }}'
         draft: false
         prerelease: ${{ env.RELEASE_PRERELEASE }}
