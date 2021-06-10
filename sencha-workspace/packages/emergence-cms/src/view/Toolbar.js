@@ -82,8 +82,7 @@ Ext.define('Emergence.cms.view.Toolbar', {
         },
         '->',
         {
-            reference: 'publishedTimeBtn',
-
+            itemId: 'publishTimeBtn',
             xtype: 'button',
             text: 'Publication time',
             glyph: 0xf017+'@FontAwesome', // fa-clock-o
@@ -93,11 +92,13 @@ Ext.define('Emergence.cms.view.Toolbar', {
                 items: [
                     '<div class="menu-title">Publication time</div>',
                     {
+                        itemId: 'publishOnSaveCheck',
                         xtype: 'menucheckitem',
                         text: 'Publish on save'
                     },
                     '-',
                     {
+                        itemId: 'publishTimeCt',
                         xtype: 'fieldcontainer',
                         layout: 'anchor',
                         defaults: { anchor: '100%' },

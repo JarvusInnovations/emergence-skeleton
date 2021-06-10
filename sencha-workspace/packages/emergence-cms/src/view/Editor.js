@@ -159,9 +159,9 @@ Ext.define('Emergence.cms.view.Editor', {
     }],
 
     getSelectedDateTime: function() {
-        var publishedTimeBtn = this.lookupReference('publishedTimeBtn'),
-            date = publishedTimeBtn.down('datefield').getValue() || new Date(),
-            time = publishedTimeBtn.down('timefield').getValue() || new Date();
+        var publishedTimeCt = this.down('#publishTimeCt'),
+            date = publishedTimeCt.down('datefield').getValue() || new Date(),
+            time = publishedTimeCt.down('timefield').getValue() || new Date();
 
         date.setHours(time.getHours());
         date.setMinutes(time.getMinutes());

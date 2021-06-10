@@ -22,10 +22,10 @@ Ext.define('Emergence.cms.view.EditorController', {
         'button[reference=summaryToggleBtn]': {
             toggle: 'onSummaryToggle',
         },
-        'button[reference=publishedTimeBtn] menucheckitem': {
+        'menucheckitem#publishOnSaveCheck': {
             checkchange: 'onPublishImmediatelyCheckChange'
         },
-        'button[reference=publishedTimeBtn] field': {
+        '#publishTimeCt field': {
             change: 'onPublishTimeFieldChange'
         }
     },
@@ -136,10 +136,10 @@ Ext.define('Emergence.cms.view.EditorController', {
     },
 
     onPublishImmediatelyCheckChange: function(menuItem, checked) {
-        var publishedTimeBtn = this.lookupReference('publishedTimeBtn');
+        var publishedTimeCt = this.getView().down('#publishTimeCt');
 
-        publishedTimeBtn.down('datefield').setDisabled(checked);
-        publishedTimeBtn.down('timefield').setDisabled(checked);
+        publishedTimeCt.down('datefield').setDisabled(checked);
+        publishedTimeCt.down('timefield').setDisabled(checked);
 
         this.syncPublishedTimeBtnText();
     },
@@ -151,8 +151,8 @@ Ext.define('Emergence.cms.view.EditorController', {
 
     // protected methods
     syncPublishedTimeBtnText: function() {
-        var publishedTimeBtn = this.lookupReference('publishedTimeBtn'),
-            immediateChecked = publishedTimeBtn.down('menucheckitem').checked,
+        var editorView = this.getView(),
+            immediateChecked = editorView.down('#publishOnSaveCheck').checked,
             date, text;
 
         if (immediateChecked) {
@@ -162,7 +162,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             text = /* (date > new Date() ? 'Publish ' : 'Published ') + */ Ext.Date.format(date, 'n/j/Y g:i a');
         }
 
-        publishedTimeBtn.setText(text);
+        editorView.down('#publishTimeBtn').setText(text);
     },
 
     syncFromRecord: function() {
@@ -177,7 +177,7 @@ Ext.define('Emergence.cms.view.EditorController', {
             composersLength = composers.length, composersIndex, composer, composerItemClass,
             composersColumn = editorView.items.getAt(0),
             //            openBtn = me.lookupReference('openBtn'),
-            publishedTimeBtn = me.lookupReference('publishedTimeBtn'),
+            publishedTimeCt = editorView.down('#publishTimeCt'),
             summary = contentRecord.get('Summary'),
             summaryHasLength = summary ? summary.length > 0 : false,
             summaryField = me.lookupReference('summaryField'),
@@ -211,9 +211,9 @@ Ext.define('Emergence.cms.view.EditorController', {
             me.getView().setIncludeSummary(summaryHasLength);
 
             // sync publish time fields
-            publishedTimeBtn.down('menucheckitem').setChecked(isPhantom);
-            publishedTimeBtn.down('datefield').setValue(isPhantom ? new Date() : publishedTime);
-            publishedTimeBtn.down('timefield').setValue(isPhantom ? new Date() : publishedTime);
+            publishedTimeCt.down('timefield').setValue(isPhantom ? new Date() : publishedTime);
+            publishedTimeCt.down('datefield').setValue(isPhantom ? new Date() : publishedTime);
+            editorView.down('#publishOnSaveCheck').setChecked(isPhantom);
 
             // remove any existing composers from the column if its been initialized already
             if (composersColumn) {
@@ -274,7 +274,7 @@ Ext.define('Emergence.cms.view.EditorController', {
         contentRecord.set('Visibility', me.lookupReference('visibilityBtn').down('[checked]').value);
 
         // update published-on timestamp
-        contentRecord.set('Published', me.lookupReference('publishedTimeBtn').down('menucheckitem').checked ? new Date() : editorView.getSelectedDateTime());
+        contentRecord.set('Published', editorView.down('menucheckitem#publishOnSaveCheck').checked ? new Date() : editorView.getSelectedDateTime());
 
         // update tags list
         contentRecord.set('tags', Ext.Array.map(me.lookupReference('tagsField').getValueRecords(), function(tag) {
