@@ -94,7 +94,7 @@ Ext.define('Emergence.cms.view.DualViewController', {
             previewCmp = this.lookupReference('preview'),
             date = editorView.down('menucheckitem#publishOnSaveCheck').checked ? new Date() : editorView.getSelectedDateTime();
 
-        previewCmp.timeEl.set({ datetime: Ext.Date.format(date, 'c') }).update(Ext.Date.format(date, 'l, F n, Y \\a\\t g:i a'));
+        previewCmp.timeEl.set({ datetime: Ext.Date.format(date, 'c') }).update(Ext.Date.format(date, 'l, F j, Y \\a\\t g:i a'));
         previewCmp.timeWrapper.show();
         previewCmp.infoWrapper.show();
     }, 50),
