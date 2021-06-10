@@ -1,4 +1,4 @@
-describe('Admin login test', () => {
+describe('Registration and profile', () => {
 
     // reset database before tests
     before(() => {
@@ -15,37 +15,31 @@ describe('Admin login test', () => {
             .focus()
             .should('have.attr', 'name', 'FirstName')
             .type('Fname')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'LastName')
             .type('Lname')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'Email')
             .type('email@example.org')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'Username')
             .type('zerocool')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'Password')
             .type('password123')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'PasswordConfirm')
-            .type('password1234{enter}')
-        ;
+            .type('password1234{enter}');
 
         cy.location('pathname').should('eq', '/register');
 
@@ -69,8 +63,7 @@ describe('Admin login test', () => {
             .tab()
             .tab()
             .tab()
-            .type('password123{enter}')
-        ;
+            .type('password123{enter}');
 
         cy.contains('Fill out your profile').click();
         cy.location('pathname').should('eq', '/profile');
@@ -91,22 +84,20 @@ describe('Admin login test', () => {
             .should('have.class', 'highlight')
             .should('not.contain', 'Make Default')
             .next('.photo')
-                .should('not.have.class', 'highlight')
-                .contains('Make Default')
-                .click()
-        ;
+            .should('not.have.class', 'highlight')
+            .contains('Make Default')
+            .click();
 
         cy.get('.photosGallery .photo:first-child')
             .should('not.have.class', 'highlight')
             .should('contain', 'Make Default')
             .next('.photo')
-                .should('have.class', 'highlight')
-                .should('not.contain', 'Make Default')
-                .find('img')
-                    .should('have.attr', 'src', '/thumbnail/2/100x100')
-                    .should('have.prop', 'width', 100)
-                    .should('have.prop', 'height', 75)
-        ;
+            .should('have.class', 'highlight')
+            .should('not.contain', 'Make Default')
+            .find('img')
+            .should('have.attr', 'src', '/thumbnail/2/100x100')
+            .should('have.prop', 'width', 100)
+            .should('have.prop', 'height', 75);
     });
 
     it('Fill out profile', () => {
@@ -115,36 +106,30 @@ describe('Admin login test', () => {
 
         cy.get('input[name=Location]')
             .type('Philadelphia, PA')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'About')
             .type('Meow')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('contain', 'Markdown codes')
             .should('have.attr', 'target', '_blank')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('contain', 'Save profile')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'Email')
             .type('email@example.com')
-            .tab()
-        ;
+            .tab();
 
         cy.focused()
             .should('have.attr', 'name', 'Phone')
-            .type('(123) 456-7890{enter}')
-        ;
+            .type('(123) 456-7890{enter}');
 
         cy.location('pathname').should('eq', '/profile');
         cy.location('search').should('eq', '?status=saved');
