@@ -67,7 +67,7 @@ Cypress.Commands.add('dropDatabase', () => {
 
 // Reload the original data fixtures
 Cypress.Commands.add('loadDatabase', () => {
-    cy.exec(`cat cypress/fixtures/database/*.sql | ${_buildHabExec('core/mysql', 'mysql')} -u root -h 127.0.0.1 default`);
+    cy.exec(`${_buildHabExec('core/hab-backline', 'bash')} -c 'source "$(hab pkg path emergence/studio)/studio.sh"; DB_SERVICE=core/mysql DB_DATABASE=default load-fixtures'`);
 });
 
 // Ext command getter
