@@ -56,5 +56,20 @@ describe('Blogging', () => {
 
         cy.location('pathname').should('eq', '/blog/hello_world/edit');
         cy.location('search').should('be.empty');
+
+        cy.get('.x-component.emergence-cms-preview').within(() => {
+
+            cy.get('time[data-ref="timeEl"]')
+                .should('contain', 'Wednesday, January 2, 2030 at 4:05 pm');
+
+            cy.get('[data-ref=tagsCt] a')
+                .should('have.length', 2)
+                .first()
+                .should('have.attr', 'href', '/tags/tag1')
+                .should('have.text', 'tag1')
+                .next()
+                .should('have.attr', 'href', '/tags/tag2')
+                .should('have.text', 'tag2');
+        });
     });
 });
