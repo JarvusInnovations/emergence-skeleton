@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# script/test: Run all tests
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+repo_path="$(pwd)"
+temp_path="${repo_path}.cypress-workspace"
+
+
+echo
+echo "==> test: setting up temporary workspace diretory…"
+if [ -d "${temp_path}" ]; then
+    echo "removing existing content..."
+    sudo umount "${temp_path}/merged/node_modules" || true
+    sudo umount "${temp_path}/merged" || true
+    rm -rf "${temp_path}"
+fi
+
+mkdir -pv "${temp_path}/base"
+mkdir -pv "${temp_path}/merged"
+mkdir -pv "${temp_path}/workdir"
+
+
+echo
+echo "==> test: projecting Cypress workspace…"
+workspace_tree="$(git holo project cypress-workspace)"
+
+if [ -z "${workspace_tree}" ]; then
+    echo
+    echo "==> test: failed to project Cypress workspace"
+    exit 1
+fi
+
+
+echo
+echo "==> test: writing Cypress workspace…"
+git archive "${workspace_tree}" --format=tar | (cd "${temp_path}/base" && tar -xf -)
+
+
+echo
+echo "==> test: setting up overlay mount…"
+
+sudo mount \
+    -t overlay \
+    -o lowerdir="${temp_path}/base",upperdir="${repo_path}",workdir="${temp_path}/workdir" \
+    overlay \
+    "${temp_path}/merged"
+
+
+echo
+echo "==> test: setting up tmpfs node_modules mount…"
+mkdir -p "${temp_path}/merged/node_modules"
+sudo mount \
+    -t tmpfs \
+    tmpfs \
+    "${temp_path}/merged/node_modules"
+
+
+echo
+echo "==> test: installing node_modules…"
+(cd "${temp_path}/merged" && npm install)
+
+
+echo
+echo "==> test: executing \`cypress open\`…"
+(cd "${temp_path}/merged" && npx cypress open)
