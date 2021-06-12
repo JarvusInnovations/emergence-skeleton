@@ -18,7 +18,7 @@ jobs:
       run: sudo service mysql stop
 
     - name: 'Initialize Chef Habitat environment'
-      uses: JarvusInnovations/habitat-action@action/develop
+      uses: JarvusInnovations/habitat-action@action/v1
       env:
         HAB_NGINX: |
           [http.listen]
@@ -49,10 +49,18 @@ jobs:
         sudo --preserve-env hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
         # sudo chown runner:docker -R /hab/cache/artifacts
 
+    - name: Set up Cypress workspace
+      run: |
+        CYPRESS_TREE="$(hab pkg exec jarvus/hologit git-holo project cypress-workspace)"
+        [ -n "${CYPRESS_TREE}" ] || exit 1
+        mkdir "${GITHUB_WORKSPACE}.cypress-workspace"
+        git archive --format=tar "${CYPRESS_TREE}" | (cd "${GITHUB_WORKSPACE}.cypress-workspace" && tar xf -)
+
     - name: Run Cypress tests
       uses: cypress-io/github-action@v2
       with:
         env: STUDIO_CONTAINER=,STUDIO_SSH=
+        working-directory: ${{ github.workspace }}.cypress-workspace
 
     - name: Upload supervisor log
       uses: actions/upload-artifact@v1
@@ -66,11 +74,11 @@ jobs:
       if: failure()
       with:
         name: cypress-screenshots
-        path: cypress/screenshots
+        path: ${{ github.workspace }}.cypress-workspace/cypress/screenshots
 
     - name: Upload Cypress videos
       uses: actions/upload-artifact@v1
       if: always()
       with:
         name: cypress-videos
-        path: cypress/videos
+        path: ${{ github.workspace }}.cypress-workspace/cypress/videos
