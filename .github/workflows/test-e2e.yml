@@ -4,6 +4,8 @@ on: pull_request
 
 env:
   HAB_LICENSE: accept-no-persist
+  HOLO_CACHE_TO: origin
+  HOLO_CACHE_FROM: origin
 
 jobs:
   test-e2e:
