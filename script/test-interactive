@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script/test: Run all tests
+# script/test-interactive: Run all tests interactively with Cypress GUI
 
 set -e
 cd "$(dirname "$0")/.."
@@ -14,14 +14,12 @@ echo
 echo "==> test: setting up temporary workspace diretory…"
 if [ -d "${temp_path}" ]; then
     echo "removing existing content..."
-    sudo umount "${temp_path}/merged/node_modules" || true
     sudo umount "${temp_path}/merged" || true
     rm -rf "${temp_path}"
 fi
 
 mkdir -pv "${temp_path}/base"
 mkdir -pv "${temp_path}/merged"
-mkdir -pv "${temp_path}/workdir"
 
 
 echo
@@ -43,20 +41,10 @@ git archive "${workspace_tree}" --format=tar | (cd "${temp_path}/base" && tar -x
 echo
 echo "==> test: setting up overlay mount…"
 
-sudo mount \
-    -t overlay \
-    -o lowerdir="${temp_path}/base",upperdir="${repo_path}",workdir="${temp_path}/workdir" \
-    overlay \
+unionfs -o cow \
+    -o allow_other,use_ino,suid,dev \
+    "${repo_path}"=RW:"${temp_path}/base"=RO \
     "${temp_path}/merged"
-
-
-echo
-echo "==> test: setting up tmpfs node_modules mount…"
-mkdir -p "${temp_path}/merged/node_modules"
-sudo mount \
-    -t tmpfs \
-    tmpfs \
-    "${temp_path}/merged/node_modules"
 
 
 echo
