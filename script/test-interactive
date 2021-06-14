@@ -11,7 +11,7 @@ temp_path="${repo_path}.cypress-workspace"
 
 
 echo
-echo "==> test: setting up cleanup trap…"
+echo "==> test-interactive: setting up cleanup trap…"
 function _cleanup {
     echo
     echo "cleaning up workspace..."
@@ -24,7 +24,7 @@ trap _cleanup EXIT
 
 
 echo
-echo "==> test: setting up temporary workspace diretory…"
+echo "==> test-interactive: setting up temporary workspace diretory…"
 if [ -d "${temp_path}" ]; then
     _cleanup
 fi
@@ -34,23 +34,23 @@ mkdir -pv "${temp_path}/merged"
 
 
 echo
-echo "==> test: projecting Cypress workspace…"
+echo "==> test-interactive: projecting Cypress workspace…"
 workspace_tree="$(git holo project cypress-workspace)"
 
 if [ -z "${workspace_tree}" ]; then
     echo
-    echo "==> test: failed to project Cypress workspace"
+    echo "==> test-interactive: failed to project Cypress workspace"
     exit 1
 fi
 
 
 echo
-echo "==> test: writing Cypress workspace…"
+echo "==> test-interactive: writing Cypress workspace…"
 git archive "${workspace_tree}" --format=tar | (cd "${temp_path}/base" && tar -xf -)
 
 
 echo
-echo "==> test: setting up overlay mount…"
+echo "==> test-interactive: setting up overlay mount…"
 
 unionfs -o cow \
     -o allow_other,use_ino,suid,dev \
@@ -59,10 +59,10 @@ unionfs -o cow \
 
 
 echo
-echo "==> test: installing node_modules…"
+echo "==> test-interactive: installing node_modules…"
 (cd "${temp_path}/merged" && npm install)
 
 
 echo
-echo "==> test: executing \`cypress open\`…"
+echo "==> test-interactive: executing \`cypress open\`…"
 (cd "${temp_path}/merged" && npx cypress open)
