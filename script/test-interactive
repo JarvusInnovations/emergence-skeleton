@@ -11,6 +11,19 @@ temp_path="${repo_path}.cypress-workspace"
 
 
 echo
+echo "==> test-interactive: verifying unionfs…"
+
+if ! [ -x "$(command -v unionfs)" ]; then
+    echo "Please clone, build, and install the unionfs command:"
+    echo "git clone https://github.com/rpodgorny/unionfs-fuse"
+    echo "cd unionfs-fuse"
+    echo "make"
+    echo "sudo make install"
+    exit 1
+fi
+
+
+echo
 echo "==> test-interactive: setting up cleanup trap…"
 function _cleanup {
     echo
