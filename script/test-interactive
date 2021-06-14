@@ -11,13 +11,22 @@ temp_path="${repo_path}.cypress-workspace"
 
 
 echo
-echo "==> test: setting up temporary workspace diretory…"
-if [ -d "${temp_path}" ]; then
-    echo "removing existing content..."
+echo "==> test: setting up cleanup trap…"
+function _cleanup {
+    echo
+    echo "cleaning up workspace..."
     if [ -d "${temp_path}/merged" ] && mount | grep -q "${temp_path}/merged"; then
         sudo umount -f "${temp_path}/merged"
     fi
     rm -rf "${temp_path}"
+}
+trap _cleanup EXIT
+
+
+echo
+echo "==> test: setting up temporary workspace diretory…"
+if [ -d "${temp_path}" ]; then
+    _cleanup
 fi
 
 mkdir -pv "${temp_path}/base"
