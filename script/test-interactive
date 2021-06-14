@@ -14,7 +14,9 @@ echo
 echo "==> test: setting up temporary workspace diretory…"
 if [ -d "${temp_path}" ]; then
     echo "removing existing content..."
-    sudo umount "${temp_path}/merged" || true
+    if [ -d "${temp_path}/merged" ] && mount | grep -q "${temp_path}/merged"; then
+        sudo umount -f "${temp_path}/merged"
+    fi
     rm -rf "${temp_path}"
 fi
 
