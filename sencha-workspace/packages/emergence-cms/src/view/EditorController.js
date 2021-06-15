@@ -211,8 +211,8 @@ Ext.define('Emergence.cms.view.EditorController', {
             me.getView().setIncludeSummary(summaryHasLength);
 
             // sync publish time fields
-            publishedTimeCt.down('timefield').setValue(isPhantom ? new Date() : publishedTime);
-            publishedTimeCt.down('datefield').setValue(isPhantom ? new Date() : publishedTime);
+            publishedTimeCt.down('timefield').setValue(isPhantom ? new Date() : Ext.Date.clone(publishedTime));
+            publishedTimeCt.down('datefield').setValue(isPhantom ? new Date() : Ext.Date.clone(publishedTime));
             editorView.down('#publishOnSaveCheck').setChecked(isPhantom);
 
             // remove any existing composers from the column if its been initialized already
@@ -261,10 +261,12 @@ Ext.define('Emergence.cms.view.EditorController', {
         var me = this,
             editorView = me.getView(),
             composersColumn = editorView.items.getAt(0),
-            contentRecord = editorView.getContentRecord(),
             summaryField = me.lookupReference('summaryField'),
             itemsData = [],
-            order = 1;
+            order = 1, contentRecord;
+
+
+        contentRecord = editorView.getContentRecord();
 
         // update title
         contentRecord.set('Title', me.lookupReference('titleField').getValue());
