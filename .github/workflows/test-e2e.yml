@@ -62,6 +62,9 @@ jobs:
 
     - name: Run Cypress tests
       uses: cypress-io/github-action@v2
+      env:
+        GIT_DIR: ${{ github.workspace }}/.git
+        GIT_WORK_TREE: ${{ github.workspace }}
       with:
         env: STUDIO_CONTAINER=,STUDIO_SSH=
         working-directory: ${{ github.workspace }}.cypress-workspace
