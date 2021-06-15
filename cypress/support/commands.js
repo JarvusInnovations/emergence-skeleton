@@ -67,7 +67,22 @@ Cypress.Commands.add('dropDatabase', () => {
 
 // Reload the original data fixtures
 Cypress.Commands.add('loadDatabase', () => {
-    cy.exec(`${_buildHabExec('core/hab-backline', 'bash')} -c 'source "$(hab pkg path emergence/studio)/studio.sh"; DB_SERVICE=core/mysql DB_DATABASE=default load-fixtures'`);
+    cy.exec(`${_buildHabExec('jarvus/hologit', 'git')} holo project fixtures --working`)
+        .then(({ stdout: treeHash }) => {
+            if (!treeHash) {
+                throw new Error('unable to compute tree hash for fixtures data');
+            }
+
+            cy.exec(`${_buildHabExec('emergence/php-runtime', 'bash')} -c '
+                (
+                    for fixture_file in $(git ls-tree -r --name-only ${treeHash}); do
+                        git cat-file -p "${treeHash}:\${fixture_file}"
+                    done
+                ) | mysql
+            '`);
+
+            cy.exec(`${_buildHabExec('emergence/php-runtime', 'emergence-console-run')} migrations:execute --all`);
+        });
 });
 
 // Ext command getter
