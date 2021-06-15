@@ -66,7 +66,6 @@ echo
 echo "==> test-interactive: setting up overlay mount…"
 
 unionfs -o cow \
-    -o allow_other,use_ino,suid,dev \
     "${repo_path}"=RW:"${temp_path}/base"=RO \
     "${temp_path}/merged"
 
