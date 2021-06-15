@@ -78,7 +78,7 @@ Cypress.Commands.add('loadDatabase', () => {
                     for fixture_file in $(git ls-tree -r --name-only ${treeHash}); do
                         git cat-file -p "${treeHash}:\${fixture_file}"
                     done
-                ) | mysql
+                ) | mysql default
             '`);
 
             cy.exec(`${_buildHabExec('emergence/php-runtime', 'emergence-console-run')} migrations:execute --all`);
