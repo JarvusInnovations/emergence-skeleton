@@ -65,6 +65,9 @@ git archive "${workspace_tree}" --format=tar | (cd "${temp_path}/base" && tar -x
 echo
 echo "==> test-interactive: setting up overlay mount…"
 
+# unionfs was selected for mac+linux compatibility, though under Linux Kernel 4.10+
+# overlayfs might offer the advantage of propogating FS events from upperdir to mergedir
+# (see https://github.com/libuv/libuv/issues/1201)
 unionfs -o cow \
     "${repo_path}"=RW:"${temp_path}/base"=RO \
     "${temp_path}/merged"
