@@ -42,6 +42,11 @@ jobs:
           emergence/php-runtime --bind="database:mysql.default"
           emergence/nginx --bind="backend:php-runtime.default"
 
+    - name: Configure MySQL command-line client
+      run: |
+        sudo chmod ugo+Xr /hab/svc/mysql/config /hab/svc/mysql/config/client.cnf
+        ln -sf /hab/svc/mysql/config/client.cnf ~/.my.cnf
+
     - name: Load site projection into emergence runtime
       env:
         HOLO_CACHE_FROM: origin
