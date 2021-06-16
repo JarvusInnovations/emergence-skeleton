@@ -42,6 +42,13 @@ jobs:
           emergence/php-runtime --bind="database:mysql.default"
           emergence/nginx --bind="backend:php-runtime.default"
 
+    - name: Waiting for MySQL
+      run: |
+        while ! nc -z localhost 3306; do
+          sleep 0.5
+          echo -n "."
+        done
+
     - name: Configure MySQL command-line client
       run: |
         sudo chmod ugo+Xr /hab/svc/mysql/config /hab/svc/mysql/config/client.cnf
