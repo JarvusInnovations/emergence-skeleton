@@ -54,7 +54,9 @@ jobs:
       run: |
         sudo chmod ugo+Xr \
           /hab/svc/mysql/config \
-          /hab/svc/mysql/config/client.cnf
+          /hab/svc/mysql/config/client.cnf \
+          /hab/svc/php-runtime/config \
+          /hab/svc/php-runtime/config/fpm-exec
 
         ln -sf /hab/svc/mysql/config/client.cnf ~/.my.cnf
 
