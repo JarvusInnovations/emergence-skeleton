@@ -1,4 +1,4 @@
-name: 'Test: E2E'
+name: 'Test: Cypress'
 
 on: pull_request
 
@@ -8,7 +8,7 @@ env:
   HOLO_CACHE_FROM: origin
 
 jobs:
-  test-e2e:
+  test-cypress:
 
     runs-on: ubuntu-latest
     steps:
