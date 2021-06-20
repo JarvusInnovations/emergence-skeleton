@@ -67,7 +67,6 @@ jobs:
         HOLO_CACHE_FROM: origin
         HOLO_CACHE_TO: origin
       run: |
-        until sudo test -f /hab/svc/php-runtime/config/fpm-exec; do sleep .1; done
         SITE_TREE="$(hab pkg exec jarvus/hologit git-holo project emergence-site)"
         [ -n "${SITE_TREE}" ] || exit 1
         hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
