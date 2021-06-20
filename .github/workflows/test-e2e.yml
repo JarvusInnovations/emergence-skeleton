@@ -54,11 +54,13 @@ jobs:
           echo -n "."
         done
 
-    - name: Configure command-line mysql access
+    - name: Configure command-line client access
       run: |
-        sudo chmod ugo+Xr \
+        sudo chmod ugo+xr \
           /hab/svc/mysql/config \
-          /hab/svc/mysql/config/client.cnf
+          /hab/svc/mysql/config/client.cnf \
+          /hab/svc/php-runtime/config \
+          /hab/svc/php-runtime/config/fpm-exec
 
         ln -sf /hab/svc/mysql/config/client.cnf ~/.my.cnf
 
