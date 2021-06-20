@@ -35,9 +35,6 @@ jobs:
       with:
         deps: |
           jarvus/hologit
-          core/mysql
-          emergence/php-runtime
-          emergence/nginx
         supervisor: |
           core/mysql
           emergence/php-runtime --bind="database:mysql.default"
