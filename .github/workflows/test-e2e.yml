@@ -54,7 +54,7 @@ jobs:
           echo -n "."
         done
 
-    - name: Configure command-line client access
+    - name: Configure command-line mysql access
       run: |
         sudo chmod ugo+Xr \
           /hab/svc/mysql/config \
