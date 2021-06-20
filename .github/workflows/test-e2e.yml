@@ -56,9 +56,7 @@ jobs:
       run: |
         sudo chmod ugo+Xr \
           /hab/svc/mysql/config \
-          /hab/svc/mysql/config/client.cnf \
-          /hab/svc/php-runtime/config \
-          /hab/svc/php-runtime/config/fpm-exec
+          /hab/svc/mysql/config/client.cnf
 
         ln -sf /hab/svc/mysql/config/client.cnf ~/.my.cnf
 
@@ -67,11 +65,10 @@ jobs:
         HOLO_CACHE_FROM: origin
         HOLO_CACHE_TO: origin
       run: |
-        until sudo test -f /hab/svc/php-runtime/config/fpm-exec; do sleep .1; done
+        until test -f /hab/svc/php-runtime/config/fpm-exec; do sleep .1; done
         SITE_TREE="$(hab pkg exec jarvus/hologit git-holo project emergence-site)"
         [ -n "${SITE_TREE}" ] || exit 1
-        sudo --preserve-env hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
-        # sudo chown runner:docker -R /hab/cache/artifacts
+        hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
 
     - name: Set up Cypress workspace
       run: |
