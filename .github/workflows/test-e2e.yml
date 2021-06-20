@@ -40,13 +40,15 @@ jobs:
           emergence/php-runtime --bind="database:mysql.default"
           emergence/nginx --bind="backend:php-runtime.default"
 
-    - name: Waiting for MySQL and Emergence runtime
+    - name: Waiting for MySQL
       run: |
         until nc -z localhost 3306; do
           sleep 0.5
           echo -n "."
         done
 
+    - name: Waiting for Emergence runtime
+      run: |
         until nc -z localhost 9123; do
           sleep 0.5
           echo -n "."
