@@ -89,6 +89,9 @@ jobs:
         env: STUDIO_CONTAINER=,STUDIO_SSH=
         working-directory: ${{ github.workspace }}.cypress-workspace
 
+    - uses: mxschmitt/action-tmate@v3
+      if: always()
+
     - name: Upload supervisor log
       uses: actions/upload-artifact@v1
       if: always()
