@@ -29,17 +29,54 @@
 
         <fieldset class="shrink">
             <div class="inline-fields">
-                {* field name label='' error='' type=text placeholder='' hint='' required=false attribs='' default=null class=null *}
-                {field FirstName 'First Name' $errors.FirstName text '' '' true 'autofocus'}
-                {field LastName  'Last Name'  $errors.LastName  text '' '' true}
+                {field
+                    inputName=FirstName
+                    label='First Name'
+                    error=$errors.FirstName
+                    required=true
+                    autofocus=true
+                }
+
+                {field
+                    inputName=LastName
+                    label='Last Name'
+                    error=$errors.LastName
+                    required=true
+                }
             </div>
 
-                {field Email    'Email Address' $errors.Email    email '' '' true}
-                {field Username 'Username'      $errors.Username text  '' '' true 'autocapitalize="none" autocorrect="off"'}
+            {field
+                inputName=Email
+                label='Email Address'
+                error=$errors.Email
+                type=email
+                required=true
+            }
+
+            {field
+                inputName=Username
+                label='Username'
+                error=$errors.Username
+                required=true
+                attribs='autocapitalize="none" autocorrect="off"'
+            }
 
             <div class="inline-fields">
-                {field Password        'Password'  $errors.Password        password '' '' true}
-                {field PasswordConfirm '(Confirm)' $errors.PasswordConfirm password '' '' true}
+                {field
+                    inputName=Password
+                    label='Password'
+                    error=$errors.Password
+                    type=password
+                    required=true
+                }
+
+                {field
+                    inputName=PasswordConfirm
+                    label='(Confirm)'
+                    error=$errors.PasswordConfirm
+                    type=password
+                    required=true
+                }
             </div>
 
             {if RemoteSystems\ReCaptcha::$siteKey}
