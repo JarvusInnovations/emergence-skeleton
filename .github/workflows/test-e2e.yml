@@ -20,7 +20,7 @@ jobs:
       run: sudo service mysql stop
 
     - name: 'Initialize Chef Habitat environment'
-      uses: JarvusInnovations/habitat-action@action/v1
+      uses: JarvusInnovations/habitat-action@action/develop
       env:
         HAB_NGINX: |
           [http.listen]
