@@ -47,6 +47,7 @@ extra:
     name: emergence-skeleton
     url: git@github.com:JarvusInnovations/emergence-skeleton.git
   studio:
+    name: skeleton-studio
     web_port: 7080
     static_port: 7081
     docs_port: 7088

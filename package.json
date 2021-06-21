@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Development tooling for emergence-skeleton",
   "devDependencies": {
-    "cypress": "^3.8.2",
-    "cypress-plugin-tab": "^1.0.1"
+    "cypress": "^7.5.0",
+    "cypress-plugin-tab": "^1.0.5"
   },
   "scripts": {
     "cypress:open": "cypress open"
