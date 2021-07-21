@@ -63,6 +63,11 @@ git archive "${workspace_tree}" --format=tar | (cd "${temp_path}/base" && tar -x
 
 
 echo
+echo "==> test-interactive: installing node_modules…"
+(cd "${temp_path}/base" && npm install)
+
+
+echo
 echo "==> test-interactive: setting up overlay mount…"
 
 # unionfs was selected for mac+linux compatibility, though under Linux Kernel 4.10+
@@ -71,11 +76,6 @@ echo "==> test-interactive: setting up overlay mount…"
 unionfs -o cow \
     "${repo_path}"=RW:"${temp_path}/base"=RO \
     "${temp_path}/merged"
-
-
-echo
-echo "==> test-interactive: installing node_modules…"
-(cd "${temp_path}/merged" && npm install)
 
 
 echo
