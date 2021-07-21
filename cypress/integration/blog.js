@@ -6,7 +6,7 @@ describe('Blogging', () => {
     });
 
     it('Create post', () => {
-        cy.loginAs('user', 'user');
+        cy.loginAs();
 
         cy.visit('/blog');
 
@@ -74,7 +74,7 @@ describe('Blogging', () => {
     });
 
     it('Edit post', () => {
-        cy.loginAs('user', 'user');
+        cy.loginAs();
 
         cy.visit('/drafts');
 

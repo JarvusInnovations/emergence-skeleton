@@ -41,6 +41,14 @@ Cypress.Commands.add('upload_file', (fileName, fileType = ' ', selector) => {
 
 // Login command
 Cypress.Commands.add('loginAs', (user, password) => {
+    if (!user) {
+        user = Cypress.env('TEST_USER') || 'user';
+    }
+
+    if (!password) {
+        password = Cypress.env('TEST_PASSWORD') || user;
+    }
+
     cy.visit('/');
     cy.request({
         method: 'POST',
@@ -48,7 +56,7 @@ Cypress.Commands.add('loginAs', (user, password) => {
         form: true,
         body: {
             '_LOGIN[username]': user,
-            '_LOGIN[password]': password || user,
+            '_LOGIN[password]': password,
             '_LOGIN[returnMethod]': 'POST'
         }
     });
