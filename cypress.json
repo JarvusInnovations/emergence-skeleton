@@ -1,9 +1,6 @@
 {
     "baseUrl": "http://localhost:7080",
     "env": {
-        "STUDIO_SSH": null,
         "STUDIO_CONTAINER": "skeleton-studio"
-    },
-    "viewportWidth": 1200,
-    "viewportHeight": 660
+    }
 }
