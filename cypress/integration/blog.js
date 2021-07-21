@@ -82,7 +82,7 @@ describe('Blogging', () => {
             .should('have.attr', 'href', '/blog/hello_world')
             .click();
 
-        cy.contains('Edit')
+        cy.contains('.blog-post a', 'Edit')
             .should('have.attr', 'href', '/blog/hello_world/edit')
             .click();
 
