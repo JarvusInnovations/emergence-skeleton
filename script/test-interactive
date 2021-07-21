@@ -29,7 +29,7 @@ function _cleanup {
     echo
     echo "cleaning up workspace..."
     if [ -d "${temp_path}/merged" ] && mount | grep -q "${temp_path}/merged"; then
-        sudo umount -f "${temp_path}/merged"
+        umount -f "${temp_path}/merged"
     fi
     rm -rf "${temp_path}"
 }
