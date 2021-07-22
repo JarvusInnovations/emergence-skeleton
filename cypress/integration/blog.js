@@ -6,7 +6,7 @@ describe('Blogging', () => {
     });
 
     it('Create post', () => {
-        cy.loginAs('user', 'user');
+        cy.loginAs();
 
         cy.visit('/blog');
 
@@ -74,7 +74,7 @@ describe('Blogging', () => {
     });
 
     it('Edit post', () => {
-        cy.loginAs('user', 'user');
+        cy.loginAs();
 
         cy.visit('/drafts');
 
@@ -82,7 +82,7 @@ describe('Blogging', () => {
             .should('have.attr', 'href', '/blog/hello_world')
             .click();
 
-        cy.contains('Edit')
+        cy.contains('.blog-post a', 'Edit')
             .should('have.attr', 'href', '/blog/hello_world/edit')
             .click();
 
