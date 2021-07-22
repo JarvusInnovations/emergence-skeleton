@@ -73,7 +73,7 @@ describe('Registration', () => {
             // verify profile API data
             cy.request('/profile?format=json').its('body.data').then(data => {
                 expect(data).to.have.property('ID', 1);
-                expect(data).to.have.property('Class', values['profile-data-class']);
+                expect(data).to.have.property('Class', values['profile-data'].Class);
                 expect(data).to.have.property('FirstName', 'Fname');
                 expect(data).to.have.property('LastName', 'Lname');
                 expect(data).to.have.property('Email', 'email@example.org');
