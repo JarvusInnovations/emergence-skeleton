@@ -15,10 +15,7 @@ module.exports = () => {
   const config = {
     ignoreTestFiles: ['*.json'],
     viewportWidth: 1200,
-    viewportHeight: 600,
-    env: {
-      STUDIO_SSH: null
-    }
+    viewportHeight: 600
   };
 
   return config;
