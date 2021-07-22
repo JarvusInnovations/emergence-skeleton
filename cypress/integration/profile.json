@@ -2,15 +2,19 @@
     "selectors": {
         "gallery-photo": ".photo",
         "gallery-photo-first": ".photosGallery .photo:first-child",
-        "gallery-default-link": "a[title=\"Make Default\"][href^=\"/profile/primaryPhoto?\"]",
-        "profile-view-photo-last": ".photo-thumb:last-of-type"
-    },
+        "gallery-default-link": "a[title=\"Make Default\"][href^=\"/profile/primaryPhoto?\"]"    },
     "values": {
         "gallery-photo-selected-class": "highlight",
         "profile-markdown-link-text": "Markdown",
         "profile-markdown-link-href": "https://www.markdownguide.org/cheat-sheet",
         "profile-save-button-text": "Save profile",
-        "profile-data-class": "User",
-        "profile-photo-last-href": "/thumbnail/2/1024x768"
+        "profile-photo-last-href": "/thumbnail/2/1024x768",
+        "profile-data": {
+            "Class": "User",
+            "FirstName": "Regular",
+            "LastName": "User",
+            "Username": "user",
+            "AccountLevel": "User"
+        }
     }
 }
