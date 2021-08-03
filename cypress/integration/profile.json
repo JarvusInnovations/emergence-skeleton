@@ -2,7 +2,9 @@
     "selectors": {
         "gallery-photo": ".photo",
         "gallery-photo-first": ".photosGallery .photo:first-child",
-        "gallery-default-link": "a[title=\"Make Default\"][href^=\"/profile/primaryPhoto?\"]"    },
+        "gallery-default-link": "a[title=\"Make Default\"][href^=\"/profile/primaryPhoto?\"]",
+        "about-content": "#info .about"
+    },
     "values": {
         "gallery-photo-selected-class": "highlight",
         "profile-markdown-link-text": "Markdown",
@@ -15,5 +17,9 @@
             "Username": "user",
             "AccountLevel": "User"
         }
+    },
+    "features": {
+        "location": true,
+        "gallery": true
     }
 }
