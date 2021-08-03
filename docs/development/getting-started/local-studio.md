@@ -105,3 +105,12 @@ After visiting [`/register`](http://localhost:{{ studio.web_port }}/register) an
 ```bash
 promote-user <myuser>
 ```
+
+## Connect to local database
+
+The studio container hosts a local MySQL instance that can be connected to at:
+
+- **Host**: `localhost` (or LAN/WAN IP of machine hosting Docker engine)
+- **Port**: `{{ studio.mysql_port }}`
+- **Username**: `admin`
+- **Password**: `admin`

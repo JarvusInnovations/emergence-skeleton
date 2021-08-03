@@ -1,3 +1,5 @@
+edit_uri: edit/develop/docs
+
 theme:
   name: material
   features:
