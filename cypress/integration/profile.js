@@ -85,23 +85,33 @@ describe('Profile', () => {
             cy.location('search').should('eq', '?status=saved');
 
             // verify profile API data
-            cy.request('/profile?format=json').its('body.data').then(data => {
+            cy.request('/profile?format=json&include=PrimaryEmail,PrimaryPhone').its('body.data').then(data => {
                 expect(data).to.have.property('Class', values['profile-data'].Class);
                 expect(data).to.have.property('FirstName', values['profile-data'].FirstName);
                 expect(data).to.have.property('LastName', values['profile-data'].LastName);
-                expect(data).to.have.property('Email', 'email@example.com');
-                expect(data).to.have.property('Phone', 1234567890);
                 expect(data).to.have.property('Location', 'Philadelphia, PA');
                 expect(data).to.have.property('About', 'Meow');
                 expect(data).to.have.property('PrimaryPhotoID', 2);
                 expect(data).to.have.property('Username', values['profile-data'].Username);
                 expect(data).to.have.property('AccountLevel', values['profile-data'].AccountLevel);
+
+                if (data.Email) {
+                    expect(data).to.have.property('Email', 'email@example.com');
+                } else {
+                    expect(data).to.have.nested.property('PrimaryEmail.Data', 'email@example.com');
+                }
+
+                if (data.Phone) {
+                    expect(data).to.have.property('Phone', 1234567890);
+                } else {
+                    expect(data).to.have.nested.property('PrimaryPhone.Data', '1234567890');
+                }
             });
         });
     });
 
     it('View profile', () => {
-        cy.readFile('cypress/integration/profile.json').then(({ selectors, values }) => {
+        cy.readFile('cypress/integration/profile.json').then(({ selectors, values, features }) => {
             cy.loginAs();
             cy.visit('/profile');
 
@@ -109,13 +119,19 @@ describe('Profile', () => {
             cy.visit('/profile/view');
             cy.location('pathname').should('eq', `/people/${values['profile-data'].Username}`);
             cy.get('.header-title').should('contain', `${values['profile-data'].FirstName} ${values['profile-data'].LastName}`);
-            cy.get('a[href^="http://maps.google.com/"]').should('contain', 'Philadelphia, PA');
-            cy.get('.photo-thumb')
-                .should('have.length', 2)
-                .last()
-                    .should('have.attr', 'href')
-                    .and('match', /^\/thumbnail\/2\/\d+x\d+(\/cropped)?$/);
-            cy.get('#info .about').should('contain', 'Meow');
+            cy.get(selectors['about-content']).should('contain', 'Meow');
+
+            if (features['location']) {
+                cy.get('a[href^="http://maps.google.com/"]').should('contain', 'Philadelphia, PA');
+            }
+
+            if (features['gallery']) {
+                cy.get('.photo-thumb')
+                    .should('have.length', 2)
+                    .last()
+                        .should('have.attr', 'href')
+                        .and('match', /^\/thumbnail\/2\/\d+x\d+(\/cropped)?$/);
+            }
         });
     });
 });
