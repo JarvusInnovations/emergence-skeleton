@@ -1,0 +1,7 @@
+repo_url: https://github.com/JarvusInnovations/emergence-skeleton
+edit_uri: edit/develop/docs
+
+extra:
+  repository:
+    name: emergence-skeleton
+    url: git@github.com:JarvusInnovations/emergence-skeleton.git
