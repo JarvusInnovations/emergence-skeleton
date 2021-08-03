@@ -1,7 +1,3 @@
-site_name: Skeleton Docs
-site_url: https://jarvusinnovations.github.io/emergence-skeleton
-edit_uri: edit/develop/docs
-
 theme:
   name: material
   features:
@@ -41,32 +37,3 @@ markdown_extensions:
       permalink: " ¶"
   - smarty
   - fontawesome_markdown
-
-extra:
-  repository:
-    name: emergence-skeleton
-    url: git@github.com:JarvusInnovations/emergence-skeleton.git
-  studio:
-    name: skeleton-studio
-    web_port: 7080
-    static_port: 7081
-    docs_port: 7088
-    mysql_port: 7036
-  fixtures:
-    users:
-      - username: system
-        password: system
-        level: Developer
-        about: 'Full system access'
-      - username: admin
-        password: admin
-        level: Administrator
-        about: 'Manage site and staff'
-      - username: staff
-        password: staff
-        level: Staff
-        about: 'Staff access'
-      - username: user
-        password: user
-        level: User
-        about: 'Regular user'
