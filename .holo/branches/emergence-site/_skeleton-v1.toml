@@ -6,7 +6,9 @@ files = [
     "!.github/",
     "!.holo/lenses/mkdocs.toml",
     "!.vscode/",
+    "!cypress/",
     "!docs/",
+    "!fixtures/",
     "!php-config/Git.config.d/",
     "!script/",
 
