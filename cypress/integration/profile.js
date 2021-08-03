@@ -102,7 +102,7 @@ describe('Profile', () => {
                 }
 
                 if (data.Phone) {
-                    expect(data).to.have.property('Phone', '1234567890');
+                    expect(data).to.have.property('Phone', 1234567890);
                 } else {
                     expect(data).to.have.nested.property('PrimaryPhone.Data', '1234567890');
                 }
