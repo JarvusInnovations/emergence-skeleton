@@ -584,6 +584,7 @@
 <p class="admonition-title">Making Cypress auto-reload as you save changes</p>
 <p>Because filesystem change events from your local project work tree to the merged unionfs that Cypress runs out of don&rsquo;t always work, work on Cypress tests out of the <code>merged</code> mount instead.</p>
 <p>Any changes you make will immediately be written to to your local project work tree ready to stage into a git commit, and filesystem change events will fire live for Cypress to auto-reload test suites as you work.</p>
+<p>The <strong>Open in IDE</strong> button that Cypress&rsquo; main window will how you as you hover over tests in the list can be used to open the copy of the file in the <code>merged</code> mount where changes will trigger auto-reload.</p>
 </div>
 <h2 id="testing-against-a-remote-server">Testing against a remote server<a class="headerlink" href="#testing-against-a-remote-server" title="Permanent link"> ¶</a></h2>
 <p>By setting environment variables before launching the Cypress GUI, the E2E test suite can be configured to execute against a backend studio hosted on a remote machine or server.</p>
