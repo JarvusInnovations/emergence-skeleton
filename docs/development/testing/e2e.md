@@ -62,7 +62,7 @@ On the local terminal **outside the studio** in the root of your local project r
 1. Set base URL to studo HTTP root reachable from local workstation:
 
     ```bash
-    export CYPRESS_BASE_URL='http://workstation.mydomain:7080'
+    export CYPRESS_BASE_URL='http://workstation.mydomain:{{ studio.web_port }}'
     ```
 
 2. Configure the SSH host that the backend studio is running on:
