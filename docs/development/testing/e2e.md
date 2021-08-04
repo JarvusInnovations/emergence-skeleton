@@ -53,6 +53,8 @@ This virtual directory mount gets set up at `${path_to_your_repo}.cypress-worksp
 
     Any changes you make will immediately be written to to your local project work tree ready to stage into a git commit, and filesystem change events will fire live for Cypress to auto-reload test suites as you work.
 
+    The **Open in IDE** button that Cypress' main window will how you as you hover over tests in the list can be used to open the copy of the file in the `merged` mount where changes will trigger auto-reload.
+
 ## Testing against a remote server
 
 By setting environment variables before launching the Cypress GUI, the E2E test suite can be configured to execute against a backend studio hosted on a remote machine or server.
