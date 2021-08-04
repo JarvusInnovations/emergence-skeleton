@@ -54,7 +54,11 @@ describe('Blogging', () => {
         cy.contains('.x-btn.save-btn', 'Save')
             .click();
 
-        cy.location('pathname').should('eq', '/blog/hello_world/edit');
+        cy.contains('.emergence-cms-editor .x-mask-msg-text', 'Saving').should('be.visible');
+
+        cy.location('pathname', { timeout: 10000 })
+            .should('eq', '/blog/hello_world/edit');
+
         cy.location('search').should('be.empty');
 
         cy.get('.x-component.emergence-cms-preview').within(() => {
@@ -99,8 +103,18 @@ describe('Blogging', () => {
             .should('contain', 'Wednesday, January 2, 2030 at 6:07 pm')
             .click();
 
+        cy.intercept({ method: 'POST', pathname: '/blog/save' }).as('saveBlog');
+
         cy.contains('.x-btn.save-btn', 'Save')
             .click();
+
+        cy.contains('.emergence-cms-editor .x-mask-msg-text', 'Saving')
+            .should('be.visible');
+
+        cy.wait('@saveBlog').its('response.statusCode').should('eq', 200);
+
+        cy.contains('.emergence-cms-editor .x-mask-msg-text', 'Saving', { timeout: 10000 })
+            .should('not.be.visible');
 
         cy.reload();
 
