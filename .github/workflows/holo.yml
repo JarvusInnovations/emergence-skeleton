@@ -35,6 +35,7 @@ jobs:
         # pull latest commit
         curl -X POST \
           --silent \
+          --fail \
           -H "Authorization: Token ${VFS_DEV_TOKEN}" \
           -H "Accept: application/json" \
           "http://skeleton-v1.emr.ge/site-admin/sources/emergence-skeleton-v1/pull?fetch=true" \
@@ -43,6 +44,7 @@ jobs:
         # sync VFS to git
         curl -X POST \
           --silent \
+          --fail \
           -H "Authorization: Token ${VFS_DEV_TOKEN}" \
           -H "Accept: application/json" \
           "http://skeleton-v1.emr.ge/site-admin/sources/emergence-skeleton-v1/sync-to-vfs" \
