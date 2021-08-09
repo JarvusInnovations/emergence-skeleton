@@ -74,22 +74,23 @@ Cypress.Commands.add('dropDatabase', () => {
 });
 
 // Reload the original data fixtures
+let cachedFixturesTreeHash;
+
 Cypress.Commands.add('loadDatabase', () => {
+    if (cachedFixturesTreeHash) {
+        cy.log('Using cached fixtures tree', cachedFixturesTreeHash);
+        return _loadFixturesTree(cachedFixturesTreeHash);
+    }
+
     cy.exec(`${_buildHabExec('jarvus/hologit', 'git')} holo project fixtures --working`)
         .then(({ stdout: treeHash }) => {
             if (!treeHash) {
                 throw new Error('unable to compute tree hash for fixtures data');
             }
 
-            cy.exec(`${_buildHabExec('emergence/php-runtime', 'bash')} -c '
-                (
-                    for fixture_file in $(git ls-tree -r --name-only ${treeHash}); do
-                        git cat-file -p "${treeHash}:\${fixture_file}"
-                    done
-                ) | mysql default
-            '`);
+            cachedFixturesTreeHash = treeHash;
 
-            cy.exec(`${_buildHabExec('emergence/php-runtime', 'emergence-console-run')} migrations:execute --all`);
+            _loadFixturesTree(treeHash);
         });
 });
 
@@ -117,4 +118,16 @@ function _buildHabExec(pkg, pkgCmd) {
     }
 
     return cmd;
+}
+
+function _loadFixturesTree(treeHash) {
+    cy.exec(`${_buildHabExec('emergence/php-runtime', 'bash')} -c '
+        (
+            for fixture_file in $(git ls-tree -r --name-only ${treeHash}); do
+                git cat-file -p "${treeHash}:\${fixture_file}"
+            done
+        ) | mysql default
+    '`);
+
+    cy.exec(`${_buildHabExec('emergence/php-runtime', 'emergence-console-run')} migrations:execute --all`);
 }
