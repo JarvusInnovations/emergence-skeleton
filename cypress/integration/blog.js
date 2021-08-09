@@ -51,10 +51,22 @@ describe('Blogging', () => {
         cy.get('.x-panel-body .x-field textarea')
             .type('## Header 2{enter}{enter}### Header 3{enter}{enter}- point 1{enter}- point2{enter}');
 
+        cy.intercept(
+            {
+                method: 'POST',
+                pathname: '/blog/save',
+                middleware: true
+            },
+            // delay response so loadmask can be verified
+            req => req.on('response', res => res.setDelay(250))
+        ).as('saveBlog');
+
         cy.contains('.x-btn.save-btn', 'Save')
             .click();
 
         cy.contains('.emergence-cms-editor .x-mask-msg-text', 'Saving').should('be.visible');
+
+        cy.wait('@saveBlog').its('response.statusCode').should('eq', 200);
 
         cy.location('pathname', { timeout: 10000 })
             .should('eq', '/blog/hello_world/edit');
@@ -103,7 +115,15 @@ describe('Blogging', () => {
             .should('contain', 'Wednesday, January 2, 2030 at 6:07 pm')
             .click();
 
-        cy.intercept({ method: 'POST', pathname: '/blog/save' }).as('saveBlog');
+        cy.intercept(
+            {
+                method: 'POST',
+                pathname: '/blog/save',
+                middleware: true
+            },
+            // delay response so loadmask can be verified
+            req => req.on('response', res => res.setDelay(250))
+        ).as('saveBlog');
 
         cy.contains('.x-btn.save-btn', 'Save')
             .click();
