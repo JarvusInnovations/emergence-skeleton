@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# script/-test-bootstrap: Check dependencies for testing.
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+echo
+echo "==> studio-bootstrap: verifying hologit"
+
+if ! [ -x "$(command -v git-holo)" ]; then
+    echo "Please install git-holo command with npm: npm install -g hologit"
+    echo "Or with Habitat: hab pkg install --binlink jarvus/hologit"
+    exit 1
+fi
