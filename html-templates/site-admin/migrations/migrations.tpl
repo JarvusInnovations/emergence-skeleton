@@ -8,8 +8,11 @@
 {block content}
     <div class="page-header">
         <div class="btn-toolbar float-right">
-            <form method="POST" action="/site-admin/migrations/refresh" class="btn-group">
-                <button type="submit" class="btn btn-secondary">Refresh Inherited Migrations</button>
+            <form method="POST" action="/site-admin/migrations/!refresh" class="ml-2">
+                <button type="submit" class="btn btn-secondary">Refresh inherited migrations</button>
+            </form>
+            <form method="POST" action="/site-admin/migrations/!all" class="ml-2">
+                <button type="submit" class="btn btn-primary">Execute all</button>
             </form>
         </div>
 
