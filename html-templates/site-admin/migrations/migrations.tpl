@@ -33,9 +33,14 @@
                     <td class="migration-status">{$migration.status}</td>
                     <td class="migration-timestamp">{$migration.executed}</td>
                     <td class="migration-action">
-                        {if $migration.status == 'new'}
+                        {if $migration.status != 'executed'}
                             <form class="execute-migration" action="/site-admin/migrations/{$migration.key|escape}" method="POST">
-                                <button type="submit" class="btn btn-primary">Execute</button>
+                                {if $migration.status == 'new'}
+                                    <button type="submit" class="btn btn-primary">Execute</button>
+                                {elseif $migration.status == 'started' || $migration.status == 'failed'}
+                                    <input type="hidden" name="force" value="yes">
+                                    <button type="submit" class="btn btn-danger">Force re-execute</button>
+                                {/if}
                             </form>
                         {/if}
                     </td>

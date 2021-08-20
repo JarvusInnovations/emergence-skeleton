@@ -67,7 +67,7 @@ class MigrationsRequestHandler extends \RequestHandler
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
-                $migration = static::executeMigration($migrationKey);
+                $migration = static::executeMigration($migrationKey, !empty($_REQUEST['force']));
             } catch (OutOfBoundsException $e) {
                 return static::throwNotFoundError($e->getMessage());
             } catch (RangeException $e) {
