@@ -1,4 +1,5 @@
 nav:
-    - getting-started
-    - testing
+    - README.md
+    - workspace-setup
+    - running-tests
     - ...

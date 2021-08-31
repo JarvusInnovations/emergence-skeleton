@@ -1,4 +1,6 @@
 nav:
     - README.md
+    - getting-started
+    - usage
     - development
-    - ...
+    - operations
