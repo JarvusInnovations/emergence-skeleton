@@ -2,37 +2,57 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://jarvusinnovations.github.io/emergence-skeleton/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <lastmod>2021-08-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/</loc>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/email/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/migrations/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/getting-started/content-editor/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/running-tests/e2e/</loc>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/getting-started/local-studio/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/workspace-setup/content-editor/</loc>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/getting-started/virtual-multisite/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/workspace-setup/local-studio/</loc>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/testing/e2e/</loc>
-         <lastmod>2021-08-04</lastmod>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/development/workspace-setup/virtual-multisite/</loc>
+         <lastmod>2021-08-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/getting-started/</loc>
+         <lastmod>2021-08-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/operations/</loc>
+         <lastmod>2021-08-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://jarvusinnovations.github.io/emergence-skeleton/usage/</loc>
+         <lastmod>2021-08-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
