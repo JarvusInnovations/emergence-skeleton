@@ -18,7 +18,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
     public static $title;
     public static $connectorId;
 
-    public static $accountLevelBrowse = 'Administrator';
+    public static $accountLevelBrowse = false;
     public static $accountLevelSynchronize = 'Administrator';
     public static $synchronizeTimeLimit = 0;
     public static $globalRecordCaching = true;
