@@ -18,7 +18,7 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
     public static $title;
     public static $connectorId;
 
-    public static $synchronizeRequiredAccountLevel = 'Administrator';
+    public static $accountLevelSynchronize = 'Administrator';
     public static $synchronizeTimeLimit = 0;
     public static $globalRecordCaching = true;
 
@@ -79,8 +79,8 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 return static::throwNotFoundError('Job not found');
             }
 
-            if (static::$synchronizeRequiredAccountLevel) {
-                $GLOBALS['Session']->requireAccountLevel(static::$synchronizeRequiredAccountLevel);
+            if (static::$accountLevelSynchronize) {
+                $GLOBALS['Session']->requireAccountLevel(static::$accountLevelSynchronize);
             }
 
             if (static::peekPath() == 'log') {
@@ -116,8 +116,8 @@ abstract class AbstractConnector extends \RequestHandler implements IConnector
                 ,'Config' => $TemplateJob->Config
             ));
         } else {
-            if (static::$synchronizeRequiredAccountLevel) {
-                $GLOBALS['Session']->requireAccountLevel(static::$synchronizeRequiredAccountLevel);
+            if (static::$accountLevelSynchronize) {
+                $GLOBALS['Session']->requireAccountLevel(static::$accountLevelSynchronize);
             }
 
             $Job = static::_createJob(static::_getJobConfig($_REQUEST));
