@@ -123,9 +123,13 @@ function _buildHabExec(pkg, pkgCmd) {
 function _loadFixturesTree(treeHash) {
     cy.exec(`${_buildHabExec('emergence/php-runtime', 'bash')} -c '
         (
+            echo "SET autocommit=0;"
+            echo "SET unique_checks=0;"
+            echo "SET foreign_key_checks=0;"
             for fixture_file in $(git ls-tree -r --name-only ${treeHash}); do
                 git cat-file -p "${treeHash}:\${fixture_file}"
             done
+            echo "COMMIT;"
         ) | mysql default
     '`);
 
