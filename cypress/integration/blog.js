@@ -22,10 +22,12 @@ describe('Blogging', () => {
             .click();
 
         cy.get('input[id^=datefield-]')
-            .type('{selectall}01/02/2030');
+            .clear()
+            .type('01/02/2030');
 
         cy.get('input[id^=timefield-]')
-            .type('{selectall}4:05 pm{enter}');
+            .clear()
+            .type('4:05 pm{enter}');
 
         cy.get('.x-component.emergence-cms-preview time[data-ref="timeEl"]')
             .should('contain', 'Wednesday, January 2, 2030 at 4:05 pm')
@@ -109,7 +111,8 @@ describe('Blogging', () => {
             .click();
 
         cy.get('input[id^=timefield-]')
-            .type('{selectall}6:07 pm{enter}');
+            .clear()
+            .type('6:07 pm{enter}');
 
         cy.get('.x-component.emergence-cms-preview time[data-ref="timeEl"]')
             .should('contain', 'Wednesday, January 2, 2030 at 6:07 pm')
