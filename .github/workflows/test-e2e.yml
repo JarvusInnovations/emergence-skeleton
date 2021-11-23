@@ -93,8 +93,8 @@ jobs:
     - name: Open access to crash log
       if: always()
       run: |
-        sudo chmod ugo+rX /hab/svc/php-runtime/{var,var/logs}
-        sudo chmod ugo+r /hab/svc/php-runtime/var/logs/crash.log
+        sudo chmod ugo+rX /hab/svc/php-runtime/{var,var/logs} || true
+        sudo chmod ugo+r /hab/svc/php-runtime/var/logs/crash.log || true
 
     - name: Upload crash log
       uses: actions/upload-artifact@v1
