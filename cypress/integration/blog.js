@@ -22,10 +22,12 @@ describe('Blogging', () => {
             .click();
 
         cy.get('input[id^=datefield-]')
+            .click()
             .clear()
             .type('01/02/2030');
 
         cy.get('input[id^=timefield-]')
+            .click()
             .clear()
             .type('4:05 pm{enter}');
 
@@ -39,6 +41,7 @@ describe('Blogging', () => {
         cy.contains('.x-menu-item-text[id^=menuitem-]', '1/2/2030 4:05 pm');
 
         cy.get('.x-field.field-title input')
+            .click()
             .type('Hello world!')
             .tab();
 
@@ -51,6 +54,7 @@ describe('Blogging', () => {
             .type('tag1{enter}tag2');
 
         cy.get('.x-panel-body .x-field textarea')
+            .click()
             .type('## Header 2{enter}{enter}### Header 3{enter}{enter}- point 1{enter}- point2{enter}');
 
         cy.intercept(
@@ -111,6 +115,7 @@ describe('Blogging', () => {
             .click();
 
         cy.get('input[id^=timefield-]')
+            .click()
             .clear()
             .type('6:07 pm{enter}');
 
