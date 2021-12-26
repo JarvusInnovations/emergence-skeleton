@@ -153,7 +153,7 @@ class TagItem extends ActiveRecord
             $itemsCountQuery .= sprintf(
                 ' AND TagItem.`%s` = "%s" AND TagItem.`%s` IN (%s)'
                 ,TagItem::getColumnName('ContextClass')
-                ,$options['Class']::getStaticRootClass()
+                ,DB::escape($options['Class']::getStaticRootClass())
                 ,TagItem::getColumnName('ContextID')
                 ,implode(",",$classIDs)
             );
