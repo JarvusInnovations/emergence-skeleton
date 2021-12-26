@@ -132,7 +132,7 @@ class TagItem extends ActiveRecord
 
         if (!empty($options['overlayTag'])) {
             if (!is_object($OverlayTag = $options['overlayTag']) && !$OverlayTag = Tag::getByHandle($options['overlayTag'])) {
-                throw new Excoption('Overlay tag not found');
+                throw new Exception('Overlay tag not found');
             }
 
             $itemsCountQuery .= sprintf(
