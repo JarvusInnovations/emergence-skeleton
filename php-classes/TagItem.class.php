@@ -148,12 +148,14 @@ class TagItem extends ActiveRecord
         }
 
         if (isset($classSubquery)) {
+            $classIDs = DB::allValues('ID', $classSubquery, $classParams);
+
             $itemsCountQuery .= sprintf(
                 ' AND TagItem.`%s` = "%s" AND TagItem.`%s` IN (%s)'
                 ,TagItem::getColumnName('ContextClass')
                 ,$options['Class']::getStaticRootClass()
                 ,TagItem::getColumnName('ContextID')
-                ,DB::prepareQuery($classSubquery, $classParams)
+                ,implode(",",$classIDs)
             );
         }
 
