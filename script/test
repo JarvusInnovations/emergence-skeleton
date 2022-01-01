@@ -6,7 +6,7 @@ set -e
 cd "$(dirname "$0")/.."
 
 
-script/-studio-bootstrap
+script/-test-bootstrap
 
 
 temp_path="$(pwd)"
