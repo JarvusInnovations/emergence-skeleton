@@ -3,7 +3,7 @@
 
 CREATE TABLE `connector_jobs` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Class` enum('Emergence\\Connectors\\Job','Slate\\Connectors\\Job') NOT NULL,
+  `Class` enum('Emergence\\Connectors\\Job') NOT NULL,
   `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `CreatorID` int(11) DEFAULT NULL,
   `Title` varchar(255) DEFAULT NULL,
