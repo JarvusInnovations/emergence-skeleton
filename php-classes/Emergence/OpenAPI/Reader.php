@@ -119,113 +119,122 @@ class Reader
     protected static function normalizeSchemaObject(array $object)
     {
         if (!empty($object['x-activeRecord'])) {
-            if (!class_exists($object['x-activeRecord']) || !is_a($object['x-activeRecord'], ActiveRecord::class, true)) {
-                throw new Exception('x-activeRecord value does not match an available ActiveRecord class: ' . $object['x-activeRecord']);
+            if (!class_exists($object['x-activeRecord'])) {
+                throw new Exception('x-activeRecord value does not match an available class: ' . $object['x-activeRecord']);
             }
 
-            $required = [];
-
-            foreach ($object['x-activeRecord']::aggregateStackedConfig('fields') AS $fieldName => $fieldConfig) {
-                if ($fieldName == 'RevisionID' && is_a($object['x-activeRecord'], VersionedRecord::class, true)) {
-                    continue;
-                }
-
-                if ($fieldConfig['notnull'] && !isset($fieldConfig['default']) && !$fieldConfig['autoincrement']) {
-                    $required[] = $fieldName;
-                }
-
-                $propertyDefaults = [
-                    'title' => $fieldConfig['label']
-                ];
-
-                if (!empty($fieldConfig['description'])) {
-                    $propertyDefaults['description'] = $fieldConfig['description'];
-                }
-
-                if (isset($fieldConfig['default'])) {
-                    $propertyDefaults['default'] = $fieldConfig['default'];
-                }
-
-                switch ($fieldConfig['type']) {
-                    case 'int':
-                    case 'uint':
-                    case 'integer':
-                    case 'tinyint':
-                    case 'smallint':
-                    case 'mediumint':
-                    case 'year':
-                        $propertyDefaults['type'] = 'number';
-                        break;
-
-                    case 'bigint':
-                        $propertyDefaults['type'] = 'number';
-                        $propertyDefaults['format'] = 'int64';
-                        break;
-
-                    case 'float':
-                    case 'decimal':
-                        $propertyDefaults['type'] = 'number';
-                        $propertyDefaults['format'] = 'float';
-                        break;
-
-                    case 'double':
-                        $propertyDefaults['type'] = 'number';
-                        $propertyDefaults['format'] = 'double';
-                        break;
-
-                    case 'enum':
-                        $propertyDefaults['enum'] = $fieldConfig['values'];
-                        // fall through to string type
-                    case 'set':
-                    case 'string':
-                    case 'clob':
-                    case 'serialized':
-                    case 'json':
-                    case 'list':
-                        $propertyDefaults['type'] = 'string';
-                        break;
-
-                    case 'password':
-                        $propertyDefaults['type'] = 'string';
-                        $propertyDefaults['format'] = 'password';
-                        break;
-
-                    case 'blob':
-                        $propertyDefaults['type'] = 'string';
-                        $propertyDefaults['format'] = 'binary';
-                        break;
-
-                    case 'boolean':
-                        $propertyDefaults['type'] = 'boolean';
-                        break;
-
-                    case 'timestamp':
-                        $propertyDefaults['type'] = 'string';
-                        $propertyDefaults['format'] = 'date-time';
-
-                        if ($propertyDefaults['default'] == 'CURRENT_TIMESTAMP') {
-                            unset($propertyDefaults['default']);
-
-                            $description = 'Defaults to current timestamp.';
-                            $propertyDefaults['description'] = !empty($propertyDefaults['description']) ? $propertyDefaults['description'] . "\n\n" . $description : $description;
-                        }
-                        break;
-
-                    case 'date':
-                        $propertyDefaults['type'] = 'string';
-                        $propertyDefaults['format'] = 'date';
-                        break;
-                }
-
-                $object['properties'][$fieldName] = isset($object['properties'][$fieldName]) ? array_merge($propertyDefaults, $object['properties'][$fieldName]) : $propertyDefaults;
+            if (!is_a($object['x-activeRecord'], ActiveRecord::class, true)) {
+                throw new Exception('x-activeRecord value is not an ActiveRecord subclass: ' . $object['x-activeRecord']);
             }
 
-            if (count($required)) {
-                $object['required'] = isset($object['required']) ? array_unique(array_merge($object['required'], $required)) : $required;
-            }
+            static::fillSchemaFromActiveRecord($object['x-activeRecord'], $object);
         }
 
         return $object;
+    }
+
+    protected static function fillSchemaFromActiveRecord($className, &$outSchema)
+    {
+        $required = [];
+
+        foreach ($className::aggregateStackedConfig('fields') AS $fieldName => $fieldConfig) {
+            if ($fieldName == 'RevisionID' && is_a($className, VersionedRecord::class, true)) {
+                continue;
+            }
+
+            if ($fieldConfig['notnull'] && !isset($fieldConfig['default']) && !$fieldConfig['autoincrement']) {
+                $required[] = $fieldName;
+            }
+
+            $propertyDefaults = [
+                'title' => $fieldConfig['label']
+            ];
+
+            if (!empty($fieldConfig['description'])) {
+                $propertyDefaults['description'] = $fieldConfig['description'];
+            }
+
+            if (isset($fieldConfig['default'])) {
+                $propertyDefaults['default'] = $fieldConfig['default'];
+            }
+
+            switch ($fieldConfig['type']) {
+                case 'int':
+                case 'uint':
+                case 'integer':
+                case 'tinyint':
+                case 'smallint':
+                case 'mediumint':
+                case 'year':
+                    $propertyDefaults['type'] = 'number';
+                    break;
+
+                case 'bigint':
+                    $propertyDefaults['type'] = 'number';
+                    $propertyDefaults['format'] = 'int64';
+                    break;
+
+                case 'float':
+                case 'decimal':
+                    $propertyDefaults['type'] = 'number';
+                    $propertyDefaults['format'] = 'float';
+                    break;
+
+                case 'double':
+                    $propertyDefaults['type'] = 'number';
+                    $propertyDefaults['format'] = 'double';
+                    break;
+
+                case 'enum':
+                    $propertyDefaults['enum'] = $fieldConfig['values'];
+                    // fall through to string type
+                case 'set':
+                case 'string':
+                case 'clob':
+                case 'serialized':
+                case 'json':
+                case 'list':
+                    $propertyDefaults['type'] = 'string';
+                    break;
+
+                case 'password':
+                    $propertyDefaults['type'] = 'string';
+                    $propertyDefaults['format'] = 'password';
+                    break;
+
+                case 'blob':
+                    $propertyDefaults['type'] = 'string';
+                    $propertyDefaults['format'] = 'binary';
+                    break;
+
+                case 'boolean':
+                    $propertyDefaults['type'] = 'boolean';
+                    break;
+
+                case 'timestamp':
+                    $propertyDefaults['type'] = 'string';
+                    $propertyDefaults['format'] = 'date-time';
+
+                    if ($propertyDefaults['default'] == 'CURRENT_TIMESTAMP') {
+                        unset($propertyDefaults['default']);
+
+                        $description = 'Defaults to current timestamp.';
+                        $propertyDefaults['description'] = !empty($propertyDefaults['description']) ? $propertyDefaults['description'] . "\n\n" . $description : $description;
+                    }
+                    break;
+
+                case 'date':
+                    $propertyDefaults['type'] = 'string';
+                    $propertyDefaults['format'] = 'date';
+                    break;
+            }
+
+            $outSchema['properties'][$fieldName] = isset($outSchema['properties'][$fieldName]) ? array_merge($propertyDefaults, $outSchema['properties'][$fieldName]) : $propertyDefaults;
+        }
+
+        if (count($required)) {
+            $outSchema['required'] = isset($outSchema['required']) ? array_unique(array_merge($outSchema['required'], $required)) : $required;
+        }
     }
 
     public static function dereferenceNode(array $node, array $document)
