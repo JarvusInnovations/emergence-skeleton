@@ -70,7 +70,7 @@ Cypress.Commands.add('resetDatabase', () => {
 
 // Drops the entire
 Cypress.Commands.add('dropDatabase', () => {
-    cy.exec(`echo 'DROP DATABASE IF EXISTS \`default\`; CREATE DATABASE \`default\`;' | ${_buildHabExec('core/mysql', 'mysql')} -u root -h 127.0.0.1`);
+    cy.exec(`echo 'DROP DATABASE IF EXISTS \`default\`; CREATE DATABASE \`default\`;' | ${_buildHabExec('core/mysql', 'mysql', '-u root -h 127.0.0.1')}`);
 });
 
 // Reload the original data fixtures
@@ -82,7 +82,7 @@ Cypress.Commands.add('loadDatabase', () => {
         return _loadFixturesTree(cachedFixturesTreeHash);
     }
 
-    cy.exec(`${_buildHabExec('jarvus/hologit', 'git')} holo project fixtures --working`)
+    cy.exec(_buildHabExec('jarvus/hologit', 'git', `holo project fixtures --working`))
         .then(({ stdout: treeHash }) => {
             if (!treeHash) {
                 throw new Error('unable to compute tree hash for fixtures data');
@@ -107,21 +107,25 @@ Cypress.Commands.add('withExt', () => {
 });
 
 // private method
-function _buildHabExec(pkg, pkgCmd) {
+function _buildHabExec(pkg, pkgCmd, pkgArgs) {
     const studioContainer = Cypress.env('STUDIO_CONTAINER') || null;
     const studioSSH = Cypress.env('STUDIO_SSH') || null;
 
-    let cmd = `hab pkg exec ${pkg} ${pkgCmd}`;
+    let cmd = `hab pkg exec ${pkg} -- ${pkgCmd} ${pkgArgs||''}`;
 
     if (studioContainer) {
-        cmd = `${studioSSH ? `ssh ${studioSSH}` : ''} docker exec -i ${studioContainer} ${cmd}`;
+        cmd = `docker exec -i ${studioContainer} ${cmd}`;
+
+        if (studioSSH) {
+            cmd = `ssh ${studioSSH} '${cmd.replace(/'/g, `'"'"'`)}'`
+        }
     }
 
     return cmd;
 }
 
 function _loadFixturesTree(treeHash) {
-    cy.exec(`${_buildHabExec('emergence/php-runtime', 'bash')} -c '
+    cy.exec(_buildHabExec('emergence/php-runtime', 'bash', `-c '
         (
             echo "SET autocommit=0;"
             echo "SET unique_checks=0;"
@@ -131,7 +135,7 @@ function _loadFixturesTree(treeHash) {
             done
             echo "COMMIT;"
         ) | mysql default
-    '`);
+    '`));
 
-    cy.exec(`${_buildHabExec('emergence/php-runtime', 'emergence-console-run')} migrations:execute --all`);
+    cy.exec(_buildHabExec('emergence/php-runtime', 'emergence-console-run', `migrations:execute --all`));
 }
