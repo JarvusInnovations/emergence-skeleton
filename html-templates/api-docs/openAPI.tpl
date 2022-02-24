@@ -9,19 +9,15 @@
 
 {block "content"}
     <?php
-        // we need to keep a reference to the top-level document for resolving JSONSchema refs
-        $GLOBALS['swaggerDocument'] = $this->scope['swaggerDocument'] = &$this->scope;
+        // flatten all $refs in document ahead of rendering
+        $this->scope = Emergence\OpenAPI\Reader::flattenAllRefs($this->scope);
     ?>
 
     {template definition input definitionId=null}
-        <?php
-            $this->scope['swaggerDocument'] = $GLOBALS['swaggerDocument'];
-        ?>
+        {$schema = default($input.schema, $input)}
+        {$definitionId = default($definitionId, Emergence\OpenAPI\Reader::getDefinitionIdFromPath($schema._resolvedRef))}
 
-        {$input = Emergence\OpenAPI\Reader::flattenDefinition($input, $swaggerDocument)}
-        {$definitionId = default($definitionId, Emergence\OpenAPI\Reader::getDefinitionIdFromPath($input._resolvedRef))}
-
-        {if $input.properties}
+        {if $schema.properties}
             <table class="docs-table schema-table">
                 {if $definitionId}
                     <caption>Model: <a href="#{unique_dom_id}models//{$definitionId}{/unique_dom_id}">{$definitionId}</a></caption>
@@ -35,10 +31,10 @@
                 </thead>
 
                 <tbody>
-                {foreach key=property item=propertyData from=$input.properties}
+                {foreach key=property item=propertyData from=$schema.properties}
                     <tr>
                         <td><code>{$property}</code></td>
-                        <td class="text-center">{tif is_array($input.required) && in_array($property, $input.required) ? '&#10003;' : '<span class="muted">&mdash;</span>'}</td>
+                        <td class="text-center">{tif is_array($schema.required) && in_array($property, $schema.required) ? '&#10003;' : '<span class="muted">&mdash;</span>'}</td>
                         <td>{definition $propertyData}</td>
                     </tr>
                     {if $propertyData.description}
@@ -50,17 +46,17 @@
                 </tbody>
             </table>
         {else}
-            {if $input.type == 'array'}
-                [array] {definition $input.items}
+            {if $schema.type == 'array'}
+                [array] {definition $schema.items}
             {else}
-                {$input.type}
-                {if $input.format}
-                    ({$input.format})
+                {$schema.type}
+                {if $schema.format}
+                    ({$schema.format})
                 {/if}
-                {if $input.enum}
+                {if $schema.enum}
                     (enum)
                     <ul>
-                        {foreach item=value from=$input.enum}
+                        {foreach item=value from=$schema.enum}
                             <li><q>{$value|escape}</q></li>
                         {/foreach}
                     </ul>

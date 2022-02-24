@@ -321,4 +321,26 @@ class Reader
 
         return null;
     }
+
+    public static function flattenAllRefs(array $document, array $scope = null)
+    {
+        // begin scope at entire document
+        $scope = $scope === null ? $document : $scope;
+
+        // loop through each direct descendent
+        foreach ($scope as $key => &$value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
+            // flatten any refs first
+            $value = static::dereferenceNode($value, $document);
+
+            // then descend to flatten any childern
+            $value = static::flattenAllRefs($document, $value);
+        }
+
+        // return only the scope of this iteration
+        return $scope;
+    }
 }
