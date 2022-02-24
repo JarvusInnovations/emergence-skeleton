@@ -5,6 +5,7 @@ namespace Emergence\OpenAPI;
 use Exception;
 use ActiveRecord;
 use VersionedRecord;
+use RecordsRequestHandler;
 use Emergence\Util\Data AS DataUtil;
 
 
@@ -47,7 +48,20 @@ class Reader
             }
         );
 
-        $data['paths'] = array_map([__CLASS__, 'normalizePathObject'], $data['paths']);
+        foreach ($data['paths'] as $pathKey => &$pathObject) {
+            $outSubPaths = [];
+            $outDefinitions = [];
+            $pathObject = static::normalizePathObject($pathObject, $outSubPaths, $outDefinitions);
+
+            foreach ($outSubPaths as $subPathKey => $subPathObject) {
+                $data['paths']["{$pathKey}/{$subPathKey}"] = static::normalizePathObject($subPathObject);
+            }
+
+            foreach ($outDefinitions as $definitionKey => $definitionObject) {
+                // will be normalized in next loop
+                $data['definitions'][$definitionKey] = $definitionObject;
+            }
+        }
         ksort($data['paths']);
 
 
@@ -110,10 +124,94 @@ class Reader
         return false;
     }
 
-    protected static function normalizePathObject(array $object)
+    protected static function normalizePathObject(array $object, array &$outSubPaths = null, array &$outDefinitions = null)
     {
-        // TODO: generate path and sub-path spec if x-recordsRequestHandler is set
+        if (!empty($object['x-recordsRequestHandler'])) {
+            if (!isset($outSubPaths)) {
+                throw new Exception('x-recordsRequestHandler value cannot be processed within a generated subpath');
+            }
+
+            if (!class_exists($object['x-recordsRequestHandler'])) {
+                throw new Exception('x-recordsRequestHandler value does not match an available class: ' . $object['x-recordsRequestHandler']);
+            }
+
+            if (!is_a($object['x-recordsRequestHandler'], RecordsRequestHandler::class, true)) {
+                throw new Exception('x-recordsRequestHandler value is not an RecordsRequestHandler subclass: ' . $object['x-recordsRequestHandler']);
+            }
+
+            static::fillPathsFromRecordsRequestHandler($object['x-recordsRequestHandler'], $object, $outSubPaths, $outDefinitions);
+
+            unset($object['x-recordsRequestHandler']);
+        }
+
         return $object;
+    }
+
+    protected static function fillPathsFromRecordsRequestHandler($className, &$outPath, array &$outSubPaths, array &$outDefinitions)
+    {
+        $recordClass = $className::$recordClass;
+
+        // generate record definition
+        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function( $matches) {
+            return strtoupper($matches[2]);
+        }, $recordClass::$singularNoun);
+
+        $recordDefinition = [];
+        static::fillSchemaFromActiveRecord($recordClass, $recordDefinition);
+        $outDefinitions[$recordDefinitionName] = $recordDefinition;
+
+        // generate response definition
+        $outDefinitions["{$recordDefinitionName}Response"] = [
+            'required' => [ 'data', 'success' ],
+            'properties' => [
+                'data' => [
+                    'type' => 'array',
+                    'items' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
+                ],
+                'success' => [
+                    'type' => 'boolean'
+                ],
+                'limit' => [
+                    'type' => 'integer',
+                    'description' => 'Number of records response was limited to'
+                ],
+                'offset' => [
+                    'type' => 'integer',
+                    'description' => 'Position of first record returned in full result set'
+                ],
+                'total' => [
+                    'type' => 'integer',
+                    'description' => 'The total number of records available in the result set across all pages'
+                ],
+                'conditions' => [
+                    'type' => 'object',
+                    'description' => 'SQL filters applied to current result set '
+                ]
+            ]
+        ];
+
+
+        // GET /records
+        $outPath['get'] = [
+            'description' => "Get list of {$recordClass} record instances",
+            'parameters' => [
+                [ '$ref' => '#/parameters/limit' ],
+                [ '$ref' => '#/parameters/offset' ],
+                [ '$ref' => '#/parameters/query' ],
+                [ '$ref' => '#/parameters/include' ],
+                [ '$ref' => '#/parameters/format' ],
+                [ '$ref' => '#/parameters/accept' ]
+            ],
+            'responses' => [
+                '200' => [
+                    'description' => 'Successful response',
+                    'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}Response" ]
+                ]
+            ]
+        ];
+
+        // $outPath['get'] = 'test';
+        // $outSubPaths["subpath"] = [ 'foo' => 'bar' ];
     }
 
     protected static function normalizeSchemaObject(array $object)
