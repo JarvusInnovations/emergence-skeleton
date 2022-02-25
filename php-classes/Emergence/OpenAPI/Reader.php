@@ -162,6 +162,7 @@ class Reader
 
         // generate response definition
         $outDefinitions["{$recordDefinitionName}Response"] = [
+            'type' => 'object',
             'required' => [ 'data', 'success' ],
             'properties' => [
                 'data' => [
@@ -233,6 +234,8 @@ class Reader
 
     protected static function fillSchemaFromActiveRecord($className, &$outSchema)
     {
+        $outSchema['type'] = 'object';
+
         $required = [];
 
         foreach ($className::aggregateStackedConfig('fields') AS $fieldName => $fieldConfig) {
