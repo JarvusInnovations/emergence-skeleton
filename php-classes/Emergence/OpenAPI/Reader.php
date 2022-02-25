@@ -191,7 +191,6 @@ class Reader
             ]
         ];
 
-
         // GET /records
         $outPath['get'] = [
             'description' => "Get list of {$recordClass} record instances",
@@ -211,8 +210,87 @@ class Reader
             ]
         ];
 
-        // $outPath['get'] = 'test';
-        // $outSubPaths["subpath"] = [ 'foo' => 'bar' ];
+        // GET /records/*fields
+        $outSubPaths['*fields'] = [
+            'get' => [
+                'description' => "Get configuration of all available {$recordClass} fields",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'fields' => [
+                                    'type' => 'object',
+                                    'description' => 'All available fields and their configurations'
+                                ],
+                                'dynamicFields' => [
+                                    'type' => 'object',
+                                    'description' => 'All available dynamic fields and their configurations'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // GET or POST /records/create
+        $outSubPaths['create'] = [
+            'get' => [
+                'description' => "Get form/data needed to create a {$recordClass} object",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'array',
+                                    'items' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
+                                ],
+                                'success' => [
+                                    'type' => 'boolean'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'post' => [
+                'description' => "Get form/data needed to create a {$recordClass} object",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ],
+                                'success' => [
+                                    'type' => 'boolean'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     protected static function normalizeSchemaObject(array $object)
