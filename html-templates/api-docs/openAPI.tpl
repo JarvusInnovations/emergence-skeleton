@@ -131,7 +131,7 @@
                             {foreach key=method item=methodData from=$pathData}
                                 <section class="endpoint-path-method indent" id="{unique_dom_id}paths/{$path}.{$method}{/unique_dom_id}" data-method="{$method}">
                                     <header class="section-header">
-                                        <h4 class="header-title"><a href="#{unique_dom_id}paths/{$path}.{$method}{/unique_dom_id}"><span class="http-method">{$method}</span> {$path}</a></h4>
+                                        <h4 class="header-title"><a href="#{unique_dom_id}paths/{$path}.{$method}{/unique_dom_id}"><span class="http-method">{$method|upper}</span> {$path}</a></h4>
                                     </header>
 
                                     <div class="markdown indent">{$methodData.description|escape|markdown}</div>
