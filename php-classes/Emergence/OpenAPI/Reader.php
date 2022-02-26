@@ -150,11 +150,12 @@ class Reader
     protected static function fillPathsFromRecordsRequestHandler($className, &$outPath, array &$outSubPaths, array &$outDefinitions)
     {
         $recordClass = $className::$recordClass;
+        $recordNoun = $recordClass::$singularNoun;
 
         // generate record definition
-        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function( $matches) {
+        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function($matches) {
             return strtoupper($matches[2]);
-        }, $recordClass::$singularNoun);
+        }, $recordNoun);
 
         $recordDefinition = [];
         static::fillSchemaFromActiveRecord($recordClass, $recordDefinition);
@@ -165,12 +166,12 @@ class Reader
             'type' => 'object',
             'required' => [ 'data', 'success' ],
             'properties' => [
+                'success' => [
+                    'type' => 'boolean'
+                ],
                 'data' => [
                     'type' => 'array',
                     'items' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
-                ],
-                'success' => [
-                    'type' => 'boolean'
                 ],
                 'limit' => [
                     'type' => 'integer',
@@ -193,7 +194,7 @@ class Reader
 
         // GET /records
         $outPath['get'] = [
-            'description' => "Get list of {$recordClass} record instances",
+            'description' => "Get list of `{$recordClass}` record instances",
             'parameters' => [
                 [ '$ref' => '#/parameters/limit' ],
                 [ '$ref' => '#/parameters/offset' ],
@@ -205,7 +206,9 @@ class Reader
             'responses' => [
                 '200' => [
                     'description' => 'Successful response',
-                    'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}Response" ]
+                    'schema' => [
+                        '$ref' => "#/definitions/{$recordDefinitionName}Response"
+                    ]
                 ]
             ]
         ];
@@ -213,7 +216,7 @@ class Reader
         // GET /records/*fields
         $outSubPaths['*fields'] = [
             'get' => [
-                'description' => "Get configuration of all available {$recordClass} fields",
+                'description' => "Get configuration of all available `{$recordClass}` fields",
                 'parameters' => [
                     [ '$ref' => '#/parameters/format' ],
                     [ '$ref' => '#/parameters/accept' ]
@@ -239,10 +242,126 @@ class Reader
             ]
         ];
 
+        // POST /records/save
+        $outSubPaths['save'] = [
+            'post' => [
+                'description' => "Create or update one or more `{$recordClass}` records",
+                'consumes' => [ 'application/json' ],
+                'parameters' => [
+                    [
+                        'name' => 'body',
+                        'in' => 'body',
+                        'description' => "Values for new `{$recordClass}` record fields",
+                        'required' => true,
+                        'schema' => [
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'array',
+                                    'descriptions' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
+                                    'items' => [
+                                        '$ref' => "#/definitions/{$recordDefinitionName}"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => "#/definitions/{$recordDefinitionName}"
+                                    ]
+                                ],
+                                'failed' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'record' => [
+                                                '$ref' => "#/definitions/{$recordDefinitionName}"
+                                            ],
+                                            'validationErrors' => [
+                                                'type' => 'object',
+                                                'description' => 'All validation errors from trying to save the associated record, keyed by field name'
+                                            ]
+                                        ]
+                                    ]
+                                ],
+                                'message' => [
+                                    'type' => 'string',
+                                    'description' => 'Top line error message if save failed'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // POST /records/destroy
+        $outSubPaths['destroy'] = [
+            'post' => [
+                'description' => "Destroy one or more `{$recordClass}` record",
+                'consumes' => [ 'application/json' ],
+                'parameters' => [
+                    [
+                        'name' => 'body',
+                        'in' => 'body',
+                        'description' => "List of IDs of `{$recordNoun}` records to delete",
+                        'required' => true,
+                        'schema' => [
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'ID' => [
+                                                'type' => 'integer',
+                                                'description' => 'Could also me an object containing the property `ID`'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
         // GET or POST /records/create
         $outSubPaths['create'] = [
             'get' => [
-                'description' => "Get form/data needed to create a {$recordClass} object",
+                'description' => "Get form/data needed to create a `{$recordClass}` record",
                 'parameters' => [
                     [ '$ref' => '#/parameters/include' ],
                     [ '$ref' => '#/parameters/format' ],
@@ -254,12 +373,14 @@ class Reader
                         'schema' => [
                             'type' => 'object',
                             'properties' => [
-                                'data' => [
-                                    'type' => 'array',
-                                    'items' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
-                                ],
                                 'success' => [
                                     'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => "#/definitions/{$recordDefinitionName}"
+                                    ]
                                 ]
                             ]
                         ]
@@ -267,8 +388,16 @@ class Reader
                 ]
             ],
             'post' => [
-                'description' => "Get form/data needed to create a {$recordClass} object",
+                'description' => "Create a new `{$recordClass}` record",
+                'consumes' => [ 'application/x-www-form-urlencoded' ],
                 'parameters' => [
+                    [
+                        'name' => 'body',
+                        'in' => 'body',
+                        'description' => "Values for new `{$recordClass}` record fields",
+                        'required' => true,
+                        'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
+                    ],
                     [ '$ref' => '#/parameters/include' ],
                     [ '$ref' => '#/parameters/format' ],
                     [ '$ref' => '#/parameters/accept' ]
@@ -279,11 +408,11 @@ class Reader
                         'schema' => [
                             'type' => 'object',
                             'properties' => [
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
-                                ],
                                 'success' => [
                                     'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
                                 ]
                             ]
                         ]
@@ -410,6 +539,8 @@ class Reader
 
             $outSchema['properties'][$fieldName] = isset($outSchema['properties'][$fieldName]) ? array_merge($propertyDefaults, $outSchema['properties'][$fieldName]) : $propertyDefaults;
         }
+
+        // TODO: generate dynamicFields with "${desc} if `include=PhotoMedia`" descriptions
 
         if (count($required)) {
             $outSchema['required'] = isset($outSchema['required']) ? array_unique(array_merge($outSchema['required'], $required)) : $required;
