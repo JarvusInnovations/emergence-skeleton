@@ -257,7 +257,7 @@ class Reader
                             'properties' => [
                                 'data' => [
                                     'type' => 'array',
-                                    'descriptions' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
+                                    'description' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
                                     'items' => [
                                         '$ref' => "#/definitions/{$recordDefinitionName}"
                                     ]
@@ -280,12 +280,14 @@ class Reader
                                 ],
                                 'data' => [
                                     'type' => 'array',
+                                    'description' => 'A list of successfully saved records',
                                     'items' => [
                                         '$ref' => "#/definitions/{$recordDefinitionName}"
                                     ]
                                 ],
                                 'failed' => [
                                     'type' => 'array',
+                                    'description' => 'A list of record data objects that failed to save',
                                     'items' => [
                                         'type' => 'object',
                                         'properties' => [
