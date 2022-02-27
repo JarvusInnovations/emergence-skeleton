@@ -422,6 +422,126 @@ class Reader
                 ]
             ]
         ];
+
+        // GET /records/{identifier}
+        $outSubPaths['{identifier}'] = [
+            'get' => [
+                'description' => "Get an individual `{$recordClass}` record",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/identifier' ],
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // GET or POST /records/{identifier}/edit
+        $outSubPaths['{identifier}/edit'] = [
+            'get' => [
+                'description' => "Get form/data needed to edit the `{$recordClass}` record",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/identifier' ],
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'post' => [
+                'description' => "Submit changes to apply to the `{$recordClass}` record",
+                'consumes' => [ 'application/x-www-form-urlencoded' ],
+                'parameters' => [
+                    [
+                        'name' => 'body',
+                        'in' => 'body',
+                        'description' => "New values for one or more `{$recordClass}` record fields",
+                        'required' => true,
+                        'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
+                    ],
+                    [ '$ref' => '#/parameters/identifier' ],
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // POST /records/{identifier}/delete
+        $outSubPaths['{identifier}/delete'] = [
+            'post' => [
+                'description' => "Delete this `{$recordClass}` record",
+                'parameters' => [
+                    [ '$ref' => '#/parameters/identifier' ],
+                    [ '$ref' => '#/parameters/include' ],
+                    [ '$ref' => '#/parameters/format' ],
+                    [ '$ref' => '#/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'success' => [
+                                    'type' => 'boolean'
+                                ],
+                                'data' => [
+                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     protected static function normalizeSchemaObject(array $object)

@@ -1,0 +1,5 @@
+name: identifier
+in: path
+description: Unique numeric `ID` or string `Handle` identifier for a record
+type: string
+required: true
