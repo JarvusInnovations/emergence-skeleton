@@ -59,23 +59,23 @@ class Reader
 
             foreach ($outDefinitions as $definitionKey => $definitionObject) {
                 // will be normalized in next loop
-                $data['definitions'][$definitionKey] = $definitionObject;
+                $data['components']['schemas'][$definitionKey] = $definitionObject;
             }
         }
         ksort($data['paths']);
 
 
         // collapse and normalize definitions
-        $data['definitions'] = static::findObjects(
-            $data['definitions'],
+        $data['components']['schemas'] = static::findObjects(
+            $data['components']['schemas'],
             [__CLASS__, 'isSchemaObject'],
             function (array $keys) {
                 return implode('\\', $keys);
             }
         );
 
-        $data['definitions'] = array_map([__CLASS__, 'normalizeSchemaObject'], $data['definitions']);
-        ksort($data['definitions']);
+        $data['components']['schemas'] = array_map([__CLASS__, 'normalizeSchemaObject'], $data['components']['schemas']);
+        ksort($data['components']['schemas']);
 
 
         return $data;
@@ -153,7 +153,7 @@ class Reader
         $recordNoun = $recordClass::$singularNoun;
 
         // generate record definition
-        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function($matches) {
+        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function ($matches) {
             return strtoupper($matches[2]);
         }, $recordNoun);
 
@@ -171,7 +171,7 @@ class Reader
                 ],
                 'data' => [
                     'type' => 'array',
-                    'items' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
+                    'items' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
                 ],
                 'limit' => [
                     'type' => 'integer',
@@ -196,18 +196,22 @@ class Reader
         $outPath['get'] = [
             'description' => "Get list of `{$recordClass}` record instances",
             'parameters' => [
-                [ '$ref' => '#/parameters/limit' ],
-                [ '$ref' => '#/parameters/offset' ],
-                [ '$ref' => '#/parameters/query' ],
-                [ '$ref' => '#/parameters/include' ],
-                [ '$ref' => '#/parameters/format' ],
-                [ '$ref' => '#/parameters/accept' ]
+                [ '$ref' => '#/components/parameters/limit' ],
+                [ '$ref' => '#/components/parameters/offset' ],
+                [ '$ref' => '#/components/parameters/query' ],
+                [ '$ref' => '#/components/parameters/include' ],
+                [ '$ref' => '#/components/parameters/format' ],
+                [ '$ref' => '#/components/parameters/accept' ]
             ],
             'responses' => [
                 '200' => [
                     'description' => 'Successful response',
-                    'schema' => [
-                        '$ref' => "#/definitions/{$recordDefinitionName}Response"
+                    'content' => [
+                        'application/json' => [
+                            'schema' => [
+                                '$ref' => "#/components/schemas/{$recordDefinitionName}Response"
+                            ]
+                        ]
                     ]
                 ]
             ]
@@ -218,22 +222,26 @@ class Reader
             'get' => [
                 'description' => "Get configuration of all available `{$recordClass}` fields",
                 'parameters' => [
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'fields' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
                                     'type' => 'object',
-                                    'description' => 'All available fields and their configurations'
-                                ],
-                                'dynamicFields' => [
-                                    'type' => 'object',
-                                    'description' => 'All available dynamic fields and their configurations'
+                                    'properties' => [
+                                        'fields' => [
+                                            'type' => 'object',
+                                            'description' => 'All available fields and their configurations'
+                                        ],
+                                        'dynamicFields' => [
+                                            'type' => 'object',
+                                            'description' => 'All available dynamic fields and their configurations'
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -245,65 +253,70 @@ class Reader
         // POST /records/save
         $outSubPaths['save'] = [
             'post' => [
-                'description' => "Create or update one or more `{$recordClass}` records",
-                'consumes' => [ 'application/json' ],
+                'summary' => "Create or update one or more `{$recordClass}` records",
                 'parameters' => [
-                    [
-                        'name' => 'body',
-                        'in' => 'body',
-                        'description' => "Values for new `{$recordClass}` record fields",
-                        'required' => true,
-                        'schema' => [
-                            'properties' => [
-                                'data' => [
-                                    'type' => 'array',
-                                    'description' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
-                                    'items' => [
-                                        '$ref' => "#/definitions/{$recordDefinitionName}"
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
+                ],
+                'requestBody' => [
+                    'description' => "Values for new `{$recordClass}` record fields",
+                    'required' => true,
+                    'content' => [
+                        'application/json' => [
+                            'schema' => [
+                                'properties' => [
+                                    'data' => [
+                                        'type' => 'array',
+                                        'description' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
+                                        'items' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
                                     ]
                                 ]
                             ]
                         ]
-                    ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    'type' => 'array',
-                                    'description' => 'A list of successfully saved records',
-                                    'items' => [
-                                        '$ref' => "#/definitions/{$recordDefinitionName}"
-                                    ]
-                                ],
-                                'failed' => [
-                                    'type' => 'array',
-                                    'description' => 'A list of record data objects that failed to save',
-                                    'items' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'record' => [
-                                                '$ref' => "#/definitions/{$recordDefinitionName}"
-                                            ],
-                                            'validationErrors' => [
-                                                'type' => 'object',
-                                                'description' => 'All validation errors from trying to save the associated record, keyed by field name'
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            'type' => 'array',
+                                            'description' => 'A list of successfully saved records',
+                                            'items' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
                                             ]
+                                        ],
+                                        'failed' => [
+                                            'type' => 'array',
+                                            'description' => 'A list of record data objects that failed to save',
+                                            'items' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'record' => [
+                                                        '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                                    ],
+                                                    'validationErrors' => [
+                                                        'type' => 'object',
+                                                        'description' => 'All validation errors from trying to save the associated record, keyed by field name'
+                                                    ]
+                                                ]
+                                            ]
+                                        ],
+                                        'message' => [
+                                            'type' => 'string',
+                                            'description' => 'Top line error message if save failed'
                                         ]
                                     ]
-                                ],
-                                'message' => [
-                                    'type' => 'string',
-                                    'description' => 'Top line error message if save failed'
                                 ]
                             ]
                         ]
@@ -316,23 +329,22 @@ class Reader
         $outSubPaths['destroy'] = [
             'post' => [
                 'description' => "Destroy one or more `{$recordClass}` record",
-                'consumes' => [ 'application/json' ],
-                'parameters' => [
-                    [
-                        'name' => 'body',
-                        'in' => 'body',
-                        'description' => "List of IDs of `{$recordNoun}` records to delete",
-                        'required' => true,
-                        'schema' => [
-                            'properties' => [
-                                'data' => [
-                                    'type' => 'array',
-                                    'items' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'ID' => [
-                                                'type' => 'integer',
-                                                'description' => 'Could also me an object containing the property `ID`'
+                'requestBody' => [
+                    'description' => "List of IDs of `{$recordNoun}` records to delete",
+                    'required' => true,
+                    'content' => [
+                        'application/json' => [
+                            'schema' => [
+                                'properties' => [
+                                    'data' => [
+                                        'type' => 'array',
+                                        'items' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'ID' => [
+                                                    'type' => 'integer',
+                                                    'description' => 'Could also me an object containing the property `ID`'
+                                                ]
                                             ]
                                         ]
                                     ]
@@ -344,14 +356,18 @@ class Reader
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -365,23 +381,27 @@ class Reader
             'get' => [
                 'description' => "Get form/data needed to create a `{$recordClass}` record",
                 'parameters' => [
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    'type' => 'array',
-                                    'items' => [
-                                        '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            'type' => 'array',
+                                            'items' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
@@ -391,30 +411,35 @@ class Reader
             ],
             'post' => [
                 'description' => "Create a new `{$recordClass}` record",
-                'consumes' => [ 'application/x-www-form-urlencoded' ],
                 'parameters' => [
-                    [
-                        'name' => 'body',
-                        'in' => 'body',
-                        'description' => "Values for new `{$recordClass}` record fields",
-                        'required' => true,
-                        'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
-                    ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
+                ],
+                'requestBody' => [
+                    'description' => "Values for new `{$recordClass}` record fields",
+                    'required' => true,
+                    'content' => [
+                        'application/x-www-form-urlencoded' => [
+                            'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
+                        ]
+                    ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -428,22 +453,26 @@ class Reader
             'get' => [
                 'description' => "Get an individual `{$recordClass}` record",
                 'parameters' => [
-                    [ '$ref' => '#/parameters/identifier' ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/identifier' ],
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -457,22 +486,26 @@ class Reader
             'get' => [
                 'description' => "Get form/data needed to edit the `{$recordClass}` record",
                 'parameters' => [
-                    [ '$ref' => '#/parameters/identifier' ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/identifier' ],
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -481,31 +514,36 @@ class Reader
             ],
             'post' => [
                 'description' => "Submit changes to apply to the `{$recordClass}` record",
-                'consumes' => [ 'application/x-www-form-urlencoded' ],
                 'parameters' => [
-                    [
-                        'name' => 'body',
-                        'in' => 'body',
-                        'description' => "New values for one or more `{$recordClass}` record fields",
-                        'required' => true,
-                        'schema' => [ '$ref' => "#/definitions/{$recordDefinitionName}" ]
-                    ],
-                    [ '$ref' => '#/parameters/identifier' ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/identifier' ],
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
+                ],
+                'requestBody' => [
+                    'description' => "New values for one or more `{$recordClass}` record fields",
+                    'required' => true,
+                    'content' => [
+                        'application/x-www-form-urlencoded' => [
+                            'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
+                        ]
+                    ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -519,22 +557,26 @@ class Reader
             'post' => [
                 'description' => "Delete this `{$recordClass}` record",
                 'parameters' => [
-                    [ '$ref' => '#/parameters/identifier' ],
-                    [ '$ref' => '#/parameters/include' ],
-                    [ '$ref' => '#/parameters/format' ],
-                    [ '$ref' => '#/parameters/accept' ]
+                    [ '$ref' => '#/components/parameters/identifier' ],
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
                 'responses' => [
                     '200' => [
                         'description' => 'Successful response',
-                        'schema' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'success' => [
-                                    'type' => 'boolean'
-                                ],
-                                'data' => [
-                                    '$ref' => "#/definitions/{$recordDefinitionName}"
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => [
+                                            'type' => 'boolean'
+                                        ],
+                                        'data' => [
+                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -743,7 +785,7 @@ class Reader
     public static function getDefinitionIdFromPath($path)
     {
         if ($path) {
-            $prefix = '#/definitions/';
+            $prefix = '#/components/schemas/';
             $prefixLen = strlen($prefix);
 
             if (substr($path, 0, $prefixLen) === $prefix) {

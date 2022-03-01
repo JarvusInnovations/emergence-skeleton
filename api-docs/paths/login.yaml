@@ -1,46 +1,54 @@
 post:
   description: Create a new session
   security: []
-  consumes:
-  - application/x-www-form-urlencoded
   parameters:
-  - name: '_LOGIN[username]'
-    in: formData
+  - $ref: '#/components/parameters/include'
+  - $ref: '#/components/parameters/format'
+  - $ref: '#/components/parameters/accept'
+  requestBody:
     required: true
-    type: string
-  - name: '_LOGIN[password]'
-    in: formData
-    required: true
-    type: string
-    format: password
-  - name: '_LOGIN[returnMethod]'
-    in: formData
-    description: Set to `POST` to return session in response to POST request instead of redirecting to post-login URL
-    type: string
-    default: POST
-    enum:
-    - GET
-    - POST
-  - $ref: '#/parameters/include'
-  - $ref: '#/parameters/format'
-  - $ref: '#/parameters/accept'
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          required:
+          - _LOGIN[password]
+          - _LOGIN[username]
+          properties:
+            _LOGIN[username]:
+              type: string
+            _LOGIN[password]:
+              type: string
+              format: password
+            _LOGIN[returnMethod]:
+              type: string
+              description: Set to `POST` to return session in response to POST
+                request instead of redirecting to post-login URL
+              default: POST
+              enum:
+              - GET
+              - POST
   responses:
     200:
       description: Login credentials accepted, session created
-      schema:
-        $ref: '#/definitions/SessionResponse'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionResponse'
     401:
       description: Username or password invalid
 get:
   description: Get current Session
   parameters:
-  - $ref: '#/parameters/include'
-  - $ref: '#/parameters/format'
-  - $ref: '#/parameters/accept'
+  - $ref: '#/components/parameters/include'
+  - $ref: '#/components/parameters/format'
+  - $ref: '#/components/parameters/accept'
   responses:
     200:
       description: Session found
-      schema:
-        $ref: '#/definitions/SessionResponse'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionResponse'
     401:
       description: Sesson not provided, not valid, or expired

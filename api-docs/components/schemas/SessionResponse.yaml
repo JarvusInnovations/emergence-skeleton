@@ -3,7 +3,7 @@ properties:
   success:
     type: boolean
   data:
-    $ref: '#/definitions/Session'
+    $ref: '#/components/schemas/Session'
   returnURL:
     type: string
     description: URL that user should be sent to after login
