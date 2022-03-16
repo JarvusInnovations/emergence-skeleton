@@ -2129,16 +2129,16 @@ class ActiveRecord
                 {
                     if (!isset($this->_convertedValues[$field])) {
                         if ($fieldOptions['type'] == 'timestamp') {
-                            static $mysqlStaticTimezoneOffset;
+                            static $timestampSuffix;
 
-                            if ($mysqlStaticTimezoneOffset === null) {
-                                $mysqlStaticTimezoneOffset = DB::oneValue('SELECT @@SESSION.time_zone');
-                                if (!preg_match('/^-?\d+:\d+$/', $mysqlStaticTimezoneOffset)) {
-                                    $mysqlStaticTimezoneOffset = '';
+                            if ($timestampSuffix === null) {
+                                $timestampSuffix = static::getDatabaseOffsetTimezone();
+                                if (!$timestampSuffix) {
+                                    $timestampSuffix = '';
                                 }
                             }
 
-                            $value .= $mysqlStaticTimezoneOffset;
+                            $value .= $timestampSuffix;
                         }
 
                         if ($value && $value != '0000-00-00 00:00:00') {
@@ -2356,7 +2356,24 @@ class ActiveRecord
                 if (!$value) {
                     $value = null;
                 } elseif (is_numeric($value)) {
-                    $value = date('Y-m-d H:i:s', $value);
+                    static $offsetTimezone;
+
+                    if ($offsetTimezone === null) {
+                        $offsetTimezone = static::getDatabaseOffsetTimezone();
+
+                        if ($offsetTimezone) {
+                            $offsetTimezone = new DateTimeZone($offsetTimezone);
+                        }
+                    }
+
+                    if ($offsetTimezone) {
+                        $dateTime = new DateTime();
+                        $dateTime->setTimestamp($value);
+                        $dateTime->setTimezone($offsetTimezone);
+                        $value = $dateTime->format('Y-m-d H:i:s');
+                    } else {
+                        $value = date('Y-m-d H:i:s', $value);
+                    }
                 } elseif (is_string($value)) {
                     // trim any extra crap, or leave as-is if it doesn't fit the pattern
                     $value = preg_replace('/^(\d{4})\D?(\d{2})\D?(\d{2})T?(\d{2})\D?(\d{2})\D?(\d{2})/', '$1-$2-$3 $4:$5:$6', $value);
@@ -3052,5 +3069,36 @@ class ActiveRecord
         }
 
         return $value;
+    }
+
+    /**
+     * Get the currently configured database timezone
+     */
+    public static function getDatabaseTimezone()
+    {
+        static $mysqlStaticTimezone;
+
+        if ($mysqlStaticTimezone === null) {
+            $mysqlStaticTimezone = DB::oneValue('SELECT @@SESSION.time_zone');
+        }
+
+        return $mysqlStaticTimezone;
+    }
+
+    /**
+     * If the database is currently configured with a UTC-offset timezone, return it
+     */
+    public static function getDatabaseOffsetTimezone()
+    {
+        static $mysqlStaticTimezoneOffset;
+
+        if ($mysqlStaticTimezoneOffset === null) {
+            $mysqlStaticTimezoneOffset = static::getDatabaseTimezone();
+            if (!preg_match('/^-?\d+:\d+$/', $mysqlStaticTimezoneOffset)) {
+                $mysqlStaticTimezoneOffset = false;
+            }
+        }
+
+        return $mysqlStaticTimezoneOffset;
     }
 }
