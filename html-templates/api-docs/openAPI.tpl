@@ -81,11 +81,11 @@
                         </ul>
                     </li>
                 {/if}
-                {if count($definitions)}
+                {if count($components.schemas)}
                     <li>
                         <a href="#models">Models</a>
                         <ul>
-                            {foreach key=model item=modelData from=$definitions}
+                            {foreach key=model item=modelData from=$components.schemas}
                                 <li><a href="#{unique_dom_id}models//{$model}{/unique_dom_id}">{$model}</a></li>
                             {/foreach}
                         </ul>
@@ -190,13 +190,13 @@
                 </section>
             {/if}
 
-            {if count($definitions)}
+            {if count($components.schemas)}
                 <section class="page-section" id="models">
                     <header class="section-header">
                         <h2 class="header-title">Models</h2>
                     </header>
 
-                    {foreach key=definition item=definitionData from=$definitions}
+                    {foreach key=definition item=definitionData from=$components.schemas}
                         <section class="endpoint-model" id="{unique_dom_id}models//{$definition}{/unique_dom_id}">
                             <header class="section-header">
                                 <h3 class="header-title"><a href="#{unique_dom_id}models//{$definition}{/unique_dom_id}">{$definition}</a></h3>
