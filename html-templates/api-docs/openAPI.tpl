@@ -97,9 +97,7 @@
 
         <div
              class="detail-view endpoint-docs"
-             data-host="{$host|escape}"
-             data-basepath="{$basePath|escape}"
-             data-schemes="{$schemes|implode:','|escape}"
+             data-servers="{foreach implode="," item=server from=$servers}{$server.url|escape}{/foreach}"
              data-handle="{$info['x-handle']|escape}"
              {if $info['x-key-required']}data-key-required{/if}
             >
