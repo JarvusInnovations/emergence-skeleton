@@ -168,17 +168,36 @@
                                                 <tr>
                                                     <th>Code</th>
                                                     <th>Description</th>
+                                                    <th>Type</th>
                                                     <th>Schema</th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
                                             {foreach key=responseCode item=responseData from=$methodData.responses}
-                                                <tr>
-                                                    <td>{$responseCode}</td>
-                                                    <td><div class="markdown response-description">{$responseData.description|escape|markdown}</div></td>
-                                                    <td>{definition $responseData}</td>
-                                                </tr>
+                                                {foreach name=contentTypes key=contentType item=contentData from=$responseData.content}
+                                                    <tr>
+                                                        {if $.foreach.contentTypes.first}
+                                                            <td rowspan="{$.foreach.contentTypes.total}">{$responseCode}</td>
+                                                            <td rowspan="{$.foreach.contentTypes.total}">
+                                                                <div class="markdown response-description">
+                                                                    {$responseData.description|escape|markdown}
+                                                                </div>
+                                                            </td>
+                                                        {/if}
+                                                        <td>{$contentType|escape}</td>
+                                                        <td>{definition $contentData}</td>
+                                                    </tr>
+                                                {foreachelse}
+                                                    <tr>
+                                                        <td>{$responseCode}</td>
+                                                        <td colspan="3">
+                                                            <div class="markdown response-description">
+                                                                {$responseData.description|escape|markdown}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {/foreach}
                                             {/foreach}
                                             </tbody>
                                         </table>
