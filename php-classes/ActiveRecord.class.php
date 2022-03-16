@@ -69,14 +69,17 @@ class ActiveRecord
             'type' => 'enum'
             ,'notnull' => true
             ,'values' => array()
+            ,'description' => 'PHP class responsible for loading/saving this record instance'
         )
         ,'Created' => array(
             'type' => 'timestamp'
             ,'default' => 'CURRENT_TIMESTAMP'
+            ,'description' => 'Timestamp capturing when this record was first saved to the database'
         )
         ,'CreatorID' => array(
             'type' => 'integer'
             ,'notnull' => false
+            ,'description' => 'ID of person who first saved this record to the database'
         )
     );
 
@@ -194,6 +197,7 @@ class ActiveRecord
                 static::$fields['Modified'] = array(
                     'type' => 'timestamp'
                     ,'notnull' => false
+                    ,'description' => 'Timestamp capturing when changes to this record were last saved to the database'
                 );
             }
 
@@ -201,6 +205,7 @@ class ActiveRecord
                 static::$fields['ModifierID'] = array(
                     'type' => 'uint'
                     ,'notnull' => false
+                    ,'description' => 'ID of person who last saved changes to this record to the database'
                 );
             }
 
