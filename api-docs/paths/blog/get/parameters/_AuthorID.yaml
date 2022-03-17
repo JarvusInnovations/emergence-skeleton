@@ -1,5 +1,0 @@
-- name: AuthorID
-  in: query
-  description: The `ID` of a person the match blog post authors to
-  schema:
-    type: integer
