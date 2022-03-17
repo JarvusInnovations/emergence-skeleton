@@ -1,5 +1,7 @@
 post:
-  description: Create a new session
+  tags:
+  - Session
+  summary: Create a new session
   security: []
   parameters:
   - $ref: '#/components/parameters/include'
@@ -38,7 +40,9 @@ post:
     401:
       description: Username or password invalid
 get:
-  description: Get current Session
+  tags:
+  - Session
+  summary: Get current Session
   parameters:
   - $ref: '#/components/parameters/include'
   - $ref: '#/components/parameters/format'

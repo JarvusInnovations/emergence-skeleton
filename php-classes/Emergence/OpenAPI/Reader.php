@@ -195,7 +195,8 @@ class Reader
         // GET /records
         $outPath['get'] = array_merge_recursive(
             [
-                'description' => "Get list of `{$recordClass}` record instances",
+                'tags' => [ $recordClass ],
+                'summary' => "Get list of `{$recordClass}` record instances",
                 'parameters' => [
                     [ '$ref' => '#/components/parameters/limit' ],
                     [ '$ref' => '#/components/parameters/offset' ],
@@ -227,7 +228,8 @@ class Reader
         $outSubPaths['*fields'] = array_merge_recursive(
             [
                 'get' => [
-                    'description' => "Get configuration of all available `{$recordClass}` fields",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Get configuration of all available `{$recordClass}` fields",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/format' ],
                         [ '$ref' => '#/components/parameters/accept' ]
@@ -263,6 +265,7 @@ class Reader
         $outSubPaths['save'] = array_merge_recursive(
             [
                 'post' => [
+                    'tags' => [ $recordClass ],
                     'summary' => "Create or update one or more `{$recordClass}` records",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/include' ],
@@ -341,7 +344,8 @@ class Reader
         $outSubPaths['destroy'] = array_merge_recursive(
             [
                 'post' => [
-                    'description' => "Destroy one or more `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Destroy one or more `{$recordClass}` record",
                     'requestBody' => [
                         'description' => "List of IDs of `{$recordNoun}` records to delete",
                         'required' => true,
@@ -395,7 +399,8 @@ class Reader
         $outSubPaths['create'] = array_merge_recursive(
             [
                 'get' => [
-                    'description' => "Get form/data needed to create a `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Get form/data needed to create a `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/include' ],
                         [ '$ref' => '#/components/parameters/format' ],
@@ -426,7 +431,8 @@ class Reader
                     ]
                 ],
                 'post' => [
-                    'description' => "Create a new `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Create a new `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/include' ],
                         [ '$ref' => '#/components/parameters/format' ],
@@ -470,7 +476,8 @@ class Reader
         $outSubPaths['{identifier}'] = array_merge_recursive(
             [
                 'get' => [
-                    'description' => "Get an individual `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Get an individual `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/identifier' ],
                         [ '$ref' => '#/components/parameters/include' ],
@@ -506,7 +513,8 @@ class Reader
         $outSubPaths['{identifier}/edit'] = array_merge_recursive(
             [
                 'get' => [
-                    'description' => "Get form/data needed to edit the `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Get form/data needed to edit the `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/identifier' ],
                         [ '$ref' => '#/components/parameters/include' ],
@@ -535,7 +543,8 @@ class Reader
                     ]
                 ],
                 'post' => [
-                    'description' => "Submit changes to apply to the `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Submit changes to apply to the `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/identifier' ],
                         [ '$ref' => '#/components/parameters/include' ],
@@ -580,7 +589,8 @@ class Reader
         $outSubPaths['{identifier}/delete'] = array_merge_recursive(
             [
                 'post' => [
-                    'description' => "Delete this `{$recordClass}` record",
+                    'tags' => [ $recordClass ],
+                    'summary' => "Delete this `{$recordClass}` record",
                     'parameters' => [
                         [ '$ref' => '#/components/parameters/identifier' ],
                         [ '$ref' => '#/components/parameters/include' ],
