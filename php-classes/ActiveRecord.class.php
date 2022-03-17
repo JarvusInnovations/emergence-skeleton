@@ -114,16 +114,20 @@ class ActiveRecord
     public static $dynamicFields = array(
         'Creator',
         'validationErrors' => array(
-            'getter' => 'getValidationErrors'
+            'getter' => 'getValidationErrors',
+            'description' => 'Map of field names to any errors registered in most recent validation'
         ),
         'recordTitle' => array(
-            'getter' => 'getTitle'
+            'getter' => 'getTitle',
+            'description' => 'The self-generated title for the record'
         ),
         'recordURL' => array(
-            'getter' => 'getURL'
+            'getter' => 'getURL',
+            'description' => 'The self-generated canonical URL the record'
         ),
         'availableActions' => array(
-            'getter' => 'getAvailableActions'
+            'getter' => 'getAvailableActions',
+            'description' => 'Map of capabilities to whether they are available to the current user'
         )
     );
 

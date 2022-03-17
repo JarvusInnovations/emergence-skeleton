@@ -741,7 +741,47 @@ class Reader
             $outSchema['properties'][$fieldName] = isset($outSchema['properties'][$fieldName]) ? array_merge($propertyDefaults, $outSchema['properties'][$fieldName]) : $propertyDefaults;
         }
 
-        // TODO: generate dynamicFields with "${desc} if `include=PhotoMedia`" descriptions
+        foreach ($className::aggregateStackedConfig('dynamicFields') AS $fieldName => $fieldConfig) {
+            $propertyDefaults = [];
+
+            if (!empty($fieldConfig['label'])) {
+                $propertyDefaults['title'] = $fieldConfig['label'];
+            }
+
+            if (!empty($fieldConfig['description'])) {
+                $propertyDefaults['description'] = $fieldConfig['description'];
+            }
+
+            // try to generate description via relationship config
+            if (empty($propertyDefaults['description'])
+                && empty($fieldConfig['getter'])
+                && empty($fieldConfig['method'])
+                && !empty($fieldConfig['relationship'])
+                && $relationshipConfig = $className::getStackedConfig('relationships', $fieldConfig['relationship'])
+            ) {
+                if ($relationshipConfig['type'] == 'one-one') {
+                    $propertyDefaults['description'] = "The `{$relationshipConfig['class']}` record referenced by the local `{$relationshipConfig['local']}` field";
+                } elseif ($relationshipConfig['type'] == 'many-many') {
+                    $propertyDefaults['description'] = "The `{$relationshipConfig['class']}` records linked via `{$relationshipConfig['linkClass']}` records";
+                } elseif ($relationshipConfig['type'] == 'one-many') {
+                    $propertyDefaults['description'] = "The `{$relationshipConfig['class']}` records linked via the foreign `{$relationshipConfig['foreign']}` field";
+                } elseif ($relationshipConfig['type'] == 'context-parent') {
+                    $propertyDefaults['description'] = "The records referenced by the local `{$relationshipConfig['classField']}` + `{$relationshipConfig['local']}` fields";
+                }
+            }
+
+            $propertyDefaults['description'] = rtrim($propertyDefaults['description'], ". \n");
+
+            if (!empty($propertyDefaults['description'])) {
+                $propertyDefaults['description'] .= ', included';
+            } else {
+                $propertyDefaults['description'] = 'Included';
+            }
+
+            $propertyDefaults['description'] .= " when `?include={$fieldName}`";
+
+            $outSchema['properties'][$fieldName] = isset($outSchema['properties'][$fieldName]) ? array_merge($propertyDefaults, $outSchema['properties'][$fieldName]) : $propertyDefaults;
+        }
 
         if (count($required)) {
             $outSchema['required'] = isset($outSchema['required']) ? array_unique(array_merge($outSchema['required'], $required)) : $required;
