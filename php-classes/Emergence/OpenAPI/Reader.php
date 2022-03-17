@@ -200,6 +200,9 @@ class Reader
                 [ '$ref' => '#/components/parameters/offset' ],
                 [ '$ref' => '#/components/parameters/query' ],
                 [ '$ref' => '#/components/parameters/include' ],
+                [ '$ref' => '#/components/parameters/relatedTable' ],
+                [ '$ref' => '#/components/parameters/sort' ],
+                [ '$ref' => '#/components/parameters/dir' ],
                 [ '$ref' => '#/components/parameters/format' ],
                 [ '$ref' => '#/components/parameters/accept' ]
             ],
