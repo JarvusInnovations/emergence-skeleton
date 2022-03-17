@@ -193,56 +193,61 @@ class Reader
         ];
 
         // GET /records
-        $outPath['get'] = [
-            'description' => "Get list of `{$recordClass}` record instances",
-            'parameters' => [
-                [ '$ref' => '#/components/parameters/limit' ],
-                [ '$ref' => '#/components/parameters/offset' ],
-                [ '$ref' => '#/components/parameters/query' ],
-                [ '$ref' => '#/components/parameters/include' ],
-                [ '$ref' => '#/components/parameters/relatedTable' ],
-                [ '$ref' => '#/components/parameters/sort' ],
-                [ '$ref' => '#/components/parameters/dir' ],
-                [ '$ref' => '#/components/parameters/format' ],
-                [ '$ref' => '#/components/parameters/accept' ]
-            ],
-            'responses' => [
-                '200' => [
-                    'description' => 'Successful response',
-                    'content' => [
-                        'application/json' => [
-                            'schema' => [
-                                '$ref' => "#/components/schemas/{$recordDefinitionName}Response"
+        $outPath['get'] = array_merge_recursive(
+            [
+                'description' => "Get list of `{$recordClass}` record instances",
+                'parameters' => [
+                    [ '$ref' => '#/components/parameters/limit' ],
+                    [ '$ref' => '#/components/parameters/offset' ],
+                    [ '$ref' => '#/components/parameters/query' ],
+                    [ '$ref' => '#/components/parameters/include' ],
+                    [ '$ref' => '#/components/parameters/relatedTable' ],
+                    [ '$ref' => '#/components/parameters/sort' ],
+                    [ '$ref' => '#/components/parameters/dir' ],
+                    [ '$ref' => '#/components/parameters/format' ],
+                    [ '$ref' => '#/components/parameters/accept' ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Successful response',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    '$ref' => "#/components/schemas/{$recordDefinitionName}Response"
+                                ]
                             ]
                         ]
                     ]
                 ]
-            ]
-        ];
+            ],
+            $outPath['get'] ?: []
+        );
 
         // GET /records/*fields
-        $outSubPaths['*fields'] = [
-            'get' => [
-                'description' => "Get configuration of all available `{$recordClass}` fields",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'fields' => [
-                                            'type' => 'object',
-                                            'description' => 'All available fields and their configurations'
-                                        ],
-                                        'dynamicFields' => [
-                                            'type' => 'object',
-                                            'description' => 'All available dynamic fields and their configurations'
+        $outSubPaths['*fields'] = array_merge_recursive(
+            [
+                'get' => [
+                    'description' => "Get configuration of all available `{$recordClass}` fields",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'fields' => [
+                                                'type' => 'object',
+                                                'description' => 'All available fields and their configurations'
+                                            ],
+                                            'dynamicFields' => [
+                                                'type' => 'object',
+                                                'description' => 'All available dynamic fields and their configurations'
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -250,158 +255,129 @@ class Reader
                         ]
                     ]
                 ]
-            ]
-        ];
+            ],
+            $outSubPaths['*fields'] ?: []
+        );
 
         // POST /records/save
-        $outSubPaths['save'] = [
-            'post' => [
-                'summary' => "Create or update one or more `{$recordClass}` records",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'requestBody' => [
-                    'description' => "Values for new `{$recordClass}` record fields",
-                    'required' => true,
-                    'content' => [
-                        'application/json' => [
-                            'schema' => [
-                                'properties' => [
-                                    'data' => [
-                                        'type' => 'array',
-                                        'description' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
-                                        'items' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
+        $outSubPaths['save'] = array_merge_recursive(
+            [
+                'post' => [
+                    'summary' => "Create or update one or more `{$recordClass}` records",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'requestBody' => [
+                        'description' => "Values for new `{$recordClass}` record fields",
+                        'required' => true,
                         'content' => [
                             'application/json' => [
                                 'schema' => [
-                                    'type' => 'object',
                                     'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
                                         'data' => [
                                             'type' => 'array',
-                                            'description' => 'A list of successfully saved records',
+                                            'description' => 'An array of records to patch or create. Each object may omit fields to leave unchanged or use default values. Objects containing an `ID` value will patch the existing record, others will create new records.',
                                             'items' => [
                                                 '$ref' => "#/components/schemas/{$recordDefinitionName}"
                                             ]
-                                        ],
-                                        'failed' => [
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                'type' => 'array',
+                                                'description' => 'A list of successfully saved records',
+                                                'items' => [
+                                                    '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                                ]
+                                            ],
+                                            'failed' => [
+                                                'type' => 'array',
+                                                'description' => 'A list of record data objects that failed to save',
+                                                'items' => [
+                                                    'type' => 'object',
+                                                    'properties' => [
+                                                        'record' => [
+                                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                                        ],
+                                                        'validationErrors' => [
+                                                            'type' => 'object',
+                                                            'description' => 'All validation errors from trying to save the associated record, keyed by field name'
+                                                        ]
+                                                    ]
+                                                ]
+                                            ],
+                                            'message' => [
+                                                'type' => 'string',
+                                                'description' => 'Top line error message if save failed'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $outSubPaths['save'] ?: []
+        );
+
+        // POST /records/destroy
+        $outSubPaths['destroy'] = array_merge_recursive(
+            [
+                'post' => [
+                    'description' => "Destroy one or more `{$recordClass}` record",
+                    'requestBody' => [
+                        'description' => "List of IDs of `{$recordNoun}` records to delete",
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'properties' => [
+                                        'data' => [
                                             'type' => 'array',
-                                            'description' => 'A list of record data objects that failed to save',
                                             'items' => [
                                                 'type' => 'object',
                                                 'properties' => [
-                                                    'record' => [
-                                                        '$ref' => "#/components/schemas/{$recordDefinitionName}"
-                                                    ],
-                                                    'validationErrors' => [
-                                                        'type' => 'object',
-                                                        'description' => 'All validation errors from trying to save the associated record, keyed by field name'
+                                                    'ID' => [
+                                                        'type' => 'integer',
+                                                        'description' => 'Could also me an object containing the property `ID`'
                                                     ]
                                                 ]
                                             ]
-                                        ],
-                                        'message' => [
-                                            'type' => 'string',
-                                            'description' => 'Top line error message if save failed'
                                         ]
                                     ]
                                 ]
                             ]
                         ]
-                    ]
-                ]
-            ]
-        ];
-
-        // POST /records/destroy
-        $outSubPaths['destroy'] = [
-            'post' => [
-                'description' => "Destroy one or more `{$recordClass}` record",
-                'requestBody' => [
-                    'description' => "List of IDs of `{$recordNoun}` records to delete",
-                    'required' => true,
-                    'content' => [
-                        'application/json' => [
-                            'schema' => [
-                                'properties' => [
-                                    'data' => [
-                                        'type' => 'array',
-                                        'items' => [
-                                            'type' => 'object',
-                                            'properties' => [
-                                                'ID' => [
-                                                    'type' => 'integer',
-                                                    'description' => 'Could also me an object containing the property `ID`'
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        // GET or POST /records/create
-        $outSubPaths['create'] = [
-            'get' => [
-                'description' => "Get form/data needed to create a `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            'type' => 'array',
-                                            'items' => [
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
                                                 '$ref' => "#/components/schemas/{$recordDefinitionName}"
                                             ]
                                         ]
@@ -412,101 +388,73 @@ class Reader
                     ]
                 ]
             ],
-            'post' => [
-                'description' => "Create a new `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'requestBody' => [
-                    'description' => "Values for new `{$recordClass}` record fields",
-                    'required' => true,
-                    'content' => [
-                        'application/x-www-form-urlencoded' => [
-                            'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
-                        ]
-                    ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+            $outSubPaths['destroy'] ?: []
+        );
+
+        // GET or POST /records/create
+        $outSubPaths['create'] = array_merge_recursive(
+            [
+                'get' => [
+                    'description' => "Get form/data needed to create a `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                'type' => 'array',
+                                                'items' => [
+                                                    '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                                ]
+                                            ]
                                         ]
                                     ]
                                 ]
                             ]
                         ]
                     ]
-                ]
-            ]
-        ];
-
-        // GET /records/{identifier}
-        $outSubPaths['{identifier}'] = [
-            'get' => [
-                'description' => "Get an individual `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/identifier' ],
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
                 ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
+                'post' => [
+                    'description' => "Create a new `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'requestBody' => [
+                        'description' => "Values for new `{$recordClass}` record fields",
+                        'required' => true,
                         'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
-                                        ]
-                                    ]
-                                ]
+                            'application/x-www-form-urlencoded' => [
+                                'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
                             ]
                         ]
-                    ]
-                ]
-            ]
-        ];
-
-        // GET or POST /records/{identifier}/edit
-        $outSubPaths['{identifier}/edit'] = [
-            'get' => [
-                'description' => "Get form/data needed to edit the `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/identifier' ],
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -515,36 +463,34 @@ class Reader
                     ]
                 ]
             ],
-            'post' => [
-                'description' => "Submit changes to apply to the `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/identifier' ],
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'requestBody' => [
-                    'description' => "New values for one or more `{$recordClass}` record fields",
-                    'required' => true,
-                    'content' => [
-                        'application/x-www-form-urlencoded' => [
-                            'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
-                        ]
-                    ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+            $outSubPaths['create'] ?: []
+        );
+
+        // GET /records/{identifier}
+        $outSubPaths['{identifier}'] = array_merge_recursive(
+            [
+                'get' => [
+                    'description' => "Get an individual `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/identifier' ],
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -552,32 +498,109 @@ class Reader
                         ]
                     ]
                 ]
-            ]
-        ];
+            ],
+            $outSubPaths['{identifier}'] ?: []
+        );
+
+        // GET or POST /records/{identifier}/edit
+        $outSubPaths['{identifier}/edit'] = array_merge_recursive(
+            [
+                'get' => [
+                    'description' => "Get form/data needed to edit the `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/identifier' ],
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'post' => [
+                    'description' => "Submit changes to apply to the `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/identifier' ],
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'requestBody' => [
+                        'description' => "New values for one or more `{$recordClass}` record fields",
+                        'required' => true,
+                        'content' => [
+                            'application/x-www-form-urlencoded' => [
+                                'schema' => [ '$ref' => "#/components/schemas/{$recordDefinitionName}" ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $outSubPaths['{identifier}/edit'] ?: []
+        );
 
         // POST /records/{identifier}/delete
-        $outSubPaths['{identifier}/delete'] = [
-            'post' => [
-                'description' => "Delete this `{$recordClass}` record",
-                'parameters' => [
-                    [ '$ref' => '#/components/parameters/identifier' ],
-                    [ '$ref' => '#/components/parameters/include' ],
-                    [ '$ref' => '#/components/parameters/format' ],
-                    [ '$ref' => '#/components/parameters/accept' ]
-                ],
-                'responses' => [
-                    '200' => [
-                        'description' => 'Successful response',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'success' => [
-                                            'type' => 'boolean'
-                                        ],
-                                        'data' => [
-                                            '$ref' => "#/components/schemas/{$recordDefinitionName}"
+        $outSubPaths['{identifier}/delete'] = array_merge_recursive(
+            [
+                'post' => [
+                    'description' => "Delete this `{$recordClass}` record",
+                    'parameters' => [
+                        [ '$ref' => '#/components/parameters/identifier' ],
+                        [ '$ref' => '#/components/parameters/include' ],
+                        [ '$ref' => '#/components/parameters/format' ],
+                        [ '$ref' => '#/components/parameters/accept' ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful response',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => [
+                                                'type' => 'boolean'
+                                            ],
+                                            'data' => [
+                                                '$ref' => "#/components/schemas/{$recordDefinitionName}"
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -585,8 +608,9 @@ class Reader
                         ]
                     ]
                 ]
-            ]
-        ];
+            ],
+            $outSubPaths['{identifier}/delete'] ?: []
+        );
     }
 
     protected static function normalizeSchemaObject(array $object)
