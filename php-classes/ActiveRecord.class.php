@@ -69,14 +69,17 @@ class ActiveRecord
             'type' => 'enum'
             ,'notnull' => true
             ,'values' => array()
+            ,'description' => 'PHP class responsible for loading/saving this record instance'
         )
         ,'Created' => array(
             'type' => 'timestamp'
             ,'default' => 'CURRENT_TIMESTAMP'
+            ,'description' => 'Timestamp capturing when this record was first saved to the database'
         )
         ,'CreatorID' => array(
             'type' => 'integer'
             ,'notnull' => false
+            ,'description' => 'ID of person who first saved this record to the database'
         )
     );
 
@@ -111,16 +114,20 @@ class ActiveRecord
     public static $dynamicFields = array(
         'Creator',
         'validationErrors' => array(
-            'getter' => 'getValidationErrors'
+            'getter' => 'getValidationErrors',
+            'description' => 'Map of field names to any errors registered in most recent validation'
         ),
         'recordTitle' => array(
-            'getter' => 'getTitle'
+            'getter' => 'getTitle',
+            'description' => 'The self-generated title for the record'
         ),
         'recordURL' => array(
-            'getter' => 'getURL'
+            'getter' => 'getURL',
+            'description' => 'The self-generated canonical URL the record'
         ),
         'availableActions' => array(
-            'getter' => 'getAvailableActions'
+            'getter' => 'getAvailableActions',
+            'description' => 'Map of capabilities to whether they are available to the current user'
         )
     );
 
@@ -194,6 +201,7 @@ class ActiveRecord
                 static::$fields['Modified'] = array(
                     'type' => 'timestamp'
                     ,'notnull' => false
+                    ,'description' => 'Timestamp capturing when changes to this record were last saved to the database'
                 );
             }
 
@@ -201,6 +209,7 @@ class ActiveRecord
                 static::$fields['ModifierID'] = array(
                     'type' => 'uint'
                     ,'notnull' => false
+                    ,'description' => 'ID of person who last saved changes to this record to the database'
                 );
             }
 
