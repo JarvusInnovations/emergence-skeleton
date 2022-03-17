@@ -160,6 +160,27 @@
                                             </tbody>
                                         </table>
 
+                                        {if $methodData.requestBody}
+                                            <table class="docs-table request-body-table">
+                                                <caption>Request Body {if $methodData.requestBody.required}(Required &#10003;){/if}</caption>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Type</th>
+                                                        <th>Schema</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                {foreach key=contentType item=contentData from=$methodData.requestBody.content}
+                                                    <tr {html_attributes_encode $parameterData prefix="data-"}>
+                                                        <td>{$contentType|escape}</td>
+                                                        <td>{definition $contentData}</td>
+                                                    </tr>
+                                                {/foreach}
+                                                </tbody>
+                                            </table>
+                                        {/if}
+
                                         <table class="docs-table responses-table">
                                             <caption>Responses</caption>
                                             <thead>
