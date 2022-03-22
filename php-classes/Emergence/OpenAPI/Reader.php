@@ -31,6 +31,11 @@ class Reader
         'type'
     ];
 
+    public static $parameterObjectProperties = [
+        'name',
+        'in'
+    ];
+
 
     public static function readTree(array $base = [], $root = 'api-docs')
     {
@@ -78,6 +83,18 @@ class Reader
         ksort($data['components']['schemas']);
 
 
+        // collapse and normalize parameters
+        $data['components']['parameters'] = static::findObjects(
+            $data['components']['parameters'],
+            [__CLASS__, 'isParameterObject'],
+            function (array $keys) {
+                return implode('-', $keys);
+            }
+        );
+
+        ksort($data['components']['parameters']);
+
+
         return $data;
     }
 
@@ -116,6 +133,17 @@ class Reader
     protected static function isSchemaObject(array $object)
     {
         foreach (static::$schemaObjectProperties AS $key) {
+            if (array_key_exists($key, $object)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected static function isParameterObject(array $object)
+    {
+        foreach (static::$parameterObjectProperties AS $key) {
             if (array_key_exists($key, $object)) {
                 return true;
             }
