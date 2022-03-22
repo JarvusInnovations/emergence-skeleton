@@ -70,7 +70,7 @@ class Reader
             $data['components']['schemas'],
             [__CLASS__, 'isSchemaObject'],
             function (array $keys) {
-                return implode('\\', $keys);
+                return implode('-', $keys);
             }
         );
 
@@ -153,9 +153,7 @@ class Reader
         $recordNoun = $recordClass::$singularNoun;
 
         // generate record definition
-        $recordDefinitionName = preg_replace_callback('/(^|\s+)([a-zA-Z])/', function ($matches) {
-            return strtoupper($matches[2]);
-        }, $recordNoun);
+        $recordDefinitionName = str_replace('\\', '-', $recordClass::getRootClass());
 
         $recordDefinition = [];
         static::fillSchemaFromActiveRecord($recordClass, $recordDefinition);
