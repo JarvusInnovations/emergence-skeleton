@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:7080
+
+###
+
+# @name login
+POST {{baseUrl}}/login HTTP/1.1
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+_LOGIN[username]=system
+&_LOGIN[password]=system
+&_LOGIN[returnMethod]=POST
+
+###
+
+# @name listPeople
+GET {{baseUrl}}/people HTTP/1.1
+Authorization: Token {{login.response.body.$.data.Handle}}
+Accept: application/json
+
+###
+
+# @name getPerson
+GET {{baseUrl}}/people/system HTTP/1.1
+Authorization: Token {{login.response.body.$.data.Handle}}
+Accept: application/json
+
+###
+
+# @name getPersonEdit
+GET {{baseUrl}}/people/system/edit HTTP/1.1
+Authorization: Token {{login.response.body.$.data.Handle}}
+Accept: application/json
