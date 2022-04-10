@@ -49,7 +49,8 @@ Cypress.Commands.add('loginAs', (user, password) => {
         password = Cypress.env('TEST_PASSWORD') || user;
     }
 
-    cy.visit('/');
+    cy.log(`Logging into ${user}`);
+
     cy.request({
         method: 'POST',
         url: '/login/?format=json',
