@@ -107,6 +107,50 @@ Cypress.Commands.add('withExt', () => {
     });
 });
 
+Cypress.Commands.add('extGet', { prevSubject: 'optional' }, (subject, query, opts={ all: false } ) => {
+    const extGet = (subject, query) => cy.wrap(new Cypress.Promise((resolve) => {
+        if (typeof subject != 'undefined') {
+            expect(subject).to.be.an('object').and.have.property('query');
+            const allResults = subject.query(query);
+            const result = opts.all ? allResults : allResults[0] || null;
+
+            Cypress.log({
+                name: 'extGet',
+                message: `${subject.id}.${query}`,
+                consoleProps: () => ({
+                    Scope: subject,
+                    Result: result,
+                    'All Results': allResults
+                })
+            });
+
+            resolve(result);
+        } else {
+            cy.window({ log: false }).then(win => {
+                const allResults = win.Ext.ComponentQuery.query(query);
+                const result = opts.all ? allResults : allResults[0] || null;
+
+                Cypress.log({
+                    name: 'extGet',
+                    message: query,
+                    consoleProps: () => ({
+                        Result: result,
+                        'All Results': allResults
+                    })
+                });
+
+                resolve(result);
+            });
+        }
+    }), { log: false });
+
+    const resolve = () => {
+        extGet(subject, query).then(result => cy.verifyUpcomingAssertions(result, opts, { onRetry: resolve }))
+    }
+
+    return resolve();
+});
+
 // private method
 function _buildHabExec(pkg, pkgCmd, pkgArgs) {
     const studioContainer = Cypress.env('STUDIO_CONTAINER') || null;
