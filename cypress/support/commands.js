@@ -107,45 +107,57 @@ Cypress.Commands.add('withExt', () => {
     });
 });
 
-Cypress.Commands.add('extGet', { prevSubject: 'optional' }, (subject, query, opts={ all: false } ) => {
-    const extGet = (subject, query) => cy.wrap(new Cypress.Promise((resolve) => {
-        if (typeof subject != 'undefined') {
-            expect(subject).to.be.an('object').and.have.property('query');
-            const allResults = subject.query(query);
-            const result = opts.all ? allResults : allResults[0] || null;
+Cypress.Commands.add('extGet', { prevSubject: 'optional' }, (subject, query, options={ all: false, component: false } ) => {
+    let allResults, result;
 
-            Cypress.log({
-                name: 'extGet',
-                message: `${subject.id}.${query}`,
-                consoleProps: () => ({
-                    Scope: subject,
-                    Result: result,
-                    'All Results': allResults
-                })
-            });
+    const log = Cypress.log({
+        autoEnd: false,
+        name: 'extGet',
+        message: `${query} [${options.component?'component':'element'}]`,
+        consoleProps: () => ({
+            Scope: subject,
+            Options: options,
+            Yielded: result,
+            'All Results': allResults
+        })
+    });
 
+    const extGet = (subject, query) => cy.wrap(new Cypress.Promise((resolve, reject) => {
+        cy.window({ log: false }).then(win => {
+            if (typeof subject != 'undefined') {
+                expect(subject).to.be.an('object').and.have.property('query');
+                allResults = subject.query(query);
+            } else {
+                allResults = win.Ext.ComponentQuery.query(query);
+            }
+
+            // map to elements
+            if (!options.component) {
+                allResults = allResults.map(component => component && component.el && component.el.dom)
+            }
+
+            // pick one or multiple
+            result = options.all ? allResults : allResults[0] || null;
+
+            // finish
             resolve(result);
-        } else {
-            cy.window({ log: false }).then(win => {
-                const allResults = win.Ext.ComponentQuery.query(query);
-                const result = opts.all ? allResults : allResults[0] || null;
-
-                Cypress.log({
-                    name: 'extGet',
-                    message: query,
-                    consoleProps: () => ({
-                        Result: result,
-                        'All Results': allResults
-                    })
-                });
-
-                resolve(result);
-            });
-        }
+        });
     }), { log: false });
 
     const resolve = () => {
-        extGet(subject, query).then(result => cy.verifyUpcomingAssertions(result, opts, { onRetry: resolve }))
+        return extGet(subject, query)
+            .then(result => {
+                return cy.verifyUpcomingAssertions(result, options, { onRetry: resolve })
+                    .then(result => {
+                        if (result) {
+                            log.set({
+                                $el: result && result.el ? result.el.dom : result
+                            });
+                            log.snapshot();
+                            log.end();
+                        }
+                    });
+            });
     }
 
     return resolve();
