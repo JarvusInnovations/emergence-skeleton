@@ -1,0 +1,25 @@
+[service]
+package = "emergence/php-runtime-v2"
+
+# optional, and some superservices might reject
+[isolation]
+enabled = false
+workers = 5
+
+# optional, service will register a root+files filter of its own, if one is supplied here as well it gets applied first
+[input]
+# root = "subproject-path"
+files = [
+    # core php environment
+    "php-*/**",
+
+    # entrypoints
+    "console-commands/**/*.php",
+    "data-exporters/**/*.php",
+    "event-handlers/**/*.php",
+    "site-tasks/**/*.php",
+    "site-root/**/*.php",
+
+    ## resources
+    "html-templates/**",
+]

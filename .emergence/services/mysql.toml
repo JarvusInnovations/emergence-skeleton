@@ -1,0 +1,12 @@
+[service]
+package = "emergence/mysql"
+
+# optional, and some superservices might reject
+[isolation]
+enabled = false
+storage = 10
+
+# optional, service will register a root+files filter of its own, if one is supplied here as well it gets applied first
+[input]
+# root = "subproject-path"
+files = false
