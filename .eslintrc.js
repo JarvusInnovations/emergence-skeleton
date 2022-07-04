@@ -1,11 +1,12 @@
 module.exports = {
     "env": {
-        "browser": true
+        "browser": true,
+        "node": 1
     },
     "globals": {
         "Ext": true
     },
-    "extends": "eslint:recommended",
+     "extends": ["eslint:recommended", "plugin:cypress/recommended", "prettier"],
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-spacing": [
@@ -239,5 +240,8 @@ module.exports = {
         "wrap-regex": "error",
         "yield-star-spacing": "error",
         "yoda": "error"
-    }
+        },
+    "plugins": [
+     "cypress"
+  ]
 };
