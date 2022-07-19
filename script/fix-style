@@ -11,7 +11,7 @@ script/-test-bootstrap
 
 echo
 echo "==> fix-style: formatting with eslint…"
-npx eslint --quiet cypress/**/*.js
+npx eslint --fix cypress/**/*.js
 
 
 echo
