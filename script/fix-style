@@ -10,10 +10,10 @@ script/-test-bootstrap
 
 
 echo
-echo "==> fix-style: formatting with eslint…"
-npx eslint --fix cypress/**/*.js
+echo "==> fix-style: formatting with prettier"
+npx prettier --write cypress/**/*.js
 
 
 echo
-echo "==> fix-style: formatting with prettier"
-npx prettier --write cypress/**/*.js
+echo "==> fix-style: formatting with eslint…"
+npx eslint --fix cypress/**/*.js
