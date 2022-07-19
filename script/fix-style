@@ -16,4 +16,4 @@ npx eslint --quiet cypress/**/*.js
 
 echo
 echo "==> fix-style: formatting with prettier"
-prettier --write cypress/**/*.js
+npx prettier --write cypress/**/*.js
