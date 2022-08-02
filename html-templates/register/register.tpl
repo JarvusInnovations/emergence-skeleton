@@ -9,6 +9,11 @@
 
     {if RemoteSystems\ReCaptcha::$siteKey}
         <script src='https://www.google.com/recaptcha/api.js'></script>
+        <script>
+            function onSubmit(token) {
+                document.getElementById('register-form').submit();
+            }
+        </script>
     {/if}
 {/block}
 
@@ -20,7 +25,7 @@
         <h1 class="header-title title-1">Register a New Account</h1>
     </header>
 
-    <form method="POST" class="register-form">
+    <form method="POST" class="register-form" id="register-form">
         {if $errors}
             <div class="notify error">
                 <strong>Please double-check the fields highlighted below.</strong>
@@ -79,18 +84,18 @@
                 }
             </div>
 
-            {if RemoteSystems\ReCaptcha::$siteKey}
-                <div class="field {tif $errors.ReCaptcha ? 'has-error'}">
-                    <span class="field-label"></span>
-                    <div class="field-control g-recaptcha" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}"></div>
-                    {if $errors.ReCaptcha}
-                        <p class="error-text">{$errors.ReCaptcha|escape}</p>
-                    {/if}
-                </div>
-            {/if}
-
             <div class="submit-area">
-                <button class="submit" type="submit">Create Account</button>
+                {if $errors.ReCaptcha}
+                    <p class="error-text">{$errors.ReCaptcha|escape}</p>
+                {/if}
+
+                {if RemoteSystems\ReCaptcha::$siteKey}
+                    <button class="submit g-recaptcha" type="submit" data-sitekey="{RemoteSystems\ReCaptcha::$siteKey|escape}" data-callback='onSubmit' data-action='submit'>
+                {else}
+                    <button class="submit" type="submit">
+                {/if}
+                    Create Account
+                </button>
                 <span class="submit-text">or <a href="/login{tif $.request.return ? cat('?return=', escape($.request.return, url))}">Log In</a></span>
             </div>
         </fieldset>
