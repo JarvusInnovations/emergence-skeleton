@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# script/format-test: Format all test and view formatting errors 
-
-set -e
-cd "$(dirname "$0")/.."
-
-(cd "${temp_path}" && npx eslint --quiet cypress/**/*.js && prettier --write cypress/**/*.js
-)
