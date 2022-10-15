@@ -94,9 +94,9 @@ class Person extends VersionedRecord implements Emergence\People\IPerson
             ,'contextClass' => __CLASS__
         )
         ,'Comments' => array(
-            'type' => 'context-children'
+            'type' => 'one-many'
             ,'class' => 'Comment'
-            ,'contextClass' => __CLASS__
+            ,'foreign' => 'CreatorID'
             ,'order' => array('ID' => 'DESC')
         )
     );
