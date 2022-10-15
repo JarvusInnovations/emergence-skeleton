@@ -16,7 +16,7 @@ In the studio, you can enable relaying email to a specified SMTP endpoint.
     enable-email
     ```
 
-4. Configure postfix email backend to relay to EHLO app on Docker host machine:
+4. Configure postfix email backend to relay to HELO app on Docker host machine:
 
     ```bash
     enable-email-relay host.docker.internal 2525 studio
