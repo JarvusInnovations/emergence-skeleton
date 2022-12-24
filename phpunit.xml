@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit bootstrap="/hab/svc/php-runtime/config/initialize.php"
+         convertErrorsToExceptions="false"
+         convertNoticesToExceptions="false"
+         convertWarningsToExceptions="false"
+         stopOnError="false">
+    <php>
+        <ini name="date.timezone" value="America/New_York" />
+	</php>
+    <testsuites>
+        <testsuite name="emergence.read-only">
+            <directory>phpunit-tests/emergence.read-only</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
