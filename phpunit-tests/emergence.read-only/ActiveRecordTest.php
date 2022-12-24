@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-class ActiveRecordTest extends PHPUnit_Framework_TestCase
+final class ActiveRecordTest extends PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         require('src/TestRecord.php');
     }
