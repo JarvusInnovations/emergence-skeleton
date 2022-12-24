@@ -38,7 +38,7 @@ abstract class AbstractActiveRecord implements ActiveRecordInterface
 
     public static $fieldHandlers = [
         Fields\Integer::class,
-        Fields\String::class,
+        Fields\Str::class,
         Fields\Text::class => [
             'foo' => 'bar',
             'boo' => 'baz'
