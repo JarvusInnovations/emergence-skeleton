@@ -45,7 +45,7 @@ abstract class AbstractActiveRecord implements ActiveRecordInterface
         ],
         Fields\Enum::class,
         Fields\Timestamp::class,
-        Fields\Object::class
+        Fields\Obj::class
     ];
 
 
@@ -247,7 +247,7 @@ abstract class AbstractActiveRecord implements ActiveRecordInterface
                 throw new \Exception("No field handler registered for type '$options[type]'");
             }
         }
-        
+
         if (!empty($options['fieldHandler'])) {
             $options['fieldHandler']['class']::initOptions($options);
         }
