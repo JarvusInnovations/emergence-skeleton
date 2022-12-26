@@ -1,0 +1,101 @@
+name: 'Test: Unit'
+
+on: pull_request
+
+env:
+  HAB_LICENSE: accept-no-persist
+  HOLO_CACHE_TO: origin
+  HOLO_CACHE_FROM: origin
+
+jobs:
+  test-unit:
+
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: 'Stop default mysql service'
+      run: sudo service mysql stop
+
+    - name: 'Match system timezone to application default'
+      run: sudo timedatectl set-timezone America/New_York
+
+    - name: 'Initialize Chef Habitat environment'
+      uses: JarvusInnovations/habitat-action@action/v1
+      timeout-minutes: 5
+      env:
+        HAB_MYSQL: |
+          app_username = 'appadmin'
+          app_password = 'appadmin'
+          bind = '0.0.0.0'
+        HAB_PHP_RUNTIME: |
+          [sites.default.holo]
+          gitDir = '${{ github.workspace }}/.git'
+      with:
+        deps: |
+          jarvus/hologit
+          emergence/phpunit
+        supervisor: |
+          core/mysql
+          emergence/php-runtime --bind="database:mysql.default"
+
+    - name: Waiting for MySQL
+      run: |
+        until nc -z localhost 3306; do
+          sleep 0.5
+          echo -n "."
+        done
+
+    - name: Waiting for Emergence runtime
+      run: |
+        until nc -z localhost 9123; do
+          sleep 0.5
+          echo -n "."
+        done
+
+    - name: Configure command-line client access
+      run: |
+        sudo chmod ugo+xr \
+          /hab/svc/mysql/config \
+          /hab/svc/mysql/config/client.cnf \
+          /hab/svc/php-runtime/config \
+          /hab/svc/php-runtime/config/fpm-exec
+
+        ln -sf /hab/svc/mysql/config/client.cnf ~/.my.cnf
+
+    - name: Load site projection into emergence runtime
+      env:
+        HOLO_CACHE_FROM: origin
+        HOLO_CACHE_TO: origin
+      run: |
+        SITE_TREE="$(hab pkg exec jarvus/hologit git-holo project emergence-site)"
+        [ -n "${SITE_TREE}" ] || exit 1
+        hab pkg exec emergence/php-runtime emergence-php-load "${SITE_TREE}"
+
+    - name: Run PHPUnit tests
+      run: |
+        sudo --preserve-env --user=hab \
+          hab pkg exec emergence/phpunit phpunit -- \
+            --do-not-cache-result \
+            --testdox
+
+    - name: Open access to crash log
+      if: always()
+      run: |
+        sudo chmod ugo+rX /hab/svc/php-runtime/{var,var/logs} || true
+        sudo chmod ugo+r /hab/svc/php-runtime/var/logs/crash.log || true
+
+    - name: Upload crash log
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: crash-log
+        path: /hab/svc/php-runtime/var/logs/crash.log
+
+    - name: Upload supervisor log
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: supervisor-log
+        path: /hab/sup/default/sup.log
