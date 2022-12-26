@@ -2,14 +2,14 @@
 
 final class ActiveRecordTest extends PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
         require('src/TestRecord.php');
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $fields = TestRecord::getClassFields();
-        $this->assertEquals(array_keys($fields), array('ID', 'Class', 'Created', 'CreatorID', 'Field1', 'Field2'));
+        $this->assertEquals(array_keys($fields), array('ID', 'Class', 'Created', 'CreatorID', 'Field1', 'Field2'), 'check class fields list');
     }
 }
