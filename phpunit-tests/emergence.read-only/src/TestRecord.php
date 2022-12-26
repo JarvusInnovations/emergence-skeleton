@@ -9,6 +9,11 @@ class TestRecord extends ActiveRecord
             'type' => 'int',
             'notnull' => false,
             'default' => 1
+        ),
+        'NotNullableDefault' => array(
+            'type' => 'int',
+            'notnull' => true,
+            'default' => 1
         )
     );
 }
