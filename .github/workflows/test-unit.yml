@@ -77,7 +77,8 @@ jobs:
       run: |
         sudo --preserve-env --user=hab \
           hab pkg exec emergence/phpunit phpunit -- \
-            --do-not-cache-result
+            --do-not-cache-result \
+            --testdox
 
     - name: Open access to crash log
       if: always()
