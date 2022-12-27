@@ -55,6 +55,22 @@ This virtual directory mount gets set up at `${path_to_your_repo}.cypress-worksp
 
     The **Open in IDE** button that Cypress' main window will how you as you hover over tests in the list can be used to open the copy of the file in the `merged` mount where changes will trigger auto-reload.
 
+
+!!! tip "Prevent VSCode from opening virtual repository"
+
+    By default, Visual Studio Code will automatically detect and open the "merged" git repository produced by the unionfs with its built-in git integration. This makes it difficult to close out the testing environment as VSCode will keep many active processes accessing the git repository once it has been opened, even after you manually close it.
+
+    To prevent Visual Studio Code from automatically opening this union repository and causing all sorts of mahem, open your user `settings.json` and add an option to ignore the `*.cypress-workspace/merged` repository at whatever path your project repository lives at:
+
+    ```json
+    {
+        // ...
+        "git.ignoredRepositories": [
+            "/Users/me/Repositories/{{ repository.url }}.cypress-workspace/merged"
+        ]
+    }
+    ```
+
 ## Testing against a remote server
 
 By setting environment variables before launching the Cypress GUI, the E2E test suite can be configured to execute against a backend studio hosted on a remote machine or server.
