@@ -55,6 +55,22 @@ This virtual directory mount gets set up at `${path_to_your_repo}.cypress-worksp
 
     The **Open in IDE** button that Cypress' main window will how you as you hover over tests in the list can be used to open the copy of the file in the `merged` mount where changes will trigger auto-reload.
 
+
+!!! tip "Prevent VSCode from opening virtual repository"
+
+    By default, Visual Studio Code will automatically detect and open the "merged" git repository produced by the unionfs with its built-in git integration. This makes it difficult to close out the testing environment as VSCode will keep many active processes accessing the git repository once it has been opened, even after you manually close it.
+
+    To prevent Visual Studio Code from automatically opening this union repository and causing all sorts of mahem, open your user `settings.json` and add an option to ignore the `*.cypress-workspace/merged` repository at whatever path your project repository lives at:
+
+    ```json
+    {
+        // ...
+        "git.ignoredRepositories": [
+            "/Users/me/Repositories/{{ repository.url }}.cypress-workspace/merged"
+        ]
+    }
+    ```
+
 ## Testing against a remote server
 
 By setting environment variables before launching the Cypress GUI, the E2E test suite can be configured to execute against a backend studio hosted on a remote machine or server.
@@ -86,3 +102,22 @@ On the local terminal **outside the studio** in the root of your local project r
     ```bash
     script/test-interactive
     ```
+
+## Checking for race conditions
+
+Cypress' default timeout limits for UI assertions and XHR assertions vary greatly: 4 seconds for UI assertions and 30 seconds for XHR assertions. This disparity is a leading cause of apparent instability in Cypress tests where a test will pass locally consistently but fail in CI consistency.
+
+What causes this to happen is having UI assertions within your tests that won't pass if some XHR call leading up to them takes more than 4 seconds, which is more likely to happen occasionally on "cold" instances like CI runs always are. The solution to this is relatively simple: add a `cy.wait('@xhrInterceptName')` assertion *ahead* of any UI assertion that won't pass until that XHR call finishes. This ensures that the test script waits for XHR calls to finish under the longer timeout they have by default, and gives you more helpful errors when a failure happens at that level.
+
+It can be easy to miss these spots while you're developing tests. One step is to look through your test logs for all XHR calls (they'll show up in the actions log timeline whether you intercept or wait for them or not) and consider if any of the UI assertions surrounding it depend on it finishing first. Another approach is to introduce an artificial delay to all XHR calls on your local server, forcing them all to take longer than the default UI assertion timeout of 4 seconds:
+
+```php
+<?php
+// save to php-config/Site.config.d/delay-execute.php
+
+Site::$onBeforeScriptExecute = function() {
+    sleep(5);
+};
+```
+
+With this change loaded up into your local studio, every request that isn't a static asset request will gain a 5 second delay upfront—forcing every UI assertion in your test that accidentally depends on an XHR call finishing in less than 4 seconds to fail. Spend one round after you finish your new Cypress tests checking them with this activated, and you can gain a lot of confidence it will work as consistently in CI as it does locally. Just be sure to discard this change when you're done and avoid committing it with your work—or add it to your local `.git/info/exclude` to keep it around entirely ignored by Git while you do your work.
