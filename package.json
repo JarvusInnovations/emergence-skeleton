@@ -4,9 +4,9 @@
   "description": "Development tooling for emergence-skeleton",
   "devDependencies": {
     "csvtojson": "^2.0.10",
-    "cypress": "^9.6.0",
+    "cypress": "^12.7.0",
     "cypress-plugin-tab": "^1.0.5",
-    "dayjs": "^1.10.7"
+    "dayjs": "^1.11.7"
   },
   "scripts": {
     "cypress:open": "cypress open"
