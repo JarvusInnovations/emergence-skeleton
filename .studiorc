@@ -1,15 +1,10 @@
 #!/bin/bash
 
 # install dependent studios
-hab pkg install emergence/studio chakijs/studio jarvus/mkdocs-studio
-
-
-# disable studios printing their own help
-export STUDIO_NOHELP="yes"
+hab pkg install chakijs/studio jarvus/mkdocs-studio
 
 
 # load emergence studio
-source "$(hab pkg path emergence/studio)/studio.sh"
 source "$(hab pkg path chakijs/studio)/studio.sh"
 
 # load mkdocs studio
