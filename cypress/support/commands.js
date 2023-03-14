@@ -71,7 +71,7 @@ Cypress.Commands.add('resetDatabase', () => {
 
 // Drops the entire
 Cypress.Commands.add('dropDatabase', () => {
-    cy.exec(`echo 'DROP DATABASE IF EXISTS \`default\`; CREATE DATABASE \`default\`;' | ${_buildHabExec('core/mysql', 'mysql', '-u root -h 127.0.0.1')}`);
+    cy.exec(`echo 'DROP DATABASE IF EXISTS \`emergence-site\`; CREATE DATABASE \`emergence-site\`;' | ${_buildHabExec('core/mysql', 'mysql', '-u root -h 127.0.0.1')}`);
 });
 
 // Reload the original data fixtures
@@ -191,7 +191,7 @@ function _loadFixturesTree(treeHash) {
                 git cat-file -p "${treeHash}:\${fixture_file}"
             done
             echo "COMMIT;"
-        ) | mysql default
+        ) | mysql emergence-site
     '`));
 
     cy.exec(_buildHabExec('emergence/php-runtime', 'emergence-console-run', `migrations:execute --all`));
