@@ -115,6 +115,9 @@ spec:
             - containerPort: 80
               name: http
               protocol: TCP
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
 
           volumeMounts:
             - name: {{ .Release.Name }}-site
