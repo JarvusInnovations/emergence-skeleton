@@ -1,0 +1,12 @@
+# TODO: erase sencha-workspace after all lensing
+[hololens]
+# TODO: use a no-op or embedded script lens that can efficiently return an empty tree?
+# package = "holo/lens-k8s-normalize/1.3"
+after = "*"
+
+[hololens.input]
+root = "sencha-workspace"
+files = "**" # or [] or "" for empty tree?
+
+[hololens.output]
+merge = "replace"
