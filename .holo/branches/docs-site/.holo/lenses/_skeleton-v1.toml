@@ -1,0 +1,5 @@
+[holomapping]
+root = ".holo/lenses"
+files = [
+    "mkdocs.toml",
+]
