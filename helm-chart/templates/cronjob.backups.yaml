@@ -46,9 +46,10 @@ spec:
                   # install CLI dependencies
                   hab pkg install core/gzip core/curl
 
-                  # install restic
-                  hab pkg exec core/curl curl -L https://github.com/restic/restic/releases/download/v0.18.1/restic_0.18.1_linux_amd64.bz2 | bunzip2 > /bin/restic
-                  chmod +x /bin/restic
+                  if [ ! -f /bin/restic ]; then
+                    hab pkg exec core/curl curl -L https://github.com/restic/restic/releases/download/v0.18.1/restic_0.18.1_linux_amd64.bz2 | bunzip2 > /bin/restic
+                    chmod +x /bin/restic
+                  fi
 
                   # get composite service name
                   composite_svc_name=\"\$(hab svc status | tail -n +2 | awk '{print \$1}' | grep -- "-composite/" | cut -d '/' -f 1,2)\"
