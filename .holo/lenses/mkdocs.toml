@@ -5,6 +5,7 @@ requirements = [
     "mkdocs-awesome-pages-plugin",
     "mkdocs-macros-plugin",
     "mkdocs-material",
+    "markdown<3.4",
 ]
 
 [hololens.output]
