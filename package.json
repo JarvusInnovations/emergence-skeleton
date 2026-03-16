@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Development tooling for emergence-skeleton",
   "devDependencies": {
-    "csvtojson": "^2.0.10",
+    "csvtojson": "^2.0.13",
     "cypress": "^9.6.0",
     "cypress-plugin-tab": "^1.0.5",
     "dayjs": "^1.10.7"
